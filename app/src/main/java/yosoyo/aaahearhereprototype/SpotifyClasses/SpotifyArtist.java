@@ -16,6 +16,30 @@ public class SpotifyArtist {
 	String type;
 	String uri;
 
+	public SpotifyImage[] getImages() {
+		return images;
+	}
+
+	public SpotifyImage getImages(int index) {
+		if (index < images.length) {
+			return images[index];
+		} else {
+			return null;
+		}
+	}
+
+	public String getID(){
+		return id;
+	}
+
+	public String getGenres(){
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < genres.length; i++){
+			sb.append(genres[i]);
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public String toString(){
 		return name;

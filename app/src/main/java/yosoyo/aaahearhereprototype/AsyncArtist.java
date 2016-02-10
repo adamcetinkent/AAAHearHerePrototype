@@ -43,11 +43,21 @@ public class AsyncArtist extends AsyncTask<String, Void, SpotifyArtist[]> {
 		return s.hasNext() ? s.next() : "";
 	}
 
+	static URL urlify(String in){
+		try {
+			return new URL("https://api.spotify.com/v1/search?q=" + in.replace(" ","%20") + "&type=artist");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	@Override
 	protected SpotifyArtist[] doInBackground(String... strings) {
 		Log.d(tag, "BEGIN URL STUFF");
 		try {
-			URL url = new URL("https://api.spotify.com/v1/search?q=leon%20bridges&type=artist");
+			//URL url = new URL("https://api.spotify.com/v1/search?q=leon%20bridges&type=artist");
+			URL url = urlify(strings[0]);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -64,8 +74,6 @@ public class AsyncArtist extends AsyncTask<String, Void, SpotifyArtist[]> {
 			} finally {
 				urlConnection.disconnect();
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

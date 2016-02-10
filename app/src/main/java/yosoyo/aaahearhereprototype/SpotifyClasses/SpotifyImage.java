@@ -9,4 +9,8 @@ public class SpotifyImage {
 	String url;
 	int width;
 
+	public String getUrl() {
+		return url;
+	}
+
 }
