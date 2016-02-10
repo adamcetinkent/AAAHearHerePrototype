@@ -15,39 +15,41 @@ import java.net.URL;
 
 /**
  * Created by Adam Kent on 10/02/2016.
+ *
+ * Downloads a bitmap from a URL and sets imageView to display it.
+ * callbackTo function receives resulting bitmap for storage.
  */
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-	public String tag = "DownloadImageTask";
-	public AsyncResponse callbackTo = null;
-	public int position;
-	ImageView imageView;
-	//Bitmap bitmapStore;
+	private static final String tag = "DownloadImageTask";
 
-	public interface AsyncResponse {
+	private DownloadImageTaskCallback callbackTo = null;
+	private int position;
+	private ImageView imageView;
+
+	// Interface for classes wanting to incorporate this class to download bitmaps asynchronously
+	public interface DownloadImageTaskCallback {
 		void processFinish(Bitmap result, int position);
 	}
 
-	public DownloadImageTask(ImageView imageView, /*Bitmap bitmapStore*/AsyncResponse callbackTo, int position) {
+	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, int position) {
 		this.callbackTo = callbackTo;
 		this.position = position;
 		this.imageView = imageView;
-		//this.bitmapStore = bitmapStore;
 	}
 
+	@Override
+	// The actual process which downloads the bitmap;
 	protected Bitmap doInBackground(String... urls) {
 		Log.d(tag, "Fetching image from " + urls[0]);
 		try {
 			URL url = new URL(urls[0]);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
-				Bitmap bitmap = null;
+				Bitmap bitmap;
 				BitmapFactory.Options bitmapFactoryOptions = new BitmapFactory.Options();
 				bitmapFactoryOptions.inSampleSize = 1;
 
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-				//InputStream in = new BufferedInputStream((InputStream) urlConnection.getContent());
-				//InputStream in = (InputStream) urlConnection.getContent();
-				//InputStream in = (InputStream) new URL(urls[0]).getContent();
 				bitmap = BitmapFactory.decodeStream(in, null, bitmapFactoryOptions);
 				if (bitmap != null)
 					return bitmap;
@@ -64,11 +66,9 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 		return null;
 	}
 
-
+	// Fires once doInBackground is completed
 	protected void onPostExecute(Bitmap result) {
-		imageView.setImageBitmap(result);
-		//bitmapStore = result;
-		//imageView = result;
-		callbackTo.processFinish(result, position);
+		imageView.setImageBitmap(result); // immediately update imageView
+		callbackTo.processFinish(result, position); // send result back for storage
 	}
 }

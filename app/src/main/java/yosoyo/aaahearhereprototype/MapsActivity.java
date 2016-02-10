@@ -1,8 +1,8 @@
 package yosoyo.aaahearhereprototype;
 
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
 	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+	private static final String tag = "MainActivity";
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -84,15 +85,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	 * This should only be called once and when we are sure that {@link #mMap} is not null.
 	 */
 	private void setUpMap() {
-		//mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 
 		mMap.setMyLocationEnabled(true);
 
 		mMap.setOnMapClickListener(this);
 
-		/*Location myLocation = mMap.getMyLocation();
-		LatLng myLatLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-		mMap.addMarker(new MarkerOptions().position(myLatLng).title(artistName));*/
 	}
 
 	@Override

@@ -10,12 +10,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
 
-public class SearchResultsActivity extends AppCompatActivity implements AsyncArtist.AsyncResponse {
-
-	public static final String tag = "SearchResultsActivity";
+public class SearchResultsActivity extends AppCompatActivity implements SpotifyAPIRequest.SpotifyAPIRequestCallback {
+	private static final String tag = "SearchResultsActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,16 +41,13 @@ public class SearchResultsActivity extends AppCompatActivity implements AsyncArt
 	}
 
 	private void showResults(String query) {
-		// Query your data set and show results
-		// ...
 		Log.d(tag, "Query: " + query);
-		AsyncArtist httpThread = new AsyncArtist(this);
-		httpThread.execute(query);
+		SpotifyAPIRequest spotifyAPIRequest = new SpotifyAPIRequest(this, "artist");
+		spotifyAPIRequest.execute(query);
 	}
 
-	public void processFinish(SpotifyArtist[] artistResults){
-		//Here you will receive the artistResults fired from async class
-		//of onPostExecute(artistResults) method.
+	public void processFinish(SpotifyAPIResponse result){
+		SpotifyArtist[] artistResults = result.getArtists().getItems();
 		Log.d(tag, "JSON search results:\n" + artistResults);
 		if (artistResults == null){
 			return;
@@ -58,18 +55,16 @@ public class SearchResultsActivity extends AppCompatActivity implements AsyncArt
 
 		String artistNameList[] = new String[artistResults.length];
 		String artistImageList[] = new String[artistResults.length];
-		//String artistGenreList[] = new String[artistResults.length];
 		String artistDescList[] = new String[artistResults.length];
 		for (int i = 0; i < artistResults.length; i++){
 			artistNameList[i] = artistResults[i].toString();
 			SpotifyImage image = artistResults[i].getImages(0);
 			if (image != null)
 				artistImageList[i] = image.getUrl();
-			//artistGenreList[i] = artistResults[i].getGenres();
 			artistDescList[i] = artistResults[i].getID();
 		}
 
-		CustomListAdapter adapter = new CustomListAdapter(this, artistNameList, artistImageList, artistDescList);
+		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, artistNameList, artistImageList, artistDescList);
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
@@ -84,9 +79,6 @@ public class SearchResultsActivity extends AppCompatActivity implements AsyncArt
 			}
 		});
 
-//		ListView listView = (ListView) findViewById(R.id.listView);
-//		listView.setAdapter(
-//			new ArrayAdapter<>(this, R.layout.mylist, R.id.Itemname, artistNameList));
 	}
 
 }
