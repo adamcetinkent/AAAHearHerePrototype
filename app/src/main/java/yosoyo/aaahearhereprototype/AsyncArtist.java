@@ -21,16 +21,15 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyPagingArtist;
 public class AsyncArtist extends AsyncTask<String, Void, SpotifyArtist[]> {
 
 	public interface AsyncResponse {
-		//void processFinish(String output);
 		void processFinish(SpotifyArtist[] output);
 	}
 
-	public AsyncResponse delegate = null;
+	public AsyncResponse callbackTo = null;
 	public String tag = "HTTPThread";
 
-	public AsyncArtist(AsyncResponse delegate){
+	public AsyncArtist(AsyncResponse callbackTo){
 		Log.d(tag, "CREATED");
-		this.delegate = delegate;
+		this.callbackTo = callbackTo;
 	}
 
 	@Override
@@ -83,6 +82,6 @@ public class AsyncArtist extends AsyncTask<String, Void, SpotifyArtist[]> {
 	@Override
 	protected void onPostExecute(SpotifyArtist[] result) {
 		Log.d(tag, "onPostExecute");
-		delegate.processFinish(result);
+		callbackTo.processFinish(result);
 	}
 }

@@ -18,10 +18,20 @@ import java.net.URL;
  */
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	public String tag = "DownloadImageTask";
-	ImageView bmImage;
+	public AsyncResponse callbackTo = null;
+	public int position;
+	ImageView imageView;
+	//Bitmap bitmapStore;
 
-	public DownloadImageTask(ImageView bmImage) {
-		this.bmImage = bmImage;
+	public interface AsyncResponse {
+		void processFinish(Bitmap result, int position);
+	}
+
+	public DownloadImageTask(ImageView imageView, /*Bitmap bitmapStore*/AsyncResponse callbackTo, int position) {
+		this.callbackTo = callbackTo;
+		this.position = position;
+		this.imageView = imageView;
+		//this.bitmapStore = bitmapStore;
 	}
 
 	protected Bitmap doInBackground(String... urls) {
@@ -56,7 +66,9 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 
 	protected void onPostExecute(Bitmap result) {
-		bmImage.setImageBitmap(result);
-		//bmImage = result;
+		imageView.setImageBitmap(result);
+		//bitmapStore = result;
+		//imageView = result;
+		callbackTo.processFinish(result, position);
 	}
 }
