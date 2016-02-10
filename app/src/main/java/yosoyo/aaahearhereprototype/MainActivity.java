@@ -1,19 +1,18 @@
 package yosoyo.aaahearhereprototype;
 
-import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class MainActivity extends ListActivity implements HTTPThread.AsyncResponse {
+import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
+
+public class MainActivity extends AppCompatActivity implements AsyncArtist.AsyncResponse {
 
 	public static final String tag = "MainActivity";
 
@@ -25,6 +24,20 @@ public class MainActivity extends ListActivity implements HTTPThread.AsyncRespon
 		//setContentView(R.layout.search);
 
 		Log.d(tag, "onCreate: started");
+
+		setContentView(R.layout.activity_main);
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+		setSupportActionBar(myToolbar);
+
+//		ListView listView = (ListView) findViewById(R.id.listView);
+//		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//			@Override
+//			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//				Intent intent = new Intent(this, MapsActivity.class);
+//				startActivity(intent);
+//			}
+//		});
+
 		// Get the intent, verify the action and get the query
 		Intent intent = getIntent();
 		//if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -32,20 +45,40 @@ public class MainActivity extends ListActivity implements HTTPThread.AsyncRespon
 			//String query = intent.getStringExtra(SearchManager.QUERY);
 			//doMySearch(query);
 
-			HTTPThread httpThread = new HTTPThread(this);
-			//httpThread.execute(query);
+			//HTTPThread httpThread = new HTTPThread(this);
+			////httpThread.execute(query);
+			//httpThread.execute("dummy");
+			//Log.d(tag, "onCreate: http executed");
+
+			AsyncArtist httpThread = new AsyncArtist(this);
 			httpThread.execute("dummy");
 			Log.d(tag, "onCreate: http executed");
+
 		//}
 
 	}
 
-	public void processFinish(String result){
+	/*public void processFinish(String result){
 		//Here you will receive the result fired from async class
 		//of onPostExecute(result) method.
 		Log.d(tag, "JSON search results:\n" + result);
 		String resultList[] = {result};
-		setListAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, resultList));
+		ListView listView = (ListView) findViewById(R.id.listView);
+		listView.setAdapter(
+			new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, resultList));
+	}*/
+
+	public void processFinish(SpotifyArtist[] result){
+		//Here you will receive the result fired from async class
+		//of onPostExecute(result) method.
+		Log.d(tag, "JSON search results:\n" + result);
+		String resultList[] = new String[result.length];
+		for (int i = 0; i < result.length; i++){
+			resultList[i] = result[i].toString();
+		}
+		ListView listView = (ListView) findViewById(R.id.listView);
+		listView.setAdapter(
+			new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, resultList));
 	}
 
 	@Override
@@ -70,12 +103,12 @@ public class MainActivity extends ListActivity implements HTTPThread.AsyncRespon
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected void onListItemClick(ListView list, View view, int position,
-								   long id) {
-		super.onListItemClick(list, view, position, id);
-		Intent intent = new Intent(this, MapsActivity.class);
-		startActivity(intent);
-	}
+//	@Override
+//	protected void onListItemClick(ListView list, View view, int position,
+//								   long id) {
+//		super.onListItemClick(list, view, position, id);
+//		Intent intent = new Intent(this, MapsActivity.class);
+//		startActivity(intent);
+//	}
 
 }
