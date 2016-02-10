@@ -1,22 +1,46 @@
 package yosoyo.aaahearhereprototype;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
+	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+	private GoogleApiClient mGoogleApiClient;
+	private Location lastLocation;
+
+	private String artistName;
+	private int numMarkers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_maps);
 		setUpMapIfNeeded();
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			this.artistName = extras.getString("artistName");
+		}
+
+		// Create an instance of GoogleAPIClient.
+		if (mGoogleApiClient == null) {
+			mGoogleApiClient = new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(LocationServices.API)
+				.build();
+		}
 	}
 
 	@Override
@@ -60,10 +84,48 @@ public class MapsActivity extends FragmentActivity {
 	 * This should only be called once and when we are sure that {@link #mMap} is not null.
 	 */
 	private void setUpMap() {
-		mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+		//mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 
 		mMap.setMyLocationEnabled(true);
 
+		mMap.setOnMapClickListener(this);
+
+		/*Location myLocation = mMap.getMyLocation();
+		LatLng myLatLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+		mMap.addMarker(new MarkerOptions().position(myLatLng).title(artistName));*/
+	}
+
+	@Override
+	public void onMapClick(LatLng latLng) {
+		mMap.addMarker(new MarkerOptions().position(latLng).title("Marker " + numMarkers++));
+	}
+
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+			mGoogleApiClient);
+		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+		mMap.addMarker(new MarkerOptions().position(myLatLng).title(artistName));
+	}
+
+	protected void onStart() {
+		mGoogleApiClient.connect();
+		super.onStart();
+	}
+
+	protected void onStop() {
+		mGoogleApiClient.disconnect();
+		super.onStop();
+	}
+
+	@Override
+	public void onConnectionSuspended(int i) {
+
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
 
 	}
 }
+

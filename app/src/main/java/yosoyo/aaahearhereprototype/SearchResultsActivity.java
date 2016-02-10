@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
@@ -75,7 +76,10 @@ public class SearchResultsActivity extends AppCompatActivity implements AsyncArt
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				TextView txtArtistName = (TextView) view.findViewById(R.id.artistname);
+				String artistName = txtArtistName.getText().toString();
 				Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+				intent.putExtra("artistName", artistName);
 				startActivity(intent);
 			}
 		});

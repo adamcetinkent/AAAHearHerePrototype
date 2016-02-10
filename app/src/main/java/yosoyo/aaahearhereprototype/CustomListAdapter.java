@@ -35,32 +35,20 @@ public class CustomListAdapter extends ArrayAdapter implements DownloadImageTask
 		LayoutInflater inflater=context.getLayoutInflater();
 		View rowView = inflater.inflate(R.layout.mylist, null, true);
 
-		TextView txtTitle = (TextView) rowView.findViewById(R.id.artistname);
-		ImageView imageView = (ImageView) rowView.findViewById(R.id.artwork);
-		TextView extraText = (TextView) rowView.findViewById(R.id.artistdesc);
+		TextView txtArtistName = (TextView) rowView.findViewById(R.id.artistname);
+		ImageView imgArtwork = (ImageView) rowView.findViewById(R.id.artwork);
+		TextView txtArtistDesc = (TextView) rowView.findViewById(R.id.artistdesc);
 
-		txtTitle.setText(artistNames[position]);
-		/*if (artistImages[position] != null) {
-			BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
-			Bitmap bitmap = null;
-			if (bitmapDrawable != null) {
-				bitmap = bitmapDrawable.getBitmap();
-			}
-			if (bitmap == null) {
-				new DownloadImageTask(imageView).execute(artistImages[position]);
-			}
-		}*/
+		txtArtistName.setText(artistNames[position]);
 		if (artistImages[position] != null) {
 			if (artistBitmaps[position] == null) {
-				//new DownloadImageTask(imageView, artistBitmaps[position])
-				//	.execute(artistImages[position]);
-				new DownloadImageTask(imageView, this, position)
+				new DownloadImageTask(imgArtwork, this, position)
 					.execute(artistImages[position]);
 			} else {
-				imageView.setImageBitmap(artistBitmaps[position]);
+				imgArtwork.setImageBitmap(artistBitmaps[position]);
 			}
 		}
-		extraText.setText(artistDescs[position]);
+		txtArtistDesc.setText(artistDescs[position]);
 		return rowView;
 	}
 
