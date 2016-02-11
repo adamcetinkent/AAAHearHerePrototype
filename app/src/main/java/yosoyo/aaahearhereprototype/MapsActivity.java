@@ -7,9 +7,13 @@ import android.support.v4.app.FragmentActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
@@ -104,7 +108,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
 			mGoogleApiClient);
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		mMap.addMarker(new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));
+		mMap.addMarker(
+			new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));
+		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new
+						   CameraPosition.Builder().target(myLatLng).zoom(15).build()), 1000, null);
 	}
 
 	protected void onStart() {

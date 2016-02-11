@@ -25,7 +25,7 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 	private Bitmap[] artistBitmaps;			// Storage for downloaded bitmaps
 
 	public SearchResultsCustomListAdapter(Activity context, String[] artistNames, String[] artistImages, String[] artistDescs){
-		super(context, R.layout.mylist, artistNames);
+		super(context, R.layout.list_row_track, artistNames);
 
 		this.context = context;
 		this.artistNames = artistNames;
@@ -36,7 +36,7 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 
 	public View getView(int position, View view, ViewGroup parent){
 		LayoutInflater inflater=context.getLayoutInflater();
-		View rowView = inflater.inflate(R.layout.mylist, null, true);
+		View rowView = inflater.inflate(R.layout.list_row_track, null, true);
 
 		// Get views into which info will be put
 		TextView txtArtistName = (TextView) rowView.findViewById(R.id.artistname);
