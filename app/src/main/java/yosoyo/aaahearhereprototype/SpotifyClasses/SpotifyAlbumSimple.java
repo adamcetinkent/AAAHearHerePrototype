@@ -1,20 +1,19 @@
 package yosoyo.aaahearhereprototype.SpotifyClasses;
 
 /**
- * Created by Adam Kent on 09/02/2016.
+ * Created by Adam Kent on 11/02/2016.
  *
- * The Spotify specification for an Artist.
+ * The Spotify specification for an simplified Album
  */
-public class SpotifyArtist {
+public class SpotifyAlbumSimple {
 
+	String album_type;
+	String[] available_markets;
 	SpotifyExternalURL external_urls;
-	SpotifyFollowers followers;
-	String genres[];
 	String href;
 	String id;
-	SpotifyImage images[];
+	SpotifyImage[] images;
 	String name;
-	int popularity;
 	String type;
 	String uri;
 
@@ -28,18 +27,6 @@ public class SpotifyArtist {
 		} else {
 			return null;
 		}
-	}
-
-	public String getID(){
-		return id;
-	}
-
-	public String getGenres(){
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < genres.length; i++){
-			sb.append(genres[i]);
-		}
-		return sb.toString();
 	}
 
 	public String getName(){

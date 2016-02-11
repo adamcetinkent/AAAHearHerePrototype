@@ -9,9 +9,14 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
 public class SpotifyAPIResponse {
 
 	SpotifyPaging<SpotifyArtist> artists;
+	SpotifyPaging<SpotifyTrack> tracks;
 
 	public SpotifyPaging<SpotifyArtist> getArtists() {
 		return artists;
+	}
+
+	public SpotifyPaging<SpotifyTrack> getTracks() {
+		return tracks;
 	}
 
 }

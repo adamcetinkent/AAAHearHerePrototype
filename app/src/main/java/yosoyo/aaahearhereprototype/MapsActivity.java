@@ -21,7 +21,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	private GoogleApiClient mGoogleApiClient;
 	private Location lastLocation;
 
-	private String artistName;
+	private String trackName;
+	private String trackDesc;
 	private int numMarkers;
 
 	@Override
@@ -31,7 +32,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		setUpMapIfNeeded();
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			this.artistName = extras.getString("artistName");
+			this.trackName = extras.getString("trackName");
+			this.trackDesc = extras.getString("trackDesc");
 		}
 
 		// Create an instance of GoogleAPIClient.
@@ -102,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
 			mGoogleApiClient);
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		mMap.addMarker(new MarkerOptions().position(myLatLng).title(artistName));
+		mMap.addMarker(new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));
 	}
 
 	protected void onStart() {

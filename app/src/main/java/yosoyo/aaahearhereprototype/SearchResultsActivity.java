@@ -11,8 +11,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
-import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
+import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 public class SearchResultsActivity extends AppCompatActivity implements SpotifyAPIRequest.SpotifyAPIRequestCallback {
 	private static final String tag = "SearchResultsActivity";
@@ -42,39 +42,41 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 
 	private void showResults(String query) {
 		Log.d(tag, "Query: " + query);
-		SpotifyAPIRequest spotifyAPIRequest = new SpotifyAPIRequest(this, "artist");
+		SpotifyAPIRequest spotifyAPIRequest = new SpotifyAPIRequest(this, "track");
 		spotifyAPIRequest.execute(query);
 	}
 
 	public void processFinish(SpotifyAPIResponse result){
-		SpotifyArtist[] artistResults = result.getArtists().getItems();
-		Log.d(tag, "JSON search results:\n" + artistResults);
-		if (artistResults == null){
+		SpotifyTrack[] trackResults = result.getTracks().getItems();
+		Log.d(tag, "JSON search results:\n" + trackResults);
+		if (trackResults == null){
 			return;
 		}
-
-		String artistNameList[] = new String[artistResults.length];
-		String artistImageList[] = new String[artistResults.length];
-		String artistDescList[] = new String[artistResults.length];
-		for (int i = 0; i < artistResults.length; i++){
-			artistNameList[i] = artistResults[i].toString();
-			SpotifyImage image = artistResults[i].getImages(0);
+		String trackNameList[] = new String[trackResults.length];
+		String trackImageList[] = new String[trackResults.length];
+		String trackDescList[] = new String[trackResults.length];
+		for (int i = 0; i < trackResults.length; i++){
+			trackNameList[i] = trackResults[i].getName();
+			SpotifyImage image = trackResults[i].getImages(0);
 			if (image != null)
-				artistImageList[i] = image.getUrl();
-			artistDescList[i] = artistResults[i].getID();
+				trackImageList[i] = image.getUrl();
+			trackDescList[i] = trackResults[i].getArtistNameAlbumName();
 		}
 
-		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, artistNameList, artistImageList, artistDescList);
+		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, trackNameList, trackImageList, trackDescList);
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView txtArtistName = (TextView) view.findViewById(R.id.artistname);
-				String artistName = txtArtistName.getText().toString();
+				TextView txtTrackName = (TextView) view.findViewById(R.id.artistname);
+				String trackName = txtTrackName.getText().toString();
+				TextView txtTrackDesc = (TextView) view.findViewById(R.id.artistdesc);
+				String trackDesc = txtTrackDesc.getText().toString();
 				Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-				intent.putExtra("artistName", artistName);
+				intent.putExtra("trackName", trackName);
+				intent.putExtra("trackDesc", trackDesc);
 				startActivity(intent);
 			}
 		});
