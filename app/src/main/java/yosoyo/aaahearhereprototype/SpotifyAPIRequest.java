@@ -27,6 +27,9 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 		void processFinish(SpotifyAPIResponse output);
 	}
 
+	private static final String urlSpotifySearch = "https://api.spotify.com/v1/search?q=";
+	private static final String urlSpotifyType = "&type=";
+
 	private SpotifyAPIRequestCallback callbackTo = null;
 	private String searchType;
 
@@ -35,21 +38,10 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 		this.searchType = searchType;
 	}
 
-	@Override
-	protected void onPreExecute(){
-
-	}
-
-	// TODO: Move somewhere more useful
-	static String convertStreamToString(InputStream is) {
-		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-		return s.hasNext() ? s.next() : "";
-	}
-
-	// TODO: Expand and move somewhere more useful
-	static URL urlify(String query, String type){
+	// Construct Spotify API URL from input string
+	private static URL makeSpotifyQuery(String query, String type){
 		try {
-			return new URL("https://api.spotify.com/v1/search?q=" + query.replace(" ","%20") + "&type="+type);
+			return new URL(urlSpotifySearch + query.replace(" ","%20") + urlSpotifyType + type);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -57,20 +49,26 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	}
 
 	@Override
+	protected void onPreExecute(){
+
+	}
+
+	@Override
 	// The actual process which makes the HTTP request
 	protected SpotifyAPIResponse doInBackground(String... strings) {
 		try {
-			URL url = urlify(strings[0], this.searchType);
+			URL url = makeSpotifyQuery(strings[0], this.searchType);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-				String streamString = convertStreamToString(in);
-				SpotifyAPIResponse results = new Gson().fromJson(streamString, SpotifyAPIResponse.class);
-				return results;
+				String streamString = ZZZUtility.convertStreamToString(in);
+				return new Gson().fromJson(streamString, SpotifyAPIResponse.class);
 			} finally {
 				urlConnection.disconnect();
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -81,4 +79,5 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	protected void onPostExecute(SpotifyAPIResponse result) {
 		callbackTo.processFinish(result);	// sends results back
 	}
+
 }
