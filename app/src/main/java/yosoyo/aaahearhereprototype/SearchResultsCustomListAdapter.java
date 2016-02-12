@@ -16,7 +16,7 @@ import android.widget.TextView;
  * imgArtwork is downloaded from URLs stored in artistImages.
  */
 public class SearchResultsCustomListAdapter extends ArrayAdapter implements DownloadImageTask.DownloadImageTaskCallback {
-	private static final String tag = "SearchResultsCustomListAdapter";
+	private static final String TAG = "SearchResultsCustomListAdapter";
 
 	private final Activity context;
 	private final String[] artistNames;		// Displayed in artistName TextView

@@ -20,7 +20,7 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
  * Response is returned to processFinish function of specified SpotifyAPIRequestCallback.
  */
 public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIResponse> {
-	private static final String tag = "SpotifyAPIRequest";
+	private static final String TAG = "SpotifyAPIRequest";
 
 	// Interface for classes wanting to incorporate this class to make Spotify API Requests
 	public interface SpotifyAPIRequestCallback {

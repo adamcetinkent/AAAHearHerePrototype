@@ -15,7 +15,9 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 public class SearchResultsActivity extends AppCompatActivity implements SpotifyAPIRequest.SpotifyAPIRequestCallback {
-	private static final String tag = "SearchResultsActivity";
+	private static final String TAG = "SearchResultsActivity";
+	public static final String TRACK_NAME = "trackName";
+	public static final String TRACK_DESC = "trackDesc";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +43,14 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 	}
 
 	private void showResults(String query) {
-		Log.d(tag, "Query: " + query);
+		Log.d(TAG, "Query: " + query);
 		SpotifyAPIRequest spotifyAPIRequest = new SpotifyAPIRequest(this, "track");
 		spotifyAPIRequest.execute(query);
 	}
 
 	public void processFinish(SpotifyAPIResponse result){
 		SpotifyTrack[] trackResults = result.getTracks().getItems();
-		Log.d(tag, "JSON search results:\n" + trackResults);
+		Log.d(TAG, "JSON search results:\n" + trackResults);
 		if (trackResults == null){
 			return;
 		}
@@ -75,8 +77,8 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 				TextView txtTrackDesc = (TextView) view.findViewById(R.id.artistdesc);
 				String trackDesc = txtTrackDesc.getText().toString();
 				Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-				intent.putExtra("trackName", trackName);
-				intent.putExtra("trackDesc", trackDesc);
+				intent.putExtra(TRACK_NAME, trackName);
+				intent.putExtra(TRACK_NAME, trackDesc);
 				startActivity(intent);
 			}
 		});

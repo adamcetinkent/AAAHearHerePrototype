@@ -9,4 +9,7 @@
     <string name="search_hint">Search for artists</string>
     <string name="title_activity_searchable">SearchableActivity</string>
     <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="facebook_app_id">966494340087272</string>
+
 </resources>

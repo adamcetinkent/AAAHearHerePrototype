@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
 	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-	private static final String tag = "MainActivity";
+	private static final String TAG = "MainActivity";
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -36,8 +36,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		setUpMapIfNeeded();
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			this.trackName = extras.getString("trackName");
-			this.trackDesc = extras.getString("trackDesc");
+			this.trackName = extras.getString(SearchResultsActivity.TRACK_NAME);
+			this.trackDesc = extras.getString(SearchResultsActivity.TRACK_DESC);
 		}
 
 		// Create an instance of GoogleAPIClient.
@@ -111,7 +111,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		mMap.addMarker(
 			new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));
 		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new
-						   CameraPosition.Builder().target(myLatLng).zoom(15).build()), 1000, null);
+																	 CameraPosition.Builder()
+																	 .target(myLatLng).zoom(15)
+																	 .build()), 1000, null);
 	}
 
 	protected void onStart() {

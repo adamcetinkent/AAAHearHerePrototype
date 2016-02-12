@@ -22,7 +22,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
-	private static final String tag = "MainActivity";
+	private static final String TAG = "MainActivity";
 
 	private GoogleApiClient mGoogleApiClient;
 	private TextView signInName;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.d(tag, "onCreate: started");
+		Log.d(TAG, "onCreate: started");
 
 		setContentView(R.layout.activity_main);
 
@@ -83,14 +83,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
-		Log.e(tag, "Connection failed!");
+		Log.e(TAG, "Connection failed!");
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.sign_in_button:
-				Log.d(tag, "Sign in button pressed!");
+				Log.d(TAG, "Sign in button pressed!");
 				signIn();
 				break;
 		}
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	}
 
 	private void handleSignInResult(GoogleSignInResult result) {
-		Log.d(tag, "handleSignInResult:" + result.isSuccess());
+		Log.d(TAG, "handleSignInResult:" + result.isSuccess());
 		if (result.isSuccess()) {
 			// Signed in successfully, show authenticated UI.
 			GoogleSignInAccount acct = result.getSignInAccount();

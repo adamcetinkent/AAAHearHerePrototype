@@ -8,6 +8,7 @@ import java.io.InputStream;
  * A dump for utility functions.
  */
 public class ZZZUtility {
+	private static final String TAG = "ZZZUtility";
 
 	static String convertStreamToString(InputStream is) {
 		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");

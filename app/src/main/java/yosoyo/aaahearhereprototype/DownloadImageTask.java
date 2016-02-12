@@ -20,7 +20,7 @@ import java.net.URL;
  * callbackTo function receives resulting bitmap for storage.
  */
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-	private static final String tag = "DownloadImageTask";
+	private static final String TAG = "DownloadImageTask";
 
 	private DownloadImageTaskCallback callbackTo = null;
 	private int position;
@@ -40,7 +40,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	@Override
 	// The actual process which downloads the bitmap;
 	protected Bitmap doInBackground(String... urls) {
-		Log.d(tag, "Fetching image from " + urls[0]);
+		Log.d(TAG, "Fetching image from " + urls[0]);
 		try {
 			URL url = new URL(urls[0]);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -54,7 +54,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 				if (bitmap != null)
 					return bitmap;
 				else
-					Log.e(tag, "Empty bitmap!");
+					Log.e(TAG, "Empty bitmap!");
 			} finally {
 				urlConnection.disconnect();
 			}
