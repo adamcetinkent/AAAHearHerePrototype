@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">AAA Hear Here Prototype</string>
-    <string name="title_activity_maps">AAA Hear Here Prototype</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_maps">Maps Activity</string>
+    <string name="title_activity_main">AAA Hear Here Prototype</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <string name="search_hint">Search for artists</string>
-    <string name="title_activity_searchable">SearchableActivity</string>
-    <string name="title_activity_search_results">SearchResultsActivity</string>
+    <string name="title_activity_searchable">Searchable Activity</string>
+    <string name="title_activity_search_results">Search Results Activity</string>
 
     <string name="facebook_app_id">966494340087272</string>
 
