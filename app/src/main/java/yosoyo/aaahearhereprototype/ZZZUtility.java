@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class ZZZUtility {
 	private static final String TAG = "ZZZUtility";
 
-	static String convertStreamToString(InputStream is) {
+	public static String convertStreamToString(InputStream is) {
 		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
 		return s.hasNext() ? s.next() : "";
 	}

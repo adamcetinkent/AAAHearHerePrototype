@@ -1,13 +1,17 @@
 package yosoyo.aaahearhereprototype;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -15,9 +19,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+
+import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestCreatePostTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostsTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
-	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostsTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback {
 	private static final String TAG = "MainActivity";
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -27,7 +37,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 	private String trackName;
 	private String trackDesc;
+	private SpotifyTrack newTrack;
 	private int numMarkers;
+	private TestPost[] testPosts;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		if (extras != null) {
 			this.trackName = extras.getString(SearchResultsActivity.TRACK_NAME);
 			this.trackDesc = extras.getString(SearchResultsActivity.TRACK_DESC);
+			this.newTrack = new Gson().fromJson(extras.getString(SearchResultsActivity.TRACK_JSON),
+											 SpotifyTrack.class);
 		}
 
 		// Create an instance of GoogleAPIClient.
@@ -48,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				.addApi(LocationServices.API)
 				.build();
 		}
+
 	}
 
 	@Override
@@ -96,11 +111,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		mMap.setOnMapClickListener(this);
 
+		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+
 	}
 
 	@Override
 	public void onMapClick(LatLng latLng) {
-		mMap.addMarker(new MarkerOptions().position(latLng).title("Marker " + numMarkers++));
+		//mMap.addMarker(new MarkerOptions().position(latLng).title("Marker " + numMarkers++));
 	}
 
 	@Override
@@ -108,12 +125,19 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
 			mGoogleApiClient);
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		mMap.addMarker(
-			new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));
+		/*mMap.addMarker(
+			new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));*/
 		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new
 																	 CameraPosition.Builder()
 																	 .target(myLatLng).zoom(15)
 																	 .build()), 1000, null);
+
+		if (newTrack != null){
+			TestPost testPost = new TestPost(1, newTrack.getID(), myLatLng.latitude, myLatLng.longitude, "OMG!");
+			TestCreatePostTask testCreatePostTask = new TestCreatePostTask(this, testPost);
+			testCreatePostTask.execute();
+		}
+
 	}
 
 	protected void onStart() {
@@ -133,6 +157,89 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
+
+	}
+
+	@Override
+	public void processFinish(Boolean success) {
+		Log.d(TAG, "Successful post!");
+		TestGetPostsTask testGetPostsTask = new TestGetPostsTask(this);
+		testGetPostsTask.execute();
+	}
+
+	@Override
+	public void processFinish(TestPost[] testPosts) {
+		this.testPosts = testPosts;
+		for (int i = 0; i < testPosts.length; i++){
+			SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
+			spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
+		}
+	}
+
+	@Override
+	public void processFinish(SpotifyTrack spotifyTrack, int position) {
+
+		LatLng latLng = new LatLng(testPosts[position].getLat(), testPosts[position].getLon());
+		mMap.addMarker(
+			new MarkerOptions().position(latLng).title(
+				new Gson().toJson(testPosts[position])).snippet(
+				new Gson().toJson(spotifyTrack)));
+	}
+
+	class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, DownloadImageTask.DownloadImageTaskCallback {
+
+		private final View mWindow;
+		private final View mContents;
+
+		CustomInfoWindowAdapter(){
+			mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
+			mContents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+		}
+
+		@Override
+		public View getInfoWindow(Marker marker) {
+			render(marker, mWindow);
+			return mWindow;
+		}
+
+		@Override
+		public View getInfoContents(Marker marker) {
+			render(marker, mContents);
+			return mContents;
+		}
+
+		private void render(Marker marker, View view){
+
+			TestPost testPost = new Gson().fromJson(marker.getTitle(), TestPost.class);
+			SpotifyTrack spotifyTrack = new Gson().fromJson(marker.getSnippet(), SpotifyTrack.class);
+
+			ImageView imageView = (ImageView) view.findViewById(R.id.badge);
+
+			if (!marker.isInfoWindowShown())
+				imageView.setImageBitmap(null);
+
+			DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, this, marker);
+			downloadImageTask.execute(spotifyTrack.getImages(0).getUrl());
+
+			TextView titleUI = (TextView) view.findViewById(R.id.title);
+			TextView artistUI = (TextView) view.findViewById(R.id.artist);
+			TextView albumUI = (TextView) view.findViewById(R.id.album);
+			TextView snippetUI = (TextView) view.findViewById(R.id.snippet);
+
+			titleUI.setText(spotifyTrack.getName());
+			artistUI.setText(spotifyTrack.getArtistName());
+			albumUI.setText(spotifyTrack.getAlbumName());
+			snippetUI.setText("Message: " + testPost.getMessage());
+
+		}
+
+		@Override
+		public void processFinish(Bitmap result, int position, Marker marker) {
+			Log.d(TAG, "Finished image download");
+			if (marker != null && marker.isInfoWindowShown()){
+				marker.showInfoWindow();
+			}
+		}
 
 	}
 }

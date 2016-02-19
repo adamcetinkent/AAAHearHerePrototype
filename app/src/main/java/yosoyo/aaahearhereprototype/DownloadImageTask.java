@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.model.Marker;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,16 +27,23 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	private DownloadImageTaskCallback callbackTo = null;
 	private int position;
 	private ImageView imageView;
+	private Marker marker;
 
 	// Interface for classes wanting to incorporate this class to download bitmaps asynchronously
 	public interface DownloadImageTaskCallback {
-		void processFinish(Bitmap result, int position);
+		void processFinish(Bitmap result, int position, Marker marker);
 	}
 
 	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, int position) {
 		this.callbackTo = callbackTo;
 		this.position = position;
 		this.imageView = imageView;
+	}
+
+	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, Marker marker) {
+		this.callbackTo = callbackTo;
+		this.imageView = imageView;
+		this.marker = marker;
 	}
 
 	@Override
@@ -69,6 +78,6 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Bitmap result) {
 		imageView.setImageBitmap(result); // immediately update imageView
-		callbackTo.processFinish(result, position); // send result back for storage
+		callbackTo.processFinish(result, position, marker); // send result back for storage
 	}
 }

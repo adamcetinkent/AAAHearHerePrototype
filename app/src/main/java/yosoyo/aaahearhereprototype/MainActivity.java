@@ -12,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -30,7 +32,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, FacebookCallback<LoginResult> {
+import yosoyo.aaahearhereprototype.TestServerClasses.TestGetUserTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
+
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, FacebookCallback<LoginResult>, TestGetUserTask.TestGetUserTaskCallback {
 	private static final String TAG = "MainActivity";
 
 	private GoogleApiClient mGoogleApiClient;
@@ -101,6 +106,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 			}
 		};
+
+
+		/* RUBY STUFF */
+
+		Button button = (Button) findViewById(R.id.btnVMTestUser);
+		button.setOnClickListener(this);
+
 	}
 
 	@Override
@@ -135,10 +147,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-			case R.id.google_sign_in_button:
+
+			case R.id.google_sign_in_button: {
 				Log.d(TAG, "Sign in button pressed!");
 				signIn();
 				break;
+			}
+
+			case R.id.btnVMTestUser: {
+				Log.d(TAG, "Get user from VM Server!");
+
+				EditText editText = (EditText) findViewById(R.id.txtVMUserID);
+				long id = Long.parseLong(editText.getText().toString());
+
+				TestGetUserTask testGetUserTask = new TestGetUserTask(this, id);
+				testGetUserTask.execute();
+
+			}
+
 		}
 	}
 
@@ -213,4 +239,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 		Log.e(TAG, "error in Facebook log in!");
 	}
 
+	@Override
+	public void processFinish(TestUser testUser) {
+		TextView textView = (TextView) findViewById(R.id.txtVMUserTestReturn);
+		if (testUser != null){
+			textView.setText("User: " + testUser.getFirst_name() + " " + testUser.getLast_name());
+		} else {
+			textView.setText("Failed to get user");
+		}
+
+	}
 }

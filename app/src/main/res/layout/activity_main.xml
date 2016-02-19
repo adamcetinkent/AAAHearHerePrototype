@@ -54,4 +54,28 @@
         android:id="@+id/facebookSignInName"
         android:layout_gravity="center_horizontal"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="15dp"
+        android:id="@+id/txtVMUserID"
+        android:layout_gravity="center_horizontal"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:text="Get User"
+        android:id="@+id/btnVMTestUser"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VMServer Login"
+        android:id="@+id/txtVMUserTestReturn"
+        android:layout_gravity="center_horizontal"/>
+
 </LinearLayout>

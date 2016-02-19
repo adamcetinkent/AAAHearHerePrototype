@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -18,6 +20,8 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 	private static final String TAG = "SearchResultsActivity";
 	public static final String TRACK_NAME = "trackName";
 	public static final String TRACK_DESC = "trackDesc";
+	public static final String TRACK_JSON = "trackJson";
+	private SpotifyTrack[] trackResults;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,7 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 	}
 
 	public void processFinish(SpotifyAPIResponse result){
-		SpotifyTrack[] trackResults = result.getTracks().getItems();
+		trackResults = result.getTracks().getItems();
 		Log.d(TAG, "JSON search results:\n" + trackResults);
 		if (trackResults == null){
 			return;
@@ -76,9 +80,14 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 				String trackName = txtTrackName.getText().toString();
 				TextView txtTrackDesc = (TextView) view.findViewById(R.id.artistdesc);
 				String trackDesc = txtTrackDesc.getText().toString();
+
+				SpotifyTrack track = trackResults[position];
+
 				Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
 				intent.putExtra(TRACK_NAME, trackName);
-				intent.putExtra(TRACK_NAME, trackDesc);
+				intent.putExtra(TRACK_DESC, trackDesc);
+				intent.putExtra(TRACK_JSON, new Gson().toJson(track, SpotifyTrack.class));
+
 				startActivity(intent);
 			}
 		});

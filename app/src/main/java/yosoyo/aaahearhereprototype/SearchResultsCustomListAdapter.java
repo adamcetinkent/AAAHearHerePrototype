@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.Marker;
+
 /**
  * Created by Adam Kent on 10/02/2016.
  *
@@ -54,14 +56,15 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 				imgArtwork.setImageBitmap(artistBitmaps[position]); // get from storage
 			}
 		}
-		txtArtistDesc.setText(artistDescs[position]); // Set artistDesc TextView
+		if (artistDescs[position] != null)
+			txtArtistDesc.setText(artistDescs[position]); // Set artistDesc TextView
 
 		return rowView;
 	}
 
 
 	@Override
-	public void processFinish(Bitmap result, int position) {
+	public void processFinish(Bitmap result, int position, Marker marker) {
 		artistBitmaps[position] = result; // store downloaded bitmap
 	}
 }
