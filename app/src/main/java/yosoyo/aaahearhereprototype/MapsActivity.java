@@ -206,7 +206,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	}
 
 	@Override
-	public void onInfoWindowClick(Marker marker) {
+	public void onInfoWindowClick(final Marker marker) {
+
+		if (mediaPlayer.isPlaying()) {
+			mediaPlayer.reset();
+			marker.showInfoWindow();
+			return;
+		}
 
 		final ProgressDialog progressDialog;
 		//final VideoView videoView;
@@ -228,6 +234,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				@Override
 				public boolean onError(MediaPlayer mp, int what, int extra) {
 					mediaPlayer.reset();
+					marker.showInfoWindow();
 					return false;
 				}
 			});
@@ -236,7 +243,15 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					mediaPlayer.start();
+					marker.showInfoWindow();
 					progressDialog.dismiss();
+				}
+			});
+
+			mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+				@Override
+				public void onCompletion(MediaPlayer mp) {
+					marker.showInfoWindow();
 				}
 			});
 
@@ -282,7 +297,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			return mContents;
 		}
 
-		private void render(Marker marker, View view){
+		private void render(Marker marker, View view) {
 
 			TestPost testPost = new Gson().fromJson(marker.getTitle(), TestPost.class);
 			spotifyTrack = new Gson().fromJson(marker.getSnippet(), SpotifyTrack.class);
@@ -290,11 +305,12 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 			ImageView imageView = (ImageView) view.findViewById(R.id.badge);
 
-			if (!marker.isInfoWindowShown())
+			if (!marker.isInfoWindowShown()){
 				imageView.setImageBitmap(null);
 
-			DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, this, marker);
-			downloadImageTask.execute(spotifyTrack.getImages(0).getUrl());
+				DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, this, marker);
+				downloadImageTask.execute(spotifyTrack.getImages(0).getUrl());
+			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
 			TextView artistUI = (TextView) view.findViewById(R.id.artist);
@@ -306,7 +322,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			albumUI.setText(spotifyTrack.getAlbumName());
 			snippetUI.setText("Message: " + testPost.getMessage());
 
-			ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
+			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
+			if (mediaPlayer.isPlaying()) {
+				playButton.setImageResource(R.drawable.ic_media_pause);
+			} else {
+				playButton.setImageResource(R.drawable.ic_media_play);
+			}
+
 
 		}
 
