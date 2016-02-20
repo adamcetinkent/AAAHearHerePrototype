@@ -23,7 +23,7 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="left"
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="#ff000000"
@@ -35,7 +35,7 @@
             android:id="@+id/artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="left"
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="#ff000000"
@@ -47,7 +47,7 @@
             android:id="@+id/album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="left"
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="#ff000000"
@@ -64,6 +64,12 @@
             android:textColor="#ff7f7f7f"
             android:textSize="14dp"
             />
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_play"/>
 
     </LinearLayout>
 

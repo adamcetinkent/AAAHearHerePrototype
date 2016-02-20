@@ -1,11 +1,14 @@
 package yosoyo.aaahearhereprototype;
 
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,25 +24,29 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCreatePostTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostsTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
-	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostsTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback {
-	private static final String TAG = "MainActivity";
+	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostsTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback, GoogleMap.OnInfoWindowClickListener {
+	private static final String TAG = "MapsActivity";
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
 	private GoogleApiClient mGoogleApiClient;
 	private Location lastLocation;
 
-	private String trackName;
-	private String trackDesc;
+	//private String trackName;
+	//private String trackDesc;
 	private SpotifyTrack newTrack;
-	private int numMarkers;
+	//private int numMarkers;
 	private TestPost[] testPosts;
+	private SpotifyTrack currentTrack;
+	private MediaPlayer mediaPlayer = new MediaPlayer();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +55,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		setUpMapIfNeeded();
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			this.trackName = extras.getString(SearchResultsActivity.TRACK_NAME);
-			this.trackDesc = extras.getString(SearchResultsActivity.TRACK_DESC);
+			//this.trackName = extras.getString(SearchResultsActivity.TRACK_NAME);
+			//this.trackDesc = extras.getString(SearchResultsActivity.TRACK_DESC);
 			this.newTrack = new Gson().fromJson(extras.getString(SearchResultsActivity.TRACK_JSON),
 											 SpotifyTrack.class);
 		}
@@ -113,6 +120,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
+		mMap.setOnInfoWindowClickListener(this);
+
 	}
 
 	@Override
@@ -136,6 +145,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			TestPost testPost = new TestPost(1, newTrack.getID(), myLatLng.latitude, myLatLng.longitude, "OMG!");
 			TestCreatePostTask testCreatePostTask = new TestCreatePostTask(this, testPost);
 			testCreatePostTask.execute();
+		} else {
+			getAllPosts();
 		}
 
 	}
@@ -163,6 +174,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	@Override
 	public void processFinish(Boolean success) {
 		Log.d(TAG, "Successful post!");
+		getAllPosts();
+	}
+
+	private void getAllPosts(){
 		TestGetPostsTask testGetPostsTask = new TestGetPostsTask(this);
 		testGetPostsTask.execute();
 	}
@@ -170,9 +185,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	@Override
 	public void processFinish(TestPost[] testPosts) {
 		this.testPosts = testPosts;
-		for (int i = 0; i < testPosts.length; i++){
-			SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
-			spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
+		if (testPosts != null) {
+			for (int i = 0; i < testPosts.length; i++) {
+				SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
+				spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
+			}
+		} else {
+			Log.e(TAG, "No posts found!");
 		}
 	}
 
@@ -186,10 +205,65 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				new Gson().toJson(spotifyTrack)));
 	}
 
+	@Override
+	public void onInfoWindowClick(Marker marker) {
+
+		final ProgressDialog progressDialog;
+		//final VideoView videoView;
+
+		//videoView = (VideoView) findViewById(R.id.VideoView);
+
+		progressDialog = new ProgressDialog(MapsActivity.this);
+		progressDialog.setTitle("Playing from Spotify");
+		progressDialog.setMessage("Buffering...");
+		progressDialog.setIndeterminate(false);
+		progressDialog.setCancelable(false);
+		progressDialog.show();
+
+		try {
+			//MediaController mediaController = new MediaController(MapsActivity.this);
+			//Uri audioStream = Uri.parse(currentTrack.getPreview_url());
+
+			mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+				@Override
+				public boolean onError(MediaPlayer mp, int what, int extra) {
+					mediaPlayer.reset();
+					return false;
+				}
+			});
+
+			mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					mediaPlayer.start();
+					progressDialog.dismiss();
+				}
+			});
+
+			mediaPlayer.setDataSource(currentTrack.getPreview_url());
+			mediaPlayer.prepareAsync();
+
+		} catch (IllegalArgumentException e) {
+			Log.e(TAG, "Error: " + e.getMessage());
+			progressDialog.dismiss();
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			Log.e(TAG, "Error: " + e.getMessage());
+			progressDialog.dismiss();
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.e(TAG, "Error: " + e.getMessage());
+			progressDialog.dismiss();
+			e.printStackTrace();
+		}
+
+	}
+
 	class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, DownloadImageTask.DownloadImageTaskCallback {
 
 		private final View mWindow;
 		private final View mContents;
+		private SpotifyTrack spotifyTrack;
 
 		CustomInfoWindowAdapter(){
 			mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
@@ -211,7 +285,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		private void render(Marker marker, View view){
 
 			TestPost testPost = new Gson().fromJson(marker.getTitle(), TestPost.class);
-			SpotifyTrack spotifyTrack = new Gson().fromJson(marker.getSnippet(), SpotifyTrack.class);
+			spotifyTrack = new Gson().fromJson(marker.getSnippet(), SpotifyTrack.class);
+			currentTrack = spotifyTrack;
 
 			ImageView imageView = (ImageView) view.findViewById(R.id.badge);
 
@@ -230,6 +305,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			artistUI.setText(spotifyTrack.getArtistName());
 			albumUI.setText(spotifyTrack.getAlbumName());
 			snippetUI.setText("Message: " + testPost.getMessage());
+
+			ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 
 		}
 

@@ -122,8 +122,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 		// Set up SearchView
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) MenuItemCompat.getActionView(
-			menu.findItem(R.id.search));
+		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
 
 		ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
 		searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
@@ -194,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 			googleSignInName.setText("GOOGLE: " + acct.getDisplayName());
 			//mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
 			//updateUI(true);
+			Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+			startActivity(intent);
 		} else {
 			// Signed out, show unauthenticated UI.
 			//updateUI(false);

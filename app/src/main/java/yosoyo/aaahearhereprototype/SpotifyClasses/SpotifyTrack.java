@@ -70,6 +70,10 @@ public class SpotifyTrack {
 		return  getArtistName() + " - " + getAlbumName();
 	}
 
+	public String getPreview_url() {
+		return preview_url;
+	}
+
 	@Override
 	public String toString(){
 		return name;
