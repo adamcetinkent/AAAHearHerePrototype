@@ -1,16 +1,23 @@
 package yosoyo.aaahearhereprototype;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +25,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -25,8 +33,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.List;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.ORMCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.ORMTestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCreatePostTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostsTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
@@ -39,14 +51,21 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 	private GoogleApiClient mGoogleApiClient;
 	private Location lastLocation;
+	private Location middleLocation;
 
-	//private String trackName;
-	//private String trackDesc;
 	private SpotifyTrack newTrack;
-	//private int numMarkers;
 	private TestPost[] testPosts;
-	private SpotifyTrack currentTrack;
+	private List<TestPost> localTestPosts;
+	private List<CachedSpotifyTrack> localSpotifyTracks;
+	private CachedSpotifyTrack currentTrack;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
+
+	private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
+	private static final String LOCATION_ADDRESS_KEY = "location-address";
+	protected boolean mAddressRequested;
+	protected String mAddressOutput;
+	private AddressResultReceiver mResultReceiver;
+	private ProgressBar mProgressBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +74,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		setUpMapIfNeeded();
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			//this.trackName = extras.getString(SearchResultsActivity.TRACK_NAME);
-			//this.trackDesc = extras.getString(SearchResultsActivity.TRACK_DESC);
+
 			this.newTrack = new Gson().fromJson(extras.getString(SearchResultsActivity.TRACK_JSON),
 											 SpotifyTrack.class);
 		}
@@ -69,6 +87,62 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				.addApi(LocationServices.API)
 				.build();
 		}
+
+		localTestPosts =  ORMTestPost.getTestPosts(this);
+		localSpotifyTracks =  ORMCachedSpotifyTrack.getCachedSpotiyTracks(this);
+
+		ImageButton resetButton = (ImageButton) findViewById(R.id.reset_button);
+		resetButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mMap.clear();
+				localTestPosts.clear();
+				localSpotifyTracks.clear();
+				localTestPosts =  ORMTestPost.getTestPosts(MapsActivity.this);
+				localSpotifyTracks =  ORMCachedSpotifyTrack.getCachedSpotiyTracks(MapsActivity.this);
+				getCachedPosts();
+			}
+		});
+
+		ImageButton clearCacheButton = (ImageButton) findViewById(R.id.clear_cache_button);
+		clearCacheButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				DatabaseHelper.reset(MapsActivity.this);
+				mMap.clear();
+				localTestPosts.clear();
+				localSpotifyTracks.clear();
+				getAllPosts();
+			}
+		});
+
+		/* * ADDRESS AWARENESS * */
+
+		mResultReceiver = new AddressResultReceiver(new Handler());
+		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+		mAddressRequested = false;
+		mAddressOutput = "";
+		updateValuesFromBundle(savedInstanceState);
+		updateUIWidgets();
+
+		ImageButton findLocationButton = (ImageButton) findViewById(R.id.find_location);
+		findLocationButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				if (middleLocation == null)
+					middleLocation = new Location(lastLocation);
+
+				LatLng latLng = mMap.getCameraPosition().target;
+				middleLocation.setLatitude(latLng.latitude);
+				middleLocation.setLongitude(latLng.longitude);
+				if (mGoogleApiClient.isConnected() && middleLocation != null){
+					startIntentService();
+				}
+				mAddressRequested = true;
+				updateUIWidgets();
+			}
+		});
 
 	}
 
@@ -126,7 +200,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 	@Override
 	public void onMapClick(LatLng latLng) {
-		//mMap.addMarker(new MarkerOptions().position(latLng).title("Marker " + numMarkers++));
+
+		if (middleLocation == null)
+			middleLocation = new Location(lastLocation);
+
+		middleLocation.setLatitude(latLng.latitude);
+		middleLocation.setLongitude(latLng.longitude);
+		if (mGoogleApiClient.isConnected() && middleLocation != null){
+			startIntentService();
+		}
+		mAddressRequested = true;
+		updateUIWidgets();
+		
 	}
 
 	@Override
@@ -134,19 +219,27 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
 			mGoogleApiClient);
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-		/*mMap.addMarker(
-			new MarkerOptions().position(myLatLng).title(trackName).snippet(trackDesc));*/
+
 		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new
 																	 CameraPosition.Builder()
 																	 .target(myLatLng).zoom(15)
 																	 .build()), 1000, null);
 
+		getCachedPosts();
 		if (newTrack != null){
 			TestPost testPost = new TestPost(1, newTrack.getID(), myLatLng.latitude, myLatLng.longitude, "OMG!");
 			TestCreatePostTask testCreatePostTask = new TestCreatePostTask(this, testPost);
 			testCreatePostTask.execute();
 		} else {
 			getAllPosts();
+		}
+
+		if (mAddressRequested){
+			if (!Geocoder.isPresent()) {
+				Toast.makeText(this, R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
+				return;
+			}
+			startIntentService();
 		}
 
 	}
@@ -177,6 +270,27 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		getAllPosts();
 	}
 
+	public void getCachedPosts(){
+		for (TestPost testPost : localTestPosts){
+			addPostMarker(testPost);
+		}
+	}
+
+	private void addPostMarker(TestPost testPost){
+		LatLng latLng = new LatLng(testPost.getLat(), testPost.getLon());
+		for (CachedSpotifyTrack cachedSpotifyTrack : localSpotifyTracks) {
+			if (cachedSpotifyTrack.getTrackID().equals(testPost.getTrack())){
+				mMap.addMarker(
+					new MarkerOptions().position(latLng)
+									   .title(new Gson().toJson(testPost))
+									   .snippet(new Gson().toJson(cachedSpotifyTrack))
+									   .icon(BitmapDescriptorFactory.fromResource(R.drawable.music_marker_small))
+							  );
+				return;
+			}
+		}
+	}
+
 	private void getAllPosts(){
 		TestGetPostsTask testGetPostsTask = new TestGetPostsTask(this);
 		testGetPostsTask.execute();
@@ -187,22 +301,42 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		this.testPosts = testPosts;
 		if (testPosts != null) {
 			for (int i = 0; i < testPosts.length; i++) {
-				SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
-				spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
+				if (addTestPost(testPosts[i])) {
+					ORMTestPost.insertPost(this, testPosts[i]);
+					SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
+					spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
+					localTestPosts.add(testPosts[i]);
+				}
 			}
 		} else {
 			Log.e(TAG, "No posts found!");
 		}
 	}
 
+	public boolean addTestPost(TestPost testPost){
+		for (TestPost post : localTestPosts){
+			if (post.getId() == testPost.getId())
+				return false;
+		}
+		return true;
+	}
+
 	@Override
 	public void processFinish(SpotifyTrack spotifyTrack, int position) {
-
+		CachedSpotifyTrack cachedSpotifyTrack = new CachedSpotifyTrack(spotifyTrack);
+		for (CachedSpotifyTrack track : localSpotifyTracks){
+			if (track.getTrackID() == cachedSpotifyTrack.getTrackID())
+				return;
+		}
+		ORMCachedSpotifyTrack.insertSpotifyTrack(this, spotifyTrack);
+		localSpotifyTracks.add(cachedSpotifyTrack);
 		LatLng latLng = new LatLng(testPosts[position].getLat(), testPosts[position].getLon());
 		mMap.addMarker(
-			new MarkerOptions().position(latLng).title(
-				new Gson().toJson(testPosts[position])).snippet(
-				new Gson().toJson(spotifyTrack)));
+			new MarkerOptions().position(latLng)
+							   .title(new Gson().toJson(testPosts[position]))
+							   .snippet(new Gson().toJson(cachedSpotifyTrack))
+							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.music_marker_small))
+					  );
 	}
 
 	@Override
@@ -215,9 +349,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		}
 
 		final ProgressDialog progressDialog;
-		//final VideoView videoView;
-
-		//videoView = (VideoView) findViewById(R.id.VideoView);
 
 		progressDialog = new ProgressDialog(MapsActivity.this);
 		progressDialog.setTitle("Playing from Spotify");
@@ -227,8 +358,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		progressDialog.show();
 
 		try {
-			//MediaController mediaController = new MediaController(MapsActivity.this);
-			//Uri audioStream = Uri.parse(currentTrack.getPreview_url());
 
 			mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 				@Override
@@ -255,7 +384,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				}
 			});
 
-			mediaPlayer.setDataSource(currentTrack.getPreview_url());
+			mediaPlayer.setDataSource(currentTrack.getPreviewUrl());
 			mediaPlayer.prepareAsync();
 
 		} catch (IllegalArgumentException e) {
@@ -278,7 +407,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		private final View mWindow;
 		private final View mContents;
-		private SpotifyTrack spotifyTrack;
+		private CachedSpotifyTrack spotifyTrack;
 
 		CustomInfoWindowAdapter(){
 			mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
@@ -300,27 +429,29 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		private void render(Marker marker, View view) {
 
 			TestPost testPost = new Gson().fromJson(marker.getTitle(), TestPost.class);
-			spotifyTrack = new Gson().fromJson(marker.getSnippet(), SpotifyTrack.class);
+			spotifyTrack = new Gson().fromJson(marker.getSnippet(), CachedSpotifyTrack.class);
 			currentTrack = spotifyTrack;
 
 			ImageView imageView = (ImageView) view.findViewById(R.id.badge);
 
-			if (!marker.isInfoWindowShown()){
+			if (!marker.isInfoWindowShown()) {
 				imageView.setImageBitmap(null);
 
 				DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, this, marker);
-				downloadImageTask.execute(spotifyTrack.getImages(0).getUrl());
+				downloadImageTask.execute(spotifyTrack.getImageUrl());
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
 			TextView artistUI = (TextView) view.findViewById(R.id.artist);
 			TextView albumUI = (TextView) view.findViewById(R.id.album);
 			TextView snippetUI = (TextView) view.findViewById(R.id.snippet);
+			TextView dateUI = (TextView) view.findViewById(R.id.date_time);
 
 			titleUI.setText(spotifyTrack.getName());
-			artistUI.setText(spotifyTrack.getArtistName());
-			albumUI.setText(spotifyTrack.getAlbumName());
+			artistUI.setText(spotifyTrack.getArtist());
+			albumUI.setText(spotifyTrack.getAlbum());
 			snippetUI.setText("Message: " + testPost.getMessage());
+			dateUI.setText("Posted: " +testPost.getCreatedAt());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 			if (mediaPlayer.isPlaying()) {
@@ -328,7 +459,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			} else {
 				playButton.setImageResource(R.drawable.ic_media_play);
 			}
-
 
 		}
 
@@ -340,6 +470,62 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			}
 		}
 
+	}
+
+	protected void startIntentService() {
+		Intent intent = new Intent(this, FetchAddressIntentService.class);
+		intent.putExtra(FetchAddressIntentService.Constants.RECEIVER, mResultReceiver);
+		intent.putExtra(FetchAddressIntentService.Constants.LOCATION_DATA_EXTRA, middleLocation);
+		startService(intent);
+	}
+
+	private void updateUIWidgets(){
+		if (mAddressRequested){
+			mProgressBar.setVisibility(ProgressBar.VISIBLE);
+		} else {
+			mProgressBar.setVisibility(ProgressBar.GONE);
+		}
+	}
+
+	private void updateValuesFromBundle(Bundle savedInstanceState) {
+		if (savedInstanceState != null){
+			if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)){
+				mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
+			}
+
+			if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)){
+				mAddressOutput = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+				displayAddressOutput();
+			}
+		}
+	}
+
+	private void showToast(String text){
+		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+	}
+
+	private void displayAddressOutput(){
+		showToast(mAddressOutput);
+	}
+
+	@SuppressLint("ParcelCreator")
+	private class AddressResultReceiver extends ResultReceiver {
+		public AddressResultReceiver(Handler handler){
+			super(handler);
+		}
+
+		@Override
+		protected void onReceiveResult(int resultCode, Bundle resultData){
+			mAddressOutput = resultData.getString(FetchAddressIntentService.Constants.RESULT_DATA_KEY);
+			displayAddressOutput();
+
+			//if (resultCode == FetchAddressIntentService.Constants.SUCCESS_RESULT){
+			//	showToast(getString(R.string.address_found));
+			//}
+
+			mAddressRequested = false;
+			updateUIWidgets();
+		}
 	}
 }
 

@@ -27,11 +27,16 @@ public class SpotifyTrack {
 	String uri;
 
 	public SpotifyImage[] getImages() {
-		return album.getImages();
+		if (album != null)
+			return album.getImages();
+		else
+			return null;
 	}
 
 	public SpotifyImage getImages(int index) {
 		SpotifyImage[] images = getImages();
+		if (images == null)
+			return null;
 		if (index < images.length) {
 			return images[index];
 		} else {
@@ -52,6 +57,8 @@ public class SpotifyTrack {
 	}
 
 	public String getArtistName(){
+		if (artists == null)
+			return null;
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < artists.length; i++){
 			sb.append(artists[i].getName());
@@ -63,10 +70,14 @@ public class SpotifyTrack {
 	}
 
 	public String getAlbumName(){
+		if (album == null)
+			return null;
 		return album.getName();
 	}
 
 	public String getArtistNameAlbumName(){
+		if (artists == null || album == null)
+			return null;
 		return  getArtistName() + " - " + getAlbumName();
 	}
 

@@ -12,4 +12,11 @@
 
     <string name="facebook_app_id">966494340087272</string>
 
+    <string name="no_location_data_provided">No location data provided</string>
+    <string name="service_not_available">Service not available</string>
+    <string name="invalid_lat_long_used">Invalid Latitude and/or Longitude</string>
+    <string name="no_address_found">No Address Found</string>
+    <string name="address_found">Address Found</string>
+    <string name="no_geocoder_available">No Geocoder Available</string>
+
 </resources>
