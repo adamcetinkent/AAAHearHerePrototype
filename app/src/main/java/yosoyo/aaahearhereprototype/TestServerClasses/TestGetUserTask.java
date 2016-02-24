@@ -24,7 +24,7 @@ public class TestGetUserTask extends AsyncTask<Integer, Void, TestUser> {
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestGetUserTaskCallback {
-		void processFinish(TestUser testUser);
+		void returnTestUser(TestUser testUser);
 	}
 
 	private TestGetUserTaskCallback callbackTo;
@@ -59,7 +59,7 @@ public class TestGetUserTask extends AsyncTask<Integer, Void, TestUser> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(TestUser result) {
-		callbackTo.processFinish(result);	// sends results back
+		callbackTo.returnTestUser(result);	// sends results back
 	}
 
 }

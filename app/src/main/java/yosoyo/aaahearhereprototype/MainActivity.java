@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -31,11 +33,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.Marker;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.TestGetUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, FacebookCallback<LoginResult>, TestGetUserTask.TestGetUserTaskCallback {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, FacebookCallback<LoginResult>, TestGetUserTask.TestGetUserTaskCallback, DownloadImageTask.DownloadImageTaskCallback {
 	private static final String TAG = "MainActivity";
 
 	private GoogleApiClient mGoogleApiClient;
@@ -157,7 +160,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 				Log.d(TAG, "Get user from VM Server!");
 
 				EditText editText = (EditText) findViewById(R.id.txtVMUserID);
-				long id = Long.parseLong(editText.getText().toString());
+				String strEditText = editText.getText().toString();
+
+				if (strEditText.isEmpty())
+					return;
+
+				long id = Long.parseLong(strEditText);
 
 				TestGetUserTask testGetUserTask = new TestGetUserTask(this, id);
 				testGetUserTask.execute();
@@ -241,13 +249,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	}
 
 	@Override
-	public void processFinish(TestUser testUser) {
+	public void returnTestUser(TestUser testUser) {
 		TextView textView = (TextView) findViewById(R.id.txtVMUserTestReturn);
+		ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
 		if (testUser != null){
-			textView.setText("User: " + testUser.getFirst_name() + " " + testUser.getLast_name());
+			textView.setText("User: " + testUser.getFirstName() + " " + testUser.getLastName());
+			new DownloadImageTask(imageView, this).execute(testUser.getImgUrl());
 		} else {
 			textView.setText("Failed to get user");
 		}
 
+	}
+
+	@Override
+	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
+		Log.d(TAG, "User image downloaded");
 	}
 }

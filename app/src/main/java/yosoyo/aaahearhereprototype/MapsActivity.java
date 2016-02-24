@@ -38,13 +38,14 @@ import java.util.List;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.ORMCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.ORMTestPost;
+import yosoyo.aaahearhereprototype.TestServerClasses.ORMTestPostUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCreatePostTask;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostsTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostUsersTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
-	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostsTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback, GoogleMap.OnInfoWindowClickListener {
+	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostUsersTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback, GoogleMap.OnInfoWindowClickListener, ORMCachedSpotifyTrack.GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback, ORMTestPostUser.GetDBTestPostsTask.GetDBTestPostUsersCallback, ORMTestPostUser.InsertDBTestPostUserTask.InsertDBTestPostUserCallback {
 	private static final String TAG = "MapsActivity";
 
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -54,8 +55,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	private Location middleLocation;
 
 	private SpotifyTrack newTrack;
-	private TestPost[] testPosts;
-	private List<TestPost> localTestPosts;
+	private TestPostUser[] testPostUsers;
+	private List<TestPostUser> localTestPostUsers;
+	private boolean cachedPostsAvailable = false;
+	private boolean waitingForCachedPostsAvailable = false;
 	private List<CachedSpotifyTrack> localSpotifyTracks;
 	private CachedSpotifyTrack currentTrack;
 	private MediaPlayer mediaPlayer = new MediaPlayer();
@@ -88,19 +91,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				.build();
 		}
 
-		localTestPosts =  ORMTestPost.getTestPosts(this);
-		localSpotifyTracks =  ORMCachedSpotifyTrack.getCachedSpotiyTracks(this);
+		ORMTestPostUser.getTestPosts(this, this);
+		ORMCachedSpotifyTrack.getCachedSpotifyTracks(this, this);
 
 		ImageButton resetButton = (ImageButton) findViewById(R.id.reset_button);
 		resetButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mMap.clear();
-				localTestPosts.clear();
+				localTestPostUsers.clear();
 				localSpotifyTracks.clear();
-				localTestPosts =  ORMTestPost.getTestPosts(MapsActivity.this);
-				localSpotifyTracks =  ORMCachedSpotifyTrack.getCachedSpotiyTracks(MapsActivity.this);
-				getCachedPosts();
+				ORMTestPostUser.getTestPosts(MapsActivity.this, MapsActivity.this);
+				ORMCachedSpotifyTrack.getCachedSpotifyTracks(MapsActivity.this, MapsActivity.this);
 			}
 		});
 
@@ -110,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			public void onClick(View v) {
 				DatabaseHelper.reset(MapsActivity.this);
 				mMap.clear();
-				localTestPosts.clear();
+				localTestPostUsers.clear();
 				localSpotifyTracks.clear();
 				getAllPosts();
 			}
@@ -211,7 +213,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		}
 		mAddressRequested = true;
 		updateUIWidgets();
-		
+
 	}
 
 	@Override
@@ -224,8 +226,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 																	 CameraPosition.Builder()
 																	 .target(myLatLng).zoom(15)
 																	 .build()), 1000, null);
+		if (cachedPostsAvailable)
+			getCachedPosts();
+		else
+			waitingForCachedPostsAvailable = true;
 
-		getCachedPosts();
 		if (newTrack != null){
 			TestPost testPost = new TestPost(1, newTrack.getID(), myLatLng.latitude, myLatLng.longitude, "OMG!");
 			TestCreatePostTask testCreatePostTask = new TestCreatePostTask(this, testPost);
@@ -271,18 +276,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	}
 
 	public void getCachedPosts(){
-		for (TestPost testPost : localTestPosts){
-			addPostMarker(testPost);
+		for (TestPostUser testPostUser : localTestPostUsers){
+			addPostMarker(testPostUser);
 		}
 	}
 
-	private void addPostMarker(TestPost testPost){
-		LatLng latLng = new LatLng(testPost.getLat(), testPost.getLon());
+	private void addPostMarker(TestPostUser testPostUser){
+		LatLng latLng = new LatLng(testPostUser.getTestPost().getLat(), testPostUser.getTestPost().getLon());
 		for (CachedSpotifyTrack cachedSpotifyTrack : localSpotifyTracks) {
-			if (cachedSpotifyTrack.getTrackID().equals(testPost.getTrack())){
+			if (cachedSpotifyTrack.getTrackID().equals(testPostUser.getTestPost().getTrack())){
 				mMap.addMarker(
 					new MarkerOptions().position(latLng)
-									   .title(new Gson().toJson(testPost))
+									   .title(new Gson().toJson(testPostUser))
 									   .snippet(new Gson().toJson(cachedSpotifyTrack))
 									   .icon(BitmapDescriptorFactory.fromResource(R.drawable.music_marker_small))
 							  );
@@ -292,20 +297,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	}
 
 	private void getAllPosts(){
-		TestGetPostsTask testGetPostsTask = new TestGetPostsTask(this);
-		testGetPostsTask.execute();
+		TestGetPostUsersTask testGetPostUsersTask = new TestGetPostUsersTask(this);
+		testGetPostUsersTask.execute();
 	}
 
 	@Override
-	public void processFinish(TestPost[] testPosts) {
-		this.testPosts = testPosts;
-		if (testPosts != null) {
-			for (int i = 0; i < testPosts.length; i++) {
-				if (addTestPost(testPosts[i])) {
-					ORMTestPost.insertPost(this, testPosts[i]);
-					SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, i);
-					spotifyAPIRequestTrack.execute(testPosts[i].getTrack());
-					localTestPosts.add(testPosts[i]);
+	public void returnTestPostUsers(TestPostUser[] testPostUsers) {
+		this.testPostUsers = testPostUsers;
+		if (this.testPostUsers != null) {
+			for (int i = 0; i < this.testPostUsers.length; i++) {
+				if (addTestPost(this.testPostUsers[i])) {
+					ORMTestPostUser.insertPost(this, this.testPostUsers[i], i, this);
 				}
 			}
 		} else {
@@ -313,9 +315,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		}
 	}
 
-	public boolean addTestPost(TestPost testPost){
-		for (TestPost post : localTestPosts){
-			if (post.getId() == testPost.getId())
+	public boolean addTestPost(TestPostUser testPostUser){
+		for (TestPostUser postUser : localTestPostUsers){
+			if (postUser.getTestPost().getId() == testPostUser.getTestPost().getId())
 				return false;
 		}
 		return true;
@@ -330,10 +332,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		}
 		ORMCachedSpotifyTrack.insertSpotifyTrack(this, spotifyTrack);
 		localSpotifyTracks.add(cachedSpotifyTrack);
-		LatLng latLng = new LatLng(testPosts[position].getLat(), testPosts[position].getLon());
+		LatLng latLng = new LatLng(testPostUsers[position].getTestPost().getLat(), testPostUsers[position].getTestPost().getLon());
 		mMap.addMarker(
 			new MarkerOptions().position(latLng)
-							   .title(new Gson().toJson(testPosts[position]))
+							   .title(new Gson().toJson(testPostUsers[position]))
 							   .snippet(new Gson().toJson(cachedSpotifyTrack))
 							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.music_marker_small))
 					  );
@@ -403,6 +405,26 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 	}
 
+	@Override
+	public void returnCachedSpotifyTracks(List<CachedSpotifyTrack> cachedSpotifyTracks) {
+		localSpotifyTracks = cachedSpotifyTracks;
+		getCachedPosts();
+	}
+
+	@Override
+	public void returnTestPostUsers(List<TestPostUser> testPostUsers) {
+		localTestPostUsers = testPostUsers;
+		if (waitingForCachedPostsAvailable)
+			getCachedPosts();
+	}
+
+	@Override
+	public void returnInsertedPostUserID(Long postID, int position) {
+		SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, position);
+		spotifyAPIRequestTrack.execute(testPostUsers[position].getTestPost().getTrack());
+		localTestPostUsers.add(testPostUsers[position]);
+	}
+
 	class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, DownloadImageTask.DownloadImageTaskCallback {
 
 		private final View mWindow;
@@ -428,17 +450,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		private void render(Marker marker, View view) {
 
-			TestPost testPost = new Gson().fromJson(marker.getTitle(), TestPost.class);
+			TestPostUser testPostUser = new Gson().fromJson(marker.getTitle(), TestPostUser.class);
 			spotifyTrack = new Gson().fromJson(marker.getSnippet(), CachedSpotifyTrack.class);
 			currentTrack = spotifyTrack;
 
-			ImageView imageView = (ImageView) view.findViewById(R.id.badge);
+			ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
+			ImageView imgUserArt = (ImageView) view.findViewById(R.id.imgUserArt);
 
 			if (!marker.isInfoWindowShown()) {
-				imageView.setImageBitmap(null);
+				imgAlbumArt.setImageBitmap(null);
+				imgUserArt.setImageBitmap(null);
 
-				DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, this, marker);
-				downloadImageTask.execute(spotifyTrack.getImageUrl());
+				DownloadImageTask downloadImageTaskAlbumArt = new DownloadImageTask(imgAlbumArt, this, marker);
+				downloadImageTaskAlbumArt.execute(spotifyTrack.getImageUrl());
+
+				DownloadImageTask downloadImageTaskUserArt = new DownloadImageTask(imgUserArt, this, marker);
+				downloadImageTaskUserArt.execute(testPostUser.getTestUser().getImgUrl());
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
@@ -446,12 +473,14 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 			TextView albumUI = (TextView) view.findViewById(R.id.album);
 			TextView snippetUI = (TextView) view.findViewById(R.id.snippet);
 			TextView dateUI = (TextView) view.findViewById(R.id.date_time);
+			TextView userUI = (TextView) view.findViewById(R.id.txtUserID);
 
 			titleUI.setText(spotifyTrack.getName());
 			artistUI.setText(spotifyTrack.getArtist());
 			albumUI.setText(spotifyTrack.getAlbum());
-			snippetUI.setText("Message: " + testPost.getMessage());
-			dateUI.setText("Posted: " +testPost.getCreatedAt());
+			snippetUI.setText("Message: " + testPostUser.getTestPost().getMessage());
+			dateUI.setText("Posted: " + testPostUser.getTestPost().getCreatedAt());
+			userUI.setText(testPostUser.getTestUser().getFirstName() + " " + testPostUser.getTestUser().getLastName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 			if (mediaPlayer.isPlaying()) {
@@ -463,7 +492,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		}
 
 		@Override
-		public void processFinish(Bitmap result, int position, Marker marker) {
+		public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 			Log.d(TAG, "Finished image download");
 			if (marker != null && marker.isInfoWindowShown()){
 				marker.showInfoWindow();

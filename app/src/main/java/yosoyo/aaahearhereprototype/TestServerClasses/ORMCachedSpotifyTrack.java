@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -93,30 +94,54 @@ public class ORMCachedSpotifyTrack {
 		return contentValues;
 	}
 
-	public static List<CachedSpotifyTrack> getCachedSpotiyTracks(Context context){
-		DatabaseHelper databaseHelper = new DatabaseHelper(context);
-		SQLiteDatabase database = databaseHelper.getReadableDatabase();
+	public static void getCachedSpotifyTracks(Context context, GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback callbackTo){
+		new GetDBCachedSpotifyTracksTask(context, callbackTo).execute();
+	}
 
-		Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+	public static class GetDBCachedSpotifyTracksTask extends AsyncTask<Void, Void, List<CachedSpotifyTrack>> {
+		private Context context;
+		private GetDBCachedSpotifyTracksCallback callbackTo;
 
-		int numTracks = cursor.getCount();
-		Log.d(TAG, "Loaded " + numTracks + " CachedSpotifyTracks...");
-		List<CachedSpotifyTrack> cachedSpotifyTracks = new ArrayList<>(numTracks);
-
-		if (numTracks > 0){
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()){
-				CachedSpotifyTrack track = new CachedSpotifyTrack(cursor);
-				cachedSpotifyTracks.add(track);
-				cursor.moveToNext();
-			}
-			Log.d(TAG, "CachedSpotifyTracks loaded successfully");
+		public interface GetDBCachedSpotifyTracksCallback {
+			void returnCachedSpotifyTracks(List<CachedSpotifyTrack> cachedSpotifyTracks);
 		}
 
-		cursor.close();
-		database.close();
+		public GetDBCachedSpotifyTracksTask(Context context, GetDBCachedSpotifyTracksCallback callbackTo){
+			this.context = context;
+			this.callbackTo = callbackTo;
+		}
 
-		return cachedSpotifyTracks;
+		@Override
+		protected List<CachedSpotifyTrack> doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+
+			int numTracks = cursor.getCount();
+			Log.d(TAG, "Loaded " + numTracks + " CachedSpotifyTracks...");
+			List<CachedSpotifyTrack> cachedSpotifyTracks = new ArrayList<>(numTracks);
+
+			if (numTracks > 0){
+				cursor.moveToFirst();
+				while (!cursor.isAfterLast()){
+					CachedSpotifyTrack track = new CachedSpotifyTrack(cursor);
+					cachedSpotifyTracks.add(track);
+					cursor.moveToNext();
+				}
+				Log.d(TAG, "CachedSpotifyTracks loaded successfully");
+			}
+
+			cursor.close();
+			database.close();
+
+			return cachedSpotifyTracks;
+		}
+
+		@Override
+		protected void onPostExecute(List<CachedSpotifyTrack> cachedSpotifyTracks){
+			callbackTo.returnCachedSpotifyTracks(cachedSpotifyTracks);
+		}
 	}
 
 }

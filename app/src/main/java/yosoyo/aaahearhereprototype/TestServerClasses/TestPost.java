@@ -29,14 +29,25 @@ public class TestPost {
 	}
 
 	public TestPost(Cursor cursor){
-		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestPost.COLUMN_ID_NAME));
-		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMTestPost.COLUMN_USER_ID_NAME));
-		this.track = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_TRACK_NAME));
-		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMTestPost.COLUMN_LAT_NAME));
-		this.lon = cursor.getDouble(cursor.getColumnIndex(ORMTestPost.COLUMN_LON_NAME));
-		this.message = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_MESSAGE_NAME));
-		this.updated_at = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_UPDATED_AT_NAME));
-		this.created_at = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_CREATED_AT_NAME));
+		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestPostUser.COLUMN_ID_NAME));
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_ID_NAME));
+		this.track = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_TRACK_NAME));
+		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMTestPostUser.COLUMN_LAT_NAME));
+		this.lon = cursor.getDouble(cursor.getColumnIndex(ORMTestPostUser.COLUMN_LON_NAME));
+		this.message = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_MESSAGE_NAME));
+		this.updated_at = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_UPDATED_AT_NAME));
+		this.created_at = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_CREATED_AT_NAME));
+	}
+
+	public TestPost(TestPostUserNested testPostUserNested){
+		this.id = testPostUserNested.id;
+		this.user_id = testPostUserNested.user_id;
+		this.track = testPostUserNested.track;
+		this.lat = testPostUserNested.lat;
+		this.lon = testPostUserNested.lon;
+		this.message = testPostUserNested.message;
+		this.updated_at = testPostUserNested.updated_at;
+		this.created_at = testPostUserNested.created_at;
 	}
 
 	public long getId() {

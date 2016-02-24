@@ -64,7 +64,7 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 
 
 	@Override
-	public void processFinish(Bitmap result, int position, Marker marker) {
+	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 		artistBitmaps[position] = result; // store downloaded bitmap
 	}
 }

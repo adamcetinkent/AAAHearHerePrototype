@@ -31,7 +31,12 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 	// Interface for classes wanting to incorporate this class to download bitmaps asynchronously
 	public interface DownloadImageTaskCallback {
-		void processFinish(Bitmap result, int position, Marker marker);
+		void returnDownloadedImage(Bitmap result, int position, Marker marker);
+	}
+
+	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo) {
+		this.callbackTo = callbackTo;
+		this.imageView = imageView;
 	}
 
 	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, int position) {
@@ -78,6 +83,6 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Bitmap result) {
 		imageView.setImageBitmap(result); // immediately update imageView
-		callbackTo.processFinish(result, position, marker); // send result back for storage
+		callbackTo.returnDownloadedImage(result, position, marker); // send result back for storage
 	}
 }
