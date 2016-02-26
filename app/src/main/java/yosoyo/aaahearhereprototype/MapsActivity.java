@@ -127,25 +127,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 		updateValuesFromBundle(savedInstanceState);
 		updateUIWidgets();
 
-		ImageButton findLocationButton = (ImageButton) findViewById(R.id.find_location);
-		findLocationButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-
-				if (middleLocation == null)
-					middleLocation = new Location(lastLocation);
-
-				LatLng latLng = mMap.getCameraPosition().target;
-				middleLocation.setLatitude(latLng.latitude);
-				middleLocation.setLongitude(latLng.longitude);
-				if (mGoogleApiClient.isConnected() && middleLocation != null){
-					startIntentService();
-				}
-				mAddressRequested = true;
-				updateUIWidgets();
-			}
-		});
-
 	}
 
 	@Override
@@ -270,7 +251,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	}
 
 	@Override
-	public void processFinish(Boolean success) {
+	public void returnResultCreatePost(Boolean success, TestPost testPost) {
 		Log.d(TAG, "Successful post!");
 		getAllPosts();
 	}

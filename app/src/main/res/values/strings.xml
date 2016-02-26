@@ -18,5 +18,7 @@
     <string name="no_address_found">No Address Found</string>
     <string name="address_found">Address Found</string>
     <string name="no_geocoder_available">No Geocoder Available</string>
+    <string name="web_client_id">309766108839-mgshbchl5l2ue610pjnc5cja5eeejoes.apps.googleusercontent.com</string>
+    <string name="client_id_android">309766108839-jnep7jmtn48cl16ge39ucs5991bkkqlp.apps.googleusercontent.com</string>
 
 </resources>

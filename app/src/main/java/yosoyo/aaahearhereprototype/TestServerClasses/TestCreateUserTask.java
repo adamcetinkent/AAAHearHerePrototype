@@ -18,28 +18,28 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
+public class TestCreateUserTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "TestCreatePostTask";
-	private static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/posts/";
+	private static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/users/";
 	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/posts/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface TestCreatePostTaskCallback {
-		void returnResultCreatePost(Boolean success, TestPost testPost);
+	public interface TestCreateUserTaskCallback {
+		void returnResultCreateUser(Boolean success, TestUser testUser);
 	}
 
-	private TestCreatePostTaskCallback callbackTo;
-	private TestPost testPost;
-	private TestPost testPostReturned;
+	private TestCreateUserTaskCallback callbackTo;
+	private TestUser testUser;
+	private TestUser testUserReturned;
 
-	public TestCreatePostTask(TestCreatePostTaskCallback callbackTo, TestPost testPost) {
+	public TestCreateUserTask(TestCreateUserTaskCallback callbackTo, TestUser testUser) {
 		this.callbackTo = callbackTo;
-		this.testPost = testPost;
+		this.testUser = testUser;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting test post to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Posting test user to " + VM_SERVER_ADDRESS);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -50,8 +50,8 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(testPost, TestPost.class);
-				String jsonplus = "{\"post\": "+json+"}";
+				String json = new Gson().toJson(testUser, TestUser.class);
+				String jsonplus = "{\"user\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
 				out.write(jsonplus);
@@ -64,7 +64,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					testPostReturned = new Gson().fromJson(inString, TestPost.class);
+					testUserReturned = new Gson().fromJson(inString, TestUser.class);
 
 					return true;
 				} else {
@@ -86,7 +86,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreatePost(result, testPostReturned);	// sends results back
+		callbackTo.returnResultCreateUser(result, testUserReturned);	// sends results back
 	}
 
 }

@@ -31,26 +31,6 @@
         android:gravity="right"
         android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            >
-            <ImageButton
-                android:id="@+id/find_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/places_ic_search"
-                android:layout_gravity="left"
-                android:paddingLeft="10dp"
-                android:paddingTop="10dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="10dp"
-                />
-        </LinearLayout>
-
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"

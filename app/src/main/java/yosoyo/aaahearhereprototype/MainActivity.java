@@ -14,38 +14,38 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
-import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.Marker;
 
-import yosoyo.aaahearhereprototype.TestServerClasses.TestGetUserTask;
+import java.net.HttpURLConnection;
+
+import yosoyo.aaahearhereprototype.TestServerClasses.TestCreateUserTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestFacebookAuthenticateUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, FacebookCallback<LoginResult>, TestGetUserTask.TestGetUserTaskCallback, DownloadImageTask.DownloadImageTaskCallback {
+public class MainActivity extends AppCompatActivity implements FacebookCallback<LoginResult>,
+	DownloadImageTask.DownloadImageTaskCallback,
+	TestFacebookAuthenticateUserTask.TestFacebookAuthenticateUserTaskCallback,
+	TestCreateUserTask.TestCreateUserTaskCallback,
+	View.OnClickListener
+{
 	private static final String TAG = "MainActivity";
 
-	private GoogleApiClient mGoogleApiClient;
 	private CallbackManager callbackManager;
-	private ProfileTracker profileTracker;
-	private TextView googleSignInName;
 	private TextView facebookSignInName;
+	private Button continueButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,23 +60,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 		setSupportActionBar(myToolbar);
 
-		/* --- GOOGLE STUFF --- */
-
-		// Configure sign-in to request the user's ID, email address, and basic
-		// profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-			.requestEmail()
-			.build();
-
-		// Build a GoogleApiClient with access to the Google Sign-In API and the
-		// options specified by gso.
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-			.enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-			.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-			.build();
-
-		findViewById(R.id.google_sign_in_button).setOnClickListener(this);
-		googleSignInName = (TextView) findViewById(R.id.googleSignInName);
+		continueButton = (Button) findViewById(R.id.btnContinue);
+		continueButton.setOnClickListener(this);
 
 		/* --- FACEBOOK STUFF --- */
 
@@ -85,36 +70,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 		callbackManager = CallbackManager.Factory.create();
 		LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
 		loginButton.registerCallback(callbackManager, this);
-
-		profileTracker = new ProfileTracker() {
-			@Override
-			protected void onCurrentProfileChanged(
-				Profile oldProfile,
-				Profile currentProfile) {
-				Log.d(TAG, "PROFILE CHANGE:: ");
-
-				if (oldProfile != null) {
-					Log.d(TAG, "\t+ oldProfile: " + oldProfile.getName());
-				} else {
-					Log.d(TAG, "\t+ oldProfile: ---");
-				}
-
-				if (currentProfile != null) {
-					Log.d(TAG, "\t+ currentProfile: " + currentProfile.getName());
-					facebookSignInName.setText("FACEBOOK: " + currentProfile.getName());
-				} else {
-					Log.d(TAG, "\t+ currentProfile: ---");
-					facebookSignInName.setText("FACEBOOK SIGN IN");
-				}
-
-			}
-		};
-
-
-		/* RUBY STUFF */
-
-		Button button = (Button) findViewById(R.id.btnVMTestUser);
-		button.setOnClickListener(this);
 
 	}
 
@@ -135,86 +90,46 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 	/*	*	*	*	*	*	*	*
 	*							*
-	* 	GOOGLE SIGN IN STUFF	*
+	* 	FACEBOOK SIGN IN STUFF	*
 	*							*
 	*	*	*	*	*	*	*	*/
-
-	private static final int RC_SIGN_IN = 9001;
-
-	@Override
-	public void onConnectionFailed(ConnectionResult connectionResult) {
-		Log.e(TAG, "Connection failed!");
-	}
-
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-
-			case R.id.google_sign_in_button: {
-				Log.d(TAG, "Sign in button pressed!");
-				signIn();
-				break;
-			}
-
-			case R.id.btnVMTestUser: {
-				Log.d(TAG, "Get user from VM Server!");
-
-				EditText editText = (EditText) findViewById(R.id.txtVMUserID);
-				String strEditText = editText.getText().toString();
-
-				if (strEditText.isEmpty())
-					return;
-
-				long id = Long.parseLong(strEditText);
-
-				TestGetUserTask testGetUserTask = new TestGetUserTask(this, id);
-				testGetUserTask.execute();
-
-			}
-
-		}
-	}
-
-	private void signIn() {
-		Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-		startActivityForResult(signInIntent, RC_SIGN_IN);
-	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
-		// Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-		if (requestCode == RC_SIGN_IN) {
-			GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-			handleSignInResult(result);
-		}
-
 		callbackManager.onActivityResult(requestCode, resultCode, data);
 	}
 
-	private void handleSignInResult(GoogleSignInResult result) {
-		Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-		if (result.isSuccess()) {
-			// Signed in successfully, show authenticated UI.
-			GoogleSignInAccount acct = result.getSignInAccount();
-			googleSignInName.setText("GOOGLE: " + acct.getDisplayName());
-			//mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-			//updateUI(true);
-			Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-			startActivity(intent);
+	@Override
+	public void returnAuthenticationResult(Integer result) {
+		if (result == HttpURLConnection.HTTP_OK) {
+			facebookSignInSucceeded();
+		} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
+			Toast.makeText(this, "Creating new user...", Toast.LENGTH_LONG);
+			TestUser testUser = new TestUser(Profile.getCurrentProfile());
+			new TestCreateUserTask(this, testUser).execute();
 		} else {
-			// Signed out, show unauthenticated UI.
-			//updateUI(false);
-			googleSignInName.setText("LOGIN FAILED");
+			facebookSignInFailed();
 		}
 	}
 
-	/*	*	*	*	*	*	*	*
-	*							*
-	* 	FACEBOOK SIGN IN STUFF	*
-	*							*
-	*	*	*	*	*	*	*	*/
+	private void facebookSignInFailed(){
+		facebookSignInName.setText("LOGIN FAILED");
+		Toast.makeText(this, "Facebook Sign In Failed!", Toast.LENGTH_LONG);
+		continueButton.setEnabled(false);
+	}
+
+	private void facebookSignInSucceeded() {
+		Profile profile = Profile.getCurrentProfile();
+		facebookSignInName.setText(profile.getFirstName() + " " + profile.getLastName());
+		Toast.makeText(this,
+					   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(), Toast.LENGTH_LONG);
+		continueButton.setEnabled(true);
+
+		ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
+		new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());
+	}
 
 	@Override
 	protected void onResume() {
@@ -235,6 +150,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 	@Override
 	public void onSuccess(LoginResult loginResult) {
+		AccessToken accessToken = AccessToken.getCurrentAccessToken();
+		String strAccessToken = accessToken.getToken();
+
+		Toast.makeText(this, strAccessToken, Toast.LENGTH_LONG).show();
+
+		new TestFacebookAuthenticateUserTask(this, accessToken).execute();
+
 		Log.d(TAG, "signed in on Facebook!/n" + loginResult.toString());
 	}
 
@@ -249,20 +171,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 	}
 
 	@Override
-	public void returnTestUser(TestUser testUser) {
-		TextView textView = (TextView) findViewById(R.id.txtVMUserTestReturn);
-		ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
-		if (testUser != null){
-			textView.setText("User: " + testUser.getFirstName() + " " + testUser.getLastName());
-			new DownloadImageTask(imageView, this).execute(testUser.getImgUrl());
-		} else {
-			textView.setText("Failed to get user");
-		}
-
+	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
+		Log.d(TAG, "User image downloaded");
 	}
 
 	@Override
-	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
-		Log.d(TAG, "User image downloaded");
+	public void returnResultCreateUser(Boolean success, TestUser testUser) {
+		facebookSignInSucceeded();
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()){
+			case (R.id.btnContinue): {
+				if (continueButton.isEnabled()){
+					Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+					startActivity(intent);
+				}
+			}
+		}
 	}
 }

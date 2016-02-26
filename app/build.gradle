@@ -27,6 +27,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    //compile 'com.koushikdutta.ion:ion:2.+'
 }
 
 apply plugin: 'com.google.gms.google-services'

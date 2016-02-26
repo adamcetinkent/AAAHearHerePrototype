@@ -56,6 +56,9 @@ public class ORMTestPostUser {
 	private static final String COLUMN_USER_IMG_TYPE = "TEXT";
 	public static final String COLUMN_USER_IMG_NAME = "user_img_url";
 
+	private static final String COLUMN_FB_USER_ID_TYPE = "TEXT";
+	public static final String COLUMN_FB_USER_ID_NAME = "fb_user_id";
+
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +
 			COLUMN_ID_NAME + " " + COLUMN_ID_TYPE + COMMA_SEP +
@@ -68,7 +71,8 @@ public class ORMTestPostUser {
 			COLUMN_UPDATED_AT_NAME + " " + COLUMN_UPDATED_AT_TYPE + COMMA_SEP +
 			COLUMN_USER_FIRST_NAME_NAME + " " + COLUMN_USER_FIRST_NAME_TYPE +COMMA_SEP +
 			COLUMN_USER_LAST_NAME_NAME + " " + COLUMN_USER_LAST_NAME_TYPE +COMMA_SEP +
-			COLUMN_USER_IMG_NAME + " " + COLUMN_USER_IMG_TYPE +
+			COLUMN_USER_IMG_NAME + " " + COLUMN_USER_IMG_TYPE + COMMA_SEP +
+			COLUMN_FB_USER_ID_NAME + " " + COLUMN_FB_USER_ID_TYPE +
 		");";
 
 	public static final String SQL_DROP_TABLE =
@@ -102,6 +106,7 @@ public class ORMTestPostUser {
 		contentValues.put(ORMTestPostUser.COLUMN_USER_FIRST_NAME_NAME, testPostUser.getTestUser().first_name);
 		contentValues.put(ORMTestPostUser.COLUMN_USER_LAST_NAME_NAME, testPostUser.getTestUser().last_name);
 		contentValues.put(ORMTestPostUser.COLUMN_USER_IMG_NAME, testPostUser.getTestUser().img_url);
+		contentValues.put(ORMTestPostUser.COLUMN_FB_USER_ID_NAME, testPostUser.getTestUser().fb_user_id);
 		return contentValues;
 	}
 

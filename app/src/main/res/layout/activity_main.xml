@@ -17,27 +17,6 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <!--<ListView
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/listView"/>-->
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/google_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="GOOGLE SIGN IN"
-        android:id="@+id/googleSignInName"
-        android:layout_gravity="center_horizontal"/>
-
     <com.facebook.login.widget.LoginButton
         android:id="@+id/facebook_login_button"
         android:layout_width="wrap_content"
@@ -52,31 +31,18 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="FACEBOOK SIGN IN"
         android:id="@+id/facebookSignInName"
-        android:layout_gravity="center_horizontal"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="15dp"
-        android:id="@+id/txtVMUserID"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="30dp"/>
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
-        android:text="Get User"
-        android:id="@+id/btnVMTestUser"
-        android:layout_gravity="center_horizontal"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="VMServer Login"
-        android:id="@+id/txtVMUserTestReturn"
-        android:layout_gravity="center_horizontal"/>
+        android:text="Continue"
+        android:id="@+id/btnContinue"
+        android:layout_gravity="center_horizontal"
+        android:enabled="false"/>
 
     <ImageView
         android:id="@+id/imgUserImage"
