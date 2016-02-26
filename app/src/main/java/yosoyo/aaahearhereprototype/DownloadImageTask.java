@@ -24,6 +24,11 @@ import java.net.URL;
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	private static final String TAG = "DownloadImageTask";
 
+	public static final String FACEBOOK_PROFILE_PHOTO = "https://graph.facebook.com/";
+	public static final String FACEBOOK_PROFILE_PHOTO_SMALL = "/picture?type=small";
+	public static final String FACEBOOK_PROFILE_PHOTO_NORMAL = "/picture?type=normal";
+	public static final String FACEBOOK_PROFILE_PHOTO_LARGE = "/picture?type=large";
+
 	private DownloadImageTaskCallback callbackTo = null;
 	private int position;
 	private ImageView imageView;

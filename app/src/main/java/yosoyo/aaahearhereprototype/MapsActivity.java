@@ -44,7 +44,7 @@ import yosoyo.aaahearhereprototype.TestServerClasses.TestGetPostUsersTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
 
-public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapClickListener,
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLongClickListener,
 	GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, TestCreatePostTask.TestCreatePostTaskCallback, TestGetPostUsersTask.TestGetPostsTaskCallback, SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback, GoogleMap.OnInfoWindowClickListener, ORMCachedSpotifyTrack.GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback, ORMTestPostUser.GetDBTestPostsTask.GetDBTestPostUsersCallback, ORMTestPostUser.InsertDBTestPostUserTask.InsertDBTestPostUserCallback {
 	private static final String TAG = "MapsActivity";
 
@@ -69,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	protected String mAddressOutput;
 	private AddressResultReceiver mResultReceiver;
 	private ProgressBar mProgressBar;
+	private Marker currentMarker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		mMap.setMyLocationEnabled(true);
 
-		mMap.setOnMapClickListener(this);
+		mMap.setOnMapLongClickListener(this);
 
 		mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
@@ -182,7 +183,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 	}
 
 	@Override
-	public void onMapClick(LatLng latLng) {
+	public void onMapLongClick(LatLng latLng) {
 
 		if (middleLocation == null)
 			middleLocation = new Location(lastLocation);
@@ -431,6 +432,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 
 		private void render(Marker marker, View view) {
 
+			currentMarker = marker;
+
 			TestPostUser testPostUser = new Gson().fromJson(marker.getTitle(), TestPostUser.class);
 			spotifyTrack = new Gson().fromJson(marker.getSnippet(), CachedSpotifyTrack.class);
 			currentTrack = spotifyTrack;
@@ -446,7 +449,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapCli
 				downloadImageTaskAlbumArt.execute(spotifyTrack.getImageUrl());
 
 				DownloadImageTask downloadImageTaskUserArt = new DownloadImageTask(imgUserArt, this, marker);
-				downloadImageTaskUserArt.execute(testPostUser.getTestUser().getImgUrl());
+				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPostUser.getTestUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);

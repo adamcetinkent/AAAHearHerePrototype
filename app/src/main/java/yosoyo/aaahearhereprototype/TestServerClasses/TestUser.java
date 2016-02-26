@@ -30,6 +30,10 @@ public class TestUser {
 		return img_url;
 	}
 
+	public String  getFBUserID(){
+		return fb_user_id;
+	}
+
 	public TestUser(Cursor cursor){
 		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_ID_NAME));;
 		this.first_name = cursor.getString(
