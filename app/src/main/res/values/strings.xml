@@ -21,4 +21,19 @@
     <string name="web_client_id">309766108839-mgshbchl5l2ue610pjnc5cja5eeejoes.apps.googleusercontent.com</string>
     <string name="client_id_android">309766108839-jnep7jmtn48cl16ge39ucs5991bkkqlp.apps.googleusercontent.com</string>
 
+    <string name="home_fragment_title">Home fragment</string>
+    <string name="map_fragment_title">Map fragment</string>
+    <string name="post_fragment_title">Post fragment</string>
+    <string name="profile_fragment_title">Profile fragment</string>
+    <string name="open_drawer">Open drawer</string>
+    <string name="close_drawer">Close drawer</string>
+
+    <string-array name="navigation_options">
+        <item>Home</item>
+        <item>Map</item>
+        <item>Post</item>
+        <item>Profile</item>
+    </string-array>
+
+
 </resources>

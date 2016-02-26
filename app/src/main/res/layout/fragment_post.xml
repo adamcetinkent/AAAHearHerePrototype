@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="yosoyo.aaahearhereprototype.Fragments.PostFragment">
+
+    <TextView
+        android:id="@+id/title_post"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/post_fragment_title"/>
+
+</FrameLayout>

@@ -1,15 +1,9 @@
 package yosoyo.aaahearhereprototype;
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -35,7 +29,7 @@ import yosoyo.aaahearhereprototype.TestServerClasses.TestCreateUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestFacebookAuthenticateUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class MainActivity extends AppCompatActivity implements FacebookCallback<LoginResult>,
+public class MainActivity extends /*AppCompatActivity*/ Activity implements FacebookCallback<LoginResult>,
 	DownloadImageTask.DownloadImageTaskCallback,
 	TestFacebookAuthenticateUserTask.TestFacebookAuthenticateUserTaskCallback,
 	TestCreateUserTask.TestCreateUserTaskCallback,
@@ -46,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements FacebookCallback<
 	private CallbackManager callbackManager;
 	private TextView facebookSignInName;
 	private Button continueButton;
+	private Button shortcutButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +52,14 @@ public class MainActivity extends AppCompatActivity implements FacebookCallback<
 		setContentView(R.layout.activity_main);
 
 		// Set up Action Bar
-		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-		setSupportActionBar(myToolbar);
+		//Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+		//setSupportActionBar(myToolbar);
 
 		continueButton = (Button) findViewById(R.id.btnContinue);
 		continueButton.setOnClickListener(this);
+
+		shortcutButton = (Button) findViewById(R.id.btnShortcut);
+		shortcutButton.setOnClickListener(this);
 
 		/* --- FACEBOOK STUFF --- */
 
@@ -78,12 +76,14 @@ public class MainActivity extends AppCompatActivity implements FacebookCallback<
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 
+		/*
 		// Set up SearchView
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
 
 		ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
 		searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
+		*/
 
 		return true;
 	}
@@ -187,7 +187,13 @@ public class MainActivity extends AppCompatActivity implements FacebookCallback<
 				if (continueButton.isEnabled()){
 					Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
 					startActivity(intent);
+					break;
 				}
+			}
+			case (R.id.btnShortcut): {
+				Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
+				startActivity(intent);
+				break;
 			}
 		}
 	}

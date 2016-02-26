@@ -21,7 +21,7 @@ import java.net.URL;
  * Downloads a bitmap from a URL and sets imageView to display it.
  * callbackTo function receives resulting bitmap for storage.
  */
-class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	private static final String TAG = "DownloadImageTask";
 
 	public static final String FACEBOOK_PROFILE_PHOTO = "https://graph.facebook.com/";
