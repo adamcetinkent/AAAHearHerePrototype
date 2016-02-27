@@ -3,19 +3,23 @@ package yosoyo.aaahearhereprototype.Fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +44,8 @@ public class HomeFragment extends Fragment implements
 
 	private static final String TAG = HomeFragment.class.getSimpleName();
 	private ListView lstTimeline;
+
+	private static MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public HomeFragment() {
 		// Required empty public constructor
@@ -109,7 +115,7 @@ public class HomeFragment extends Fragment implements
 
 			TestPost testPost = testPostUserTracks.get(position).getTestPostUser().getTestPost();
 			TestUser testUser = testPostUserTracks.get(position).getTestPostUser().getTestUser();
-			CachedSpotifyTrack cachedSpotifyTrack = testPostUserTracks.get(position).getCachedSpotifyTrack();
+			final CachedSpotifyTrack cachedSpotifyTrack = testPostUserTracks.get(position).getCachedSpotifyTrack();
 
 			// get Album Art
 			ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.imgAlbumArt);
@@ -156,9 +162,83 @@ public class HomeFragment extends Fragment implements
 			TextView txtMessage = (TextView) rowView.findViewById(R.id.txtMessage);
 			txtMessage.setText(testPost.getMessage());
 
+			final ImageButton btnPlayButton = (ImageButton) rowView.findViewById(R.id.btnPlayButton);
+			btnPlayButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.reset();
+						updatePlayButton(btnPlayButton);
+						return;
+					}
+
+					final ProgressDialog progressDialog;
+
+					progressDialog = new ProgressDialog(getContext());
+					progressDialog.setTitle("Playing from Spotify");
+					progressDialog.setMessage("Buffering...");
+					progressDialog.setIndeterminate(false);
+					progressDialog.setCancelable(false);
+					progressDialog.show();
+
+					try {
+
+						mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+							@Override
+							public boolean onError(MediaPlayer mp, int what, int extra) {
+								mediaPlayer.reset();
+								updatePlayButton(btnPlayButton);
+								return false;
+							}
+						});
+
+						mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+							@Override
+							public void onPrepared(MediaPlayer mp) {
+								mediaPlayer.start();
+								progressDialog.dismiss();
+								updatePlayButton(btnPlayButton);
+							}
+						});
+
+						mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+							@Override
+							public void onCompletion(MediaPlayer mp) {
+								updatePlayButton(btnPlayButton);
+							}
+						});
+
+						mediaPlayer.setDataSource(cachedSpotifyTrack.getPreviewUrl());
+						mediaPlayer.prepareAsync();
+
+					} catch (IllegalArgumentException e) {
+						Log.e(TAG, "Error: " + e.getMessage());
+						progressDialog.dismiss();
+						e.printStackTrace();
+					} catch (IllegalStateException e) {
+						Log.e(TAG, "Error: " + e.getMessage());
+						progressDialog.dismiss();
+						e.printStackTrace();
+					} catch (IOException e) {
+						Log.e(TAG, "Error: " + e.getMessage());
+						progressDialog.dismiss();
+						e.printStackTrace();
+					}
+				}
+			});
+
+			updatePlayButton(btnPlayButton);
+
 			return rowView;
 		}
 
+		private void updatePlayButton(ImageButton btnPlayButton){
+			if (mediaPlayer.isPlaying()) {
+				btnPlayButton.setImageResource(R.drawable.ic_media_pause);
+			} else {
+				btnPlayButton.setImageResource(R.drawable.ic_media_play);
+			}
+		}
 
 		@Override
 		public void returnDownloadedImage(Bitmap result, int position, Marker marker) {

@@ -152,15 +152,32 @@
             android:id="@+id/llArtFrame"
             android:orientation="vertical"
             android:layout_width="110dp"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp">
 
-            <ImageView
-                android:id="@+id/imgAlbumArt"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+            <FrameLayout
+                android:layout_width="104dp"
+                android:layout_height="104dp"
                 android:layout_marginRight="5dp"
-                android:src="@drawable/com_facebook_profile_picture_blank_square"
-                android:layout_marginLeft="5dp"/>
+                android:layout_marginLeft="5dp">
+
+                <ImageView
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:background="@color/cardview_dark_background"
+                    />
+
+                <ImageView
+                    android:id="@+id/imgAlbumArt"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginTop="1dp"
+                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    />
+
+            </FrameLayout>
+
 
             <ImageButton
                 android:id="@+id/btnPlayButton"
