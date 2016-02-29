@@ -70,7 +70,7 @@ public class MapsFragment
 	ORMTestPostUser.GetDBTestPostsTask.GetDBTestPostUsersCallback,
 	ORMTestPostUser.InsertDBTestPostUserTask.InsertDBTestPostUserCallback{
 
-	private static final String TAG = "MapsActivity";
+	private static final String TAG = "MapsFragment";
 
 	private Activity activityContext;
 	private GoogleMap mMap; // Might be null if Google Play services APK is not available.

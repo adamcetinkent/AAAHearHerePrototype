@@ -83,7 +83,7 @@ public class SearchResultsActivity extends AppCompatActivity implements SpotifyA
 
 				SpotifyTrack track = trackResults[position];
 
-				Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+				Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
 				intent.putExtra(TRACK_NAME, trackName);
 				intent.putExtra(TRACK_DESC, trackDesc);
 				intent.putExtra(TRACK_JSON, new Gson().toJson(track, SpotifyTrack.class));

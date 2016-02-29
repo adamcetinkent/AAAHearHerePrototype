@@ -1,6 +1,7 @@
 package yosoyo.aaahearhereprototype;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -41,6 +43,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	private TextView facebookSignInName;
 	private Button continueButton;
 	private Button shortcutButton;
+	private ProgressDialog progressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +72,31 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
 		loginButton.registerCallback(callbackManager, this);
 
+		AccessTokenTracker accessTokenTracker = new AccessTokenTracker(){
+			@Override
+			protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken){
+				if (newAccessToken == null){
+					Log.d(TAG, "logged out");
+					updateUI(false);
+				} else {
+					Log.d(TAG, "logged in");
+				}
+
+			}
+		};
+
+		if (isLoggedIn()){
+			Log.d(TAG, "logged in");
+			startHearHereAuthentication();
+		}
+
 	}
+
+	private boolean isLoggedIn(){
+		AccessToken accessToken = AccessToken.getCurrentAccessToken();
+		return (accessToken != null && !accessToken.isExpired());
+	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,17 +145,12 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		facebookSignInName.setText("LOGIN FAILED");
 		Toast.makeText(this, "Facebook Sign In Failed!", Toast.LENGTH_LONG);
 		continueButton.setEnabled(false);
+		progressDialog.dismiss();
 	}
 
 	private void facebookSignInSucceeded() {
-		Profile profile = Profile.getCurrentProfile();
-		facebookSignInName.setText(profile.getFirstName() + " " + profile.getLastName());
-		Toast.makeText(this,
-					   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(), Toast.LENGTH_LONG);
-		continueButton.setEnabled(true);
-
-		ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
-		new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());
+		updateUI(true);
+		progressDialog.dismiss();
 	}
 
 	@Override
@@ -150,14 +172,22 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 
 	@Override
 	public void onSuccess(LoginResult loginResult) {
-		AccessToken accessToken = AccessToken.getCurrentAccessToken();
-		String strAccessToken = accessToken.getToken();
-
-		Toast.makeText(this, strAccessToken, Toast.LENGTH_LONG).show();
-
-		new TestFacebookAuthenticateUserTask(this, accessToken).execute();
+		startHearHereAuthentication();
 
 		Log.d(TAG, "signed in on Facebook!/n" + loginResult.toString());
+	}
+
+	private void startHearHereAuthentication(){
+		AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
+		progressDialog = new ProgressDialog(this);
+		progressDialog.setTitle("Authenticating with Hear Here");
+		progressDialog.setMessage("Please wait...");
+		progressDialog.setIndeterminate(false);
+		progressDialog.setCancelable(false);
+		progressDialog.show();
+
+		new TestFacebookAuthenticateUserTask(this, accessToken).execute();
 	}
 
 	@Override
@@ -185,7 +215,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		switch (v.getId()){
 			case (R.id.btnContinue): {
 				if (continueButton.isEnabled()){
-					Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+					Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
 					startActivity(intent);
 					break;
 				}
@@ -195,6 +225,26 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 				startActivity(intent);
 				break;
 			}
+		}
+	}
+
+	private void updateUI(boolean loggedIn){
+		if (loggedIn){
+			Profile profile = Profile.getCurrentProfile();
+			facebookSignInName.setText(profile.getFirstName() + " " + profile.getLastName());
+			Toast.makeText(this,
+						   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(), Toast.LENGTH_LONG);
+			continueButton.setEnabled(true);
+
+			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
+			new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());
+		} else {
+			facebookSignInName.setText("Logged Out");
+			Toast.makeText(MainActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);
+			continueButton.setEnabled(false);
+
+			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
+			imageView.setImageBitmap(null);
 		}
 	}
 }
