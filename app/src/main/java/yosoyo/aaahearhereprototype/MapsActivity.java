@@ -306,7 +306,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
 	}
 
 	@Override
-	public void processFinish(SpotifyTrack spotifyTrack, int position) {
+	public void returnSpotifyTrack(SpotifyTrack spotifyTrack, int position, TestPostUser testPostUser) {
 		CachedSpotifyTrack cachedSpotifyTrack = new CachedSpotifyTrack(spotifyTrack);
 		for (CachedSpotifyTrack track : localSpotifyTracks){
 			if (track.getTrackID() == cachedSpotifyTrack.getTrackID())
@@ -401,7 +401,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMapLon
 	}
 
 	@Override
-	public void returnInsertedPostUserID(Long postID, int position) {
+	public void returnInsertedPostUserID(Long postID, int position, TestPostUser testPostUser) {
 		SpotifyAPIRequestTrack spotifyAPIRequestTrack = new SpotifyAPIRequestTrack(this, position);
 		spotifyAPIRequestTrack.execute(testPostUsers[position].getTestPost().getTrack());
 		localTestPostUsers.add(testPostUsers[position]);

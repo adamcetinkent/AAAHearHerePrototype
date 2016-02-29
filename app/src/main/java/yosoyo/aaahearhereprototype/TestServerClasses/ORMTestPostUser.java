@@ -93,6 +93,10 @@ public class ORMTestPostUser {
 		new InsertDBTestPostUserTask(context, testPostUser, position, callbackTo).execute();
 	}
 
+	public static void insertPost(Context context, TestPostUser testPostUser, InsertDBTestPostUserTask.InsertDBTestPostUserCallback callbackTo){
+		new InsertDBTestPostUserTask(context, testPostUser, -1, callbackTo).execute();
+	}
+
 	private static ContentValues testPostToContentValuse(TestPostUser testPostUser){
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(ORMTestPostUser.COLUMN_ID_NAME, testPostUser.getTestPost().id);
@@ -169,7 +173,7 @@ public class ORMTestPostUser {
 		private InsertDBTestPostUserCallback callbackTo;
 
 		public interface InsertDBTestPostUserCallback {
-			void returnInsertedPostUserID(Long postID, int position);
+			void returnInsertedPostUserID(Long postID, int position, TestPostUser testPostUser);
 		}
 
 		public InsertDBTestPostUserTask(Context context, TestPostUser testPostUser, int position, InsertDBTestPostUserCallback callbackTo){
@@ -195,7 +199,7 @@ public class ORMTestPostUser {
 
 		@Override
 		protected void onPostExecute(Long postID){
-			callbackTo.returnInsertedPostUserID(postID, position);
+			callbackTo.returnInsertedPostUserID(postID, position, testPostUser);
 		}
 	}
 

@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.DownloadImageTask;
+import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.ORMCachedSpotifyTrack;
@@ -79,7 +80,7 @@ public class HomeFragment extends Fragment implements
 	@Override
 	public void returnCachedSpotifyTracks(List<CachedSpotifyTrack> cachedSpotifyTracks) {
 		ZZZDataHolder.cachedSpotifyTracks = cachedSpotifyTracks;
-		ZZZDataHolder.createTestPostUserTracks();
+		HolderActivity.dataHolder.createTestPostUserTracks();
 		lstTimeline.setAdapter(
 			new TimelineCustomListAdapter(getActivity(), ZZZDataHolder.testPostUserTracks));
 		Log.d(TAG, "Adapter set!");

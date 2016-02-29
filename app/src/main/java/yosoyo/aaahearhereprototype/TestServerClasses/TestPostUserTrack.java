@@ -20,4 +20,16 @@ public class TestPostUserTrack {
 	public CachedSpotifyTrack getCachedSpotifyTrack() {
 		return cachedSpotifyTrack;
 	}
+
+	public TestPost getTestPost(){
+		if (testPostUser == null)
+			return null;
+		return testPostUser.getTestPost();
+	}
+
+	public TestUser getTestUser(){
+		if (testPostUser == null)
+			return null;
+		return testPostUser.getTestUser();
+	}
 }

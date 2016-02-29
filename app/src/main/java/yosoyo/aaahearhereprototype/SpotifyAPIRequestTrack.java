@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
 
 /**
  * Created by Adam Kent on 08/02/2016.
@@ -24,7 +25,7 @@ public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack
 
 	// Interface for classes wanting to incorporate this class to make Spotify API Requests
 	public interface SpotifyAPIRequestTrackCallback {
-		void processFinish(SpotifyTrack output, int position);
+		void returnSpotifyTrack(SpotifyTrack spotifyTrack, int position, TestPostUser testPostUser);
 	}
 
 	private static final String urlSpotifySearch = "https://api.spotify.com/v1/tracks/";
@@ -32,10 +33,17 @@ public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack
 
 	private SpotifyAPIRequestTrackCallback callbackTo = null;
 	private int position;
+	private TestPostUser testPostUser;
 
 	public SpotifyAPIRequestTrack(SpotifyAPIRequestTrackCallback callbackTo, int position){
 		this.callbackTo = callbackTo;
 		this.position = position;
+	}
+
+	public SpotifyAPIRequestTrack(SpotifyAPIRequestTrackCallback callbackTo, TestPostUser testPostUser){
+		this.callbackTo = callbackTo;
+		this.testPostUser = testPostUser;
+		this.position = -1;
 	}
 
 	// Construct Spotify API URL from input string
@@ -77,7 +85,7 @@ public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(SpotifyTrack result) {
-		callbackTo.processFinish(result, position);	// sends results back
+		callbackTo.returnSpotifyTrack(result, position, testPostUser);	// sends results back
 	}
 
 }

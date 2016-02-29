@@ -1,11 +1,11 @@
 package yosoyo.aaahearhereprototype;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
@@ -19,8 +19,9 @@ import yosoyo.aaahearhereprototype.Fragments.HomeFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapsFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
+import yosoyo.aaahearhereprototype.Fragments.TestMapFragment;
 
-public class HolderActivity extends Activity {
+public class HolderActivity extends FragmentActivity {
 
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
@@ -29,6 +30,7 @@ public class HolderActivity extends Activity {
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
 	private int currentPosition = 0;
+	public static ZZZDataHolder dataHolder = new ZZZDataHolder();
 
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
@@ -41,6 +43,8 @@ public class HolderActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_holder);
+
+		dataHolder.setContext(this);
 
 		navigationOptions = getResources().getStringArray(R.array.navigation_options);
 		drawerList = (ListView) findViewById(R.id.drawer);
@@ -111,7 +115,8 @@ public class HolderActivity extends Activity {
 		Fragment fragment;
 		switch (position) {
 			case 1: {
-				fragment = new MapsFragment();
+				//fragment = new MapsFragment();
+				fragment = new TestMapFragment();
 				break;
 			}
 			case 2: {
