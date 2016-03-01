@@ -22,9 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -52,18 +50,18 @@ import yosoyo.aaahearhereprototype.ZZZDataHolder;
 /**
  * Created by adam on 27/02/16.
  */
-public class TestMapFragment
+public class MapViewFragment
 	extends Fragment
 	implements GoogleMap.OnInfoWindowClickListener
 	{
 
-	private static final String TAG = "TestMapFragment";
+	private static final String TAG = "MapViewFragment";
 
 	private MapView mMapView;
 	private GoogleMap googleMap;
 	private Boolean mapExists = false;
-	private Boolean apiExists = false;
-	private GoogleApiClient mGoogleApiClient;
+	//private Boolean apiExists = false;
+	//private GoogleApiClient mGoogleApiClient;
 	private Location lastLocation;
 	private Location middleLocation;
 	private Marker currentMarker;
@@ -75,7 +73,7 @@ public class TestMapFragment
 	protected String mAddressOutput;
 	private ProgressBar mProgressBar;
 
-	MediaPlayer mediaPlayer = new MediaPlayer();
+	//MediaPlayer mediaPlayer = new MediaPlayer();
 	private CachedSpotifyTrack currentTrack;
 
 	@Nullable
@@ -96,65 +94,47 @@ public class TestMapFragment
 			e.printStackTrace();
 		}
 
-		// Create an instance of GoogleAPIClient.
-		if (mGoogleApiClient == null) {
-			mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-				.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null) {
+			HolderActivity.mGoogleApiClient.registerConnectionCallbacks(
+				new GoogleApiClient.ConnectionCallbacks() {
 					@Override
 					public void onConnected(@Nullable Bundle bundle) {
-						apiExists = true;
+						//apiExists = true;
 
 						onMapReadyForLocation();
 
-						if (mAddressRequested){
+						if (mAddressRequested) {
 							if (!Geocoder.isPresent()) {
-								Toast.makeText(getActivity(), R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
+								Toast.makeText(getActivity(), R.string.no_geocoder_available,
+											   Toast.LENGTH_LONG).show();
 								return;
 							}
 							startIntentService();
 						}
 
-						HolderActivity.dataHolder.getAllPosts(getActivity(),
-														new ZZZDataHolder.getAllPostsCallback() {
-															@Override
-															public void returnOnePost(TestPostUserTrack testPostUserTrack) {
-																addMapMarker(testPostUserTrack);
-															}
+						HolderActivity.dataHolder.getAllPosts(
+							getActivity(),
+							new ZZZDataHolder.GetPostUsersCallback() {
+								@Override
+								public void returnOnePost(TestPostUserTrack testPostUserTrack) {
+									addMapMarker(testPostUserTrack, true);
+								}
 
-															@Override
-															public void returnAllPosts(List<TestPostUser> testPostUsers) {
-																HolderActivity.dataHolder.createTestPostUserTracks();
-																addMapMarkers();
-															}
-														});
+								@Override
+								public void returnAllPosts(List<TestPostUser> testPostUsers) {
+									HolderActivity.dataHolder
+										.createTestPostUserTracks();
+									addMapMarkers();
+								}
+							});
 
-						/*if (cachedPostsAvailable)
-							getCachedPosts();
-						else
-							waitingForCachedPostsAvailable = true;
-
-						if (newTrack != null){
-							TestPost testPost = new TestPost(1, newTrack.getID(), myLatLng.latitude, myLatLng.longitude, "OMG!");
-							TestCreatePostTask testCreatePostTask = new TestCreatePostTask(this, testPost);
-							testCreatePostTask.execute();
-						} else {
-							getAllPosts();
-						}*/
 					}
 
 					@Override
 					public void onConnectionSuspended(int i) {
 
 					}
-				})
-				.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-					@Override
-					public void onConnectionFailed(ConnectionResult connectionResult) {
-
-					}
-				})
-				.addApi(LocationServices.API)
-				.build();
+				});
 		}
 
 		mMapView.getMapAsync(new OnMapReadyCallback() {
@@ -171,7 +151,7 @@ public class TestMapFragment
 	}
 
 	public void onStart() {
-		mGoogleApiClient.connect();
+		//mGoogleApiClient.connect();
 
 		/* * ADDRESS AWARENESS * */
 
@@ -186,7 +166,7 @@ public class TestMapFragment
 	}
 
 	public void onStop() {
-		mGoogleApiClient.disconnect();
+		//mGoogleApiClient.disconnect();
 		super.onStop();
 	}
 
@@ -221,7 +201,7 @@ public class TestMapFragment
 			@Override
 			public void onMapLongClick(LatLng latLng) {
 
-				if (!apiExists)
+				if (!HolderActivity.apiExists)
 					return;
 
 				if (middleLocation == null)
@@ -229,7 +209,7 @@ public class TestMapFragment
 
 				middleLocation.setLatitude(latLng.latitude);
 				middleLocation.setLongitude(latLng.longitude);
-				if (mGoogleApiClient.isConnected() && middleLocation != null){
+				if (HolderActivity.mGoogleApiClient.isConnected() && middleLocation != null){
 					startIntentService();
 				}
 				mAddressRequested = true;
@@ -245,11 +225,10 @@ public class TestMapFragment
 
 	private void onMapReadyForLocation(){
 
-		if (!(apiExists && mapExists))
+		if (!(HolderActivity.apiExists && mapExists))
 			return;
 
-		lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-			mGoogleApiClient);
+		lastLocation = HolderActivity.getLastLocation();
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
 		addMapMarkers();
@@ -262,17 +241,17 @@ public class TestMapFragment
 	private void addMapMarkers(){
 		googleMap.clear();
 		for (TestPostUserTrack testPostUserTrack : ZZZDataHolder.testPostUserTracks) {
-			addMapMarker(testPostUserTrack);
+			addMapMarker(testPostUserTrack, false);
 		}
 	}
 
-	private void addMapMarker(TestPostUserTrack testPostUserTrack){
+	private void addMapMarker(TestPostUserTrack testPostUserTrack, boolean newColour){
 		LatLng latLng = new LatLng(testPostUserTrack.getTestPost().getLat(), testPostUserTrack.getTestPost().getLon());
 		googleMap.addMarker(
 			new MarkerOptions().position(latLng)
 							   .title(new Gson().toJson(testPostUserTrack))
 							   .icon(BitmapDescriptorFactory
-										 .fromResource(R.drawable.music_marker_small))
+										 .fromResource(newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
 						   );
 	}
 
@@ -286,8 +265,8 @@ public class TestMapFragment
 	@Override
 	public void onInfoWindowClick(final Marker marker) {
 
-		if (mediaPlayer.isPlaying()) {
-			mediaPlayer.reset();
+		if (HolderActivity.mediaPlayer.isPlaying()) {
+			HolderActivity.mediaPlayer.reset();
 			marker.showInfoWindow();
 			return;
 		}
@@ -303,33 +282,33 @@ public class TestMapFragment
 
 		try {
 
-			mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+			HolderActivity.mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 				@Override
 				public boolean onError(MediaPlayer mp, int what, int extra) {
-					mediaPlayer.reset();
+					HolderActivity.mediaPlayer.reset();
 					marker.showInfoWindow();
 					return false;
 				}
 			});
 
-			mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+			HolderActivity.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 				@Override
 				public void onPrepared(MediaPlayer mp) {
-					mediaPlayer.start();
+					HolderActivity.mediaPlayer.start();
 					marker.showInfoWindow();
 					progressDialog.dismiss();
 				}
 			});
 
-			mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+			HolderActivity.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
 					marker.showInfoWindow();
 				}
 			});
 
-			mediaPlayer.setDataSource(currentTrack.getPreviewUrl());
-			mediaPlayer.prepareAsync();
+			HolderActivity.mediaPlayer.setDataSource(currentTrack.getPreviewUrl());
+			HolderActivity.mediaPlayer.prepareAsync();
 
 		} catch (IllegalArgumentException e) {
 			Log.e(TAG, "Error: " + e.getMessage());
@@ -408,7 +387,7 @@ public class TestMapFragment
 			userUI.setText(testPostUserTrack.getTestUser().getFirstName() + " " + testPostUserTrack.getTestUser().getLastName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
-			if (mediaPlayer.isPlaying()) {
+			if (HolderActivity.mediaPlayer.isPlaying()) {
 				playButton.setImageResource(R.drawable.ic_media_pause);
 			} else {
 				playButton.setImageResource(R.drawable.ic_media_play);

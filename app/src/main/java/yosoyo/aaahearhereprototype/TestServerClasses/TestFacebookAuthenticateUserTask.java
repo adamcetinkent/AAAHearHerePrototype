@@ -26,11 +26,12 @@ public class TestFacebookAuthenticateUserTask extends AsyncTask<Void, Void, Inte
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestFacebookAuthenticateUserTaskCallback {
-		void returnAuthenticationResult(Integer result);
+		void returnAuthenticationResult(Integer result, TestUser testUser);
 	}
 
 	private TestFacebookAuthenticateUserTaskCallback callbackTo;
 	private AccessToken accessToken;
+	private TestUser testUser;
 
 	public TestFacebookAuthenticateUserTask(TestFacebookAuthenticateUserTaskCallback callbackTo, AccessToken accessToken) {
 		this.callbackTo = callbackTo;
@@ -67,6 +68,7 @@ public class TestFacebookAuthenticateUserTask extends AsyncTask<Void, Void, Inte
 				if (httpResult == HttpURLConnection.HTTP_OK){
 
 					Log.d(TAG, httpResponseStream);
+					testUser = new Gson().fromJson(httpResponseStream, TestUser.class);
 					return httpResult;
 
 				} else if (httpResult == HttpURLConnection.HTTP_ACCEPTED) {
@@ -91,7 +93,7 @@ public class TestFacebookAuthenticateUserTask extends AsyncTask<Void, Void, Inte
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Integer result) {
-		callbackTo.returnAuthenticationResult(result);	// sends results back
+		callbackTo.returnAuthenticationResult(result, testUser);	// sends results back
 	}
 
 }

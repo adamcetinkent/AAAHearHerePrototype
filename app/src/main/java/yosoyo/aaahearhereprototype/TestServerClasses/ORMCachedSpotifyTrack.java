@@ -70,11 +70,11 @@ public class ORMCachedSpotifyTrack {
 		database.close();
 	}
 
-	public static long insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack){
+	/*public static long insertCachedSpotifyTrack(Context context, CachedSpotifyTrack cachedSpotifyTrack){
 		DatabaseHelper databaseHelper = new DatabaseHelper(context);
 		SQLiteDatabase database = databaseHelper.getWritableDatabase();
 
-		ContentValues values = spotifyTrackToContentValuse(spotifyTrack);
+		ContentValues values = cachedSpotifyTrackToContentValues(cachedSpotifyTrack);
 		long postID = database.insert(TABLE_NAME, "null", values);
 		Log.d(TAG, "Inserted new CachedSpotifyTrack with ID:" + postID);
 
@@ -83,16 +83,48 @@ public class ORMCachedSpotifyTrack {
 		return postID;
 	}
 
-	private static ContentValues spotifyTrackToContentValuse(SpotifyTrack track){
+	public static long insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack){
+		DatabaseHelper databaseHelper = new DatabaseHelper(context);
+		SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+		ContentValues values = spotifyTrackToContentValues(spotifyTrack);
+		long postID = database.insert(TABLE_NAME, "null", values);
+		Log.d(TAG, "Inserted new CachedSpotifyTrack with ID:" + postID);
+
+		database.close();
+
+		return postID;
+	}*/
+
+	public static void insertCachedSpotifyTrack(Context context, CachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
+		new InsertCachedSpotifyTrackTask(context, cachedSpotifyTrack, -1, callbackTo).execute();
+	}
+
+	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
+		new InsertCachedSpotifyTrackTask(context, spotifyTrack, -1, callbackTo).execute();
+	}
+
+	private static ContentValues cachedSpotifyTrackToContentValues(CachedSpotifyTrack track){
+		ContentValues contentValues = new ContentValues();
+		contentValues.put(COLUMN_TRACK_ID_NAME, track.getTrackID());
+		contentValues.put(COLUMN_NAME_NAME, track.getName());
+		contentValues.put(COLUMN_ARTIST_NAME, track.getArtist());
+		contentValues.put(COLUMN_ALBUM_NAME, track.getAlbum());
+		contentValues.put(COLUMN_IMAGE_URL_NAME, track.getImageUrl());
+		contentValues.put(COLUMN_PREVIEW_URL_NAME, track.getPreviewUrl());
+		return contentValues;
+	}
+
+	/*private static ContentValues spotifyTrackToContentValues(SpotifyTrack track){
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(COLUMN_TRACK_ID_NAME, track.getID());
 		contentValues.put(COLUMN_NAME_NAME, track.getName());
 		contentValues.put(COLUMN_ARTIST_NAME, track.getArtistName());
 		contentValues.put(COLUMN_ALBUM_NAME, track.getAlbumName());
 		contentValues.put(COLUMN_IMAGE_URL_NAME, track.getImages(0).getUrl());
-		contentValues.put(COLUMN_PREVIEW_URL_NAME, track.getPreview_url());
+		contentValues.put(COLUMN_PREVIEW_URL_NAME, track.getPreviewUrl());
 		return contentValues;
-	}
+	}*/
 
 	public static void getCachedSpotifyTracks(Context context, GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback callbackTo){
 		new GetDBCachedSpotifyTracksTask(context, callbackTo).execute();
@@ -141,6 +173,51 @@ public class ORMCachedSpotifyTrack {
 		@Override
 		protected void onPostExecute(List<CachedSpotifyTrack> cachedSpotifyTracks){
 			callbackTo.returnCachedSpotifyTracks(cachedSpotifyTracks);
+		}
+	}
+
+	public static class InsertCachedSpotifyTrackTask extends AsyncTask<Void, Void, Long> {
+
+		private Context context;
+		private CachedSpotifyTrack cachedSpotifyTrack;
+		private int position;
+		private InsertCachedSpotifyTrackTaskCallback callbackTo;
+
+		public interface InsertCachedSpotifyTrackTaskCallback {
+			void returnInsertCachedSpotifyTrack(Long trackID, int position, CachedSpotifyTrack cachedSpotifyTrack);
+		}
+
+		public InsertCachedSpotifyTrackTask(Context context, CachedSpotifyTrack cachedSpotifyTrack, int position, InsertCachedSpotifyTrackTaskCallback callbackTo){
+			this.context = context;
+			this.cachedSpotifyTrack = cachedSpotifyTrack;
+			this.position = position;
+			this.callbackTo = callbackTo;
+		}
+
+		public InsertCachedSpotifyTrackTask(Context context, SpotifyTrack spotifyTrack, int position, InsertCachedSpotifyTrackTaskCallback callbackTo){
+			this.context = context;
+			this.cachedSpotifyTrack = new CachedSpotifyTrack(spotifyTrack);
+			this.position = position;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Long doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			ContentValues values = cachedSpotifyTrackToContentValues(cachedSpotifyTrack);
+			long trackID = database.insert(TABLE_NAME, "null", values);
+			Log.d(TAG, "Inserted new CachedSpotifyTrack with ID:" + trackID);
+
+			database.close();
+
+			return trackID;
+		}
+
+		@Override
+		protected void onPostExecute(Long trackID){
+			callbackTo.returnInsertCachedSpotifyTrack(trackID, position, cachedSpotifyTrack);
 		}
 	}
 

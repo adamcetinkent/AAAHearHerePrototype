@@ -87,7 +87,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Bitmap result) {
-		imageView.setImageBitmap(result); // immediately update imageView
+		if (imageView != null) {
+			imageView.setImageBitmap(result); // immediately update imageView
+		}
 		callbackTo.returnDownloadedImage(result, position, marker); // send result back for storage
 	}
 }

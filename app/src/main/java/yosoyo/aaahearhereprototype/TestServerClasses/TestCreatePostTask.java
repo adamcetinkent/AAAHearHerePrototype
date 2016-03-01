@@ -25,12 +25,12 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface TestCreatePostTaskCallback {
-		void returnResultCreatePost(Boolean success, TestPost testPost);
+		void returnResultCreatePost(Boolean success, TestPostUser testPostUser);
 	}
 
 	private TestCreatePostTaskCallback callbackTo;
 	private TestPost testPost;
-	private TestPost testPostReturned;
+	private TestPostUser testPostUserReturned;
 
 	public TestCreatePostTask(TestCreatePostTaskCallback callbackTo, TestPost testPost) {
 		this.callbackTo = callbackTo;
@@ -64,7 +64,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					testPostReturned = new Gson().fromJson(inString, TestPost.class);
+					testPostUserReturned = new Gson().fromJson(inString, TestPostUser.class);
 
 					return true;
 				} else {
@@ -86,7 +86,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreatePost(result, testPostReturned);	// sends results back
+		callbackTo.returnResultCreatePost(result, testPostUserReturned);	// sends results back
 	}
 
 }

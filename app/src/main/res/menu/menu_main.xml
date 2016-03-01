@@ -1,15 +1,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:appNamespace="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="yosoyo.aaahearhereprototype.MainActivity">
-      <item android:id="@+id/search"
+      tools:context="yosoyo.aaahearhereprototype.HolderActivity">
+      <item android:id="@+id/post"
+            android:title="Post"
+            android:icon="@android:drawable/ic_menu_add"
+            appNamespace:showAsAction="ifRoom"
+          />
+      <!--<item android:id="@+id/search"
             android:title="Search"
             android:icon="@android:drawable/ic_menu_search"
-            app:showAsAction="collapseActionView|ifRoom"
-            app:actionViewClass="android.support.v7.widget.SearchView" />
+            appNamespace:showAsAction="collapseActionView|ifRoom"
+            appNamespace:actionViewClass="android.support.v7.widget.SearchView" />-->
       <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="never"/>
+            android:title="@string/action_settings"
+            android:orderInCategory="100"
+            appNamespace:showAsAction="never"/>
 
 </menu>

@@ -10,6 +10,7 @@ public class SpotifyAPIResponse {
 
 	SpotifyPaging<SpotifyArtist> artists;
 	SpotifyPaging<SpotifyTrack> tracks;
+	SpotifyPaging<SpotifyAlbum> albums;
 
 	public SpotifyPaging<SpotifyArtist> getArtists() {
 		return artists;
@@ -17,6 +18,10 @@ public class SpotifyAPIResponse {
 
 	public SpotifyPaging<SpotifyTrack> getTracks() {
 		return tracks;
+	}
+
+	public SpotifyPaging<SpotifyAlbum> getAlbums(){
+		return albums;
 	}
 
 }

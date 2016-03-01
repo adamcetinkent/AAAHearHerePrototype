@@ -24,6 +24,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.maps.model.Marker;
+import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
 
@@ -44,6 +45,8 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	private Button continueButton;
 	private Button shortcutButton;
 	private ProgressDialog progressDialog;
+	private Bitmap profilePicture;
+	private TestUser testUser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,15 +106,6 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 
-		/*
-		// Set up SearchView
-		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
-
-		ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
-		searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
-		*/
-
 		return true;
 	}
 
@@ -129,12 +123,13 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	}
 
 	@Override
-	public void returnAuthenticationResult(Integer result) {
+	public void returnAuthenticationResult(Integer result, TestUser testUser) {
 		if (result == HttpURLConnection.HTTP_OK) {
+			this.testUser = testUser;
 			facebookSignInSucceeded();
 		} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
 			Toast.makeText(this, "Creating new user...", Toast.LENGTH_LONG);
-			TestUser testUser = new TestUser(Profile.getCurrentProfile());
+			this.testUser = new TestUser(Profile.getCurrentProfile());
 			new TestCreateUserTask(this, testUser).execute();
 		} else {
 			facebookSignInFailed();
@@ -151,6 +146,22 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	private void facebookSignInSucceeded() {
 		updateUI(true);
 		progressDialog.dismiss();
+
+		proceedToHolderActivity();
+
+	}
+
+	private void proceedToHolderActivity(){
+		Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
+
+		if (profilePicture != null) {
+			byte[] bytes = ZZZUtility.convertBitmapToByteArray(profilePicture);
+			intent.putExtra(HolderActivity.PROFILE_PICTURE, bytes);
+		}
+
+		intent.putExtra(HolderActivity.TEST_USER, new Gson().toJson(testUser, TestUser.class));
+
+		startActivity(intent);
 	}
 
 	@Override
@@ -203,6 +214,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	@Override
 	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 		Log.d(TAG, "User image downloaded");
+		profilePicture = result;
 	}
 
 	@Override
@@ -215,14 +227,13 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		switch (v.getId()){
 			case (R.id.btnContinue): {
 				if (continueButton.isEnabled()){
-					Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
-					startActivity(intent);
+					proceedToHolderActivity();
 					break;
 				}
 			}
 			case (R.id.btnShortcut): {
-				Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
-				startActivity(intent);
+				testUser = new TestUser(Profile.getCurrentProfile());
+				proceedToHolderActivity();
 				break;
 			}
 		}

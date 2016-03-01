@@ -6,7 +6,7 @@
     >
 
     <LinearLayout
-        android:id="@+id/llUserFrame"
+        android:id="@+id/list_row_timeline_llUserFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -21,7 +21,7 @@
             android:layout_marginRight="5dp">
 
             <ImageView
-                android:id="@+id/imgProfile"
+                android:id="@+id/list_row_timeline_imgProfile"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait"
@@ -43,13 +43,13 @@
             >
 
             <TextView
-                android:id="@+id/txtUserName"
+                android:id="@+id/list_row_timeline_txtUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="USER NAME"/>
 
             <TextView
-                android:id="@+id/txtLocation"
+                android:id="@+id/list_row_timeline_txtLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Location"
@@ -59,7 +59,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/txtDateTime"
+            android:id="@+id/list_row_timeline_txtDateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
@@ -74,13 +74,13 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/llPostFrame"
+        android:id="@+id/list_row_timeline_llPostFrame"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/llTrackFrame"
+            android:id="@+id/list_row_timeline_llTrackFrame"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -90,7 +90,7 @@
             >
 
             <TextView
-                android:id="@+id/txtTrackName"
+                android:id="@+id/list_row_timeline_txtTrackName"
                 android:text="Song Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                 android:layout_marginRight="5dp"/>
 
             <TextView
-                android:id="@+id/txtArtist"
+                android:id="@+id/list_row_timeline_txtArtist"
                 android:text="Artist Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -119,7 +119,7 @@
                 android:layout_marginRight="5dp"/>
 
             <TextView
-                android:id="@+id/txtAlbum"
+                android:id="@+id/list_row_timeline_txtAlbum"
                 android:text="Album Name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,7 +134,7 @@
                 android:layout_marginRight="5dp"/>
 
             <TextView
-                android:id="@+id/txtMessage"
+                android:id="@+id/list_row_timeline_txtMessage"
                 android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et felis tempus, gravida dui id, pulvinar turpis. In tincidunt, quam at faucibus tincidunt, quam magna viverra ipsum, at ornare sem tortor convallis est. Mauris posuere vestibulum tortor id ornare. "
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -149,7 +149,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llArtFrame"
+            android:id="@+id/list_row_timeline_llArtFrame"
             android:orientation="vertical"
             android:layout_width="110dp"
             android:layout_height="match_parent"
@@ -168,7 +168,7 @@
                     />
 
                 <ImageView
-                    android:id="@+id/imgAlbumArt"
+                    android:id="@+id/list_row_timeline_imgAlbumArt"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginLeft="1dp"
@@ -180,7 +180,7 @@
 
 
             <ImageButton
-                android:id="@+id/btnPlayButton"
+                android:id="@+id/list_row_timeline_btnPlayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_media_play"

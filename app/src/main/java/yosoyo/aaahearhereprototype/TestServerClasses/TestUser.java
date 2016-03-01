@@ -18,6 +18,10 @@ public class TestUser {
 	String created_at;
 	String updated_at;
 
+	public long getID(){
+		return id;
+	}
+
 	public String getFirstName() {
 		return first_name;
 	}

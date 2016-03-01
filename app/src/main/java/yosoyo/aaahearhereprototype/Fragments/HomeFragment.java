@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment implements
 	private static final String TAG = HomeFragment.class.getSimpleName();
 	private ListView lstTimeline;
 
-	private static MediaPlayer mediaPlayer = new MediaPlayer();
+	//private static MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public HomeFragment() {
 		// Required empty public constructor
@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment implements
 			final CachedSpotifyTrack cachedSpotifyTrack = testPostUserTracks.get(position).getCachedSpotifyTrack();
 
 			// get Album Art
-			ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.imgAlbumArt);
+			ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgAlbumArt);
 			if (testPostUserTracks.get(position) != null) {
 				if (artistBitmaps[position] == null) { // need to download image
 					new DownloadImageTask(imgAlbumArt, this, position)
@@ -130,7 +130,7 @@ public class HomeFragment extends Fragment implements
 			}
 
 			// get User Image
-			ImageView imgProfile = (ImageView) rowView.findViewById(R.id.imgProfile);
+			ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgProfile);
 			if (testPostUserTracks.get(position) != null) {
 				if (userBitmaps[position] == null) { // need to download image
 					new DownloadImageTask(imgProfile, this, position)
@@ -142,33 +142,33 @@ public class HomeFragment extends Fragment implements
 				}
 			}
 
-			TextView txtUserName = (TextView) rowView.findViewById(R.id.txtUserName);
+			TextView txtUserName = (TextView) rowView.findViewById(R.id.list_row_timeline_txtUserName);
 			txtUserName.setText(testUser.getFirstName() + " " + testUser.getLastName());
 
-			TextView txtLocation = (TextView) rowView.findViewById(R.id.txtLocation);
+			TextView txtLocation = (TextView) rowView.findViewById(R.id.list_row_timeline_txtLocation);
 			txtLocation.setText(testPost.getLat() + " " + testPost.getLon());
 
-			TextView txtDateTime = (TextView) rowView.findViewById(R.id.txtDateTime);
+			TextView txtDateTime = (TextView) rowView.findViewById(R.id.list_row_timeline_txtDateTime);
 			txtDateTime.setText(testPost.getCreatedAt());
 
-			TextView txtTrackName = (TextView) rowView.findViewById(R.id.txtTrackName);
+			TextView txtTrackName = (TextView) rowView.findViewById(R.id.list_row_timeline_txtTrackName);
 			txtTrackName.setText(cachedSpotifyTrack.getName());
 
-			TextView txtArtist = (TextView) rowView.findViewById(R.id.txtArtist);
+			TextView txtArtist = (TextView) rowView.findViewById(R.id.list_row_timeline_txtArtist);
 			txtArtist.setText(cachedSpotifyTrack.getArtist());
 
-			TextView txtAlbum = (TextView) rowView.findViewById(R.id.txtAlbum);
+			TextView txtAlbum = (TextView) rowView.findViewById(R.id.list_row_timeline_txtAlbum);
 			txtAlbum.setText(cachedSpotifyTrack.getAlbum());
 
-			TextView txtMessage = (TextView) rowView.findViewById(R.id.txtMessage);
+			TextView txtMessage = (TextView) rowView.findViewById(R.id.list_row_timeline_txtMessage);
 			txtMessage.setText(testPost.getMessage());
 
-			final ImageButton btnPlayButton = (ImageButton) rowView.findViewById(R.id.btnPlayButton);
+			final ImageButton btnPlayButton = (ImageButton) rowView.findViewById(R.id.list_row_timeline_btnPlayButton);
 			btnPlayButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if (mediaPlayer.isPlaying()) {
-						mediaPlayer.reset();
+					if (HolderActivity.mediaPlayer.isPlaying()) {
+						HolderActivity.mediaPlayer.reset();
 						updatePlayButton(btnPlayButton);
 						return;
 					}
@@ -184,33 +184,33 @@ public class HomeFragment extends Fragment implements
 
 					try {
 
-						mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+						HolderActivity.mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 							@Override
 							public boolean onError(MediaPlayer mp, int what, int extra) {
-								mediaPlayer.reset();
+								HolderActivity.mediaPlayer.reset();
 								updatePlayButton(btnPlayButton);
 								return false;
 							}
 						});
 
-						mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+						HolderActivity.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 							@Override
 							public void onPrepared(MediaPlayer mp) {
-								mediaPlayer.start();
+								HolderActivity.mediaPlayer.start();
 								progressDialog.dismiss();
 								updatePlayButton(btnPlayButton);
 							}
 						});
 
-						mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+						HolderActivity.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 							@Override
 							public void onCompletion(MediaPlayer mp) {
 								updatePlayButton(btnPlayButton);
 							}
 						});
 
-						mediaPlayer.setDataSource(cachedSpotifyTrack.getPreviewUrl());
-						mediaPlayer.prepareAsync();
+						HolderActivity.mediaPlayer.setDataSource(cachedSpotifyTrack.getPreviewUrl());
+						HolderActivity.mediaPlayer.prepareAsync();
 
 					} catch (IllegalArgumentException e) {
 						Log.e(TAG, "Error: " + e.getMessage());
@@ -234,7 +234,7 @@ public class HomeFragment extends Fragment implements
 		}
 
 		private void updatePlayButton(ImageButton btnPlayButton){
-			if (mediaPlayer.isPlaying()) {
+			if (HolderActivity.mediaPlayer.isPlaying()) {
 				btnPlayButton.setImageResource(R.drawable.ic_media_pause);
 			} else {
 				btnPlayButton.setImageResource(R.drawable.ic_media_play);

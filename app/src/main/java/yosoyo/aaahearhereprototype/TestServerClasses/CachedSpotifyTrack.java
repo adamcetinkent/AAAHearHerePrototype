@@ -22,7 +22,7 @@ public class CachedSpotifyTrack {
 		this.artist = spotifyTrack.getArtistName();
 		this.album = spotifyTrack.getAlbumName();
 		this.image_url = spotifyTrack.getImages(0).getUrl();
-		this.preview_url = spotifyTrack.getPreview_url();
+		this.preview_url = spotifyTrack.getPreviewUrl();
 	}
 
 	public CachedSpotifyTrack(Cursor cursor){

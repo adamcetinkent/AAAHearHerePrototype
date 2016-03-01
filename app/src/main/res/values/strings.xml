@@ -31,7 +31,7 @@
     <string-array name="navigation_options">
         <item>Home</item>
         <item>Map</item>
-        <item>Post</item>
+        <!--<item>Post</item>-->
         <item>Profile</item>
     </string-array>
 

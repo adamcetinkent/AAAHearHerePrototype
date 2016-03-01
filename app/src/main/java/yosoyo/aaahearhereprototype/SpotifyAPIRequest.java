@@ -24,7 +24,7 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 
 	// Interface for classes wanting to incorporate this class to make Spotify API Requests
 	public interface SpotifyAPIRequestCallback {
-		void processFinish(SpotifyAPIResponse output);
+		void returnSpotifySearchResults(SpotifyAPIResponse output);
 	}
 
 	private static final String urlSpotifySearch = "https://api.spotify.com/v1/search?q=";
@@ -77,7 +77,7 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(SpotifyAPIResponse result) {
-		callbackTo.processFinish(result);	// sends results back
+		callbackTo.returnSpotifySearchResults(result);	// sends results back
 	}
 
 }

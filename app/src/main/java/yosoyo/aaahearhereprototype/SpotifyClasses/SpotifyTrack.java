@@ -81,7 +81,7 @@ public class SpotifyTrack {
 		return  getArtistName() + " - " + getAlbumName();
 	}
 
-	public String getPreview_url() {
+	public String getPreviewUrl() {
 		return preview_url;
 	}
 
