@@ -3,6 +3,7 @@ package yosoyo.aaahearhereprototype.TestServerClasses;
 import android.database.Cursor;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.Database.ORMCachedSpotifyTrack;
 
 /**
  * Created by adam on 23/02/16.

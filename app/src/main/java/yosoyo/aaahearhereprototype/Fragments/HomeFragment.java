@@ -20,31 +20,33 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.Marker;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.ORMCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.ORMTestPostUser;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUserTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
-import yosoyo.aaahearhereprototype.ZZZDataHolder;
+import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements
+public class HomeFragment extends Fragment /*implements
 	ORMTestPostUser.GetDBTestPostsTask.GetDBTestPostUsersCallback,
-	ORMCachedSpotifyTrack.GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback{
+	ORMCachedSpotifyTrack.GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback*/ {
 
 	private static final String TAG = HomeFragment.class.getSimpleName();
 	private ListView lstTimeline;
+	private TimelineCustomListAdapter lstTimelineAdapter;
+	private List<TestPostFull> posts = new ArrayList<>();
 
 	//private static MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -57,21 +59,44 @@ public class HomeFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
-		ORMTestPostUser.getTestPosts(getActivity(), this);
+		View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+		lstTimeline = (ListView) view.findViewById(R.id.lstTimeline);
+		lstTimelineAdapter = new TimelineCustomListAdapter(getActivity(), posts);
+		lstTimeline.setAdapter(lstTimelineAdapter);
+
+		AsyncDataManager.getAllPosts(new AsyncDataManager.GetAllPostsCallback() {
+			@Override
+			public void returnAllCachedPosts(List<TestPostFull> cachedPosts) {
+				Log.d(TAG, "Cached posts returned");
+				posts = ZZZUtility.mergeLists(posts, cachedPosts);
+				Collections.sort(posts);
+				lstTimelineAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void returnWebPost(TestPostFull webPost) {
+				Log.d(TAG, "Web post returned!");
+				if(ZZZUtility.mergeLists(posts, webPost)) {
+					Collections.sort(posts);
+					lstTimelineAdapter.notifyDataSetChanged();
+				}
+			}
+		});
 
 		// Inflate the layout for this fragment
-		return inflater.inflate(R.layout.fragment_home, container, false);
+		return view;
 	}
 
 	@Override
 	public void onStart(){
 		super.onStart();
 
-		View view = getView();
-		lstTimeline = (ListView) view.findViewById(R.id.lstTimeline);
+		//View view = getView();
+
 	}
 
-	@Override
+	/*@Override
 	public void returnTestPostUsers(List<TestPostUser> testPostUsers) {
 		ZZZDataHolder.testPostUsers = testPostUsers;
 		ORMCachedSpotifyTrack.getCachedSpotifyTracks(getActivity(), this);
@@ -80,47 +105,62 @@ public class HomeFragment extends Fragment implements
 	@Override
 	public void returnCachedSpotifyTracks(List<CachedSpotifyTrack> cachedSpotifyTracks) {
 		ZZZDataHolder.cachedSpotifyTracks = cachedSpotifyTracks;
-		HolderActivity.dataHolder.createTestPostUserTracks();
+		//HolderActivity.dataHolder.createTestPostUserTracks();
 		lstTimeline.setAdapter(
 			new TimelineCustomListAdapter(getActivity(), ZZZDataHolder.testPostUserTracks));
 		Log.d(TAG, "Adapter set!");
-	}
+	}*/
 
 	private static class TimelineCustomListAdapter extends ArrayAdapter implements DownloadImageTask.DownloadImageTaskCallback {
 		private static final String TAG = TimelineCustomListAdapter.class.getSimpleName();
 
 		private final Activity context;
-		private List<TestPostUserTrack> testPostUserTracks;
+		//private List<TestPostUserTrack> testPostUserTracks;
+		private List<TestPostFull> posts;
 		private Bitmap[] userBitmaps;
 		private Bitmap[] artistBitmaps;
 
-		public TimelineCustomListAdapter(Activity context, List<TestPostUserTrack> testPostUserTracks) {
-			super(context, R.layout.list_row_timeline, testPostUserTracks);
+		public TimelineCustomListAdapter(Activity context, List<TestPostFull> posts) {
+			super(context, R.layout.list_row_timeline, posts);
 
 			this.context = context;
-			this.testPostUserTracks = testPostUserTracks;
-			Collections.sort(testPostUserTracks, new Comparator<TestPostUserTrack>() {
+			this.posts = posts;
+			Collections.sort(posts, new Comparator<TestPostFull>() {
 				@Override
-				public int compare(TestPostUserTrack lhs, TestPostUserTrack rhs) {
-					return rhs.getTestPostUser().getTestPost().getCreatedAt().compareTo(lhs.getTestPostUser().getTestPost().getCreatedAt());
+				public int compare(TestPostFull lhs, TestPostFull rhs) {
+					return rhs.getPost().getCreatedAt().compareTo(lhs.getPost().getCreatedAt());
 				}
 			});
-			artistBitmaps = new Bitmap[testPostUserTracks.size()];
-			userBitmaps = new Bitmap[testPostUserTracks.size()];
+			artistBitmaps = new Bitmap[posts.size()];
+			userBitmaps = new Bitmap[posts.size()];
 
+		}
+
+		@Override
+		public void notifyDataSetChanged() {
+			super.notifyDataSetChanged();
+
+			Bitmap[] newUserBitmaps = new Bitmap[posts.size()];
+			System.arraycopy(userBitmaps, 0, newUserBitmaps, 0, userBitmaps.length);
+			userBitmaps = newUserBitmaps;
+
+			Bitmap[] newArtistBitmaps = new Bitmap[posts.size()];
+			System.arraycopy(artistBitmaps, 0, newArtistBitmaps, 0, artistBitmaps.length);
+			artistBitmaps = newArtistBitmaps;
 		}
 
 		public View getView(int position, View view, ViewGroup parent){
 			LayoutInflater inflater = context.getLayoutInflater();
 			View rowView = inflater.inflate(R.layout.list_row_timeline, null, true);
 
-			TestPost testPost = testPostUserTracks.get(position).getTestPostUser().getTestPost();
-			TestUser testUser = testPostUserTracks.get(position).getTestPostUser().getTestUser();
-			final CachedSpotifyTrack cachedSpotifyTrack = testPostUserTracks.get(position).getCachedSpotifyTrack();
+			TestPost testPost = posts.get(position).getPost();
+			TestUser testUser = posts.get(position).getUser();
+			final CachedSpotifyTrack cachedSpotifyTrack = posts.get(position).getTrack();
+			List<TestCommentUser> comments = posts.get(position).getComments();
 
 			// get Album Art
 			ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgAlbumArt);
-			if (testPostUserTracks.get(position) != null) {
+			if (posts.get(position) != null) {
 				if (artistBitmaps[position] == null) { // need to download image
 					new DownloadImageTask(imgAlbumArt, this, position)
 						.execute(cachedSpotifyTrack.getImageUrl());
@@ -131,7 +171,7 @@ public class HomeFragment extends Fragment implements
 
 			// get User Image
 			ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgProfile);
-			if (testPostUserTracks.get(position) != null) {
+			if (posts.get(position) != null) {
 				if (userBitmaps[position] == null) { // need to download image
 					new DownloadImageTask(imgProfile, this, position)
 						.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO +
@@ -149,7 +189,7 @@ public class HomeFragment extends Fragment implements
 			txtLocation.setText(testPost.getLat() + " " + testPost.getLon());
 
 			TextView txtDateTime = (TextView) rowView.findViewById(R.id.list_row_timeline_txtDateTime);
-			txtDateTime.setText(testPost.getCreatedAt());
+			txtDateTime.setText(String.valueOf(testPost.getCreatedAt()));
 
 			TextView txtTrackName = (TextView) rowView.findViewById(R.id.list_row_timeline_txtTrackName);
 			txtTrackName.setText(cachedSpotifyTrack.getName());

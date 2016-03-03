@@ -12,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
 
 /**
  * Created by Adam Kent on 08/02/2016.
@@ -20,30 +19,22 @@ import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
  * Asynchronously performs API request from Spotify.
  * Response is returned to processFinish function of specified SpotifyAPIRequestCallback.
  */
-public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack> {
+public class SpotifyAPIRequestTrack extends AsyncTask<Void, Void, SpotifyTrack> {
 	private static final String TAG = "SpotifyAPIRequestTrack";
 
 	// Interface for classes wanting to incorporate this class to make Spotify API Requests
 	public interface SpotifyAPIRequestTrackCallback {
-		void returnSpotifyTrack(SpotifyTrack spotifyTrack, int position, TestPostUser testPostUser);
+		void returnSpotifyTrack(SpotifyTrack spotifyTrack);
 	}
 
 	private static final String urlSpotifySearch = "https://api.spotify.com/v1/tracks/";
-	//private static final String urlSpotifyType = "&type=";
 
-	private SpotifyAPIRequestTrackCallback callbackTo = null;
-	private int position;
-	private TestPostUser testPostUser;
+	private SpotifyAPIRequestTrackCallback callback = null;
+	private String trackID;
 
-	public SpotifyAPIRequestTrack(SpotifyAPIRequestTrackCallback callbackTo, int position){
-		this.callbackTo = callbackTo;
-		this.position = position;
-	}
-
-	public SpotifyAPIRequestTrack(SpotifyAPIRequestTrackCallback callbackTo, TestPostUser testPostUser){
-		this.callbackTo = callbackTo;
-		this.testPostUser = testPostUser;
-		this.position = -1;
+	public SpotifyAPIRequestTrack(String trackID, SpotifyAPIRequestTrackCallback callback){
+		this.callback = callback;
+		this.trackID = trackID;
 	}
 
 	// Construct Spotify API URL from input string
@@ -63,9 +54,9 @@ public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack
 
 	@Override
 	// The actual process which makes the HTTP request
-	protected SpotifyTrack doInBackground(String... spotifyTracks) {
+	protected SpotifyTrack doInBackground(Void... params) {
 		try {
-			URL url = makeSpotifyQuery(spotifyTracks[0]);
+			URL url = makeSpotifyQuery(trackID);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -85,7 +76,7 @@ public class SpotifyAPIRequestTrack extends AsyncTask<String, Void, SpotifyTrack
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(SpotifyTrack result) {
-		callbackTo.returnSpotifyTrack(result, position, testPostUser);	// sends results back
+		callback.returnSpotifyTrack(result);	// sends results back
 	}
 
 }

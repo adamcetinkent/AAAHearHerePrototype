@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.TestServerClasses;
+package yosoyo.aaahearhereprototype.TestServerClasses.Tasks;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**

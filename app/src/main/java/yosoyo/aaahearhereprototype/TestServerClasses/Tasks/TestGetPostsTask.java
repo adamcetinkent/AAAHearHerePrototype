@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.TestServerClasses;
+package yosoyo.aaahearhereprototype.TestServerClasses.Tasks;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -11,32 +11,36 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TaskReturns.TestPostUserCommentsNested;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-public class TestGetPostUsersTask extends AsyncTask<Integer, Void, TestPostUser[]> {
-	private static final String TAG = "TestGetPostUsersTask";
+public class TestGetPostsTask extends AsyncTask<Void, Void, List<TestPostFullProcess>> {
+	private static final String TAG = "TestGetPostsTask";
 	private static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/posts/";
 	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/posts/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestGetPostsTaskCallback {
-		void returnTestPostUsers(TestPostUser[] testPost);
+		void returnTestPosts(List<TestPostFullProcess> testPosts);
 	}
 
 	private TestGetPostsTaskCallback callbackTo;
 	//private long id;
 
-	public TestGetPostUsersTask(TestGetPostsTaskCallback callbackTo/*, long id*/) {
+	public TestGetPostsTask(TestGetPostsTaskCallback callbackTo/*, long id*/) {
 		this.callbackTo = callbackTo;
 		//this.id = id;
 	}
 
 	@Override
-	protected TestPostUser[] doInBackground(Integer... params) {
+	protected List<TestPostFullProcess> doInBackground(Void... params) {
 		Log.d(TAG, "Fetching posts from " + VM_SERVER_ADDRESS);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS);
@@ -44,12 +48,12 @@ public class TestGetPostUsersTask extends AsyncTask<Integer, Void, TestPostUser[
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				TestPostUserNested[] testPostUsersNested = new Gson().fromJson(streamString, TestPostUserNested[].class);
-				TestPostUser[] testPostUsers = new TestPostUser[testPostUsersNested.length];
-				for (int i = 0; i < testPostUsersNested.length; i++){
-					testPostUsers[i] = new TestPostUser(testPostUsersNested[i]);
+				TestPostUserCommentsNested[] testPostsNested = new Gson().fromJson(streamString, TestPostUserCommentsNested[].class);
+				List<TestPostFullProcess> testPosts = new ArrayList<>(testPostsNested.length);
+				for (int i = 0; i < testPostsNested.length; i++){
+					testPosts.add(new TestPostFullProcess(testPostsNested[i]));
 				}
-				return testPostUsers;
+				return testPosts;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -63,8 +67,8 @@ public class TestGetPostUsersTask extends AsyncTask<Integer, Void, TestPostUser[
 
 	@Override
 	// Fires once doInBackground is completed
-	protected void onPostExecute(TestPostUser[] result) {
-		callbackTo.returnTestPostUsers(result);	// sends results back
+	protected void onPostExecute(List<TestPostFullProcess> result) {
+		callbackTo.returnTestPosts(result);	// sends results back
 	}
 
 }

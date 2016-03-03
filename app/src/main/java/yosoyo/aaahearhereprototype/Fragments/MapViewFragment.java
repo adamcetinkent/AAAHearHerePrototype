@@ -36,16 +36,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUserTrack;
-import yosoyo.aaahearhereprototype.ZZZDataHolder;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
+import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 27/02/16.
@@ -56,6 +57,8 @@ public class MapViewFragment
 	{
 
 	private static final String TAG = "MapViewFragment";
+
+	private List<TestPostFull> posts = new ArrayList<>();
 
 	private MapView mMapView;
 	private GoogleMap googleMap;
@@ -111,22 +114,6 @@ public class MapViewFragment
 							}
 							startIntentService();
 						}
-
-						HolderActivity.dataHolder.getAllPosts(
-							getActivity(),
-							new ZZZDataHolder.GetPostUsersCallback() {
-								@Override
-								public void returnOnePost(TestPostUserTrack testPostUserTrack) {
-									addMapMarker(testPostUserTrack, true);
-								}
-
-								@Override
-								public void returnAllPosts(List<TestPostUser> testPostUsers) {
-									HolderActivity.dataHolder
-										.createTestPostUserTracks();
-									addMapMarkers();
-								}
-							});
 
 					}
 
@@ -209,7 +196,7 @@ public class MapViewFragment
 
 				middleLocation.setLatitude(latLng.latitude);
 				middleLocation.setLongitude(latLng.longitude);
-				if (HolderActivity.mGoogleApiClient.isConnected() && middleLocation != null){
+				if (HolderActivity.mGoogleApiClient.isConnected() && middleLocation != null) {
 					startIntentService();
 				}
 				mAddressRequested = true;
@@ -221,6 +208,21 @@ public class MapViewFragment
 		googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
 		googleMap.setOnInfoWindowClickListener(this);
+
+		AsyncDataManager.getAllPosts(
+			new AsyncDataManager.GetAllPostsCallback() {
+				@Override
+				public void returnAllCachedPosts(List<TestPostFull> cachedPosts) {
+					posts = ZZZUtility.mergeLists(posts, cachedPosts);
+					addMapMarkers();
+				}
+
+				@Override
+				public void returnWebPost(TestPostFull webPost) {
+					if (ZZZUtility.mergeLists(posts, webPost))
+						addMapMarker(webPost, true);
+				}
+			});
 	}
 
 	private void onMapReadyForLocation(){
@@ -240,18 +242,30 @@ public class MapViewFragment
 
 	private void addMapMarkers(){
 		googleMap.clear();
-		for (TestPostUserTrack testPostUserTrack : ZZZDataHolder.testPostUserTracks) {
-			addMapMarker(testPostUserTrack, false);
+		for (TestPostFull post : posts) {
+			addMapMarker(post, false);
 		}
 	}
 
-	private void addMapMarker(TestPostUserTrack testPostUserTrack, boolean newColour){
-		LatLng latLng = new LatLng(testPostUserTrack.getTestPost().getLat(), testPostUserTrack.getTestPost().getLon());
+//	private void addMapMarker(TestPostUserTrack testPostUserTrack, boolean newColour){
+//		LatLng latLng = new LatLng(testPostUserTrack.getTestPost().getLat(), testPostUserTrack.getTestPost().getLon());
+//		googleMap.addMarker(
+//			new MarkerOptions().position(latLng)
+//							   .title(new Gson().toJson(testPostUserTrack))
+//							   .icon(BitmapDescriptorFactory
+//										 .fromResource(
+//											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
+//						   );
+//	}
+
+	private void addMapMarker(TestPostFull testPost, boolean newColour){
+		LatLng latLng = new LatLng(testPost.getPost().getLat(), testPost.getPost().getLon());
 		googleMap.addMarker(
 			new MarkerOptions().position(latLng)
-							   .title(new Gson().toJson(testPostUserTrack))
+							   .title(new Gson().toJson(testPost))
 							   .icon(BitmapDescriptorFactory
-										 .fromResource(newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
+										 .fromResource(
+											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
 						   );
 	}
 
@@ -353,9 +367,9 @@ public class MapViewFragment
 
 			currentMarker = marker;
 
-			TestPostUserTrack testPostUserTrack = new Gson().fromJson(marker.getTitle(), TestPostUserTrack.class);
+			TestPostFull testPost = new Gson().fromJson(marker.getTitle(), TestPostFull.class);
 			//spotifyTrack = new Gson().fromJson(marker.getSnippet(), CachedSpotifyTrack.class);
-			spotifyTrack = testPostUserTrack.getCachedSpotifyTrack();
+			spotifyTrack = testPost.getTrack();
 			currentTrack = spotifyTrack;
 
 			ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
@@ -369,7 +383,7 @@ public class MapViewFragment
 				downloadImageTaskAlbumArt.execute(spotifyTrack.getImageUrl());
 
 				DownloadImageTask downloadImageTaskUserArt = new DownloadImageTask(imgUserArt, this, marker);
-				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPostUserTrack.getTestUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
+				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPost.getUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
@@ -382,9 +396,9 @@ public class MapViewFragment
 			titleUI.setText(spotifyTrack.getName());
 			artistUI.setText(spotifyTrack.getArtist());
 			albumUI.setText(spotifyTrack.getAlbum());
-			snippetUI.setText("Message: " + testPostUserTrack.getTestPost().getMessage());
-			dateUI.setText("Posted: " + testPostUserTrack.getTestPost().getCreatedAt());
-			userUI.setText(testPostUserTrack.getTestUser().getFirstName() + " " + testPostUserTrack.getTestUser().getLastName());
+			snippetUI.setText("Message: " + testPost.getPost().getMessage());
+			dateUI.setText("Posted: " + testPost.getPost().getCreatedAt());
+			userUI.setText(testPost.getUser().getFirstName() + " " + testPost.getUser().getLastName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 			if (HolderActivity.mediaPlayer.isPlaying()) {

@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.TestServerClasses;
+package yosoyo.aaahearhereprototype.TestServerClasses.Tasks;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -13,6 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TaskReturns.TestPostUserCommentsNested;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -25,12 +28,13 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface TestCreatePostTaskCallback {
-		void returnResultCreatePost(Boolean success, TestPostUser testPostUser);
+		void returnResultCreatePost(Boolean success, TestPostFull testPost);
 	}
 
 	private TestCreatePostTaskCallback callbackTo;
 	private TestPost testPost;
-	private TestPostUser testPostUserReturned;
+	//private TestPostUser testPostUserReturned;
+	private TestPostUserCommentsNested testPostReturned;
 
 	public TestCreatePostTask(TestCreatePostTaskCallback callbackTo, TestPost testPost) {
 		this.callbackTo = callbackTo;
@@ -64,7 +68,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					testPostUserReturned = new Gson().fromJson(inString, TestPostUser.class);
+					testPostReturned = new Gson().fromJson(inString, TestPostUserCommentsNested.class);
 
 					return true;
 				} else {
@@ -86,7 +90,7 @@ public class TestCreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreatePost(result, testPostUserReturned);	// sends results back
+		callbackTo.returnResultCreatePost(result, new TestPostFull(testPostReturned));	// sends results back
 	}
 
 }

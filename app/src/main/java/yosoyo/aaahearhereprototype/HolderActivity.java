@@ -31,7 +31,6 @@ import yosoyo.aaahearhereprototype.Fragments.HomeFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
-import yosoyo.aaahearhereprototype.TestServerClasses.PostFragmentPostedListener;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 public class HolderActivity extends Activity implements DownloadImageTask.DownloadImageTaskCallback, PostFragmentPostedListener {
@@ -48,7 +47,8 @@ public class HolderActivity extends Activity implements DownloadImageTask.Downlo
 	private ActionBarDrawerToggle drawerToggle;
 	private int currentPosition = 0;
 
-	public static ZZZDataHolder dataHolder = new ZZZDataHolder();
+	//public static ZZZDataHolder dataHolder = new ZZZDataHolder();
+	//public static AsyncDataManager asyncDataManager = new AsyncDataManager();
 	public static TestUser testUser;
 	public static Bitmap profilePicture = null;
 	public static boolean apiExists = false;
@@ -68,7 +68,7 @@ public class HolderActivity extends Activity implements DownloadImageTask.Downlo
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_holder);
 
-		dataHolder.setContext(this);
+		AsyncDataManager.setContext(this);
 
 		Intent intent = getIntent();
 		if (intent.hasExtra(PROFILE_PICTURE)){

@@ -28,8 +28,8 @@ import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
 
-import yosoyo.aaahearhereprototype.TestServerClasses.TestCreateUserTask;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestFacebookAuthenticateUserTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreateUserTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestFacebookAuthenticateUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 public class MainActivity extends /*AppCompatActivity*/ Activity implements FacebookCallback<LoginResult>,

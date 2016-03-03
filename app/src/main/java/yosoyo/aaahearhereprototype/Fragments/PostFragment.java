@@ -30,15 +30,15 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 import yosoyo.aaahearhereprototype.HolderActivity;
+import yosoyo.aaahearhereprototype.PostFragmentPostedListener;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.SearchResultsActivity;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.PostFragmentPostedListener;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestCreatePostTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreatePostTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostUser;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -381,7 +381,7 @@ public class PostFragment extends Fragment
 	}
 
 	@Override
-	public void returnResultCreatePost(Boolean success, TestPostUser testPostUser) {
+	public void returnResultCreatePost(Boolean success, TestPostFull testPostUser) {
 		if (success) {
 			Log.d(TAG, "New Post created!");
 			//TestPostUserTrack testPostUserTrack = new TestPostUserTrack(testPostUser, new CachedSpotifyTrack(spotifyTrack));

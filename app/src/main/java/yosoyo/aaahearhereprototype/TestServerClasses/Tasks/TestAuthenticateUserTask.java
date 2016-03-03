@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.TestServerClasses;
+package yosoyo.aaahearhereprototype.TestServerClasses.Tasks;
 
 import android.os.AsyncTask;
 import android.util.Log;

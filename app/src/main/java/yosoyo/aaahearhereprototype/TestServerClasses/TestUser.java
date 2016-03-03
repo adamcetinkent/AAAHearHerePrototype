@@ -4,6 +4,10 @@ import android.database.Cursor;
 
 import com.facebook.Profile;
 
+import java.sql.Timestamp;
+
+import yosoyo.aaahearhereprototype.TestServerClasses.Database.ORMTestUser;
+
 /**
  * Created by adam on 18/02/16.
  */
@@ -13,10 +17,9 @@ public class TestUser {
 	String first_name;
 	String last_name;
 	String email;
-	String img_url;
 	String fb_user_id;
-	String created_at;
-	String updated_at;
+	Timestamp created_at;
+	Timestamp updated_at;
 
 	public long getID(){
 		return id;
@@ -30,27 +33,35 @@ public class TestUser {
 		return last_name;
 	}
 
-	public String getImgUrl(){
-		return img_url;
+	public String getEmail() {
+		return email;
 	}
 
 	public String  getFBUserID(){
 		return fb_user_id;
 	}
 
+	public Timestamp getCreatedAt() {
+		return created_at;
+	}
+
+	public Timestamp getUpdatedAt() {
+		return updated_at;
+	}
+
 	public TestUser(Cursor cursor){
-		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_ID_NAME));;
-		this.first_name = cursor.getString(
-			cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_FIRST_NAME_NAME));
-		this.last_name = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_LAST_NAME_NAME));
-		this.img_url = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_USER_IMG_NAME));
-		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMTestPostUser.COLUMN_FB_USER_ID_NAME));
+		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestUser.COLUMN_ID_NAME));;
+		this.first_name = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_FIRST_NAME_NAME));
+		this.last_name = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_LAST_NAME_NAME));
+		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_FB_USER_ID_NAME));
+		this.updated_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_UPDATED_AT_NAME)));
+		this.created_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_CREATED_AT_NAME)));
 	}
 
 	public TestUser(Profile profile){
 		this.first_name = profile.getFirstName();
 		this.last_name = profile.getLastName();
-		this.img_url = profile.getProfilePictureUri(200, 200).toString();
+		//this.img_url = profile.getProfilePictureUri(200, 200).toString();
 		this.fb_user_id = profile.getId();
 	}
 
