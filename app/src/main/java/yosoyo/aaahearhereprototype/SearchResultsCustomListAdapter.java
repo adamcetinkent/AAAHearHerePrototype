@@ -9,15 +9,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.Marker;
-
 /**
  * Created by Adam Kent on 10/02/2016.
  *
  * Custom Adapter for ListView to show artwork (imageView), title and description (textViews).
  * imgArtwork is downloaded from URLs stored in artistImages.
  */
-public class SearchResultsCustomListAdapter extends ArrayAdapter implements DownloadImageTask.DownloadImageTaskCallback {
+public class SearchResultsCustomListAdapter extends ArrayAdapter /*implements DownloadImageTask.DownloadImageTaskCallback*/ {
 	private static final String TAG = "SearchResultsCustomListAdapter";
 
 	private final Activity context;
@@ -50,11 +48,11 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 
 		// Set artwork imgView bitmap
 		if (artistImages[position] != null) {
-			if (artistBitmaps[position] == null) { // need to download image
+			/*if (artistBitmaps[position] == null) { // need to download image
 				new DownloadImageTask(imgArtwork, this, position).execute(artistImages[position]);
 			} else {
 				imgArtwork.setImageBitmap(artistBitmaps[position]); // get from storage
-			}
+			}*/
 		}
 		if (artistDescs[position] != null)
 			txtArtistDesc.setText(artistDescs[position]); // Set artistDesc TextView
@@ -63,8 +61,8 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter implements Down
 	}
 
 
-	@Override
+	/*@Override
 	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 		artistBitmaps[position] = result; // store downloaded bitmap
-	}
+	}*/
 }

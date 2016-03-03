@@ -16,8 +16,7 @@ import java.net.URL;
  */
 public class TestAuthenticateUserTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "TestAuthenticateUser";
-	public static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/auth/";
-	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/users/";
+	public static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestAuthenticateUserTaskCallback {

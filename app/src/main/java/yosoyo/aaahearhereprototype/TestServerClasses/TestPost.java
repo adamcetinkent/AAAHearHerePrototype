@@ -25,6 +25,8 @@ public class TestPost {
 		return track;
 	}
 
+	public TestPost(){}
+
 	public TestPost(TestPostUserCommentsNested nested){
 		this.id = nested.getID();
 		this.user_id = nested.getUserID();

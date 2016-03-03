@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_vertical"
+              android:background="#fff4f4f4"
+              android:layout_marginLeft="20dp"
+              android:layout_marginRight="10dp"
+    >
+
+    <FrameLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="right"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
+
+        <ImageView
+            android:id="@+id/list_row_comment_imgProfile"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/frame"
+            />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/list_row_comment_txtUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="USER NAME"/>
+
+    <TextView
+        android:id="@+id/list_row_comment_txtComment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Message"
+        android:layout_marginLeft="10dp"
+        android:textColor="#ff7f7f7f"
+        android:textSize="14dp"
+        />
+
+    <!--<TextView
+        android:id="@+id/list_row_comment_txtDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textSize="10dp"
+        android:textColor="#ffaaaaaa"
+        android:layout_gravity="center_vertical|right"
+        android:textAlignment="gravity"
+        android:text="DATE"
+        android:gravity="right"
+        android:layout_marginRight="10dp"/>-->
+
+</LinearLayout>

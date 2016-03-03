@@ -4,9 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
-
-import com.google.android.gms.maps.model.Marker;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -30,21 +27,25 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	public static final String FACEBOOK_PROFILE_PHOTO_LARGE = "/picture?type=large";
 
 	private DownloadImageTaskCallback callbackTo = null;
-	private int position;
-	private ImageView imageView;
-	private Marker marker;
+	//private int position;
+	//private ImageView imageView;
+	//private Marker marker;
 
 	// Interface for classes wanting to incorporate this class to download bitmaps asynchronously
 	public interface DownloadImageTaskCallback {
-		void returnDownloadedImage(Bitmap result, int position, Marker marker);
+		void returnDownloadedImage(Bitmap result/*, int position, Marker marker*/);
 	}
 
-	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo) {
+	public DownloadImageTask(DownloadImageTaskCallback callbackTo){
 		this.callbackTo = callbackTo;
-		this.imageView = imageView;
 	}
 
-	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, int position) {
+//	public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo) {
+//		this.callbackTo = callbackTo;
+//		this.imageView = imageView;
+//	}
+
+	/*public DownloadImageTask(ImageView imageView, DownloadImageTaskCallback callbackTo, int position) {
 		this.callbackTo = callbackTo;
 		this.position = position;
 		this.imageView = imageView;
@@ -54,7 +55,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 		this.callbackTo = callbackTo;
 		this.imageView = imageView;
 		this.marker = marker;
-	}
+	}*/
 
 	@Override
 	// The actual process which downloads the bitmap;
@@ -87,9 +88,6 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Bitmap result) {
-		if (imageView != null) {
-			imageView.setImageBitmap(result); // immediately update imageView
-		}
-		callbackTo.returnDownloadedImage(result, position, marker); // send result back for storage
+		callbackTo.returnDownloadedImage(result); // send result back for storage
 	}
 }

@@ -20,7 +20,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class TestGetUserTask extends AsyncTask<Integer, Void, TestUser> {
 	private static final String TAG = "TestGetUserTask";
-	private static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/users/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "users/";
 	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/users/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously

@@ -22,8 +22,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class TestFacebookAuthenticateUserTask extends AsyncTask<Void, Void, Integer> {
 	private static final String TAG = "FBAuthenticateUser";
-	public static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/auth/";
-	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/users/";
+	public static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestFacebookAuthenticateUserTaskCallback {

@@ -4,10 +4,10 @@
              android:layout_height="match_parent"
              tools:context="yosoyo.aaahearhereprototype.Fragments.HomeFragment">
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/lstTimeline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        android:groupIndicator="@null"/>
 
 </FrameLayout>

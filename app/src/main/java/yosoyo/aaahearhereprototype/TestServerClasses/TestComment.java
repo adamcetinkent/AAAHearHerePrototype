@@ -19,6 +19,8 @@ public class TestComment {
 	Timestamp updated_at;
 	Timestamp created_at;
 
+	public TestComment(){}
+
 	public TestComment(TestCommentUserNested nested){
 		this.id = nested.getID();
 		this.post_id = nested.getPostID();

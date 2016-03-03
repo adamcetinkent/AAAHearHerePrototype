@@ -10,9 +10,9 @@ import java.util.List;
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
-import yosoyo.aaahearhereprototype.TestServerClasses.WebHelper;
 
 /**
  * Created by adam on 22/02/16.
@@ -102,8 +102,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 											 }
 										 });
 
-
-		// FIND TRACKS IN DATABASE
 		ORMCachedSpotifyTrack
 			.getTracksFromPosts(context, webPostsToProcess,
 								new ORMCachedSpotifyTrack.DBCachedSpotifyTrackSelectManyFromPostsTask.DBCachedSpotifyTrackSelectManyFromPostsTaskCallback() {

@@ -5,9 +5,9 @@ import android.content.Context;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.Database.DatabaseHelper;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
-import yosoyo.aaahearhereprototype.TestServerClasses.WebHelper;
 
 /**
  * Created by adam on 02/03/16.
@@ -44,7 +44,8 @@ public class AsyncDataManager {
 		WebHelper.getAllWebPosts(new WebHelper.GetAllWebPostsCallback() {
 			@Override
 			public void returnAllWebPosts(List<TestPostFullProcess> webPostsToProcess) {
-				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+				if (webPostsToProcess != null)
+					DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
 			}
 		});
 	}

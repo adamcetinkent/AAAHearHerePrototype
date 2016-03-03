@@ -20,11 +20,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.facebook.Profile;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
 
 import yosoyo.aaahearhereprototype.Fragments.HomeFragment;
@@ -33,7 +31,7 @@ import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class HolderActivity extends Activity implements DownloadImageTask.DownloadImageTaskCallback, PostFragmentPostedListener {
+public class HolderActivity extends Activity implements /*DownloadImageTask.DownloadImageTaskCallback,*/ PostFragmentPostedListener {
 
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
@@ -74,8 +72,8 @@ public class HolderActivity extends Activity implements DownloadImageTask.Downlo
 		if (intent.hasExtra(PROFILE_PICTURE)){
 			profilePicture = ZZZUtility.convertByteArrayToBitmap(intent.getByteArrayExtra(PROFILE_PICTURE));
 		} else {
-			new DownloadImageTask(null, this).execute(
-				Profile.getCurrentProfile().getProfilePictureUri(200, 200).toString());
+			/*new DownloadImageTask(null, this).execute(
+				Profile.getCurrentProfile().getProfilePictureUri(200, 200).toString());*/
 		}
 		testUser = new Gson().fromJson(intent.getStringExtra(TEST_USER), TestUser.class);
 
@@ -267,10 +265,10 @@ public class HolderActivity extends Activity implements DownloadImageTask.Downlo
 		bundle.putInt(KEY_POSITION, currentPosition);
 	}
 
-	@Override
+	/*@Override
 	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 		profilePicture = result;
-	}
+	}*/
 
 	public static Location getLastLocation(){
 		return LocationServices.FusedLocationApi.getLastLocation(HolderActivity.mGoogleApiClient);

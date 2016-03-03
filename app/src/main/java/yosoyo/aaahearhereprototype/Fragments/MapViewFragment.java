@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.MediaPlayer;
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
@@ -340,7 +338,7 @@ public class MapViewFragment
 
 	}
 
-		class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter, DownloadImageTask.DownloadImageTaskCallback {
+		class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter/*, DownloadImageTask.DownloadImageTaskCallback*/ {
 
 		private final View mWindow;
 		private final View mContents;
@@ -379,11 +377,11 @@ public class MapViewFragment
 				imgAlbumArt.setImageBitmap(null);
 				imgUserArt.setImageBitmap(null);
 
-				DownloadImageTask downloadImageTaskAlbumArt = new DownloadImageTask(imgAlbumArt, this, marker);
+				/*DownloadImageTask downloadImageTaskAlbumArt = new DownloadImageTask(imgAlbumArt, this, marker);
 				downloadImageTaskAlbumArt.execute(spotifyTrack.getImageUrl());
 
 				DownloadImageTask downloadImageTaskUserArt = new DownloadImageTask(imgUserArt, this, marker);
-				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPost.getUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
+				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPost.getUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);*/
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
@@ -409,13 +407,13 @@ public class MapViewFragment
 
 		}
 
-		@Override
+		/*@Override
 		public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 			Log.d(TAG, "Finished image download");
 			if (marker != null && marker.isInfoWindowShown()){
 				marker.showInfoWindow();
 			}
-		}
+		}*/
 	}
 
 	@SuppressLint("ParcelCreator")

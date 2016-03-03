@@ -21,8 +21,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class TestCreateUserTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "TestCreatePostTask";
-	private static final String VM_SERVER_ADDRESS = "http://10.0.1.79:3000/users/";
-	//private static final String VM_SERVER_ADDRESS = "http://10.72.150.66:3000/posts/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/users/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface TestCreateUserTaskCallback {

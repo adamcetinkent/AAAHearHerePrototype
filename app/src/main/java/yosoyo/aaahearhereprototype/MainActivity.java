@@ -23,7 +23,6 @@ import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
@@ -33,7 +32,7 @@ import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestFacebookAuthentic
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 public class MainActivity extends /*AppCompatActivity*/ Activity implements FacebookCallback<LoginResult>,
-	DownloadImageTask.DownloadImageTaskCallback,
+	/*DownloadImageTask.DownloadImageTaskCallback,*/
 	TestFacebookAuthenticateUserTask.TestFacebookAuthenticateUserTaskCallback,
 	TestCreateUserTask.TestCreateUserTaskCallback,
 	View.OnClickListener
@@ -211,11 +210,11 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		Log.e(TAG, "error in Facebook log in!");
 	}
 
-	@Override
+	/*@Override
 	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
 		Log.d(TAG, "User image downloaded");
 		profilePicture = result;
-	}
+	}*/
 
 	@Override
 	public void returnResultCreateUser(Boolean success, TestUser testUser) {
@@ -248,7 +247,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 			continueButton.setEnabled(true);
 
 			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
-			new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());
+			/*new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());*/
 		} else {
 			facebookSignInName.setText("Logged Out");
 			Toast.makeText(MainActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);
