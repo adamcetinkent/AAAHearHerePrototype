@@ -48,6 +48,4 @@ public class TestPostFullProcess extends TestPostFull {
 		this.trackProcessed = trackProcessed;
 	}
 
-
-
 }

@@ -255,32 +255,52 @@
                     android:src="@drawable/com_facebook_profile_picture_blank_square"
                     />
 
+                <ImageView
+                    android:id="@+id/post_fragment_btnPlayButton"
+                    android:src="@drawable/play_overlay"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginTop="1dp"/>
+
             </FrameLayout>
 
-
-            <ImageButton
-                android:id="@+id/post_fragment_btnPlayButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_play"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"/>
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="bottom|right"
+        >
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            >
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/send"
+                android:background="@android:color/transparent"
+                android:id="@+id/post_fragment_btnPost"
+                />
+
+            <ProgressBar
+                android:id="@+id/post_fragment_progressBar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:visibility="invisible"/>
+
+        </FrameLayout>
 
     </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Post!"
-        android:id="@+id/post_fragment_btnPost"
-        android:layout_gravity="right"/>
 
 </LinearLayout>

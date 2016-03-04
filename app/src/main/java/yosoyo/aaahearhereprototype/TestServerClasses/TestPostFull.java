@@ -16,6 +16,13 @@ public class TestPostFull implements Comparable {
 	List<TestCommentUser> comments;
 	CachedSpotifyTrack track;
 
+	public TestPostFull(TestPostFullProcess that){
+		this.post = that.post;
+		this.user = that.user;
+		this.comments = that.comments;
+		this.track = that.track;
+	}
+
 	public TestPostFull(TestPostUserCommentsNested nested){
 		this.post = new TestPost(nested);
 		this.user = nested.getUser();
@@ -54,7 +61,7 @@ public class TestPostFull implements Comparable {
 		this.comments = comments;
 	}
 
-	@Override
+	/*@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		//if (o == null || getClass() != o.getClass()) return false;
@@ -62,7 +69,7 @@ public class TestPostFull implements Comparable {
 		TestPostFull that = (TestPostFull) o;
 
 		return (post != null ? !post.equals(that.post) : that.post != null);
-	}
+	}*/
 
 	@Override
 	public int compareTo(Object that) {
@@ -72,4 +79,16 @@ public class TestPostFull implements Comparable {
 		return ((TestPostFull) that).getPost().getCreatedAt().compareTo(
 			this.getPost().getCreatedAt());
 	}
+
+	@Override
+	public boolean equals(Object o){
+		TestPostFull that = (TestPostFull) o;
+		return (this.post.id == that.post.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) post.id;
+	}
+
 }

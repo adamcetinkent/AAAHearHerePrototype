@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -154,10 +153,12 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 		if (trackResults == null){
 			return;
 		}
+		String trackIDList[] = new String[trackResults.length];
 		String trackNameList[] = new String[trackResults.length];
 		String trackImageList[] = new String[trackResults.length];
 		String trackDescList[] = new String[trackResults.length];
 		for (int i = 0; i < trackResults.length; i++){
+			trackIDList[i] = trackResults[i].getID();
 			trackNameList[i] = trackResults[i].getName();
 			SpotifyImage image = trackResults[i].getImages(0);
 			if (image != null)
@@ -165,7 +166,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 			trackDescList[i] = trackResults[i].getArtistNameAlbumName();
 		}
 
-		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, trackNameList, trackImageList, trackDescList);
+		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, trackIDList, trackNameList, trackImageList, trackDescList);
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
@@ -177,8 +178,8 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(TRACK_JSON, new Gson().toJson(track, SpotifyTrack.class));
 
-				byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				resultIntent.putExtra(BMP_JSON, bytes);
+				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
+				//resultIntent.putExtra(BMP_JSON, bytes);
 
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
@@ -193,10 +194,12 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 		if (artistResults == null){
 			return;
 		}
+		String artistIDList[] = new String[artistResults.length];
 		String artistNameList[] = new String[artistResults.length];
 		String artistImageList[] = new String[artistResults.length];
 		String artistDescList[] = new String[artistResults.length];
 		for (int i = 0; i < artistResults.length; i++){
+			artistIDList[i] = artistResults[i].getID();
 			artistNameList[i] = artistResults[i].getName();
 			SpotifyImage image = artistResults[i].getImages(0);
 			if (image != null)
@@ -204,7 +207,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 			artistDescList[i] = artistResults[i].getGenres();
 		}
 
-		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, artistNameList, artistImageList, artistDescList);
+		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, artistIDList, artistNameList, artistImageList, artistDescList);
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
@@ -216,8 +219,8 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(ARTIST_JSON, new Gson().toJson(artist, SpotifyArtist.class));
 
-				byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				resultIntent.putExtra(BMP_JSON, bytes);
+				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
+				//resultIntent.putExtra(BMP_JSON, bytes);
 
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
@@ -231,10 +234,12 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 		if (albumResults == null){
 			return;
 		}
+		String albumIDList[] = new String[albumResults.length];
 		String albumNameList[] = new String[albumResults.length];
 		String albumImageList[] = new String[albumResults.length];
 		String albumDescList[] = new String[albumResults.length];
 		for (int i = 0; i < albumResults.length; i++){
+			albumIDList[i] = albumResults[i].getID();
 			albumNameList[i] = albumResults[i].getName();
 			SpotifyImage image = albumResults[i].getImages(0);
 			if (image != null)
@@ -242,7 +247,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 			albumDescList[i] = albumResults[i].getArtistName();
 		}
 
-		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, albumNameList, albumImageList, albumDescList);
+		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, albumIDList, albumNameList, albumImageList, albumDescList);
 		ListView listView = (ListView) findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 
@@ -254,8 +259,8 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(ALBUM_JSON, new Gson().toJson(album, SpotifyAlbum.class));
 
-				byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				resultIntent.putExtra(BMP_JSON, bytes);
+				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
+				//resultIntent.putExtra(BMP_JSON, bytes);
 
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();

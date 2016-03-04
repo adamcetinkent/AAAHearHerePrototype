@@ -7,6 +7,8 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -16,10 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,9 +39,9 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreatePostTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
-import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,7 +68,7 @@ public class PostFragment extends Fragment
 	private ImageView imgAlbumArt;
 	private LinearLayout llSearch;
 	private LinearLayout llText;
-	private ImageButton btnPlayButton;
+	private ImageView btnPlayButton;
 
 	private boolean postAdded = false;
 	private boolean trackAdded = false;
@@ -92,7 +94,7 @@ public class PostFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_post, container, false);
+		final View view = inflater.inflate(R.layout.fragment_post, container, false);
 
 		TextView txtUserName = (TextView) view.findViewById(R.id.post_fragment_txtUserName);
 		txtUserName.setText(Profile.getCurrentProfile().getName());
@@ -199,7 +201,7 @@ public class PostFragment extends Fragment
 			}
 		});
 
-		btnPlayButton = (ImageButton) view.findViewById(R.id.post_fragment_btnPlayButton);
+		btnPlayButton = (ImageView) view.findViewById(R.id.post_fragment_btnPlayButton);
 		btnPlayButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -271,7 +273,7 @@ public class PostFragment extends Fragment
 
 		updatePlayButton(btnPlayButton);
 
-		Button postButton = (Button) view.findViewById(R.id.post_fragment_btnPost);
+		final ImageButton postButton = (ImageButton) view.findViewById(R.id.post_fragment_btnPost);
 		postButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -281,22 +283,31 @@ public class PostFragment extends Fragment
 				}
 				TestPost testPost = new TestPost(HolderActivity.testUser.getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString());
 				new TestCreatePostTask(PostFragment.this, testPost).execute();
+				postButton.setVisibility(View.INVISIBLE);
+				ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.post_fragment_progressBar);
+				progressBar.setVisibility(View.VISIBLE);
 			}
 		});
 
 		return view;
 	}
 
-	private void updatePlayButton(ImageButton btnPlayButton){
+	private void updatePlayButton(ImageView btnPlayButton){
 		if (spotifyTrack == null){
 			btnPlayButton.setVisibility(View.GONE);
 		} else {
 			btnPlayButton.setVisibility(View.VISIBLE);
 		}
-		if (HolderActivity.mediaPlayer.isPlaying()) {
-			btnPlayButton.setImageResource(R.drawable.ic_media_pause);
+		if (spotifyAlbum == null && spotifyArtist == null && spotifyTrack == null){
+			imgAlbumArt.setImageBitmap(null);
+			imgAlbumArt.setBackgroundColor(Color.WHITE);
 		} else {
-			btnPlayButton.setImageResource(R.drawable.ic_media_play);
+			imgAlbumArt.setBackgroundColor(Color.TRANSPARENT);
+		}
+		if (HolderActivity.mediaPlayer.isPlaying()) {
+			btnPlayButton.setImageResource(R.drawable.pause_overlay);
+		} else {
+			btnPlayButton.setImageResource(R.drawable.play_overlay);
 		}
 	}
 
@@ -333,8 +344,14 @@ public class PostFragment extends Fragment
 					llSearch.setVisibility(View.GONE);
 					llText.setVisibility(View.VISIBLE);
 
-					byte[] bytes = data.getByteArrayExtra(SearchResultsActivity.BMP_JSON);
-					imgAlbumArt.setImageBitmap(ZZZUtility.convertByteArrayToBitmap(bytes));
+					WebHelper.getSpotifyAlbumArt(spotifyTrack.getID(),
+												 spotifyTrack.getImages(0).getUrl(),
+												 new WebHelper.GetSpotifyAlbumArtCallback() {
+													 @Override
+													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
+														 imgAlbumArt.setImageBitmap(bitmap);
+													 }
+												 });
 				}
 				break;
 			}
@@ -352,10 +369,16 @@ public class PostFragment extends Fragment
 						searchViewArtist.clearFocus();
 					}
 
-					byte[] bytes = data.getByteArrayExtra(SearchResultsActivity.BMP_JSON);
-					imgAlbumArt.setImageBitmap(ZZZUtility.convertByteArrayToBitmap(bytes));
-					break;
+					WebHelper.getSpotifyAlbumArt(spotifyArtist.getID(),
+												 spotifyArtist.getImages(0).getUrl(),
+												 new WebHelper.GetSpotifyAlbumArtCallback() {
+													 @Override
+													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
+														 imgAlbumArt.setImageBitmap(bitmap);
+													 }
+												 });
 				}
+				break;
 			}
 			case (SearchResultsActivity.REQUEST_CODE_ALBUM_ARTIST):
 			case (SearchResultsActivity.REQUEST_CODE_ALBUM): {
@@ -369,10 +392,16 @@ public class PostFragment extends Fragment
 						searchViewArtist.setQueryHint(spotifyAlbum.getArtistName());
 					}
 
-					byte[] bytes = data.getByteArrayExtra(SearchResultsActivity.BMP_JSON);
-					imgAlbumArt.setImageBitmap(ZZZUtility.convertByteArrayToBitmap(bytes));
-					break;
+					WebHelper.getSpotifyAlbumArt(spotifyAlbum.getID(),
+												 spotifyAlbum.getImages(0).getUrl(),
+												 new WebHelper.GetSpotifyAlbumArtCallback() {
+													 @Override
+													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
+														 imgAlbumArt.setImageBitmap(bitmap);
+													 }
+												 });
 				}
+				break;
 			}
 		}
 
@@ -384,29 +413,8 @@ public class PostFragment extends Fragment
 	public void returnResultCreatePost(Boolean success, TestPostFull testPostUser) {
 		if (success) {
 			Log.d(TAG, "New Post created!");
-			//TestPostUserTrack testPostUserTrack = new TestPostUserTrack(testPostUser, new CachedSpotifyTrack(spotifyTrack));
-			//HolderActivity.dataHolder.addTestPostUserTrack(testPostUserTrack, this, this);
 			postFragmentPostedListener.onPostFragmentPosted();
 		}
 	}
-
-	/*@Override
-	public void returnInsertCachedSpotifyTrackCallback(long id, CachedSpotifyTrack cachedSpotifyTrack) {
-		trackAdded = true;
-		successfulPost();
-	}
-
-	@Override
-	public void returnInsertPost(long id, TestPostUser testPostUser) {
-		postAdded = true;
-		successfulPost();
-	}
-
-	private void successfulPost(){
-		if (postAdded && trackAdded) {
-			Toast.makeText(getActivity(), "Posted to Hear Here!", Toast.LENGTH_LONG).show();
-			postFragmentPostedListener.onFragmentSuicide(getTag());
-		}
-	}*/
 
 }

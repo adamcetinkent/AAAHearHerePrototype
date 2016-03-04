@@ -56,4 +56,8 @@ public class SpotifyAlbum {
 		return artists[0].id;
 	}
 
+	public String getID(){
+		return id;
+	}
+
 }

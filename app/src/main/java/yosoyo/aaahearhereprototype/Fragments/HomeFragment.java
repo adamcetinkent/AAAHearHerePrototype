@@ -11,11 +11,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import com.facebook.Profile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +33,7 @@ import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
@@ -57,35 +64,37 @@ public class HomeFragment extends Fragment {
 		lstTimelineAdapter = new TimelineCustomExpandableAdapter(getActivity(), posts);
 		lstTimeline.setAdapter(lstTimelineAdapter);
 
+		getAllData();
+
+		// Inflate the layout for this fragment
+		return view;
+	}
+
+	private void getAllData(){
 		AsyncDataManager.getAllPosts(new AsyncDataManager.GetAllPostsCallback() {
 			@Override
 			public void returnAllCachedPosts(List<TestPostFull> cachedPosts) {
 				Log.d(TAG, "Cached posts returned");
 				posts = ZZZUtility.mergeLists(posts, cachedPosts);
-				Collections.sort(posts);
-				lstTimelineAdapter.notifyDataSetChanged();
-				for(int i=0; i < lstTimelineAdapter.getGroupCount(); i++) {
-					lstTimeline.expandGroup(i);
-					lstTimelineAdapter.getChildrenCount(i);
-				}
+				notifyAdapter();
 			}
 
 			@Override
 			public void returnWebPost(TestPostFull webPost) {
 				Log.d(TAG, "Web post returned!");
-				if(ZZZUtility.mergeLists(posts, webPost)) {
-					Collections.sort(posts);
-					lstTimelineAdapter.notifyDataSetChanged();
-					for(int i=0; i < lstTimelineAdapter.getGroupCount(); i++) {
-						lstTimeline.expandGroup(i);
-						lstTimelineAdapter.getChildrenCount(i);
-					}
-				}
+				posts = ZZZUtility.mergeLists(posts, webPost);
+				notifyAdapter();
 			}
 		});
+	}
 
-		// Inflate the layout for this fragment
-		return view;
+	private void notifyAdapter(){
+		Collections.sort(posts);
+		lstTimelineAdapter.notifyDataSetChanged();
+		for(int i=0; i < lstTimelineAdapter.getGroupCount(); i++) {
+			lstTimeline.expandGroup(i);
+			lstTimelineAdapter.getChildrenCount(i);
+		}
 	}
 
 	@Override
@@ -96,32 +105,21 @@ public class HomeFragment extends Fragment {
 
 	}
 
-	private static class TimelineCustomExpandableAdapter extends BaseExpandableListAdapter{
+	private class TimelineCustomExpandableAdapter extends BaseExpandableListAdapter{
 
 		private Activity context;
 		private List<TestPostFull> posts;
-		private Bitmap[] userBitmaps;
-		private Bitmap[] artistBitmaps;
+		int addingComment = -1;
 
 		public TimelineCustomExpandableAdapter(Activity context, List<TestPostFull> posts){
 			super();
 			this.context = context;
 			this.posts = posts;
-			artistBitmaps = new Bitmap[posts.size()];
-			userBitmaps = new Bitmap[posts.size()];
 		}
 
 		@Override
 		public void notifyDataSetChanged() {
 			super.notifyDataSetChanged();
-
-			Bitmap[] newUserBitmaps = new Bitmap[posts.size()];
-			System.arraycopy(userBitmaps, 0, newUserBitmaps, 0, userBitmaps.length);
-			userBitmaps = newUserBitmaps;
-
-			Bitmap[] newArtistBitmaps = new Bitmap[posts.size()];
-			System.arraycopy(artistBitmaps, 0, newArtistBitmaps, 0, artistBitmaps.length);
-			artistBitmaps = newArtistBitmaps;
 		}
 
 		@Override
@@ -131,7 +129,8 @@ public class HomeFragment extends Fragment {
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			return posts.get(groupPosition).getComments().size();
+			int n = posts.get(groupPosition).getComments().size();
+			return (groupPosition == addingComment ? n + 1 : n);
 		}
 
 		@Override
@@ -160,13 +159,13 @@ public class HomeFragment extends Fragment {
 		}
 
 		@Override
-		public View getGroupView(int position, boolean isExpanded, View convertView, ViewGroup parent) {
+		public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 			LayoutInflater inflater = context.getLayoutInflater();
 			View rowView = inflater.inflate(R.layout.list_row_timeline, null, true);
 
-			TestPost testPost = posts.get(position).getPost();
-			TestUser testUser = posts.get(position).getUser();
-			final CachedSpotifyTrack cachedSpotifyTrack = posts.get(position).getTrack();
+			TestPost testPost = posts.get(groupPosition).getPost();
+			TestUser testUser = posts.get(groupPosition).getUser();
+			final CachedSpotifyTrack cachedSpotifyTrack = posts.get(groupPosition).getTrack();
 
 			// get Album Art
 			final ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgAlbumArt);
@@ -213,7 +212,7 @@ public class HomeFragment extends Fragment {
 			TextView txtMessage = (TextView) rowView.findViewById(R.id.list_row_timeline_txtMessage);
 			txtMessage.setText(testPost.getMessage());
 
-			final ImageButton btnPlayButton = (ImageButton) rowView.findViewById(R.id.list_row_timeline_btnPlayButton);
+			final ImageView btnPlayButton = (ImageView) rowView.findViewById(R.id.list_row_timeline_btnPlayButton);
 			btnPlayButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -234,32 +233,36 @@ public class HomeFragment extends Fragment {
 
 					try {
 
-						HolderActivity.mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-							@Override
-							public boolean onError(MediaPlayer mp, int what, int extra) {
-								HolderActivity.mediaPlayer.reset();
-								updatePlayButton(btnPlayButton);
-								return false;
-							}
-						});
+						HolderActivity.mediaPlayer
+							.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+								@Override
+								public boolean onError(MediaPlayer mp, int what, int extra) {
+									HolderActivity.mediaPlayer.reset();
+									updatePlayButton(btnPlayButton);
+									return false;
+								}
+							});
 
-						HolderActivity.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-							@Override
-							public void onPrepared(MediaPlayer mp) {
-								HolderActivity.mediaPlayer.start();
-								progressDialog.dismiss();
-								updatePlayButton(btnPlayButton);
-							}
-						});
+						HolderActivity.mediaPlayer
+							.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+								@Override
+								public void onPrepared(MediaPlayer mp) {
+									HolderActivity.mediaPlayer.start();
+									progressDialog.dismiss();
+									updatePlayButton(btnPlayButton);
+								}
+							});
 
-						HolderActivity.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-							@Override
-							public void onCompletion(MediaPlayer mp) {
-								updatePlayButton(btnPlayButton);
-							}
-						});
+						HolderActivity.mediaPlayer
+							.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+								@Override
+								public void onCompletion(MediaPlayer mp) {
+									updatePlayButton(btnPlayButton);
+								}
+							});
 
-						HolderActivity.mediaPlayer.setDataSource(cachedSpotifyTrack.getPreviewUrl());
+						HolderActivity.mediaPlayer
+							.setDataSource(cachedSpotifyTrack.getPreviewUrl());
 						HolderActivity.mediaPlayer.prepareAsync();
 
 					} catch (IllegalArgumentException e) {
@@ -280,12 +283,108 @@ public class HomeFragment extends Fragment {
 
 			updatePlayButton(btnPlayButton);
 
+			final ToggleButton btnLikeButton = (ToggleButton) rowView.findViewById(R.id.list_row_timeline_btnLike);
+			final ImageButton btnCommentButton = (ImageButton) rowView.findViewById(R.id.list_row_timeline_btnComment);
+			//final LinearLayout llAddComment = (LinearLayout) rowView.findViewById(R.id.list_row_timeline_llAddComment);
+			//final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_timeline_txtAddComment);
+			//llAddComment.setVisibility((addingComment == groupPosition) ? View.VISIBLE : View.GONE);
+			/*if (addingComment == groupPosition){
+				txtAddComment.requestFocus();
+				InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
+					Context.INPUT_METHOD_SERVICE);
+				inputMethodManager.showSoftInput(txtAddComment,
+												 InputMethodManager.SHOW_IMPLICIT);
+			}*/
+			btnCommentButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						InputMethodManager inputMethodManager;
+						if (addingComment != groupPosition) {
+							//llAddComment.setVisibility(View.VISIBLE);
+							addingComment = groupPosition;
+							//txtAddComment.requestFocus();
+							/*inputMethodManager = (InputMethodManager) context.getSystemService(
+								Context.INPUT_METHOD_SERVICE);
+							inputMethodManager.showSoftInput(txtAddComment,
+															 InputMethodManager.SHOW_IMPLICIT);*/
+						} else {
+							//llAddComment.setVisibility(View.GONE);
+							//txtAddComment.clearFocus();
+							addingComment = -1;
+							/*inputMethodManager = (InputMethodManager) context.getSystemService(
+								Context.INPUT_METHOD_SERVICE);
+							inputMethodManager
+								.hideSoftInputFromWindow(txtAddComment.getWindowToken(), 0);*/
+						}
+						notifyDataSetChanged();
+					}
+				});
+
 			return rowView;
 		}
 
 		@Override
-		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+		public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+
 			LayoutInflater inflater = context.getLayoutInflater();
+
+			if (childPosition >= posts.get(groupPosition).getComments().size()){
+				final View rowView = inflater.inflate(R.layout.list_row_comment_add, null, true);
+
+				final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_comment_add_imgProfile);
+				WebHelper.getFacebookProfilePicture(Profile.getCurrentProfile().getId(),
+													new WebHelper.GetFacebookProfilePictureCallback() {
+														@Override
+														public void returnFacebookProfilePicture(Bitmap bitmap) {
+															imgProfile.setImageBitmap(bitmap);
+														}
+													});
+
+				final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_comment_add_txtAddComment);
+
+				/*if (addingComment == groupPosition){
+					//txtAddComment.requestFocus();
+					InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
+						Context.INPUT_METHOD_SERVICE);
+					inputMethodManager.showSoftInput(txtAddComment,
+													 InputMethodManager.SHOW_IMPLICIT);
+				}*/
+
+				final ImageButton btnAddComment = (ImageButton) rowView.findViewById(R.id.list_row_comment_add_btnAddComment);
+				btnAddComment.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String message = txtAddComment.getText().toString();
+						if (message.isEmpty())
+							return;
+						final long post_id = posts.get(groupPosition).getPost().getID();
+						TestComment comment = new TestComment(post_id, HolderActivity.testUser.getID(), message);
+						AsyncDataManager.postComment(comment, new AsyncDataManager.PostCommentCallback() {
+							@Override
+							public void returnPostedComment(TestComment returnedComment) {
+								Log.d(TAG, "Posted new comment!");
+								AsyncDataManager.getWebPost(post_id,
+															new AsyncDataManager.GetWebPostCallback() {
+																@Override
+																public void returnWebPost(TestPostFull webPost) {
+																	posts = ZZZUtility
+																		.mergeLists(posts, webPost);
+																	notifyAdapter();
+																}
+															});
+								addingComment = -1;
+							}
+						});
+						btnAddComment.setVisibility(View.INVISIBLE);
+						ProgressBar progressBar = (ProgressBar) rowView.findViewById(R.id.list_row_comment_add_progressBar);
+						progressBar.setVisibility(View.VISIBLE);
+					}
+				});
+
+				return rowView;
+			}
+
 			View rowView = inflater.inflate(R.layout.list_row_comment, null, true);
 
 			TestCommentUser comment = posts.get(groupPosition).getComments().get(childPosition);
@@ -316,11 +415,11 @@ public class HomeFragment extends Fragment {
 			return true;
 		}
 
-		private void updatePlayButton(ImageButton btnPlayButton){
+		private void updatePlayButton(ImageView btnPlayButton){
 			if (HolderActivity.mediaPlayer.isPlaying()) {
-				btnPlayButton.setImageResource(R.drawable.ic_media_pause);
+				btnPlayButton.setImageResource(R.drawable.pause_overlay);
 			} else {
-				btnPlayButton.setImageResource(R.drawable.ic_media_play);
+				btnPlayButton.setImageResource(R.drawable.play_overlay);
 			}
 		}
 	}

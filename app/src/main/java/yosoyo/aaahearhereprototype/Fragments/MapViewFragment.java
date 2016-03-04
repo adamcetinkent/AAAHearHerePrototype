@@ -217,7 +217,7 @@ public class MapViewFragment
 
 				@Override
 				public void returnWebPost(TestPostFull webPost) {
-					if (ZZZUtility.mergeLists(posts, webPost))
+					if (ZZZUtility.addItemToList(posts, webPost))
 						addMapMarker(webPost, true);
 				}
 			});

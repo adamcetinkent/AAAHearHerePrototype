@@ -18,7 +18,7 @@
         >
 
         <ImageView
-            android:id="@+id/list_row_comment_imgProfile"
+            android:id="@+id/list_row_comment_add_imgProfile"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
@@ -33,28 +33,42 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/list_row_comment_add_llAddComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp">
+        >
 
-        <TextView
-            android:id="@+id/list_row_comment_txtUserName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="USER NAME"/>
-
-        <TextView
-            android:id="@+id/list_row_comment_txtComment"
+        <EditText
+            android:id="@+id/list_row_comment_add_txtAddComment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:hint="Add your comment..."/>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="Message"
-            android:textColor="#ff7f7f7f"
-            android:textSize="10dp"
-            />
+            android:layout_marginRight="10dp">
+
+            <ImageButton
+                android:id="@+id/list_row_comment_add_btnAddComment"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/send"
+                android:background="@android:color/transparent"
+                android:layout_gravity="center"/>
+
+            <ProgressBar
+                android:id="@+id/list_row_comment_add_progressBar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:visibility="invisible"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 

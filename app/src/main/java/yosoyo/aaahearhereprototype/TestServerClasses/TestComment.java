@@ -21,6 +21,12 @@ public class TestComment {
 
 	public TestComment(){}
 
+	public TestComment(long post_id, long user_id, String message){
+		this.post_id = post_id;
+		this.user_id = user_id;
+		this.message = message;
+	}
+
 	public TestComment(TestCommentUserNested nested){
 		this.id = nested.getID();
 		this.post_id = nested.getPostID();

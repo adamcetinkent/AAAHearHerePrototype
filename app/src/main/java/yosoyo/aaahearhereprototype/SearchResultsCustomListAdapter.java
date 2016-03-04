@@ -9,29 +9,31 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
+
 /**
  * Created by Adam Kent on 10/02/2016.
  *
  * Custom Adapter for ListView to show artwork (imageView), title and description (textViews).
- * imgArtwork is downloaded from URLs stored in artistImages.
+ * imgArtwork is downloaded from URLs stored in images.
  */
-public class SearchResultsCustomListAdapter extends ArrayAdapter /*implements DownloadImageTask.DownloadImageTaskCallback*/ {
+public class SearchResultsCustomListAdapter extends ArrayAdapter{
 	private static final String TAG = "SearchResultsCustomListAdapter";
 
 	private final Activity context;
-	private final String[] artistNames;		// Displayed in artistName TextView
-	private final String[] artistImages;	// URLs to download for imageView
-	private final String[] artistDescs;		// Displayed in artistDesc TextView
-	private Bitmap[] artistBitmaps;			// Storage for downloaded bitmaps
+	private final String[] ids;				// underlying IDs
+	private final String[] titles;			// Displayed in artistName TextView
+	private final String[] images;			// URLs to download for imageView
+	private final String[] descriptions;	// Displayed in artistDesc TextView
 
-	public SearchResultsCustomListAdapter(Activity context, String[] artistNames, String[] artistImages, String[] artistDescs){
-		super(context, R.layout.list_row_track, artistNames);
+	public SearchResultsCustomListAdapter(Activity context, String[] ids, String[] titles, String[] images, String[] descriptions){
+		super(context, R.layout.list_row_track, titles);
 
 		this.context = context;
-		this.artistNames = artistNames;
-		this.artistImages = artistImages;
-		this.artistDescs = artistDescs;
-		this.artistBitmaps = new Bitmap[artistImages.length];
+		this.ids = ids;
+		this.titles = titles;
+		this.images = images;
+		this.descriptions = descriptions;
 	}
 
 	public View getView(int position, View view, ViewGroup parent){
@@ -40,29 +42,24 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter /*implements Do
 
 		// Get views into which info will be put
 		TextView txtArtistName = (TextView) rowView.findViewById(R.id.artistname);
-		ImageView imgArtwork = (ImageView) rowView.findViewById(R.id.artwork);
+		final ImageView imgArtwork = (ImageView) rowView.findViewById(R.id.artwork);
 		TextView txtArtistDesc = (TextView) rowView.findViewById(R.id.artistdesc);
 
 
-		txtArtistName.setText(artistNames[position]); // Set artistName TextView
+		txtArtistName.setText(titles[position]); // Set artistName TextView
 
 		// Set artwork imgView bitmap
-		if (artistImages[position] != null) {
-			/*if (artistBitmaps[position] == null) { // need to download image
-				new DownloadImageTask(imgArtwork, this, position).execute(artistImages[position]);
-			} else {
-				imgArtwork.setImageBitmap(artistBitmaps[position]); // get from storage
-			}*/
-		}
-		if (artistDescs[position] != null)
-			txtArtistDesc.setText(artistDescs[position]); // Set artistDesc TextView
+		WebHelper.getSpotifyAlbumArt(ids[position], images[position],
+									 new WebHelper.GetSpotifyAlbumArtCallback() {
+										 @Override
+										 public void returnSpotifyAlbumArt(Bitmap bitmap) {
+											 imgArtwork.setImageBitmap(bitmap);
+										 }
+									 });
+		if (descriptions[position] != null)
+			txtArtistDesc.setText(descriptions[position]); // Set artistDesc TextView
 
 		return rowView;
 	}
 
-
-	/*@Override
-	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
-		artistBitmaps[position] = result; // store downloaded bitmap
-	}*/
 }

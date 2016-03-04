@@ -11,6 +11,7 @@ import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 
@@ -74,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 									});
 	}
 
-	public static void processWebPosts(final Context context, final AsyncDataManager.GetAllPostsCallback callback, final List<TestPostFullProcess> webPostsToProcess){
+	public static void processWebPosts(final Context context, final AsyncDataManager.GetWebPostCallback callback, final List<TestPostFullProcess> webPostsToProcess){
 		// INSERT POSTS INTO DATABASE
 		ORMTestPost.insertPosts(context, webPostsToProcess,
 								new ORMTestPost.DBTestPostInsertManyTask.DBTestPostInsertManyTaskCallback() {
@@ -152,17 +153,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	}
 
-	private static void returnProcessedPosts(final AsyncDataManager.GetAllPostsCallback callback, List<TestPostFullProcess> testPosts){
+	private static void returnProcessedPosts(final AsyncDataManager.GetWebPostCallback callback, List<TestPostFullProcess> testPosts){
 		for (TestPostFullProcess postProcess : testPosts){
 			testProcessPost(callback, postProcess, testPosts);
 		}
 	}
 
-	private static void testProcessPost(final AsyncDataManager.GetAllPostsCallback callback, TestPostFullProcess postProcess, List<TestPostFullProcess> testPosts){
+	private static void testProcessPost(final AsyncDataManager.GetWebPostCallback callback, TestPostFullProcess postProcess, List<TestPostFullProcess> testPosts){
 		if (postProcess.isPostProcessed() && postProcess.isTrackProcessed() && postProcess.isUsersProcessed() && postProcess.isCommentsProcessed()){
 			testPosts.remove(testPosts);
-			callback.returnWebPost(postProcess);
+			callback.returnWebPost(new TestPostFull(postProcess));
 		}
+	}
+
+	public interface InsertCommentCallback{
+		void returnInsertedComment(Long commentID, TestComment comment);
+	}
+
+	public static void insertComment(Context context, TestComment comment, final InsertCommentCallback callback){
+		ORMTestComment.insertComment(context, comment,
+									 new ORMTestComment.DBTestCommentInsertTask.DBTestCommentInsertTaskCallback() {
+										 @Override
+										 public void returnInsertedComment(Long commentID, TestComment comment) {
+											 callback.returnInsertedComment(commentID, comment);
+										 }
+									 });
 	}
 
 	@Override

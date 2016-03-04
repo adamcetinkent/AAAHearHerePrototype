@@ -82,6 +82,47 @@ public class ORMTestComment {
 		return contentValues;
 	}
 
+	public static void insertComment(Context context, TestComment testComment, DBTestCommentInsertTask.DBTestCommentInsertTaskCallback callbackTo){
+		new DBTestCommentInsertTask(context, testComment, callbackTo).execute();
+	}
+
+	public static class DBTestCommentInsertTask extends AsyncTask<Void, Void, Long> {
+
+		private Context context;
+		private TestComment testComment;
+		private DBTestCommentInsertTaskCallback callbackTo;
+
+		public interface DBTestCommentInsertTaskCallback {
+			void returnInsertedComment(Long commentID, TestComment comment);
+		}
+
+		public DBTestCommentInsertTask(Context context, TestComment testComment, DBTestCommentInsertTaskCallback callbackTo){
+			this.context = context;
+			this.testComment = testComment;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Long doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			ContentValues values = testCommentToContentValues(testComment);
+			Long commentID = database.insert(TABLE_NAME, "null", values);
+
+			Log.d(TAG, "Inserted new Comment with ID:" + commentID);
+
+			database.close();
+
+			return commentID;
+		}
+
+		@Override
+		protected void onPostExecute(Long commentID){
+			callbackTo.returnInsertedComment(commentID, testComment);
+		}
+	}
+
 	public static void insertCommentsFromPosts(Context context, List<TestPostFullProcess> testPosts, DBTestCommentInsertManyFromPostsTask.DBTestCommentInsertManyFromPostsTaskCallback callbackTo){
 		new DBTestCommentInsertManyFromPostsTask(context, testPosts, callbackTo).execute();
 	}

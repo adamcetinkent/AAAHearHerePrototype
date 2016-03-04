@@ -7,9 +7,9 @@ import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Adam Kent on 10/02/2016.
@@ -39,22 +39,27 @@ public class ZZZUtility {
 		return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 	}
 
-	public static <T> List<T> mergeLists (List<T> oldList, List<T> newList){
-		Set setBoth = new HashSet(newList);
+	public static <T> List<T> mergeLists(List<T> oldList, List<T> newList){
+		//TreeSet setBoth = new TreeSet(newList);
+		HashSet setBoth = new HashSet(newList);
 		setBoth.addAll(oldList);
 		oldList.clear();
 		oldList.addAll(setBoth);
 		return oldList;
 	}
 
-	public static <T> Boolean mergeLists (List<T> oldList, T newItem){
-		//if (!oldList.contains(newItem))
-		//	oldList.add(newItem);
+	public static <T> List<T> mergeLists(List<T> oldList, T newItem){
+		ArrayList<T> newList = new ArrayList<>();
+		newList.add(newItem);
+		return mergeLists(oldList, newList);
+	}
+
+
+	public static <T> Boolean addItemToList(List<T> oldList, T newItem){
 		for (T testItem : oldList)
 			if (testItem.equals(newItem))
 				return false;
 		oldList.add(newItem);
 		return true;
 	}
-
 }

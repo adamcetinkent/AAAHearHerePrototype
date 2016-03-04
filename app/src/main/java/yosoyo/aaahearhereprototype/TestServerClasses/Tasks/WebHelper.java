@@ -10,6 +10,7 @@ import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.SpotifyAPIRequestTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 
 /**
@@ -36,6 +37,19 @@ public class WebHelper {
 		}).execute();
 	}
 
+	public interface GetWebPostCallback {
+		void returnWebPost(TestPostFullProcess webPostToProcess);
+	}
+
+	public static void getWebPost(long post_id, final GetWebPostCallback callback){
+		new TestGetPostTask(post_id, new TestGetPostTask.TestGetPostTaskCallback(){
+			@Override
+			public void returnTestPost(TestPostFullProcess testPosts) {
+				callback.returnWebPost(testPosts);
+			}
+		}).execute();
+	}
+
 	public interface GetSpotifyTrackCallback {
 		void returnSpotifyTrack(SpotifyTrack spotifyTrack);
 	}
@@ -52,6 +66,19 @@ public class WebHelper {
 
 	public interface GetSpotifyAlbumArtCallback {
 		void returnSpotifyAlbumArt(Bitmap bitmap);
+	}
+
+	public static void getSpotifyAlbumArt(final String trackID, final String imageURL, final GetSpotifyAlbumArtCallback callback){
+		if (spotifyAlbumArt.containsKey(trackID))
+			callback.returnSpotifyAlbumArt(spotifyAlbumArt.get(trackID));
+		else
+			new DownloadImageTask(new DownloadImageTask.DownloadImageTaskCallback() {
+				@Override
+				public void returnDownloadedImage(Bitmap result) {
+					spotifyAlbumArt.put(trackID, result);
+					callback.returnSpotifyAlbumArt(result);
+				}
+			}).execute(imageURL);
 	}
 
 	public static void getSpotifyAlbumArt(final CachedSpotifyTrack track, final GetSpotifyAlbumArtCallback callback){
@@ -82,6 +109,20 @@ public class WebHelper {
 					callback.returnFacebookProfilePicture(result);
 				}
 			}).execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + fb_user_id + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
+	}
+
+	public interface PostCommentCallback{
+		void returnPostedComment(TestComment returnedComment);
+	}
+
+	public static void postComment(final TestComment comment, final PostCommentCallback callback){
+		new TestCreateCommentTask(comment,
+								  new TestCreateCommentTask.TestCreateCommentTaskCallback() {
+									  @Override
+									  public void returnResultCreateComment(Boolean success, TestComment testComment) {
+										  callback.returnPostedComment(testComment);
+									  }
+								  }).execute();
 	}
 
 }

@@ -77,7 +77,9 @@
         android:id="@+id/list_row_timeline_llPostFrame"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/list_row_timeline_llTrackFrame"
@@ -144,15 +146,8 @@
                 android:textSize="14dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"/>
-
-            <!--<ExpandableListView-->
-                <!--android:id="@+id/list_row_timeline_lstComments"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:layout_marginRight="10dp"/>-->
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"/>
 
         </LinearLayout>
 
@@ -161,7 +156,8 @@
             android:orientation="vertical"
             android:layout_width="110dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="10dp">
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp">
 
             <FrameLayout
                 android:layout_width="104dp"
@@ -184,18 +180,56 @@
                     android:src="@drawable/com_facebook_profile_picture_blank_square"
                     />
 
+                <ImageView
+                    android:id="@+id/list_row_timeline_btnPlayButton"
+                    android:src="@drawable/play_overlay"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginTop="1dp"/>
+
             </FrameLayout>
 
-
-            <ImageButton
-                android:id="@+id/list_row_timeline_btnPlayButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_play"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"/>
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/list_row_timeline_llLikeCommentShare"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginBottom="5dp">
+
+        <ToggleButton
+            android:id="@+id/list_row_timeline_btnLike"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:scaleType="fitXY"
+            android:background="@drawable/ic_like_toggle"
+            android:textOn=""
+            android:textOff=""
+            android:checked="false"/>
+
+        <ImageButton
+            android:id="@+id/list_row_timeline_btnComment"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/comment"
+            android:background="@android:color/transparent"
+            />
+
+        <ImageButton
+            android:id="@+id/list_row_timeline_btnShare"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/share"
+            android:background="@android:color/transparent"
+            android:text="Share"/>
+
     </LinearLayout>
 
 </LinearLayout>
