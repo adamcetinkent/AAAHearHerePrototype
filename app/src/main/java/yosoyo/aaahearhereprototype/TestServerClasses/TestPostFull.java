@@ -13,22 +13,23 @@ public class TestPostFull implements Comparable {
 
 	TestPost post;
 	TestUser user;
-	List<TestCommentUser> comments;
 	CachedSpotifyTrack track;
+	List<TestCommentUser> comments;
+	List<TestLikeUser> likes;
 
 	public TestPostFull(TestPostFullProcess that){
 		this.post = that.post;
 		this.user = that.user;
 		this.comments = that.comments;
 		this.track = that.track;
+		this.likes = that.likes;
 	}
 
 	public TestPostFull(TestPostUserCommentsNested nested){
 		this.post = new TestPost(nested);
 		this.user = nested.getUser();
 		this.comments = nested.getCommentsList();
-
-		// GET TRACK SOMEHOW FROM DB OR FROM WEB
+		this.likes = nested.getLikesList();
 	}
 
 	public TestPostFull(Cursor cursor){
@@ -49,6 +50,10 @@ public class TestPostFull implements Comparable {
 		return comments;
 	}
 
+	public List<TestLikeUser> getLikes() {
+		return likes;
+	}
+
 	public CachedSpotifyTrack getTrack() {
 		return track;
 	}
@@ -61,15 +66,9 @@ public class TestPostFull implements Comparable {
 		this.comments = comments;
 	}
 
-	/*@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		//if (o == null || getClass() != o.getClass()) return false;
-
-		TestPostFull that = (TestPostFull) o;
-
-		return (post != null ? !post.equals(that.post) : that.post != null);
-	}*/
+	public void setLikes(List<TestLikeUser> likes) {
+		this.likes = likes;
+	}
 
 	@Override
 	public int compareTo(Object that) {

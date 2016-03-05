@@ -12,6 +12,7 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLike;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 
@@ -22,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String TAG = "DatabaseHelper";
 	private static final String DB_NAME = "AAAHereHerePrototype";
-	private static final int DB_VERSION = 6;
+	private static final int DB_VERSION = 7;
 
 	public DatabaseHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
@@ -34,6 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(ORMTestPost.SQL_CREATE_TABLE);
 		db.execSQL(ORMTestUser.SQL_CREATE_TABLE);
 		db.execSQL(ORMTestComment.SQL_CREATE_TABLE);
+		db.execSQL(ORMTestLike.SQL_CREATE_TABLE);
 		db.execSQL(ORMCachedSpotifyTrack.SQL_CREATE_TABLE);
 	}
 
@@ -43,6 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(ORMTestPost.SQL_DROP_TABLE);
 		db.execSQL(ORMTestUser.SQL_DROP_TABLE);
 		db.execSQL(ORMTestComment.SQL_DROP_TABLE);
+		db.execSQL(ORMTestLike.SQL_DROP_TABLE);
 		db.execSQL(ORMCachedSpotifyTrack.SQL_DROP_TABLE);
 
 		createDatabase(db);
@@ -54,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		ORMTestPost.resetTable(context);
 		ORMTestUser.resetTable(context);
 		ORMTestComment.resetTable(context);
+		ORMTestLike.resetTable(context);
 		ORMCachedSpotifyTrack.resetTable(context);
 
 		Log.d(TAG, "Database reset");
@@ -94,12 +98,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 												   }
 											   });
 
-		// INSERT USERS & COMMENT USERS INTO DATABASE
+		// INSERT COMMENTS INTO DATABASE
+		ORMTestLike.insertLikesFromPosts(context, webPostsToProcess,
+										 new ORMTestLike.DBTestLikeInsertManyFromPostsTask.DBTestLikeInsertManyFromPostsTaskCallback() {
+											 @Override
+											 public void returnInsertedManyLikes(List<TestPostFullProcess> testPosts) {
+												 returnProcessedPosts(callback, testPosts);
+											 }
+										 });
+
+		// INSERT USERS, COMMENT USERS & LIKE USERS INTO DATABASE
 		ORMTestUser.insertUsersFromPosts(context, webPostsToProcess,
 										 new ORMTestUser.DBTestUserInsertManyFromPostsTask.DBTestUserInsertManyFromPostsTaskCallback() {
 											 @Override
 											 public void returnInsertedManyUsers(List<TestPostFullProcess> testPosts) {
-												 returnProcessedPosts(callback, testPosts);
+												 returnProcessedPosts(
+													 callback, testPosts);
 											 }
 										 });
 
@@ -166,18 +180,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+
 	public interface InsertCommentCallback{
 		void returnInsertedComment(Long commentID, TestComment comment);
 	}
 
 	public static void insertComment(Context context, TestComment comment, final InsertCommentCallback callback){
-		ORMTestComment.insertComment(context, comment,
-									 new ORMTestComment.DBTestCommentInsertTask.DBTestCommentInsertTaskCallback() {
-										 @Override
-										 public void returnInsertedComment(Long commentID, TestComment comment) {
-											 callback.returnInsertedComment(commentID, comment);
-										 }
-									 });
+		ORMTestComment.insertComment(
+			context,
+			comment,
+			new ORMTestComment.DBTestCommentInsertTask.DBTestCommentInsertTaskCallback() {
+				@Override
+				public void returnInsertedComment(Long commentID, TestComment comment) {
+					callback.returnInsertedComment(commentID, comment);
+				}
+			});
+	}
+
+	public interface InsertLikeCallback{
+		void returnInsertedLike(Long likeID, TestLike like);
+	}
+
+	public static void insertLike(Context context, TestLike like, final InsertLikeCallback callback){
+		ORMTestLike.insertLike(
+			context,
+			like,
+			new ORMTestLike.DBTestLikeInsertTask.DBTestLikeInsertTaskCallback() {
+				@Override
+				public void returnInsertedLike(Long likeID, TestLike like) {
+					callback.returnInsertedLike(likeID, like);
+				}
+			});
+	}
+
+	public interface DeleteLikeCallback{
+		void returnDeletedLike(boolean success);
+	}
+
+	public static void deleteLike(Context context, TestLike like, final DeleteLikeCallback callback){
+		ORMTestLike.deleteLike(
+			context,
+			like,
+			new ORMTestLike.DBTestLikeDeleteTask.DBTestLikeDeleteTaskCallback() {
+				@Override
+				public void returnDeletedLike(boolean success) {
+					callback.returnDeletedLike(success);
+				}
+			});
 	}
 
 	@Override

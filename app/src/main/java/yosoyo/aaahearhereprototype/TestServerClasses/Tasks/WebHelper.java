@@ -11,6 +11,7 @@ import yosoyo.aaahearhereprototype.SpotifyAPIRequestTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLike;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 
 /**
@@ -116,13 +117,43 @@ public class WebHelper {
 	}
 
 	public static void postComment(final TestComment comment, final PostCommentCallback callback){
-		new TestCreateCommentTask(comment,
-								  new TestCreateCommentTask.TestCreateCommentTaskCallback() {
-									  @Override
-									  public void returnResultCreateComment(Boolean success, TestComment testComment) {
-										  callback.returnPostedComment(testComment);
-									  }
-								  }).execute();
+		new TestCreateCommentTask(
+			comment,
+			new TestCreateCommentTask.TestCreateCommentTaskCallback() {
+				  @Override
+				  public void returnResultCreateComment(Boolean success, TestComment testComment) {
+					  callback.returnPostedComment(testComment);
+				  }
+			  }).execute();
 	}
 
+	public interface PostLikeCallback{
+		void returnPostedLike(TestLike returnedLike);
+	}
+
+	public static void postLike(final TestLike like, final PostLikeCallback callback){
+		new TestCreateLikeTask(
+			like,
+			new TestCreateLikeTask.TestCreateLikeTaskCallback() {
+				@Override
+				public void returnResultCreateLike(Boolean success, TestLike testLike) {
+					callback.returnPostedLike(testLike);
+				}
+			}).execute();
+	}
+
+	public interface DeleteLikeCallback{
+		void returnDeletedLike(boolean success);
+	}
+
+	public static void deleteLike(final TestLike like, final DeleteLikeCallback callback){
+		new TestDeleteLikeTask(
+			like,
+			new TestDeleteLikeTask.TestDeleteLikeTaskCallback() {
+				@Override
+				public void returnResultDeleteLike(Boolean success) {
+					callback.returnDeletedLike(success);
+				}
+			}).execute();
+	}
 }

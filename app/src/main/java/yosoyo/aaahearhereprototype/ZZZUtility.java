@@ -7,7 +7,6 @@ import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -48,10 +47,14 @@ public class ZZZUtility {
 		return oldList;
 	}
 
-	public static <T> List<T> mergeLists(List<T> oldList, T newItem){
-		ArrayList<T> newList = new ArrayList<>();
-		newList.add(newItem);
-		return mergeLists(oldList, newList);
+	public static <T> List<T> updateList(List<T> oldList, T newItem){
+		for (int i = 0; i < oldList.size(); i++){
+			if (oldList.get(i).equals(newItem)){
+				oldList.set(i, newItem);
+				return oldList;
+			}
+		}
+		return oldList;
 	}
 
 

@@ -33,6 +33,10 @@ public class TestUser {
 		return last_name;
 	}
 
+	public String getName(){
+		return first_name + " " + last_name;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -63,6 +67,17 @@ public class TestUser {
 		this.last_name = profile.getLastName();
 		//this.img_url = profile.getProfilePictureUri(200, 200).toString();
 		this.fb_user_id = profile.getId();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TestUser testUser = (TestUser) o;
+
+		return id == testUser.id;
+
 	}
 
 }

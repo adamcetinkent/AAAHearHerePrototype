@@ -9,6 +9,7 @@ import android.util.Log;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLikeUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
@@ -123,6 +124,14 @@ public class ORMTestUser {
 				for (int j = 0; j < comments.size(); j++){
 					TestCommentUser comment = comments.get(j);
 					values = testUserToContentValues(comment.getUser());
+					userID = database.insert(TABLE_NAME, "null", values);
+					Log.d(TAG, "Inserted new TestUser with ID:" + userID);
+				}
+
+				List<TestLikeUser> likes = testPost.getLikes();
+				for (int j = 0; j < likes.size(); j++){
+					TestLikeUser likeUser = likes.get(j);
+					values = testUserToContentValues(likeUser.getUser());
 					userID = database.insert(TABLE_NAME, "null", values);
 					Log.d(TAG, "Inserted new TestUser with ID:" + userID);
 				}

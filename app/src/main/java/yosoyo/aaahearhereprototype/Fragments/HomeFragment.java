@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -35,6 +36,8 @@ import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLike;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLikeUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
@@ -82,7 +85,7 @@ public class HomeFragment extends Fragment {
 			@Override
 			public void returnWebPost(TestPostFull webPost) {
 				Log.d(TAG, "Web post returned!");
-				posts = ZZZUtility.mergeLists(posts, webPost);
+				posts = ZZZUtility.updateList(posts, webPost);
 				notifyAdapter();
 			}
 		});
@@ -130,7 +133,9 @@ public class HomeFragment extends Fragment {
 		@Override
 		public int getChildrenCount(int groupPosition) {
 			int n = posts.get(groupPosition).getComments().size();
-			return (groupPosition == addingComment ? n + 1 : n);
+			if (posts.get(groupPosition).getLikes().size() > 0) n++;
+			if (groupPosition == addingComment) n++;
+			return n;
 		}
 
 		@Override
@@ -140,7 +145,9 @@ public class HomeFragment extends Fragment {
 
 		@Override
 		public Object getChild(int groupPosition, int childPosition) {
-			return posts.get(groupPosition).getComments().get(childPosition);
+			int n = childPosition;
+			if (posts.get(groupPosition).getLikes().size() > 0) n++;
+			return posts.get(groupPosition).getComments().get(n);
 		}
 
 		@Override
@@ -163,32 +170,34 @@ public class HomeFragment extends Fragment {
 			LayoutInflater inflater = context.getLayoutInflater();
 			View rowView = inflater.inflate(R.layout.list_row_timeline, null, true);
 
-			TestPost testPost = posts.get(groupPosition).getPost();
-			TestUser testUser = posts.get(groupPosition).getUser();
+			final TestPost testPost = posts.get(groupPosition).getPost();
+			final TestUser testUser = posts.get(groupPosition).getUser();
 			final CachedSpotifyTrack cachedSpotifyTrack = posts.get(groupPosition).getTrack();
 
 			// get Album Art
 			final ImageView imgAlbumArt = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgAlbumArt);
 			if (testPost != null) {
-				WebHelper.getSpotifyAlbumArt(cachedSpotifyTrack,
-											 new WebHelper.GetSpotifyAlbumArtCallback() {
-												 @Override
-												 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-													 imgAlbumArt.setImageBitmap(bitmap);
-												 }
-											 });
+				WebHelper.getSpotifyAlbumArt(
+					cachedSpotifyTrack,
+					 new WebHelper.GetSpotifyAlbumArtCallback() {
+						 @Override
+						 public void returnSpotifyAlbumArt(Bitmap bitmap) {
+							 imgAlbumArt.setImageBitmap(bitmap);
+						 }
+					 });
 			}
 
 			// get User Image
 			final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_timeline_imgProfile);
 			if (testUser != null) {
-				WebHelper.getFacebookProfilePicture(testUser.getFBUserID(),
-													new WebHelper.GetFacebookProfilePictureCallback() {
-														@Override
-														public void returnFacebookProfilePicture(Bitmap bitmap) {
-															imgProfile.setImageBitmap(bitmap);
-														}
-													});
+				WebHelper.getFacebookProfilePicture(
+					testUser.getFBUserID(),
+					new WebHelper.GetFacebookProfilePictureCallback() {
+						@Override
+						public void returnFacebookProfilePicture(Bitmap bitmap) {
+							imgProfile.setImageBitmap(bitmap);
+						}
+					});
 			}
 
 			TextView txtUserName = (TextView) rowView.findViewById(R.id.list_row_timeline_txtUserName);
@@ -284,38 +293,79 @@ public class HomeFragment extends Fragment {
 			updatePlayButton(btnPlayButton);
 
 			final ToggleButton btnLikeButton = (ToggleButton) rowView.findViewById(R.id.list_row_timeline_btnLike);
+			TestLikeUser myLikeUser = null;
+			for (TestLikeUser like : posts.get(groupPosition).getLikes() ){
+				if (like.getUser().equals(HolderActivity.testUser)){
+					btnLikeButton.setChecked(true);
+					myLikeUser = like;
+					break;
+				}
+			}
+			final TestLike myLike;
+			if (myLikeUser != null)
+				 myLike = myLikeUser.getLike();
+			else
+				myLike = null;
+
+			btnLikeButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					btnLikeButton.setEnabled(false);
+					if (isChecked){
+						TestLike like = new TestLike(testPost.getID(), HolderActivity.testUser.getID());
+						AsyncDataManager.postLike(like, new AsyncDataManager.PostLikeCallback() {
+							@Override
+							public void returnPostedLike(TestLike returnedLike) {
+								Log.d(TAG, "Posted new comment!");
+								AsyncDataManager.getWebPost(
+									testPost.getID(),
+									new AsyncDataManager.GetWebPostCallback() {
+										@Override
+										public void returnWebPost(TestPostFull webPost) {
+											posts = ZZZUtility.updateList(posts, webPost);
+											notifyAdapter();
+											btnLikeButton.setEnabled(true);
+										}
+									});
+							}
+						});
+					} else {
+						if (myLike == null)
+							return;
+
+						AsyncDataManager.deleteLike(
+							myLike,
+							new AsyncDataManager.DeleteLikeCallback() {
+								@Override
+								public void returnDeletedLike(boolean success) {
+									Log.d(TAG, "Deleted like!");
+									AsyncDataManager.getWebPost(
+										testPost.getID(),
+										new AsyncDataManager.GetWebPostCallback() {
+											@Override
+											public void returnWebPost(TestPostFull webPost) {
+												posts = ZZZUtility.updateList(posts, webPost);
+												notifyAdapter();
+												btnLikeButton.setEnabled(true);
+											}
+										});
+								}
+							});
+
+					}
+				}
+			});
+
 			final ImageButton btnCommentButton = (ImageButton) rowView.findViewById(R.id.list_row_timeline_btnComment);
-			//final LinearLayout llAddComment = (LinearLayout) rowView.findViewById(R.id.list_row_timeline_llAddComment);
-			//final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_timeline_txtAddComment);
-			//llAddComment.setVisibility((addingComment == groupPosition) ? View.VISIBLE : View.GONE);
-			/*if (addingComment == groupPosition){
-				txtAddComment.requestFocus();
-				InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
-					Context.INPUT_METHOD_SERVICE);
-				inputMethodManager.showSoftInput(txtAddComment,
-												 InputMethodManager.SHOW_IMPLICIT);
-			}*/
 			btnCommentButton.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						InputMethodManager inputMethodManager;
 						if (addingComment != groupPosition) {
-							//llAddComment.setVisibility(View.VISIBLE);
 							addingComment = groupPosition;
-							//txtAddComment.requestFocus();
-							/*inputMethodManager = (InputMethodManager) context.getSystemService(
-								Context.INPUT_METHOD_SERVICE);
-							inputMethodManager.showSoftInput(txtAddComment,
-															 InputMethodManager.SHOW_IMPLICIT);*/
 						} else {
-							//llAddComment.setVisibility(View.GONE);
-							//txtAddComment.clearFocus();
 							addingComment = -1;
-							/*inputMethodManager = (InputMethodManager) context.getSystemService(
-								Context.INPUT_METHOD_SERVICE);
-							inputMethodManager
-								.hideSoftInputFromWindow(txtAddComment.getWindowToken(), 0);*/
 						}
 						notifyDataSetChanged();
 					}
@@ -329,27 +379,52 @@ public class HomeFragment extends Fragment {
 
 			LayoutInflater inflater = context.getLayoutInflater();
 
-			if (childPosition >= posts.get(groupPosition).getComments().size()){
+			if (childPosition == 0 && posts.get(groupPosition).getLikes().size() > 0){
+				// HEADER FOR LIKES
+				final View rowView = inflater.inflate(R.layout.list_row_comment_like, null, true);
+
+				TextView txtLikers = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtLikers);
+				List<TestLikeUser> likes = posts.get(groupPosition).getLikes();
+
+				int youLike = -1;
+				StringBuilder sb;
+				if (likes.get(0).getUser().equals(HolderActivity.testUser)) {
+					youLike = 0;
+					sb = new StringBuilder();
+				} else {
+					sb = new StringBuilder(likes.get(0).getUser().getName());
+				}
+				for (int i = 1; i < likes.size(); i++){
+					if (likes.get(i).getUser().equals(HolderActivity.testUser)){
+						youLike = i;
+					} else {
+						sb.append(", " + likes.get(i).getUser().getName());
+					}
+				}
+				txtLikers.setText((youLike >= 0 ? "You" + ((youLike > 0) ? ", " : "") : "") + sb.toString());
+
+				TextView txtNumber = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtNumber);
+				txtNumber.setText(String.valueOf(likes.size()));
+
+				return rowView;
+			}
+
+			if ((posts.get(groupPosition).getLikes().size() == 0 && childPosition >= posts.get(groupPosition).getComments().size())
+				|| (posts.get(groupPosition).getLikes().size() > 0 && childPosition >= posts.get(groupPosition).getComments().size() + 1)){
+				// FOOTER FOR ADDING COMMENT
 				final View rowView = inflater.inflate(R.layout.list_row_comment_add, null, true);
 
 				final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_comment_add_imgProfile);
-				WebHelper.getFacebookProfilePicture(Profile.getCurrentProfile().getId(),
-													new WebHelper.GetFacebookProfilePictureCallback() {
-														@Override
-														public void returnFacebookProfilePicture(Bitmap bitmap) {
-															imgProfile.setImageBitmap(bitmap);
-														}
-													});
+				WebHelper.getFacebookProfilePicture(
+					Profile.getCurrentProfile().getId(),
+					new WebHelper.GetFacebookProfilePictureCallback() {
+						@Override
+						public void returnFacebookProfilePicture(Bitmap bitmap) {
+							imgProfile.setImageBitmap(bitmap);
+						}
+					});
 
 				final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_comment_add_txtAddComment);
-
-				/*if (addingComment == groupPosition){
-					//txtAddComment.requestFocus();
-					InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
-						Context.INPUT_METHOD_SERVICE);
-					inputMethodManager.showSoftInput(txtAddComment,
-													 InputMethodManager.SHOW_IMPLICIT);
-				}*/
 
 				final ImageButton btnAddComment = (ImageButton) rowView.findViewById(R.id.list_row_comment_add_btnAddComment);
 				btnAddComment.setOnClickListener(new View.OnClickListener() {
@@ -364,15 +439,15 @@ public class HomeFragment extends Fragment {
 							@Override
 							public void returnPostedComment(TestComment returnedComment) {
 								Log.d(TAG, "Posted new comment!");
-								AsyncDataManager.getWebPost(post_id,
-															new AsyncDataManager.GetWebPostCallback() {
-																@Override
-																public void returnWebPost(TestPostFull webPost) {
-																	posts = ZZZUtility
-																		.mergeLists(posts, webPost);
-																	notifyAdapter();
-																}
-															});
+								AsyncDataManager.getWebPost(
+									post_id,
+									new AsyncDataManager.GetWebPostCallback() {
+										@Override
+										public void returnWebPost(TestPostFull webPost) {
+											posts = ZZZUtility.updateList(posts, webPost);
+											notifyAdapter();
+										}
+									});
 								addingComment = -1;
 							}
 						});
@@ -387,6 +462,9 @@ public class HomeFragment extends Fragment {
 
 			View rowView = inflater.inflate(R.layout.list_row_comment, null, true);
 
+			if (posts.get(groupPosition).getLikes().size() > 0)
+				childPosition--;
+
 			TestCommentUser comment = posts.get(groupPosition).getComments().get(childPosition);
 
 			TextView txtUserName = (TextView) rowView.findViewById(R.id.list_row_comment_txtUserName);
@@ -398,13 +476,14 @@ public class HomeFragment extends Fragment {
 			// get User Image
 			final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_comment_imgProfile);
 			if (comment.getUser() != null) {
-				WebHelper.getFacebookProfilePicture(comment.getUser().getFBUserID(),
-													new WebHelper.GetFacebookProfilePictureCallback() {
-														@Override
-														public void returnFacebookProfilePicture(Bitmap bitmap) {
-															imgProfile.setImageBitmap(bitmap);
-														}
-													});
+				WebHelper.getFacebookProfilePicture(
+					comment.getUser().getFBUserID(),
+					new WebHelper.GetFacebookProfilePictureCallback() {
+						@Override
+						public void returnFacebookProfilePicture(Bitmap bitmap) {
+							imgProfile.setImageBitmap(bitmap);
+						}
+					});
 			}
 
 			return rowView;

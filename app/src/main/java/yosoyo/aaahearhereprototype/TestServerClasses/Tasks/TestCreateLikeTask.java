@@ -13,33 +13,33 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLike;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-public class TestCreateCommentTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "TestCreateCommentTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/comments/";
+public class TestCreateLikeTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "TestCreateLikeTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface TestCreateCommentTaskCallback {
-		void returnResultCreateComment(Boolean success, TestComment testComment);
+	public interface TestCreateLikeTaskCallback {
+		void returnResultCreateLike(Boolean success, TestLike testLike);
 	}
 
-	private TestCreateCommentTaskCallback callbackTo;
-	private TestComment testComment;
-	private TestComment testCommentReturned;
+	private TestCreateLikeTaskCallback callbackTo;
+	private TestLike testLike;
+	private TestLike testLikeReturned;
 
-	public TestCreateCommentTask(TestComment testComment, TestCreateCommentTaskCallback callbackTo) {
+	public TestCreateLikeTask(TestLike testLike, TestCreateLikeTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
-		this.testComment = testComment;
+		this.testLike = testLike;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting comment to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Posting like to " + VM_SERVER_ADDRESS);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -50,8 +50,8 @@ public class TestCreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(testComment, TestComment.class);
-				String jsonplus = "{\"comment\": "+json+"}";
+				String json = new Gson().toJson(testLike, TestLike.class);
+				String jsonplus = "{\"like\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
 				out.write(jsonplus);
@@ -64,7 +64,7 @@ public class TestCreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					testCommentReturned = new Gson().fromJson(inString, TestComment.class);
+					testLikeReturned = new Gson().fromJson(inString, TestLike.class);
 
 					return true;
 				} else {
@@ -86,7 +86,7 @@ public class TestCreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreateComment(result, testCommentReturned);	// sends results back
+		callbackTo.returnResultCreateLike(result, testLikeReturned);	// sends results back
 	}
 
 }

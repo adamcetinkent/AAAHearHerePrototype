@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestLikeUser;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 
 /**
@@ -50,36 +51,62 @@ public class ORMTestPostFull {
 					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMTestPost.TABLE_NAME + "." + ORMTestPost.COLUMN_TRACK_NAME
 				, null);
 
-			int numTracks = cursorPost.getCount();
-			Log.d(TAG, "Loaded " + numTracks + " TestPosts...");
-			List<TestPostFull> testPosts = new ArrayList<>(numTracks);
+			int numPosts = cursorPost.getCount();
+			Log.d(TAG, "Loaded " + numPosts + " TestPosts...");
+			List<TestPostFull> testPosts = new ArrayList<>(numPosts);
 
-			if (numTracks > 0){
+			if (numPosts > 0){
 				cursorPost.moveToFirst();
 				while (!cursorPost.isAfterLast()){
 					TestPostFull testPost = new TestPostFull(cursorPost);
 					testPosts.add(testPost);
 
-					Cursor cursorComment = database.rawQuery(
-						"SELECT * FROM " + ORMTestComment.TABLE_NAME
-							+ " LEFT JOIN " + ORMTestUser.TABLE_NAME
-							+ " ON " + ORMTestComment.TABLE_NAME + "." + ORMTestComment.COLUMN_USER_ID_NAME + " = " + ORMTestUser.TABLE_NAME + "." + ORMTestUser.COLUMN_ID_NAME
-							+ " WHERE " + ORMTestComment.TABLE_NAME + "." + ORMTestComment.COLUMN_POST_ID_NAME + " = ?"
-						, new String[]{String.valueOf(testPost.getPost().getID())});
+					{
+						Cursor cursorComment = database.rawQuery(
+							"SELECT * FROM " + ORMTestComment.TABLE_NAME
+								+ " LEFT JOIN " + ORMTestUser.TABLE_NAME
+								+ " ON " + ORMTestComment.TABLE_NAME + "." + ORMTestComment.COLUMN_USER_ID_NAME + " = " + ORMTestUser.TABLE_NAME + "." + ORMTestUser.COLUMN_ID_NAME
+								+ " WHERE " + ORMTestComment.TABLE_NAME + "." + ORMTestComment.COLUMN_POST_ID_NAME + " = ?"
+							, new String[]{String.valueOf(testPost.getPost().getID())});
 
-					int numComments = cursorComment.getCount();
-					Log.d(TAG, "Loaded " + numComments + " TestComments...");
-					List<TestCommentUser> testComments = new ArrayList<>(numComments);
-					if (numComments > 0){
-						cursorComment.moveToFirst();
-						while (!cursorComment.isAfterLast()){
-							TestCommentUser testCommentUser = new TestCommentUser(cursorComment);
-							testComments.add(testCommentUser);
-							cursorComment.moveToNext();
+						int numComments = cursorComment.getCount();
+						Log.d(TAG, "Loaded " + numComments + " TestComments...");
+						List<TestCommentUser> testComments = new ArrayList<>(numComments);
+						if (numComments > 0) {
+							cursorComment.moveToFirst();
+							while (!cursorComment.isAfterLast()) {
+								TestCommentUser testCommentUser = new TestCommentUser(
+									cursorComment);
+								testComments.add(testCommentUser);
+								cursorComment.moveToNext();
+							}
 						}
+						cursorComment.close();
+						testPost.setComments(testComments);
 					}
-					cursorComment.close();
-					testPost.setComments(testComments);
+
+					{
+						Cursor cursorLike = database.rawQuery(
+							"SELECT * FROM " + ORMTestLike.TABLE_NAME
+								+ " LEFT JOIN " + ORMTestUser.TABLE_NAME
+								+ " ON " + ORMTestLike.TABLE_NAME + "." + ORMTestLike.COLUMN_USER_ID_NAME + " = " + ORMTestUser.TABLE_NAME + "." + ORMTestUser.COLUMN_ID_NAME
+								+ " WHERE " + ORMTestLike.TABLE_NAME + "." + ORMTestLike.COLUMN_POST_ID_NAME + " = ?"
+							, new String[]{String.valueOf(testPost.getPost().getID())});
+
+						int numLikes = cursorLike.getCount();
+						Log.d(TAG, "Loaded " + numLikes + " TestLikes...");
+						List<TestLikeUser> testLikes = new ArrayList<>(numLikes);
+						if (numLikes > 0) {
+							cursorLike.moveToFirst();
+							while (!cursorLike.isAfterLast()) {
+								TestLikeUser testLikeUser = new TestLikeUser(cursorLike);
+								testLikes.add(testLikeUser);
+								cursorLike.moveToNext();
+							}
+						}
+						cursorLike.close();
+						testPost.setLikes(testLikes);
+					}
 
 					cursorPost.moveToNext();
 				}

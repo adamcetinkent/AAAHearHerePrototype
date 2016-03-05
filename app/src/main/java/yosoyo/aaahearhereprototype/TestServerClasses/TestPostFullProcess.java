@@ -9,6 +9,7 @@ public class TestPostFullProcess extends TestPostFull {
 
 	private boolean postProcessed = false;
 	private boolean commentsProcessed = false;
+	private boolean likesProcessed = false;
 	private boolean usersProcessed = false;
 	private boolean trackProcessed = false;
 
@@ -22,6 +23,10 @@ public class TestPostFullProcess extends TestPostFull {
 
 	public boolean isCommentsProcessed() {
 		return commentsProcessed;
+	}
+
+	public boolean isLikesProcessed() {
+		return likesProcessed;
 	}
 
 	public boolean isUsersProcessed() {
@@ -38,6 +43,10 @@ public class TestPostFullProcess extends TestPostFull {
 
 	public void setCommentsProcessed(boolean commentsProcessed) {
 		this.commentsProcessed = commentsProcessed;
+	}
+
+	public void setLikesProcessed(boolean likesProcessed) {
+		this.likesProcessed = likesProcessed;
 	}
 
 	public void setUsersProcessed(boolean usersProcessed) {
