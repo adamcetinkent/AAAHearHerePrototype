@@ -27,6 +27,7 @@
     <string name="profile_fragment_title">Profile fragment</string>
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
+    <string name="action_reset_databse">Reset Databse</string>
 
     <string-array name="navigation_options">
         <item>Home</item>

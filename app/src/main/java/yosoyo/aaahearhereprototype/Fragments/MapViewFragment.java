@@ -1,16 +1,17 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ResultReceiver;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,11 +39,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import yosoyo.aaahearhereprototype.AddressResultReceiver;
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -61,8 +64,6 @@ public class MapViewFragment
 	private MapView mMapView;
 	private GoogleMap googleMap;
 	private Boolean mapExists = false;
-	//private Boolean apiExists = false;
-	//private GoogleApiClient mGoogleApiClient;
 	private Location lastLocation;
 	private Location middleLocation;
 	private Marker currentMarker;
@@ -74,7 +75,6 @@ public class MapViewFragment
 	protected String mAddressOutput;
 	private ProgressBar mProgressBar;
 
-	//MediaPlayer mediaPlayer = new MediaPlayer();
 	private CachedSpotifyTrack currentTrack;
 
 	@Nullable
@@ -140,7 +140,25 @@ public class MapViewFragment
 
 		/* * ADDRESS AWARENESS * */
 
-		mResultReceiver = new AddressResultReceiver(new Handler());
+		mResultReceiver = new AddressResultReceiver(
+			new Handler(),
+			new AddressResultReceiver.AddressResultReceiverCallback() {
+				@Override
+				public void returnAddress(Address address) {
+					ArrayList<String> addressFragments = new ArrayList<>();
+
+					for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+						addressFragments.add(address.getAddressLine(i));
+					}
+					Log.i(TAG, getString(R.string.address_found));
+					mAddressOutput = TextUtils.join(System.getProperty("line.separator"), addressFragments);
+
+					displayAddressOutput();
+
+					mAddressRequested = false;
+					updateUIWidgets();
+				}
+			});
 		mProgressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
 		mAddressRequested = false;
 		mAddressOutput = "";
@@ -244,17 +262,6 @@ public class MapViewFragment
 			addMapMarker(post, false);
 		}
 	}
-
-//	private void addMapMarker(TestPostUserTrack testPostUserTrack, boolean newColour){
-//		LatLng latLng = new LatLng(testPostUserTrack.getTestPost().getLat(), testPostUserTrack.getTestPost().getLon());
-//		googleMap.addMarker(
-//			new MarkerOptions().position(latLng)
-//							   .title(new Gson().toJson(testPostUserTrack))
-//							   .icon(BitmapDescriptorFactory
-//										 .fromResource(
-//											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
-//						   );
-//	}
 
 	private void addMapMarker(TestPostFull testPost, boolean newColour){
 		LatLng latLng = new LatLng(testPost.getPost().getLat(), testPost.getPost().getLon());
@@ -366,22 +373,33 @@ public class MapViewFragment
 			currentMarker = marker;
 
 			TestPostFull testPost = new Gson().fromJson(marker.getTitle(), TestPostFull.class);
-			//spotifyTrack = new Gson().fromJson(marker.getSnippet(), CachedSpotifyTrack.class);
 			spotifyTrack = testPost.getTrack();
 			currentTrack = spotifyTrack;
 
-			ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
-			ImageView imgUserArt = (ImageView) view.findViewById(R.id.imgUserArt);
+			final ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
+			final ImageView imgUserArt = (ImageView) view.findViewById(R.id.imgUserArt);
 
 			if (!marker.isInfoWindowShown()) {
 				imgAlbumArt.setImageBitmap(null);
 				imgUserArt.setImageBitmap(null);
 
-				/*DownloadImageTask downloadImageTaskAlbumArt = new DownloadImageTask(imgAlbumArt, this, marker);
-				downloadImageTaskAlbumArt.execute(spotifyTrack.getImageUrl());
+				WebHelper.getSpotifyAlbumArt(
+					spotifyTrack,
+					new WebHelper.GetSpotifyAlbumArtCallback() {
+						@Override
+						public void returnSpotifyAlbumArt(Bitmap bitmap) {
+							imgAlbumArt.setImageBitmap(bitmap);
+						}
+					});
 
-				DownloadImageTask downloadImageTaskUserArt = new DownloadImageTask(imgUserArt, this, marker);
-				downloadImageTaskUserArt.execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + testPost.getUser().getFBUserID() + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);*/
+				WebHelper.getFacebookProfilePicture(
+					testPost.getUser().getFBUserID(),
+					new WebHelper.GetFacebookProfilePictureCallback() {
+						@Override
+						public void returnFacebookProfilePicture(Bitmap bitmap) {
+							imgUserArt.setImageBitmap(bitmap);
+						}
+					});
 			}
 
 			TextView titleUI = (TextView) view.findViewById(R.id.title);
@@ -395,8 +413,8 @@ public class MapViewFragment
 			artistUI.setText(spotifyTrack.getArtist());
 			albumUI.setText(spotifyTrack.getAlbum());
 			snippetUI.setText("Message: " + testPost.getPost().getMessage());
-			dateUI.setText("Posted: " + testPost.getPost().getCreatedAt());
-			userUI.setText(testPost.getUser().getFirstName() + " " + testPost.getUser().getLastName());
+			dateUI.setText("Posted: " + ZZZUtility.formatDynamicDate(testPost.getPost().getCreatedAt()));
+			userUI.setText(testPost.getUser().getName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 			if (HolderActivity.mediaPlayer.isPlaying()) {
@@ -405,34 +423,6 @@ public class MapViewFragment
 				playButton.setImageResource(R.drawable.ic_media_play);
 			}
 
-		}
-
-		/*@Override
-		public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
-			Log.d(TAG, "Finished image download");
-			if (marker != null && marker.isInfoWindowShown()){
-				marker.showInfoWindow();
-			}
-		}*/
-	}
-
-	@SuppressLint("ParcelCreator")
-	private class AddressResultReceiver extends ResultReceiver {
-		public AddressResultReceiver(Handler handler){
-			super(handler);
-		}
-
-		@Override
-		protected void onReceiveResult(int resultCode, Bundle resultData){
-			mAddressOutput = resultData.getString(FetchAddressIntentService.Constants.RESULT_DATA_KEY);
-			displayAddressOutput();
-
-			//if (resultCode == FetchAddressIntentService.Constants.SUCCESS_RESULT){
-			//	showToast(getString(R.string.address_found));
-			//}
-
-			mAddressRequested = false;
-			updateUIWidgets();
 		}
 	}
 

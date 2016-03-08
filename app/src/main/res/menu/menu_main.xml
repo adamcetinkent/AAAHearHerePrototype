@@ -12,6 +12,11 @@
             android:icon="@android:drawable/ic_menu_search"
             appNamespace:showAsAction="collapseActionView|ifRoom"
             appNamespace:actionViewClass="android.support.v7.widget.SearchView" />-->
+      <item android:id="@+id/action_reset_database"
+            android:title="@string/action_reset_databse"
+            android:orderInCategory="99"
+            appNamespace:showAsAction="never"/>
+
       <item android:id="@+id/action_settings"
             android:title="@string/action_settings"
             android:orderInCategory="100"

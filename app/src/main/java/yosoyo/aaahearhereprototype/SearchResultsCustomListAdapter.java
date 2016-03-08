@@ -49,13 +49,15 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter{
 		txtArtistName.setText(titles[position]); // Set artistName TextView
 
 		// Set artwork imgView bitmap
-		WebHelper.getSpotifyAlbumArt(ids[position], images[position],
-									 new WebHelper.GetSpotifyAlbumArtCallback() {
-										 @Override
-										 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-											 imgArtwork.setImageBitmap(bitmap);
-										 }
-									 });
+		WebHelper.getSpotifyAlbumArt(
+			ids[position],
+			images[position],
+			new WebHelper.GetSpotifyAlbumArtCallback() {
+				@Override
+				public void returnSpotifyAlbumArt(Bitmap bitmap) {
+				  imgArtwork.setImageBitmap(bitmap);
+				}
+			});
 		if (descriptions[position] != null)
 			txtArtistDesc.setText(descriptions[position]); // Set artistDesc TextView
 

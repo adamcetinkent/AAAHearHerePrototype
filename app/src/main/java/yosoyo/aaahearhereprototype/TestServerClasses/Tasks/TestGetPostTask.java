@@ -40,7 +40,7 @@ public class TestGetPostTask extends AsyncTask<Void, Void, TestPostFullProcess> 
 	protected TestPostFullProcess doInBackground(Void... params) {
 		Log.d(TAG, "Fetching post from " + VM_SERVER_ADDRESS + post_id);
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS + "/" + post_id);
+			URL url = new URL(VM_SERVER_ADDRESS + post_id);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

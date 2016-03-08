@@ -17,6 +17,8 @@ public class TestPost {
 	String track;
 	double lat;
 	double lon;
+	String place_name;
+	String google_place_id;
 	String message;
 	Timestamp updated_at;
 	Timestamp created_at;
@@ -34,16 +36,20 @@ public class TestPost {
 		this.lat = nested.getLat();
 		this.lon = nested.getLon();
 		this.message = nested.getMessage();
+		this.place_name = nested.getPlaceName();
+		this.google_place_id = nested.getGooglePlaceID();
 		this.updated_at = nested.getUpdatedAt();
 		this.created_at = nested.getCreatedAt();
 	}
 
-	public TestPost(long user_id, String track, double lat, double lon, String message) {
+	public TestPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id) {
 		this.user_id = user_id;
 		this.track = track;
 		this.lat = lat;
 		this.lon = lon;
 		this.message = message;
+		this.place_name = place_name;
+		this.google_place_id = google_place_id;
 	}
 
 	public TestPost(Cursor cursor){
@@ -53,6 +59,9 @@ public class TestPost {
 		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMTestPost.COLUMN_LAT_NAME));
 		this.lon = cursor.getDouble(cursor.getColumnIndex(ORMTestPost.COLUMN_LON_NAME));
 		this.message = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_MESSAGE_NAME));
+		this.place_name = cursor.getString(
+			cursor.getColumnIndex(ORMTestPost.COLUMN_PLACE_NAME_NAME));
+		this.google_place_id = cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_GOOGLE_PLACE_ID_NAME));
 		this.updated_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_UPDATED_AT_NAME)));
 		this.created_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestPost.COLUMN_CREATED_AT_NAME)));
 	}
@@ -75,6 +84,14 @@ public class TestPost {
 
 	public long getUserID() {
 		return user_id;
+	}
+
+	public String getPlaceName(){
+		return place_name;
+	}
+
+	public String getGooglePlaceID(){
+		return google_place_id;
 	}
 
 	public Timestamp getCreatedAt() {

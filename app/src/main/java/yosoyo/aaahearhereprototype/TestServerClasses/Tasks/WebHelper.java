@@ -20,7 +20,8 @@ import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
 public class WebHelper {
 
 	public static final String TAG = "Web Helper";
-	public static final String SERVER_IP = "http://10.0.1.79:3000";
+	//public static final String SERVER_IP = "http://10.0.1.79:3000";
+	public static final String SERVER_IP = "http://192.168.0.63:3000";
 
 	public static Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
 	public static Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
@@ -109,7 +110,7 @@ public class WebHelper {
 					facebookProfilePictures.put(fb_user_id, result);
 					callback.returnFacebookProfilePicture(result);
 				}
-			}).execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + fb_user_id + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_SMALL);
+			}).execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + fb_user_id + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_NORMAL);
 	}
 
 	public interface PostCommentCallback{

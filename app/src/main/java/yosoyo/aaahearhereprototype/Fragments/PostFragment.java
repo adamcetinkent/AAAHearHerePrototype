@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.location.Address;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +32,12 @@ import com.facebook.Profile;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 
+import yosoyo.aaahearhereprototype.AddressPicker;
+import yosoyo.aaahearhereprototype.AddressResultReceiver;
+import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.PostFragmentPostedListener;
 import yosoyo.aaahearhereprototype.R;
@@ -42,6 +49,7 @@ import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreatePostTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,13 +73,19 @@ public class PostFragment extends Fragment
 	private TextView txtArtist;
 	private TextView txtAlbum;
 	private TextView txtMessage;
+	private TextView txtDateTime;
+	private TextView txtLocation;
 	private ImageView imgAlbumArt;
 	private LinearLayout llSearch;
 	private LinearLayout llText;
 	private ImageView btnPlayButton;
+	private ImageView btnLocationButton;
 
-	private boolean postAdded = false;
-	private boolean trackAdded = false;
+	private AddressResultReceiver mResultReceiver;
+	protected boolean mAddressRequested;
+	private Address address;
+	String placeName = new String();
+	String googlePlaceID = new String();
 
 	public PostFragment() {
 		// Required empty public constructor
@@ -99,24 +113,54 @@ public class PostFragment extends Fragment
 		TextView txtUserName = (TextView) view.findViewById(R.id.post_fragment_txtUserName);
 		txtUserName.setText(Profile.getCurrentProfile().getName());
 
-		if (HolderActivity.profilePicture != null){
+		txtDateTime = (TextView) view.findViewById(R.id.post_fragment_txtDateTime);
+		txtDateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
+
+		if (TestUser.getProfilePicture() != null){
 			ImageView imgProfilePicture = (ImageView) view.findViewById(R.id.post_fragment_imgProfile);
-			imgProfilePicture.setImageBitmap(HolderActivity.profilePicture);
+			imgProfilePicture.setImageBitmap(TestUser.getProfilePicture());
 		}
+
+		btnLocationButton = (ImageView) view.findViewById(R.id.post_fragment_btnLocation);
+		btnLocationButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getActivity(), AddressPicker.class);
+				String stringJson = new Gson().toJson(address, Address.class);
+				intent.putExtra(AddressPicker.ADDRESS_JSON, stringJson);
+				startActivityForResult(intent, AddressPicker.REQUEST_CODE);
+			}
+		});
 
 		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null){
 			lastLocation = HolderActivity.getLastLocation();
-			TextView txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
+			txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
 			txtLocation.setText(lastLocation.getLatitude() + " " + lastLocation.getLongitude());
+			placeName = lastLocation.getLatitude() + " " + lastLocation.getLongitude();
+			mResultReceiver = new AddressResultReceiver(
+				new Handler(),
+				new AddressResultReceiver.AddressResultReceiverCallback() {
+					@Override
+					public void returnAddress(Address returnedAddress) {
+						address = returnedAddress;
+						txtLocation.setText(address.getThoroughfare().toString());
+						placeName = address.getThoroughfare().toString();
+						btnLocationButton.setVisibility(View.VISIBLE);
+						mAddressRequested = false;
+					}
+				});
+			if (HolderActivity.mGoogleApiClient.isConnected() && lastLocation != null) {
+				startIntentService();
+			}
 		}
 
 		searchViewTrack = (SearchView) view.findViewById(R.id.post_fragment_searchTrackName);
 		searchViewArtist = (SearchView) view.findViewById(R.id.post_fragment_searchArtist);
 		searchViewAlbum = (SearchView) view.findViewById(R.id.post_fragment_searchAlbum);
+		txtMessage = (TextView) view.findViewById(R.id.post_fragment_txtMessage);
 		txtTrack = (TextView) view.findViewById(R.id.post_fragment_txtTrackName);
 		txtArtist = (TextView) view.findViewById(R.id.post_fragment_txtArtist);
 		txtAlbum = (TextView) view.findViewById(R.id.post_fragment_txtAlbum);
-		txtMessage = (TextView) view.findViewById(R.id.post_fragment_txtMessage);
 		imgAlbumArt = (ImageView) view.findViewById(R.id.post_fragment_imgAlbumArt);
 
 		llSearch = (LinearLayout) view.findViewById(R.id.post_fragment_llPostFrameSearch);
@@ -161,12 +205,6 @@ public class PostFragment extends Fragment
 				Intent intent = new Intent(getActivity(), SearchResultsActivity.class);
 				intent.setAction(Intent.ACTION_SEARCH);
 				intent.putExtra(SearchManager.QUERY, query);
-				/*if (spotifyAlbum != null) {
-					intent.putExtra(SearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ARTIST_ALBUM);
-				} else {
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ARTIST);
-				}*/
 				startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ARTIST);
 				return false;
 			}
@@ -281,7 +319,7 @@ public class PostFragment extends Fragment
 					Toast.makeText(getActivity(), "No track selected!", Toast.LENGTH_SHORT).show();
 					return;
 				}
-				TestPost testPost = new TestPost(HolderActivity.testUser.getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString());
+				TestPost testPost = new TestPost(TestUser.getCurrentUser().getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString(), placeName, googlePlaceID);
 				new TestCreatePostTask(PostFragment.this, testPost).execute();
 				postButton.setVisibility(View.INVISIBLE);
 				ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.post_fragment_progressBar);
@@ -290,6 +328,13 @@ public class PostFragment extends Fragment
 		});
 
 		return view;
+	}
+
+	protected void startIntentService() {
+		Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
+		intent.putExtra(FetchAddressIntentService.Constants.RECEIVER, mResultReceiver);
+		intent.putExtra(FetchAddressIntentService.Constants.LOCATION_DATA_EXTRA, lastLocation);
+		getActivity().startService(intent);
 	}
 
 	private void updatePlayButton(ImageView btnPlayButton){
@@ -402,6 +447,13 @@ public class PostFragment extends Fragment
 												 });
 				}
 				break;
+			}
+			case (AddressPicker.REQUEST_CODE): {
+				if (resultCode == Activity.RESULT_OK){
+					placeName = data.getStringExtra(AddressPicker.ADDRESS_STRING);
+					googlePlaceID = data.getStringExtra(AddressPicker.GOOGLE_PLACE_ID);
+					txtLocation.setText(placeName);
+				}
 			}
 		}
 

@@ -7,11 +7,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,21 +70,15 @@ public class FetchAddressIntentService extends IntentService {
 			deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
 		} else {
 			Address address = addresses.get(0);
-			ArrayList<String> addressFragments = new ArrayList<>();
-
-			for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-				addressFragments.add(address.getAddressLine(i));
-			}
+			String addressAsJson = new Gson().toJson(address);
 			Log.i(TAG, getString(R.string.address_found));
-			deliverResultToReceiver(Constants.SUCCESS_RESULT,
-									TextUtils.join(System.getProperty("line.separator"),
-												   addressFragments));
+			deliverResultToReceiver(Constants.SUCCESS_RESULT, addressAsJson);
 		}
 	}
 
-	private void deliverResultToReceiver(int resultCode, String message){
+	private void deliverResultToReceiver(int resultCode, String addressAsJson){
 		Bundle bundle = new Bundle();
-		bundle.putString(Constants.RESULT_DATA_KEY, message);
+		bundle.putString(Constants.RESULT_DATA_KEY, addressAsJson);
 		resultReceiver.send(resultCode, bundle);
 	}
 

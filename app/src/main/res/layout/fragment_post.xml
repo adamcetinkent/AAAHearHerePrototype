@@ -58,6 +58,15 @@
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/post_fragment_btnLocation"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitXY"
+            android:src="@drawable/location"
+            android:visibility="gone"/>
+
         <TextView
             android:id="@+id/post_fragment_txtDateTime"
             android:layout_width="match_parent"
@@ -222,7 +231,7 @@
                 android:layout_gravity="top|left"
                 android:gravity="left|top"
                 android:minLines="1"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textCapSentences"
                 />
 
         </LinearLayout>

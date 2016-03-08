@@ -143,8 +143,9 @@ public class ORMTestLike {
 			DatabaseHelper databaseHelper = new DatabaseHelper(context);
 			SQLiteDatabase database = databaseHelper.getWritableDatabase();
 
-			int deletedRows = database.delete(TABLE_NAME, COLUMN_ID_NAME + "=?", new String[]{String.valueOf(
-				testLike.getID())});
+			int deletedRows = database.delete(
+				TABLE_NAME, COLUMN_POST_ID_NAME + "=? AND " +COLUMN_USER_ID_NAME + "=?",
+				new String[]{String.valueOf(testLike.getPostID()), String.valueOf(testLike.getUserID())});
 
 			Log.d(TAG, "Deleted "+deletedRows +" rows with ID:" + testLike.getID());
 

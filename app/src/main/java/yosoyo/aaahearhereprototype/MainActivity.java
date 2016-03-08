@@ -23,12 +23,12 @@ import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreateUserTask;
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestFacebookAuthenticateUserTask;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 public class MainActivity extends /*AppCompatActivity*/ Activity implements FacebookCallback<LoginResult>,
@@ -44,7 +44,6 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	private Button continueButton;
 	private Button shortcutButton;
 	private ProgressDialog progressDialog;
-	private Bitmap profilePicture;
 	private TestUser testUser;
 
 	@Override
@@ -153,12 +152,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 	private void proceedToHolderActivity(){
 		Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
 
-		if (profilePicture != null) {
-			byte[] bytes = ZZZUtility.convertBitmapToByteArray(profilePicture);
-			intent.putExtra(HolderActivity.PROFILE_PICTURE, bytes);
-		}
-
-		intent.putExtra(HolderActivity.TEST_USER, new Gson().toJson(testUser, TestUser.class));
+		TestUser.setCurrentUser(testUser);
 
 		startActivity(intent);
 	}
@@ -210,12 +204,6 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		Log.e(TAG, "error in Facebook log in!");
 	}
 
-	/*@Override
-	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
-		Log.d(TAG, "User image downloaded");
-		profilePicture = result;
-	}*/
-
 	@Override
 	public void returnResultCreateUser(Boolean success, TestUser testUser) {
 		facebookSignInSucceeded();
@@ -246,8 +234,15 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 						   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(), Toast.LENGTH_LONG);
 			continueButton.setEnabled(true);
 
-			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
-			/*new DownloadImageTask(imageView, this).execute(profile.getProfilePictureUri(200, 200).toString());*/
+			final ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
+			WebHelper.getFacebookProfilePicture(
+				profile.getCurrentProfile().getId(),
+				new WebHelper.GetFacebookProfilePictureCallback() {
+					@Override
+					public void returnFacebookProfilePicture(Bitmap bitmap) {
+						imageView.setImageBitmap(bitmap);
+					}
+				});
 		} else {
 			facebookSignInName.setText("Logged Out");
 			Toast.makeText(MainActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);

@@ -20,49 +20,57 @@ public class ORMTestPost {
 
 	private static final String TAG = "ORMTestPost";
 
-	public static final String TABLE_NAME = 				"testpost";
+	public static final String TABLE_NAME = 					"testpost";
 
-	private static final String COMMA_SEP = 				", ";
+	private static final String COMMA_SEP = 					", ";
 
-	public static final String 	COLUMN_ID_NAME = 			"_id";
-	private static final String COLUMN_ID_TYPE = 			"INTEGER PRIMARY KEY";
+	public static final String 	COLUMN_ID_NAME = 				"_id";
+	private static final String COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
 
-	public static final String 	COLUMN_USER_ID_NAME = 		"user_id";
-	private static final String COLUMN_USER_ID_TYPE = 		"INTEGER";
+	public static final String 	COLUMN_USER_ID_NAME = 			"user_id";
+	private static final String COLUMN_USER_ID_TYPE = 			"INTEGER";
 
-	public static final String 	COLUMN_TRACK_NAME = 		"track";
-	private static final String COLUMN_TRACK_TYPE = 		"TEXT";
+	public static final String 	COLUMN_TRACK_NAME =		 		"track";
+	private static final String COLUMN_TRACK_TYPE = 			"TEXT";
 
-	public static final String 	COLUMN_LAT_NAME = 			"lat";
-	private static final String COLUMN_LAT_TYPE = 			"REAL";
+	public static final String 	COLUMN_LAT_NAME = 				"lat";
+	private static final String COLUMN_LAT_TYPE = 				"REAL";
 
-	public static final String 	COLUMN_LON_NAME = 			"lon";
-	private static final String COLUMN_LON_TYPE = 			"REAL";
+	public static final String 	COLUMN_LON_NAME = 				"lon";
+	private static final String COLUMN_LON_TYPE = 				"REAL";
 
-	public static final String 	COLUMN_MESSAGE_NAME = 		"message";
-	private static final String COLUMN_MESSAGE_TYPE = 		"TEXT";
+	public static final String 	COLUMN_MESSAGE_NAME = 			"message";
+	private static final String COLUMN_MESSAGE_TYPE = 			"TEXT";
 
-	public static final String 	COLUMN_CREATED_AT_NAME = 	"created_at";
-	private static final String COLUMN_CREATED_AT_TYPE = 	"TIMESTAMP";
+	public static final String 	COLUMN_PLACE_NAME_NAME = 		"place_name";
+	private static final String COLUMN_PLACE_NAME_TYPE = 		"TEXT";
 
-	public static final String 	COLUMN_UPDATED_AT_NAME = 	"updated_at";
-	private static final String COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
+	public static final String 	COLUMN_GOOGLE_PLACE_ID_NAME =	"google_place_id";
+	private static final String COLUMN_GOOGLE_PLACE_ID_TYPE =	"TEXT";
 
-	public static final String 	COLUMN_CACHED_AT_NAME =		"cached_at";
-	private static final String COLUMN_CACHED_AT_TYPE =		"TIMESTAMP";
-	public static final String 	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	public static final String 	COLUMN_CREATED_AT_NAME = 		"created_at";
+	private static final String COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
+
+	public static final String 	COLUMN_UPDATED_AT_NAME = 		"updated_at";
+	private static final String COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
+
+	public static final String 	COLUMN_CACHED_AT_NAME =			"cached_at";
+	private static final String COLUMN_CACHED_AT_TYPE =			"TIMESTAMP";
+	public static final String 	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +
-			COLUMN_ID_NAME			+ " "	+ COLUMN_ID_TYPE			+ COMMA_SEP	+
-			COLUMN_USER_ID_NAME		+ " "	+ COLUMN_USER_ID_TYPE		+ COMMA_SEP	+
-			COLUMN_TRACK_NAME		+ " "	+ COLUMN_TRACK_TYPE			+ COMMA_SEP	+
-			COLUMN_LAT_NAME			+ " "	+ COLUMN_LAT_TYPE 			+ COMMA_SEP	+
-			COLUMN_LON_NAME			+ " "	+ COLUMN_LON_TYPE			+ COMMA_SEP	+
-			COLUMN_MESSAGE_NAME		+ " "	+ COLUMN_MESSAGE_TYPE 		+ COMMA_SEP	+
-			COLUMN_CREATED_AT_NAME	+ " "	+ COLUMN_CREATED_AT_TYPE	+ COMMA_SEP	+
-			COLUMN_UPDATED_AT_NAME	+ " "	+ COLUMN_UPDATED_AT_TYPE	+ COMMA_SEP	+
-			COLUMN_CACHED_AT_NAME	+ " "	+ COLUMN_CACHED_AT_TYPE 	+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
+			COLUMN_ID_NAME				+ " "	+ COLUMN_ID_TYPE				+ COMMA_SEP	+
+			COLUMN_USER_ID_NAME			+ " "	+ COLUMN_USER_ID_TYPE			+ COMMA_SEP	+
+			COLUMN_TRACK_NAME			+ " "	+ COLUMN_TRACK_TYPE				+ COMMA_SEP	+
+			COLUMN_LAT_NAME				+ " "	+ COLUMN_LAT_TYPE 				+ COMMA_SEP	+
+			COLUMN_LON_NAME				+ " "	+ COLUMN_LON_TYPE				+ COMMA_SEP	+
+			COLUMN_MESSAGE_NAME			+ " "	+ COLUMN_MESSAGE_TYPE 			+ COMMA_SEP	+
+			COLUMN_PLACE_NAME_NAME		+ " "	+ COLUMN_PLACE_NAME_TYPE 		+ COMMA_SEP	+
+			COLUMN_GOOGLE_PLACE_ID_NAME	+ " "	+ COLUMN_GOOGLE_PLACE_ID_TYPE	+ COMMA_SEP	+
+			COLUMN_CREATED_AT_NAME		+ " "	+ COLUMN_CREATED_AT_TYPE		+ COMMA_SEP	+
+			COLUMN_UPDATED_AT_NAME		+ " "	+ COLUMN_UPDATED_AT_TYPE		+ COMMA_SEP	+
+			COLUMN_CACHED_AT_NAME		+ " "	+ COLUMN_CACHED_AT_TYPE 		+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
 		");";
 
 	public static final String SQL_DROP_TABLE =
@@ -89,14 +97,16 @@ public class ORMTestPost {
 
 	private static ContentValues testPostToContentValues(TestPost testPost){
 		ContentValues contentValues = new ContentValues();
-		contentValues.put(COLUMN_ID_NAME, 			testPost.getID());
-		contentValues.put(COLUMN_USER_ID_NAME, 		testPost.getUserID());
-		contentValues.put(COLUMN_TRACK_NAME, 		testPost.getTrack());
-		contentValues.put(COLUMN_LAT_NAME, 			testPost.getLat());
-		contentValues.put(COLUMN_LON_NAME, 			testPost.getLon());
-		contentValues.put(COLUMN_MESSAGE_NAME, 		testPost.getMessage());
-		contentValues.put(COLUMN_CREATED_AT_NAME, 	String.valueOf(testPost.getCreatedAt()));
-		contentValues.put(COLUMN_UPDATED_AT_NAME, 	String.valueOf(testPost.getUpdatedAt()));
+		contentValues.put(COLUMN_ID_NAME, 				testPost.getID());
+		contentValues.put(COLUMN_USER_ID_NAME, 			testPost.getUserID());
+		contentValues.put(COLUMN_TRACK_NAME, 			testPost.getTrack());
+		contentValues.put(COLUMN_LAT_NAME, 				testPost.getLat());
+		contentValues.put(COLUMN_LON_NAME, 				testPost.getLon());
+		contentValues.put(COLUMN_MESSAGE_NAME, 			testPost.getMessage());
+		contentValues.put(COLUMN_PLACE_NAME_NAME, 		testPost.getPlaceName());
+		contentValues.put(COLUMN_GOOGLE_PLACE_ID_NAME, 	testPost.getGooglePlaceID());
+		contentValues.put(COLUMN_CREATED_AT_NAME,	 	String.valueOf(testPost.getCreatedAt()));
+		contentValues.put(COLUMN_UPDATED_AT_NAME, 		String.valueOf(testPost.getUpdatedAt()));
 		return contentValues;
 	}
 

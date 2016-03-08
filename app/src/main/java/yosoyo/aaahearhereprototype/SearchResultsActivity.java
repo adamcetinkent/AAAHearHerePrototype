@@ -23,7 +23,6 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 	public static final String TRACK_JSON = "trackJson";
 	public static final String ARTIST_JSON = "artistJson";
 	public static final String ALBUM_JSON = "albumJson";
-	public static final String BMP_JSON = "bitmapJson";
 
 	public static final String QUERY_ARTIST = "queryArtist";
 	public static final String QUERY_ALBUM = "queryAlbum";
@@ -178,9 +177,6 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(TRACK_JSON, new Gson().toJson(track, SpotifyTrack.class));
 
-				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				//resultIntent.putExtra(BMP_JSON, bytes);
-
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}
@@ -219,9 +215,6 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(ARTIST_JSON, new Gson().toJson(artist, SpotifyArtist.class));
 
-				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				//resultIntent.putExtra(BMP_JSON, bytes);
-
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
 			}
@@ -258,9 +251,6 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(ALBUM_JSON, new Gson().toJson(album, SpotifyAlbum.class));
-
-				//byte[] bytes = ZZZUtility.convertImageViewToByteArray((ImageView) view.findViewById(R.id.artwork));
-				//resultIntent.putExtra(BMP_JSON, bytes);
 
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();

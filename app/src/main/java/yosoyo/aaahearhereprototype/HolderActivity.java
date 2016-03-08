@@ -20,18 +20,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.facebook.Profile;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.gson.Gson;
+import com.google.android.gms.location.places.Places;
 
 import yosoyo.aaahearhereprototype.Fragments.HomeFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
+import yosoyo.aaahearhereprototype.TestServerClasses.Database.DatabaseHelper;
+import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class HolderActivity extends Activity implements /*DownloadImageTask.DownloadImageTaskCallback,*/ PostFragmentPostedListener {
+public class HolderActivity extends Activity implements PostFragmentPostedListener {
 
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
@@ -45,10 +48,8 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 	private ActionBarDrawerToggle drawerToggle;
 	private int currentPosition = 0;
 
-	//public static ZZZDataHolder dataHolder = new ZZZDataHolder();
-	//public static AsyncDataManager asyncDataManager = new AsyncDataManager();
-	public static TestUser testUser;
-	public static Bitmap profilePicture = null;
+	//public static TestUser testUser;
+	//public static Bitmap profilePicture = null;
 	public static boolean apiExists = false;
 	public static MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -69,13 +70,14 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 		AsyncDataManager.setContext(this);
 
 		Intent intent = getIntent();
-		if (intent.hasExtra(PROFILE_PICTURE)){
-			profilePicture = ZZZUtility.convertByteArrayToBitmap(intent.getByteArrayExtra(PROFILE_PICTURE));
-		} else {
-			/*new DownloadImageTask(null, this).execute(
-				Profile.getCurrentProfile().getProfilePictureUri(200, 200).toString());*/
-		}
-		testUser = new Gson().fromJson(intent.getStringExtra(TEST_USER), TestUser.class);
+		WebHelper.getFacebookProfilePicture(
+			Profile.getCurrentProfile().getId(),
+			new WebHelper.GetFacebookProfilePictureCallback() {
+				@Override
+				public void returnFacebookProfilePicture(Bitmap bitmap) {
+					TestUser.setProfilePicture(bitmap);
+				}
+			});
 
 		navigationOptions = getResources().getStringArray(R.array.navigation_options);
 		drawerList = (ListView) findViewById(R.id.drawer);
@@ -83,7 +85,7 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 
 		drawerList.setAdapter(
 			new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1,
-									 navigationOptions));
+							   navigationOptions));
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		if (savedInstanceState == null){
@@ -133,7 +135,7 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 					drawerList.setItemChecked(currentPosition, true);
 				}
 			}
-		);
+														  );
 
 		mGoogleApiClient = new GoogleApiClient.Builder(this)
 			.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -154,6 +156,8 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 				}
 			})
 			.addApi(LocationServices.API)
+			.addApi(Places.PLACE_DETECTION_API)
+			.addApi(Places.GEO_DATA_API)
 			.build();
 
 	}
@@ -234,10 +238,16 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 				ft.commit();
 
 				setActionBarTitle("Post to Hear Here");
+				break;
+			}
+			case (R.id.action_reset_database):{
+				DatabaseHelper.resetDatabase(this);
+				break;
 			}
 			default:
 				return super.onOptionsItemSelected(menuItem);
 		}
+		return super.onOptionsItemSelected(menuItem);
 	}
 
 	@Override
@@ -264,11 +274,6 @@ public class HolderActivity extends Activity implements /*DownloadImageTask.Down
 		super.onSaveInstanceState(bundle);
 		bundle.putInt(KEY_POSITION, currentPosition);
 	}
-
-	/*@Override
-	public void returnDownloadedImage(Bitmap result, int position, Marker marker) {
-		profilePicture = result;
-	}*/
 
 	public static Location getLastLocation(){
 		return LocationServices.FusedLocationApi.getLastLocation(HolderActivity.mGoogleApiClient);

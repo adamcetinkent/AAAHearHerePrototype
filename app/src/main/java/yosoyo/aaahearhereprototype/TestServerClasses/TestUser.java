@@ -1,6 +1,7 @@
 package yosoyo.aaahearhereprototype.TestServerClasses;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
 
 import com.facebook.Profile;
 
@@ -57,9 +58,12 @@ public class TestUser {
 		this.id = cursor.getLong(cursor.getColumnIndex(ORMTestUser.COLUMN_ID_NAME));;
 		this.first_name = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_FIRST_NAME_NAME));
 		this.last_name = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_LAST_NAME_NAME));
-		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_FB_USER_ID_NAME));
-		this.updated_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_UPDATED_AT_NAME)));
-		this.created_at = Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_CREATED_AT_NAME)));
+		this.fb_user_id = cursor.getString(
+			cursor.getColumnIndex(ORMTestUser.COLUMN_FB_USER_ID_NAME));
+		this.updated_at = Timestamp.valueOf(
+			cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_UPDATED_AT_NAME)));
+		this.created_at = Timestamp.valueOf(
+			cursor.getString(cursor.getColumnIndex(ORMTestUser.COLUMN_CREATED_AT_NAME)));
 	}
 
 	public TestUser(Profile profile){
@@ -78,6 +82,22 @@ public class TestUser {
 
 		return id == testUser.id;
 
+	}
+
+	static TestUser currentUser;
+	public static TestUser getCurrentUser(){
+		return currentUser;
+	}
+	public static void setCurrentUser(TestUser testUser){
+		currentUser = testUser;
+	}
+
+	static Bitmap profilePicture;
+	public static void setProfilePicture(Bitmap bitmap){
+		profilePicture = bitmap;
+	}
+	public static Bitmap getProfilePicture(){
+		return profilePicture;
 	}
 
 }

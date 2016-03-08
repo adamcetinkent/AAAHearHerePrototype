@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String TAG = "DatabaseHelper";
 	private static final String DB_NAME = "AAAHereHerePrototype";
-	private static final int DB_VERSION = 7;
+	private static final int DB_VERSION = 8;
 
 	public DatabaseHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
