@@ -53,7 +53,7 @@ public class ZZZUtility {
 		} else if (elapsed > 50 * MINUTE_MILLIS) {
 			return "an hour ago";
 		} else if (elapsed > 2 * MINUTE_MILLIS) {
-			return (elapsed / MINUTE_MILLIS) + "minutes ago";
+			return (elapsed / MINUTE_MILLIS) + " minutes ago";
 		} else if (elapsed > MINUTE_MILLIS){
 			return "a minute ago";
 		} else {

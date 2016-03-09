@@ -46,14 +46,14 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment {
+public class FeedFragment extends Fragment {
 
-	private static final String TAG = HomeFragment.class.getSimpleName();
+	private static final String TAG = FeedFragment.class.getSimpleName();
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	private List<TestPostFull> posts = new ArrayList<>();
 
-	public HomeFragment() {
+	public FeedFragment() {
 		// Required empty public constructor
 	}
 

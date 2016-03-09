@@ -31,13 +31,12 @@ import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestFacebookAuthentic
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
-public class MainActivity extends /*AppCompatActivity*/ Activity implements FacebookCallback<LoginResult>,
-	/*DownloadImageTask.DownloadImageTaskCallback,*/
+public class LoginActivity extends Activity implements FacebookCallback<LoginResult>,
 	TestFacebookAuthenticateUserTask.TestFacebookAuthenticateUserTaskCallback,
 	TestCreateUserTask.TestCreateUserTaskCallback,
 	View.OnClickListener
 {
-	private static final String TAG = "MainActivity";
+	private static final String TAG = "LoginActivity";
 
 	private CallbackManager callbackManager;
 	private TextView facebookSignInName;
@@ -55,10 +54,6 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
 		setContentView(R.layout.activity_main);
 
-		// Set up Action Bar
-		//Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-		//setSupportActionBar(myToolbar);
-
 		continueButton = (Button) findViewById(R.id.btnContinue);
 		continueButton.setOnClickListener(this);
 
@@ -71,6 +66,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 
 		callbackManager = CallbackManager.Factory.create();
 		LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
+		loginButton.setReadPermissions("user_friends");
 		loginButton.registerCallback(callbackManager, this);
 
 		AccessTokenTracker accessTokenTracker = new AccessTokenTracker(){
@@ -128,7 +124,7 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 		} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
 			Toast.makeText(this, "Creating new user...", Toast.LENGTH_LONG);
 			this.testUser = new TestUser(Profile.getCurrentProfile());
-			new TestCreateUserTask(this, testUser).execute();
+			new TestCreateUserTask(this, this.testUser).execute();
 		} else {
 			facebookSignInFailed();
 		}
@@ -231,7 +227,8 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 			Profile profile = Profile.getCurrentProfile();
 			facebookSignInName.setText(profile.getFirstName() + " " + profile.getLastName());
 			Toast.makeText(this,
-						   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(), Toast.LENGTH_LONG);
+						   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(),
+						   Toast.LENGTH_LONG);
 			continueButton.setEnabled(true);
 
 			final ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
@@ -243,9 +240,22 @@ public class MainActivity extends /*AppCompatActivity*/ Activity implements Face
 						imageView.setImageBitmap(bitmap);
 					}
 				});
+
+			/*new GraphRequest(
+				AccessToken.getCurrentAccessToken(),
+				"/me/friends/",
+				null,
+				HttpMethod.GET,
+				new GraphRequest.Callback() {
+					public void onCompleted(GraphResponse response) {
+            			Log.d(TAG, "User friends:" + response.toString());
+					}
+				}
+			).executeAsync();*/
+
 		} else {
 			facebookSignInName.setText("Logged Out");
-			Toast.makeText(MainActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);
+			Toast.makeText(LoginActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);
 			continueButton.setEnabled(false);
 
 			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);

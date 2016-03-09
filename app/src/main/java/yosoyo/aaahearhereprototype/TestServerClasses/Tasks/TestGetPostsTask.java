@@ -16,6 +16,7 @@ import java.util.List;
 
 import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TaskReturns.TestPostUserCommentsNested;
 import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFullProcess;
+import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -23,26 +24,23 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class TestGetPostsTask extends AsyncTask<Void, Void, List<TestPostFullProcess>> {
 	private static final String TAG = "TestGetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
 
-	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface TestGetPostsTaskCallback {
 		void returnTestPosts(List<TestPostFullProcess> testPosts);
 	}
 
 	private TestGetPostsTaskCallback callbackTo;
-	//private long id;
 
-	public TestGetPostsTask(TestGetPostsTaskCallback callbackTo/*, long id*/) {
+	public TestGetPostsTask(TestGetPostsTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
-		//this.id = id;
 	}
 
 	@Override
 	protected List<TestPostFullProcess> doInBackground(Void... params) {
-		Log.d(TAG, "Fetching posts from " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Fetching posts from " + VM_SERVER_ADDRESS + TestUser.getCurrentUser().getID());
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS);
+			URL url = new URL(VM_SERVER_ADDRESS + TestUser.getCurrentUser().getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

@@ -26,7 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
-import yosoyo.aaahearhereprototype.Fragments.HomeFragment;
+import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
@@ -119,7 +119,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 				public void onBackStackChanged() {
 					FragmentManager fragmentManager = getFragmentManager();
 					Fragment fragment = fragmentManager.findFragmentByTag(VISIBLE_FRAGMENT);
-					if (fragment instanceof HomeFragment) {
+					if (fragment instanceof FeedFragment) {
 						currentPosition = 0;
 					}
 					if (fragment instanceof MapViewFragment) {
@@ -197,7 +197,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 				break;
 			}
 			default: {
-				fragment = new HomeFragment();
+				fragment = new FeedFragment();
 			}
 		}
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -284,8 +284,8 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 		selectItem(1);
 	}
 
-	@Override
+	/*@Override
 	public void onBackPressed() {
 		selectItem(0);
-	}
+	}*/
 }
