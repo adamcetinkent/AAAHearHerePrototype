@@ -26,14 +26,14 @@ import com.facebook.login.widget.LoginButton;
 
 import java.net.HttpURLConnection;
 
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreateUserTask;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestFacebookAuthenticateUserTask;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 
 public class LoginActivity extends Activity implements FacebookCallback<LoginResult>,
-	TestFacebookAuthenticateUserTask.TestFacebookAuthenticateUserTaskCallback,
-	TestCreateUserTask.TestCreateUserTaskCallback,
+	AuthenticateUserFacebookTask.AuthenticateUserFacebookTaskCallback,
+	CreateUserTask.CreateUserTaskCallback,
 	View.OnClickListener
 {
 	private static final String TAG = "LoginActivity";
@@ -43,7 +43,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 	private Button continueButton;
 	private Button shortcutButton;
 	private ProgressDialog progressDialog;
-	private TestUser testUser;
+	private HHUser user;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,14 +117,14 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 	}
 
 	@Override
-	public void returnAuthenticationResult(Integer result, TestUser testUser) {
+	public void returnAuthenticationResult(Integer result, HHUser user) {
 		if (result == HttpURLConnection.HTTP_OK) {
-			this.testUser = testUser;
+			this.user = user;
 			facebookSignInSucceeded();
 		} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
 			Toast.makeText(this, "Creating new user...", Toast.LENGTH_LONG);
-			this.testUser = new TestUser(Profile.getCurrentProfile());
-			new TestCreateUserTask(this, this.testUser).execute();
+			this.user = new HHUser(Profile.getCurrentProfile());
+			new CreateUserTask(this, this.user).execute();
 		} else {
 			facebookSignInFailed();
 		}
@@ -148,7 +148,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 	private void proceedToHolderActivity(){
 		Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
 
-		TestUser.setCurrentUser(testUser);
+		HHUser.setCurrentUser(user);
 
 		startActivity(intent);
 	}
@@ -187,7 +187,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 
-		new TestFacebookAuthenticateUserTask(this, accessToken).execute();
+		new AuthenticateUserFacebookTask(this, accessToken).execute();
 	}
 
 	@Override
@@ -201,7 +201,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 	}
 
 	@Override
-	public void returnResultCreateUser(Boolean success, TestUser testUser) {
+	public void returnResultCreateUser(Boolean success, HHUser userReturned) {
 		facebookSignInSucceeded();
 	}
 
@@ -215,7 +215,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 				}
 			}
 			case (R.id.btnShortcut): {
-				testUser = new TestUser(Profile.getCurrentProfile());
+				user = new HHUser(Profile.getCurrentProfile());
 				proceedToHolderActivity();
 				break;
 			}

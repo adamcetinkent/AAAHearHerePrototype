@@ -16,6 +16,7 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyImage;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequest;
 
 public class SearchResultsActivity extends Activity implements SpotifyAPIRequest.SpotifyAPIRequestCallback {
 	private static final String TAG = "SearchResultsActivity";

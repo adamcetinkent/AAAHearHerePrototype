@@ -48,7 +48,7 @@ public class ZZZUtility {
 			return halfDate.format(time);
 		} else if (elapsed > DAY_MILLIS){
 			return "Yesterday";
-		} else if (elapsed > 90 * MINUTE_MILLIS){
+		} else if (elapsed > 2 * HOUR_MILLIS){
 			return (elapsed / HOUR_MILLIS) + " hours ago";
 		} else if (elapsed > 50 * MINUTE_MILLIS) {
 			return "an hour ago";
@@ -59,6 +59,30 @@ public class ZZZUtility {
 		} else {
 			return "just now";
 		}
+
+	}
+
+	public static String truncatedAddress(String inString, int maxLength){
+		if (inString.length() < maxLength)
+			return inString;
+
+		maxLength = maxLength - 3;
+		int n = 0;
+		boolean spaceSplit = false;
+		String[] parts = inString.split(",");
+		if (parts[0].length()+1 > maxLength){
+			parts = inString.split(" ");
+			spaceSplit = true;
+			if (parts[0].length()+1 > maxLength)
+				return inString.substring(0, maxLength) + "...";
+		}
+		StringBuilder sb = new StringBuilder(parts[0]);
+		for (int i = 1; i < parts.length; i++){
+			if (sb.length() + parts[i].length() > maxLength)
+				return sb.append("...").toString();
+			sb.append(spaceSplit ? " " : ",").append(parts[i]);
+		}
+		return sb.toString();
 
 	}
 

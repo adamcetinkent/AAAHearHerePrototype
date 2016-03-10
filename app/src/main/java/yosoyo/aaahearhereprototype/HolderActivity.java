@@ -30,17 +30,15 @@ import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
-import yosoyo.aaahearhereprototype.TestServerClasses.Database.DatabaseHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 
 public class HolderActivity extends Activity implements PostFragmentPostedListener {
 
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
-	public static final String PROFILE_PICTURE = "profile_picture";
-	public static final String TEST_USER = "test_user";
 
 	private String[] navigationOptions;
 	private ListView drawerList;
@@ -48,8 +46,6 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 	private ActionBarDrawerToggle drawerToggle;
 	private int currentPosition = 0;
 
-	//public static TestUser testUser;
-	//public static Bitmap profilePicture = null;
 	public static boolean apiExists = false;
 	public static MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -75,7 +71,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 			new WebHelper.GetFacebookProfilePictureCallback() {
 				@Override
 				public void returnFacebookProfilePicture(Bitmap bitmap) {
-					TestUser.setProfilePicture(bitmap);
+					HHUser.setProfilePicture(bitmap);
 				}
 			});
 

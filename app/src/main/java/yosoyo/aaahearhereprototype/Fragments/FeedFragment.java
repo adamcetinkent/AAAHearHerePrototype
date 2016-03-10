@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -32,15 +33,16 @@ import java.util.Collections;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestComment;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestCommentUser;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestLike;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestLikeUser;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -51,7 +53,7 @@ public class FeedFragment extends Fragment {
 	private static final String TAG = FeedFragment.class.getSimpleName();
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
-	private List<TestPostFull> posts = new ArrayList<>();
+	private List<HHPostFull> posts = new ArrayList<>();
 
 	public FeedFragment() {
 		// Required empty public constructor
@@ -82,14 +84,14 @@ public class FeedFragment extends Fragment {
 	private void getAllData(){
 		AsyncDataManager.getAllPosts(new AsyncDataManager.GetAllPostsCallback() {
 			@Override
-			public void returnAllCachedPosts(List<TestPostFull> cachedPosts) {
+			public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
 				Log.d(TAG, "Cached posts returned");
 				posts = ZZZUtility.mergeLists(posts, cachedPosts);
 				notifyAdapter();
 			}
 
 			@Override
-			public void returnWebPost(TestPostFull webPost) {
+			public void returnWebPost(HHPostFull webPost) {
 				Log.d(TAG, "Web post returned!");
 				posts = ZZZUtility.updateList(posts, webPost);
 				notifyAdapter();
@@ -121,13 +123,13 @@ public class FeedFragment extends Fragment {
 		}
 
 		private Activity context;
-		private List<TestPostFull> posts;
+		private List<HHPostFull> posts;
 		private AdapterCallback callback;
 		int addingComment = -1;
 		int addingCommentFocus = -1;
 		private Handler handler = new Handler();
 
-		public TimelineCustomExpandableAdapter(Activity context, List<TestPostFull> posts, AdapterCallback callback){
+		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback){
 			super();
 			this.context = context;
 			this.posts = posts;
@@ -193,11 +195,12 @@ public class FeedFragment extends Fragment {
 			ToggleButton btnLikeButton;
 			ImageButton btnCommentButton;
 			ImageButton btnShareButton;
+			LinearLayout llTags;
+			TextView txtTags;
 			int groupPosition;
 			boolean addingComment;
-			//boolean addingCommentFocus;
-			TestPostFull post;
-			TestLike myLike;
+			HHPostFull post;
+			HHLike myLike;
 			CompoundButton.OnCheckedChangeListener likeCheckListener;
 			View.OnClickListener commentClickListener;
 		}
@@ -216,8 +219,8 @@ public class FeedFragment extends Fragment {
 
 				viewHolder.post = posts.get(groupPosition);
 
-				for (TestLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(TestUser.getCurrentUser())){
+				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
+					if (like.getUser().equals(HHUser.getCurrentUser())){
 						viewHolder.myLike = like.getLike();
 						break;
 					}
@@ -236,24 +239,26 @@ public class FeedFragment extends Fragment {
 				viewHolder.btnLikeButton = (ToggleButton) convertView.findViewById(R.id.list_row_timeline_btnLike);
 				viewHolder.btnCommentButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnComment);
 				viewHolder.btnShareButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnShare);
+				viewHolder.llTags = (LinearLayout) convertView.findViewById(R.id.list_row_timeline_llTagFrame);
+				viewHolder.txtTags = (TextView) convertView.findViewById(R.id.list_row_timeline_txtTags);
 
 				viewHolder.likeCheckListener = new CompoundButton.OnCheckedChangeListener() {
 					@Override
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						viewHolder.btnLikeButton.setEnabled(false);
 						if (isChecked) {
-							TestLike like = new TestLike(viewHolder.post.getPost().getID(),
-														 TestUser.getCurrentUser().getID());
+							HHLike like = new HHLike(viewHolder.post.getPost().getID(),
+														 HHUser.getCurrentUser().getID());
 							AsyncDataManager
 								.postLike(like, new AsyncDataManager.PostLikeCallback() {
 									@Override
-									public void returnPostedLike(TestLike returnedLike) {
+									public void returnPostedLike(HHLike returnedLike) {
 										Log.d(TAG, "Posted new comment!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),
 											new AsyncDataManager.GetWebPostCallback() {
 												@Override
-												public void returnWebPost(TestPostFull webPost) {
+												public void returnWebPost(HHPostFull webPost) {
 													posts = ZZZUtility.updateList(posts, webPost);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
@@ -277,7 +282,7 @@ public class FeedFragment extends Fragment {
 											viewHolder.post.getPost().getID(),
 											new AsyncDataManager.GetWebPostCallback() {
 												@Override
-												public void returnWebPost(TestPostFull webPost) {
+												public void returnWebPost(HHPostFull webPost) {
 													posts = ZZZUtility.updateList(posts, webPost);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
@@ -388,8 +393,8 @@ public class FeedFragment extends Fragment {
 				viewHolder.groupPosition = groupPosition;
 				viewHolder.post = posts.get(groupPosition);
 				viewHolder.myLike = null;
-				for (TestLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(TestUser.getCurrentUser())){
+				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
+					if (like.getUser().equals(HHUser.getCurrentUser())){
 						viewHolder.myLike = like.getLike();
 						break;
 					}
@@ -417,7 +422,7 @@ public class FeedFragment extends Fragment {
 				});
 
 			viewHolder.txtUserName.setText(viewHolder.post.getUser().getName());
-			viewHolder.txtLocation.setText(viewHolder.post.getPost().getPlaceName());
+			viewHolder.txtLocation.setText(ZZZUtility.truncatedAddress(viewHolder.post.getPost().getPlaceName(),35));
 			viewHolder.txtDateTime.setText(ZZZUtility.formatDynamicDate(viewHolder.post.getPost().getCreatedAt()));
 			viewHolder.txtTrackName.setText(viewHolder.post.getTrack().getName());
 			viewHolder.txtArtist.setText(viewHolder.post.getTrack().getArtist());
@@ -434,6 +439,33 @@ public class FeedFragment extends Fragment {
 			}
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(viewHolder.likeCheckListener);
 
+			if (viewHolder.post.getTags().size() > 0){
+
+				viewHolder.llTags.setVisibility(View.VISIBLE);
+
+				List<HHTagUser> tags = viewHolder.post.getTags();
+				int youTag = -1;
+				StringBuilder sb;
+				if (tags.get(0).getUser().equals(HHUser.getCurrentUser())) {
+					youTag = 0;
+					sb = new StringBuilder();
+				} else {
+					sb = new StringBuilder(tags.get(0).getUser().getName());
+				}
+				for (int i = 1; i < tags.size(); i++){
+					if (tags.get(i).getUser().equals(HHUser.getCurrentUser())){
+						youTag = i;
+					} else {
+						sb.append(", " + tags.get(i).getUser().getName());
+					}
+				}
+				viewHolder.txtTags.setText((youTag >= 0 ? "You" + ((youTag > 0) ? ", " : "") : "")
+											   + sb.toString());
+
+			} else {
+				viewHolder.llTags.setVisibility(View.GONE);
+			}
+
 			return convertView;
 		}
 
@@ -443,7 +475,7 @@ public class FeedFragment extends Fragment {
 			TextView txtComment;
 			int groupPosition;
 			int childPosition;
-			TestCommentUser comment;
+			HHCommentUser comment;
 		}
 
 		@Override
@@ -456,18 +488,18 @@ public class FeedFragment extends Fragment {
 				final View rowView = inflater.inflate(R.layout.list_row_comment_like, null, true);
 
 				TextView txtLikers = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtLikers);
-				List<TestLikeUser> likes = posts.get(groupPosition).getLikes();
+				List<HHLikeUser> likes = posts.get(groupPosition).getLikes();
 
 				int youLike = -1;
 				StringBuilder sb;
-				if (likes.get(0).getUser().equals(TestUser.getCurrentUser())) {
+				if (likes.get(0).getUser().equals(HHUser.getCurrentUser())) {
 					youLike = 0;
 					sb = new StringBuilder();
 				} else {
 					sb = new StringBuilder(likes.get(0).getUser().getName());
 				}
 				for (int i = 1; i < likes.size(); i++){
-					if (likes.get(i).getUser().equals(TestUser.getCurrentUser())){
+					if (likes.get(i).getUser().equals(HHUser.getCurrentUser())){
 						youLike = i;
 					} else {
 						sb.append(", " + likes.get(i).getUser().getName());
@@ -510,19 +542,19 @@ public class FeedFragment extends Fragment {
 						if (message.isEmpty())
 							return;
 						final long post_id = posts.get(groupPosition).getPost().getID();
-						TestComment comment = new TestComment(post_id,
-															  TestUser.getCurrentUser().getID(),
+						HHComment comment = new HHComment(post_id,
+															  HHUser.getCurrentUser().getID(),
 															  message);
 						AsyncDataManager
 							.postComment(comment, new AsyncDataManager.PostCommentCallback() {
 								@Override
-								public void returnPostedComment(TestComment returnedComment) {
+								public void returnPostedComment(HHComment returnedComment) {
 									Log.d(TAG, "Posted new comment!");
 									AsyncDataManager.getWebPost(
 										post_id,
 										new AsyncDataManager.GetWebPostCallback() {
 											@Override
-											public void returnWebPost(TestPostFull webPost) {
+											public void returnWebPost(HHPostFull webPost) {
 												posts = ZZZUtility.updateList(posts, webPost);
 												callback.onDataChange();
 											}

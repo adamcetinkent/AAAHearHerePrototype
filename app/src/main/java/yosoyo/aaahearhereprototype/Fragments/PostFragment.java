@@ -38,6 +38,11 @@ import java.util.Date;
 import yosoyo.aaahearhereprototype.AddressPicker;
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreatePostTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.PostFragmentPostedListener;
 import yosoyo.aaahearhereprototype.R;
@@ -45,17 +50,12 @@ import yosoyo.aaahearhereprototype.SearchResultsActivity;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.TestCreatePostTask;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPost;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestUser;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PostFragment extends Fragment
-	implements TestCreatePostTask.TestCreatePostTaskCallback {
+	implements CreatePostTask.CreatePostTaskCallback {
 
 	public static final String TAG = "PostFragment";
 
@@ -116,9 +116,9 @@ public class PostFragment extends Fragment
 		txtDateTime = (TextView) view.findViewById(R.id.post_fragment_txtDateTime);
 		txtDateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
 
-		if (TestUser.getProfilePicture() != null){
+		if (HHUser.getProfilePicture() != null){
 			ImageView imgProfilePicture = (ImageView) view.findViewById(R.id.post_fragment_imgProfile);
-			imgProfilePicture.setImageBitmap(TestUser.getProfilePicture());
+			imgProfilePicture.setImageBitmap(HHUser.getProfilePicture());
 		}
 
 		btnLocationButton = (ImageView) view.findViewById(R.id.post_fragment_btnLocation);
@@ -319,8 +319,8 @@ public class PostFragment extends Fragment
 					Toast.makeText(getActivity(), "No track selected!", Toast.LENGTH_SHORT).show();
 					return;
 				}
-				TestPost testPost = new TestPost(TestUser.getCurrentUser().getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString(), placeName, googlePlaceID);
-				new TestCreatePostTask(PostFragment.this, testPost).execute();
+				HHPost post = new HHPost(HHUser.getCurrentUser().getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString(), placeName, googlePlaceID);
+				new CreatePostTask(PostFragment.this, post).execute();
 				postButton.setVisibility(View.INVISIBLE);
 				ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.post_fragment_progressBar);
 				progressBar.setVisibility(View.VISIBLE);
@@ -462,7 +462,7 @@ public class PostFragment extends Fragment
 	}
 
 	@Override
-	public void returnResultCreatePost(Boolean success, TestPostFull testPostUser) {
+	public void returnResultCreatePost(Boolean success, HHPostFull postReturned) {
 		if (success) {
 			Log.d(TAG, "New Post created!");
 			postFragmentPostedListener.onPostFragmentPosted();

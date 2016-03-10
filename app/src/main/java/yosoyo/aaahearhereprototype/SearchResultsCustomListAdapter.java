@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 
 /**
  * Created by Adam Kent on 10/02/2016.

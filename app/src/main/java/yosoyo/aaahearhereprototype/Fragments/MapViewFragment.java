@@ -42,11 +42,11 @@ import java.util.List;
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
-import yosoyo.aaahearhereprototype.TestServerClasses.CachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.TestServerClasses.Tasks.WebHelper;
-import yosoyo.aaahearhereprototype.TestServerClasses.TestPostFull;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -59,7 +59,7 @@ public class MapViewFragment
 
 	private static final String TAG = "MapViewFragment";
 
-	private List<TestPostFull> posts = new ArrayList<>();
+	private List<HHPostFull> posts = new ArrayList<>();
 
 	private MapView mMapView;
 	private GoogleMap googleMap;
@@ -75,13 +75,13 @@ public class MapViewFragment
 	protected String mAddressOutput;
 	private ProgressBar mProgressBar;
 
-	private CachedSpotifyTrack currentTrack;
+	private HHCachedSpotifyTrack currentTrack;
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View v = inflater.inflate(R.layout.fragment_map_test, container, false);
+		View v = inflater.inflate(R.layout.fragment_map, container, false);
 
 		mMapView = (MapView) v.findViewById(R.id.mapView);
 
@@ -228,13 +228,13 @@ public class MapViewFragment
 		AsyncDataManager.getAllPosts(
 			new AsyncDataManager.GetAllPostsCallback() {
 				@Override
-				public void returnAllCachedPosts(List<TestPostFull> cachedPosts) {
+				public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
 					posts = ZZZUtility.mergeLists(posts, cachedPosts);
 					addMapMarkers();
 				}
 
 				@Override
-				public void returnWebPost(TestPostFull webPost) {
+				public void returnWebPost(HHPostFull webPost) {
 					if (ZZZUtility.addItemToList(posts, webPost))
 						addMapMarker(webPost, true);
 				}
@@ -258,16 +258,16 @@ public class MapViewFragment
 
 	private void addMapMarkers(){
 		googleMap.clear();
-		for (TestPostFull post : posts) {
+		for (HHPostFull post : posts) {
 			addMapMarker(post, false);
 		}
 	}
 
-	private void addMapMarker(TestPostFull testPost, boolean newColour){
-		LatLng latLng = new LatLng(testPost.getPost().getLat(), testPost.getPost().getLon());
+	private void addMapMarker(HHPostFull post, boolean newColour){
+		LatLng latLng = new LatLng(post.getPost().getLat(), post.getPost().getLon());
 		googleMap.addMarker(
 			new MarkerOptions().position(latLng)
-							   .title(new Gson().toJson(testPost))
+							   .title(new Gson().toJson(post))
 							   .icon(BitmapDescriptorFactory
 										 .fromResource(
 											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
@@ -349,7 +349,7 @@ public class MapViewFragment
 
 		private final View mWindow;
 		private final View mContents;
-		private CachedSpotifyTrack spotifyTrack;
+		private HHCachedSpotifyTrack spotifyTrack;
 
 		CustomInfoWindowAdapter(){
 			mWindow = getActivity().getLayoutInflater().inflate(R.layout.custom_info_window, null);
@@ -372,8 +372,8 @@ public class MapViewFragment
 
 			currentMarker = marker;
 
-			TestPostFull testPost = new Gson().fromJson(marker.getTitle(), TestPostFull.class);
-			spotifyTrack = testPost.getTrack();
+			HHPostFull post = new Gson().fromJson(marker.getTitle(), HHPostFull.class);
+			spotifyTrack = post.getTrack();
 			currentTrack = spotifyTrack;
 
 			final ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
@@ -393,7 +393,7 @@ public class MapViewFragment
 					});
 
 				WebHelper.getFacebookProfilePicture(
-					testPost.getUser().getFBUserID(),
+					post.getUser().getFBUserID(),
 					new WebHelper.GetFacebookProfilePictureCallback() {
 						@Override
 						public void returnFacebookProfilePicture(Bitmap bitmap) {
@@ -412,9 +412,10 @@ public class MapViewFragment
 			titleUI.setText(spotifyTrack.getName());
 			artistUI.setText(spotifyTrack.getArtist());
 			albumUI.setText(spotifyTrack.getAlbum());
-			snippetUI.setText("Message: " + testPost.getPost().getMessage());
-			dateUI.setText("Posted: " + ZZZUtility.formatDynamicDate(testPost.getPost().getCreatedAt()));
-			userUI.setText(testPost.getUser().getName());
+			snippetUI.setText("Message: " + post.getPost().getMessage());
+			dateUI.setText("Posted: " + ZZZUtility.formatDynamicDate(
+				post.getPost().getCreatedAt()));
+			userUI.setText(post.getUser().getName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
 			if (HolderActivity.mediaPlayer.isPlaying()) {
