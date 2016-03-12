@@ -1,5 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses;
 
+import android.database.Cursor;
+
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNested;
 
 /**
@@ -13,6 +15,11 @@ public class HHTagUser {
 	public HHTagUser(HHTagUserNested nested){
 		this.tag = new HHTag(nested);
 		this.user = nested.getUser();
+	}
+
+	public HHTagUser(Cursor cursor){
+		this.tag = new HHTag(cursor);
+		this.user = new HHUser(cursor);
 	}
 
 	public HHTag getTag() {

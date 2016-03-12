@@ -12,6 +12,7 @@ public class HHPostFullProcess extends HHPostFull {
 	private boolean likesProcessed = false;
 	private boolean usersProcessed = false;
 	private boolean trackProcessed = false;
+	private boolean tagsProcessed = false;
 
 	public HHPostFullProcess(HHPostFullNested nested) {
 		super(nested);
@@ -55,6 +56,14 @@ public class HHPostFullProcess extends HHPostFull {
 
 	public void setTrackProcessed(boolean trackProcessed) {
 		this.trackProcessed = trackProcessed;
+	}
+
+	public boolean isTagsProcessed() {
+		return tagsProcessed;
+	}
+
+	public void setTagsProcessed(boolean tagsProcessed) {
+		this.tagsProcessed = tagsProcessed;
 	}
 
 }

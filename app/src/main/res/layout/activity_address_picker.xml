@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:text="Location:"/>
 
-    <yosoyo.aaahearhereprototype.InstantAutoCompleteTextView
+    <yosoyo.aaahearhereprototype.ZZZInterface.InstantAutoCompleteTextView
         android:layout_row="0"
         android:layout_column="1"
         android:id="@+id/address_picker_txtLocation"

@@ -13,9 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -27,14 +27,14 @@ public class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface CreatePostTaskCallback {
-		void returnResultCreatePost(Boolean success, HHPostFull postReturned);
+		void returnResultCreatePost(Boolean success, HHPostFullProcess postReturned);
 	}
 
 	private CreatePostTaskCallback callbackTo;
-	private HHPost post;
+	private HHPostTagsArray post;
 	private HHPostFullNested postReturned;
 
-	public CreatePostTask(CreatePostTaskCallback callbackTo, HHPost post) {
+	public CreatePostTask(HHPostTagsArray post, CreatePostTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.post = post;
 	}
@@ -52,7 +52,7 @@ public class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(post, HHPost.class);
+				String json = new Gson().toJson(post, HHPostTagsArray.class);
 				String jsonplus = "{\"post\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
@@ -88,7 +88,7 @@ public class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreatePost(result, new HHPostFull(postReturned));	// sends results back
+		callbackTo.returnResultCreatePost(result, new HHPostFullProcess(postReturned));	// sends results back
 	}
 
 }

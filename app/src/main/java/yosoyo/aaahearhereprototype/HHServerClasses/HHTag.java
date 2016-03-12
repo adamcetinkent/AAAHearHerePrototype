@@ -1,5 +1,10 @@
 package yosoyo.aaahearhereprototype.HHServerClasses;
 
+import android.database.Cursor;
+
+import java.sql.Timestamp;
+
+import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNested;
 
 /**
@@ -14,6 +19,16 @@ public class HHTag extends HHLike {
 			nested.getUserID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
+			 );
+	}
+
+	public HHTag(Cursor cursor){
+		super(
+			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_ID_NAME)),
+			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_POST_ID_NAME)),
+			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_USER_ID_NAME)),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_UPDATED_AT_NAME)))
 			 );
 	}
 

@@ -14,7 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFriendshipsNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -26,14 +27,14 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface AuthenticateUserFacebookTaskCallback {
-		void returnAuthenticationResult(Integer result, HHUser user);
+		void returnAuthenticationResult(Integer result, HHUserFullProcess user);
 	}
 
 	private AuthenticateUserFacebookTaskCallback callbackTo;
 	private AccessToken accessToken;
-	private HHUser user;
+	private HHUserFullProcess user;
 
-	public AuthenticateUserFacebookTask(AuthenticateUserFacebookTaskCallback callbackTo, AccessToken accessToken) {
+	public AuthenticateUserFacebookTask(AccessToken accessToken, AuthenticateUserFacebookTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.accessToken = accessToken;
 	}
@@ -68,7 +69,7 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 				if (httpResult == HttpURLConnection.HTTP_OK){
 
 					Log.d(TAG, httpResponseStream);
-					user = new Gson().fromJson(httpResponseStream, HHUser.class);
+					user = new HHUserFullProcess(new Gson().fromJson(httpResponseStream, HHUserFriendshipsNested.class));
 					return httpResult;
 
 				} else if (httpResult == HttpURLConnection.HTTP_ACCEPTED) {

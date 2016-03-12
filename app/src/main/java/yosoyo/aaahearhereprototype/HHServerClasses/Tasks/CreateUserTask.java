@@ -32,7 +32,7 @@ public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
 	private HHUser user;
 	private HHUser userReturned;
 
-	public CreateUserTask(CreateUserTaskCallback callbackTo, HHUser user) {
+	public CreateUserTask(HHUser user, CreateUserTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.user = user;
 	}

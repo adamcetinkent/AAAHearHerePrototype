@@ -13,6 +13,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
@@ -23,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String TAG = "DatabaseHelper";
 	private static final String DB_NAME = "AAAHereHerePrototype";
-	private static final int DB_VERSION = 9;
+	private static final int DB_VERSION = 12;
 
 	public DatabaseHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
@@ -36,6 +38,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(ORMUser.SQL_CREATE_TABLE);
 		db.execSQL(ORMComment.SQL_CREATE_TABLE);
 		db.execSQL(ORMLike.SQL_CREATE_TABLE);
+		db.execSQL(ORMTag.SQL_CREATE_TABLE);
+		db.execSQL(ORMFriendship.SQL_CREATE_TABLE);
 		db.execSQL(ORMCachedSpotifyTrack.SQL_CREATE_TABLE);
 	}
 
@@ -46,6 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(ORMUser.SQL_DROP_TABLE);
 		db.execSQL(ORMComment.SQL_DROP_TABLE);
 		db.execSQL(ORMLike.SQL_DROP_TABLE);
+		db.execSQL(ORMTag.SQL_DROP_TABLE);
+		db.execSQL(ORMFriendship.SQL_DROP_TABLE);
 		db.execSQL(ORMCachedSpotifyTrack.SQL_DROP_TABLE);
 
 		createDatabase(db);
@@ -58,11 +64,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		ORMUser.resetTable(context);
 		ORMComment.resetTable(context);
 		ORMLike.resetTable(context);
+		ORMTag.resetTable(context);
+		ORMFriendship.resetTable(context);
 		ORMCachedSpotifyTrack.resetTable(context);
 
 		Log.d(TAG, "Database reset");
 	}
 
+	public interface ProcessCurrentUserCallback{
+		void returnProcessedCurrentUser(HHUserFull hhUserFull);
+	}
+
+	public static void processCurrentUser(Context context, HHUserFullProcess user, final ProcessCurrentUserCallback callback){
+		// INSERT CURRENT USER
+		ORMUser.insertCurrentUser(
+			context,
+			user,
+			new ORMUser.DBUserInsertCurrentTask.DBUserInsertCurrentTaskCallback() {
+				@Override
+				public void returnInsertedUser(long userID, HHUserFullProcess returnedUser) {
+					testProcessUser(callback, returnedUser);
+				}
+			});
+
+		// INSERT FRIENDSHIPS
+		ORMFriendship.insertFriendshipsFromUser(
+			context,
+			user,
+			new ORMFriendship.DBFriendshipInsertManyFromUserTask.DBFriendshipInsertManyFromUserTaskCallback() {
+				@Override
+				public void returnInsertedManyFriendships(HHUserFullProcess returnedUser) {
+					testProcessUser(callback, returnedUser);
+				}
+			});
+	}
+
+	private static void testProcessUser(final ProcessCurrentUserCallback callback, HHUserFullProcess userToProcess){
+		if (userToProcess.isUserProcessed() && userToProcess.isFriendshipsProcessed()){
+			callback.returnProcessedCurrentUser(new HHUserFull(userToProcess));
+		}
+	}
 
 	public interface GetAllCachedPostsCallback {
 		void returnAllCachedPosts(List<HHPostFull> cachedPosts);
@@ -81,89 +122,108 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	public static void processWebPosts(final Context context, final AsyncDataManager.GetWebPostCallback callback, final List<HHPostFullProcess> webPostsToProcess){
 		// INSERT POSTS INTO DATABASE
-		ORMPost.insertPosts(context, webPostsToProcess,
-							new ORMPost.DBPostInsertManyTask.DBPostInsertManyTaskCallback() {
-								@Override
-								public void returnInsertedManyPosts(List<HHPostFullProcess> postsToProcess) {
-									returnProcessedPosts(callback, postsToProcess);
-								}
-							});
+		ORMPost.insertPosts(
+			context,
+			webPostsToProcess,
+			new ORMPost.DBPostInsertManyTask.DBPostInsertManyTaskCallback() {
+				@Override
+				public void returnInsertedManyPosts(List<HHPostFullProcess> postsToProcess) {
+					returnProcessedPosts(callback, postsToProcess);
+				}
+			});
 
 		// INSERT COMMENTS INTO DATABASE
-		ORMComment.insertCommentsFromPosts(context, webPostsToProcess,
-										   new ORMComment.DBCommentInsertManyFromPostsTask.DBCommentInsertManyFromPostsTaskCallback() {
-											   @Override
-											   public void returnInsertedManyComments(List<HHPostFullProcess> postsToProcess) {
-												   returnProcessedPosts(callback, postsToProcess);
-											   }
-										   });
+		ORMComment.insertCommentsFromPosts(
+			context,
+			webPostsToProcess,
+			new ORMComment.DBCommentInsertManyFromPostsTask.DBCommentInsertManyFromPostsTaskCallback() {
+				@Override
+				public void returnInsertedManyComments(List<HHPostFullProcess> postsToProcess) {
+					returnProcessedPosts(callback, postsToProcess);
+				}
+			});
 
 		// INSERT COMMENTS INTO DATABASE
-		ORMLike.insertLikesFromPosts(context, webPostsToProcess,
-									 new ORMLike.DBLikeInsertManyFromPostsTask.DBLikeInsertManyFromPostsTaskCallback() {
-										 @Override
-										 public void returnInsertedManyLikes(List<HHPostFullProcess> postsToProcess) {
-											 returnProcessedPosts(callback, postsToProcess);
-										 }
-									 });
+		ORMLike.insertLikesFromPosts(
+			context,
+			webPostsToProcess,
+			new ORMLike.DBLikeInsertManyFromPostsTask.DBLikeInsertManyFromPostsTaskCallback() {
+				@Override
+				public void returnInsertedManyLikes(List<HHPostFullProcess> postsToProcess) {
+					returnProcessedPosts(callback, postsToProcess);
+				}
+			});
 
-		// INSERT USERS, COMMENT USERS & LIKE USERS INTO DATABASE
-		ORMUser.insertUsersFromPosts(context, webPostsToProcess,
-									 new ORMUser.DBUserInsertManyFromPostsTask.DBUserInsertManyFromPostsTaskCallback() {
-										 @Override
-										 public void returnInsertedManyUsers(List<HHPostFullProcess> postsToProcess) {
-											 returnProcessedPosts(
-												 callback, postsToProcess);
-										 }
-									 });
+		// INSERT TAGS INTO DATABASE
+		ORMTag.insertTagsFromPosts(
+			context,
+			webPostsToProcess,
+			new ORMTag.DBTagInsertManyFromPostsTask.DBTagInsertManyFromPostsTaskCallback() {
+				@Override
+				public void returnInsertedManyTags(List<HHPostFullProcess> postsToProcess) {
+					returnProcessedPosts(callback, postsToProcess);
+				}
+			});
 
-		ORMCachedSpotifyTrack
-			.getTracksFromPosts(context, webPostsToProcess,
-								new ORMCachedSpotifyTrack.DBCachedSpotifyTrackSelectManyFromPostsTask.DBCachedSpotifyTrackSelectManyFromPostsTaskCallback() {
+		// INSERT USERS, COMMENT USERS, LIKE USERS, TAG USERS INTO DATABASE
+		ORMUser.insertUsersFromPosts(
+			context,
+			webPostsToProcess,
+			new ORMUser.DBUserInsertManyFromPostsTask.DBUserInsertManyFromPostsTaskCallback() {
+				@Override
+				public void returnInsertedManyUsers(List<HHPostFullProcess> postsToProcess) {
+					returnProcessedPosts(callback, postsToProcess);
+				}
+			});
+
+		ORMCachedSpotifyTrack.getTracksFromPosts(
+			context,
+			webPostsToProcess,
+			new ORMCachedSpotifyTrack.DBCachedSpotifyTrackSelectManyFromPostsTask.DBCachedSpotifyTrackSelectManyFromPostsTaskCallback() {
+				@Override
+				public void returnSelectedManyCachedSpotifyTracks(final List<HHPostFullProcess> posts) {
+					for (final HHPostFullProcess postToProcess : posts) {
+						if (postToProcess.isTrackProcessed()) {
+
+							// TRACK ALREADY IN CACHE
+							testProcessPost(callback,
+											postToProcess,
+											posts);
+
+						} else {
+
+							// GET TRACK FROM WEB
+							WebHelper.getSpotifyTrack(
+								postToProcess.getPost().getTrack(),
+								new WebHelper.GetSpotifyTrackCallback() {
 									@Override
-									public void returnSelectedManyCachedSpotifyTracks(final List<HHPostFullProcess> posts) {
-										for (final HHPostFullProcess postToProcess : posts) {
-											if (postToProcess.isTrackProcessed()) {
+									public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
 
-												// TRACK ALREADY IN CACHE
-												testProcessPost(callback,
-																postToProcess,
-																posts);
+										postToProcess.setTrack(
+											new HHCachedSpotifyTrack(
+												spotifyTrack));
 
-											} else {
-
-												// GET TRACK FROM WEB
-												WebHelper.getSpotifyTrack(
-													postToProcess.getPost().getTrack(),
-													new WebHelper.GetSpotifyTrackCallback() {
-														@Override
-														public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
-
-															postToProcess.setTrack(
-																new HHCachedSpotifyTrack(
-																	spotifyTrack));
-
-															// INSERT TRACK INTO DATABASE
-															ORMCachedSpotifyTrack
-																.insertTrackFromPosts(
-																	context,
-																	postToProcess,
-																	new ORMCachedSpotifyTrack.DBCachedSpotifyTrackInsertFromPostTask.DBCachedSpotifyTrackInsertFromPostTaskCallback() {
-																		@Override
-																		public void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess) {
-																			testProcessPost(
-																				callback,
-																				postToProcess,
-																				posts);
-																		}
-																	});
-														}
-													});
-
-											}
-										}
+										// INSERT TRACK INTO DATABASE
+										ORMCachedSpotifyTrack
+											.insertTrackFromPosts(
+												context,
+												postToProcess,
+												new ORMCachedSpotifyTrack.DBCachedSpotifyTrackInsertFromPostTask.DBCachedSpotifyTrackInsertFromPostTaskCallback() {
+													@Override
+													public void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess) {
+														testProcessPost(
+															callback,
+															postToProcess,
+															posts);
+													}
+												});
 									}
 								});
+
+						}
+					}
+				}
+			});
 
 	}
 
@@ -174,7 +234,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	private static void testProcessPost(final AsyncDataManager.GetWebPostCallback callback, HHPostFullProcess postToProcess, List<HHPostFullProcess> postsToProcess){
-		if (postToProcess.isPostProcessed() && postToProcess.isTrackProcessed() && postToProcess.isUsersProcessed() && postToProcess.isCommentsProcessed()){
+		if (postToProcess.isPostProcessed()
+			&& postToProcess.isTrackProcessed()
+			&& postToProcess.isUsersProcessed()
+			&& postToProcess.isCommentsProcessed()
+			&& postToProcess.isTagsProcessed()){
+
 			postsToProcess.remove(postsToProcess);
 			callback.returnWebPost(new HHPostFull(postToProcess));
 		}

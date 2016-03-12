@@ -41,27 +41,8 @@ public class HHComment extends HHLike {
 		this.message = cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_MESSAGE_NAME));
 	}
 
-	public long getID() {
-		return id;
-	}
-
-	public long getPostID() {
-		return post_id;
-	}
-
-	public long getUserID() {
-		return user_id;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
-	public Timestamp getUpdatedAt() {
-		return updated_at;
-	}
-
-	public Timestamp getCreatedAt() {
-		return created_at;
-	}
 }

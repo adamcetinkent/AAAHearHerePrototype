@@ -248,7 +248,7 @@ public class FeedFragment extends Fragment {
 						viewHolder.btnLikeButton.setEnabled(false);
 						if (isChecked) {
 							HHLike like = new HHLike(viewHolder.post.getPost().getID(),
-														 HHUser.getCurrentUser().getID());
+														 HHUser.getCurrentUser().getUser().getID());
 							AsyncDataManager
 								.postLike(like, new AsyncDataManager.PostLikeCallback() {
 									@Override
@@ -543,7 +543,7 @@ public class FeedFragment extends Fragment {
 							return;
 						final long post_id = posts.get(groupPosition).getPost().getID();
 						HHComment comment = new HHComment(post_id,
-															  HHUser.getCurrentUser().getID(),
+															  HHUser.getCurrentUser().getUser().getID(),
 															  message);
 						AsyncDataManager
 							.postComment(comment, new AsyncDataManager.PostCommentCallback() {

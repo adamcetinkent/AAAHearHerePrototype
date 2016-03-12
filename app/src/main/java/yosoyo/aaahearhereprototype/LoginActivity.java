@@ -24,17 +24,11 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import java.net.HttpURLConnection;
-
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 
-public class LoginActivity extends Activity implements FacebookCallback<LoginResult>,
-	AuthenticateUserFacebookTask.AuthenticateUserFacebookTaskCallback,
-	CreateUserTask.CreateUserTaskCallback,
-	View.OnClickListener
+public class LoginActivity extends Activity implements View.OnClickListener
 {
 	private static final String TAG = "LoginActivity";
 
@@ -43,13 +37,15 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 	private Button continueButton;
 	private Button shortcutButton;
 	private ProgressDialog progressDialog;
-	private HHUser user;
+	//private HHUser user;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		Log.d(TAG, "onCreate: started");
+
+		AsyncDataManager.setContext(this);
 
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
 		setContentView(R.layout.activity_main);
@@ -67,7 +63,24 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 		callbackManager = CallbackManager.Factory.create();
 		LoginButton loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
 		loginButton.setReadPermissions("user_friends");
-		loginButton.registerCallback(callbackManager, this);
+		loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+			@Override
+			public void onSuccess(LoginResult loginResult) {
+				startHearHereAuthentication();
+
+				Log.d(TAG, "signed in on Facebook!/n" + loginResult.toString());
+			}
+
+			@Override
+			public void onCancel() {
+				Log.e(TAG, "cancelled Facebook log in!");
+			}
+
+			@Override
+			public void onError(FacebookException error) {
+				Log.e(TAG, "error in Facebook log in!");
+			}
+		});
 
 		AccessTokenTracker accessTokenTracker = new AccessTokenTracker(){
 			@Override
@@ -116,20 +129,6 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 		callbackManager.onActivityResult(requestCode, resultCode, data);
 	}
 
-	@Override
-	public void returnAuthenticationResult(Integer result, HHUser user) {
-		if (result == HttpURLConnection.HTTP_OK) {
-			this.user = user;
-			facebookSignInSucceeded();
-		} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
-			Toast.makeText(this, "Creating new user...", Toast.LENGTH_LONG);
-			this.user = new HHUser(Profile.getCurrentProfile());
-			new CreateUserTask(this, this.user).execute();
-		} else {
-			facebookSignInFailed();
-		}
-	}
-
 	private void facebookSignInFailed(){
 		facebookSignInName.setText("LOGIN FAILED");
 		Toast.makeText(this, "Facebook Sign In Failed!", Toast.LENGTH_LONG);
@@ -147,8 +146,6 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 
 	private void proceedToHolderActivity(){
 		Intent intent = new Intent(getApplicationContext(), HolderActivity.class);
-
-		HHUser.setCurrentUser(user);
 
 		startActivity(intent);
 	}
@@ -169,14 +166,6 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 		AppEventsLogger.deactivateApp(this);
 	}
 
-
-	@Override
-	public void onSuccess(LoginResult loginResult) {
-		startHearHereAuthentication();
-
-		Log.d(TAG, "signed in on Facebook!/n" + loginResult.toString());
-	}
-
 	private void startHearHereAuthentication(){
 		AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
@@ -187,22 +176,19 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 		progressDialog.setCancelable(false);
 		progressDialog.show();
 
-		new AuthenticateUserFacebookTask(this, accessToken).execute();
-	}
 
-	@Override
-	public void onCancel() {
-		Log.e(TAG, "cancelled Facebook log in!");
-	}
-
-	@Override
-	public void onError(FacebookException error) {
-		Log.e(TAG, "error in Facebook log in!");
-	}
-
-	@Override
-	public void returnResultCreateUser(Boolean success, HHUser userReturned) {
-		facebookSignInSucceeded();
+		AsyncDataManager.authenticateUser(
+			accessToken,
+			new AsyncDataManager.AuthenticateUserCallback() {
+				@Override
+				public void returnAuthenticationResult(boolean success) {
+					if (success) {
+						facebookSignInSucceeded();
+					} else {
+						facebookSignInFailed();
+					}
+				}
+			});
 	}
 
 	@Override
@@ -215,7 +201,7 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 				}
 			}
 			case (R.id.btnShortcut): {
-				user = new HHUser(Profile.getCurrentProfile());
+				HHUser.setCurrentUser(new HHUserFull(Profile.getCurrentProfile()));
 				proceedToHolderActivity();
 				break;
 			}
@@ -240,18 +226,6 @@ public class LoginActivity extends Activity implements FacebookCallback<LoginRes
 						imageView.setImageBitmap(bitmap);
 					}
 				});
-
-			/*new GraphRequest(
-				AccessToken.getCurrentAccessToken(),
-				"/me/friends/",
-				null,
-				HttpMethod.GET,
-				new GraphRequest.Callback() {
-					public void onCompleted(GraphResponse response) {
-            			Log.d(TAG, "User friends:" + response.toString());
-					}
-				}
-			).executeAsync();*/
 
 		} else {
 			facebookSignInName.setText("Logged Out");

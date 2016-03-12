@@ -38,9 +38,10 @@ public class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>>
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		Log.d(TAG, "Fetching Posts from " + VM_SERVER_ADDRESS + HHUser.getCurrentUser().getID());
+		Log.d(TAG, "Fetching Posts from " + VM_SERVER_ADDRESS + HHUser.getCurrentUser().getUser()
+																	  .getID());
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS + HHUser.getCurrentUser().getID());
+			URL url = new URL(VM_SERVER_ADDRESS + HHUser.getCurrentUser().getUser().getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

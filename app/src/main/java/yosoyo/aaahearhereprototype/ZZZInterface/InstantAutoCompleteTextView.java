@@ -1,7 +1,9 @@
-package yosoyo.aaahearhereprototype;
+package yosoyo.aaahearhereprototype.ZZZInterface;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.AutoCompleteTextView;
 
@@ -14,12 +16,17 @@ public class InstantAutoCompleteTextView extends AutoCompleteTextView {
 		super(context);
 	}
 
-	public InstantAutoCompleteTextView(Context arg0, AttributeSet arg1) {
-		super(arg0, arg1);
+	public InstantAutoCompleteTextView(Context context, AttributeSet attrs) {
+		super(context, attrs);
 	}
 
-	public InstantAutoCompleteTextView(Context arg0, AttributeSet arg1, int arg2) {
-		super(arg0, arg1, arg2);
+	public InstantAutoCompleteTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
+
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public InstantAutoCompleteTextView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
 	}
 
 	@Override

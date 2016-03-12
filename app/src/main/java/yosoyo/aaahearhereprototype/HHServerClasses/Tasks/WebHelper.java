@@ -11,6 +11,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
 
@@ -49,6 +50,19 @@ public class WebHelper {
 			@Override
 			public void returnPost(HHPostFullProcess post) {
 				callback.returnWebPost(post);
+			}
+		}).execute();
+	}
+
+	public interface PostPostCallback {
+		void returnPostedPost(boolean success, HHPostFullProcess webPostToProcess);
+	}
+
+	public static void postPost(HHPostTagsArray post, final PostPostCallback callback){
+		new CreatePostTask(post, new CreatePostTask.CreatePostTaskCallback() {
+			@Override
+			public void returnResultCreatePost(Boolean success, HHPostFullProcess postToProcess) {
+				callback.returnPostedPost(success, postToProcess);
 			}
 		}).execute();
 	}

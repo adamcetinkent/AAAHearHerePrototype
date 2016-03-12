@@ -110,7 +110,25 @@ public class ORMPostFull {
 					}
 
 					{
+						Cursor cursorTag = database.rawQuery(
+							"SELECT * FROM " + ORMTag.TABLE_NAME
+								+ " LEFT JOIN " + ORMUser.TABLE_NAME
+								+ " ON " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
+								+ " WHERE " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_POST_ID_NAME + " = ?"
+							, new String[]{String.valueOf(post.getPost().getID())});
+
+						int numTags = cursorTag.getCount();
+						Log.d(TAG, "Loaded " + numTags + " Tags...");
 						List<HHTagUser> tags = new ArrayList<>();
+						if (numTags > 0) {
+							cursorTag.moveToFirst();
+							while (!cursorTag.isAfterLast()) {
+								HHTagUser tagUser = new HHTagUser(cursorTag);
+								tags.add(tagUser);
+								cursorTag.moveToNext();
+							}
+						}
+						cursorTag.close();
 						post.setTags(tags);
 					}
 

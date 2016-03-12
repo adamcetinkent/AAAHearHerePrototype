@@ -2,6 +2,10 @@ package yosoyo.aaahearhereprototype;
 
 import android.content.Context;
 
+import com.facebook.AccessToken;
+import com.facebook.Profile;
+
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +14,12 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 
 /**
@@ -22,6 +32,44 @@ public class AsyncDataManager {
 
 	public static void setContext(Context newContext){
 		context = newContext;
+	}
+
+	public interface AuthenticateUserCallback {
+		void returnAuthenticationResult(boolean success);
+	}
+
+	public static void authenticateUser(AccessToken accessToken, final AuthenticateUserCallback callback){
+		new AuthenticateUserFacebookTask(
+			accessToken,
+			new AuthenticateUserFacebookTask.AuthenticateUserFacebookTaskCallback() {
+				@Override
+				public void returnAuthenticationResult(Integer result, HHUserFullProcess returnedUser) {
+					if (result == HttpURLConnection.HTTP_OK) {
+						HHUser.setCurrentUser(returnedUser);
+						DatabaseHelper.processCurrentUser(
+							context,
+							returnedUser,
+							new DatabaseHelper.ProcessCurrentUserCallback() {
+								@Override
+								public void returnProcessedCurrentUser(HHUserFull hhUserFull) {
+									callback.returnAuthenticationResult(true);
+								}
+							});
+					} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
+						HHUser user = new HHUser(Profile.getCurrentProfile());
+						new CreateUserTask(
+							user,
+							new CreateUserTask.CreateUserTaskCallback() {
+								@Override
+								public void returnResultCreateUser(Boolean success, HHUser userReturned) {
+									callback.returnAuthenticationResult(true);
+								}
+							}).execute();
+					} else {
+						callback.returnAuthenticationResult(false);
+					}
+				}
+			}).execute();
 	}
 
 	public interface GetWebPostCallback {
@@ -63,6 +111,19 @@ public class AsyncDataManager {
 				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
 				webPostsToProcess.add(webPostToProcess);
 				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+			}
+		});
+	}
+
+	public interface PostPostCallback{
+		void returnPostedPost(boolean success, HHPostFullProcess returnedPost);
+	}
+
+	public static void postPost(final HHPostTagsArray post, final PostPostCallback callback){
+		WebHelper.postPost(post, new WebHelper.PostPostCallback() {
+			@Override
+			public void returnPostedPost(boolean success, HHPostFullProcess webPostToProcess) {
+				callback.returnPostedPost(success, webPostToProcess);
 			}
 		});
 	}

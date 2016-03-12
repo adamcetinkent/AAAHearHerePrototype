@@ -14,12 +14,22 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextWatcher;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,15 +43,21 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import yosoyo.aaahearhereprototype.AddressPicker;
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
+import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreatePostTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.PostFragmentPostedListener;
@@ -50,12 +66,13 @@ import yosoyo.aaahearhereprototype.SearchResultsActivity;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PostFragment extends Fragment
-	implements CreatePostTask.CreatePostTaskCallback {
+	/*implements CreatePostTask.CreatePostTaskCallback*/ {
 
 	public static final String TAG = "PostFragment";
 
@@ -72,7 +89,7 @@ public class PostFragment extends Fragment
 	private TextView txtTrack;
 	private TextView txtArtist;
 	private TextView txtAlbum;
-	private TextView txtMessage;
+	private TaggableEditText txtMessage;
 	private TextView txtDateTime;
 	private TextView txtLocation;
 	private ImageView imgAlbumArt;
@@ -110,7 +127,7 @@ public class PostFragment extends Fragment
 
 		final View view = inflater.inflate(R.layout.fragment_post, container, false);
 
-		TextView txtUserName = (TextView) view.findViewById(R.id.post_fragment_txtUserName);
+		final TextView txtUserName = (TextView) view.findViewById(R.id.post_fragment_txtUserName);
 		txtUserName.setText(Profile.getCurrentProfile().getName());
 
 		txtDateTime = (TextView) view.findViewById(R.id.post_fragment_txtDateTime);
@@ -157,7 +174,7 @@ public class PostFragment extends Fragment
 		searchViewTrack = (SearchView) view.findViewById(R.id.post_fragment_searchTrackName);
 		searchViewArtist = (SearchView) view.findViewById(R.id.post_fragment_searchArtist);
 		searchViewAlbum = (SearchView) view.findViewById(R.id.post_fragment_searchAlbum);
-		txtMessage = (TextView) view.findViewById(R.id.post_fragment_txtMessage);
+		txtMessage = (TaggableEditText) view.findViewById(R.id.post_fragment_txtMessage);
 		txtTrack = (TextView) view.findViewById(R.id.post_fragment_txtTrackName);
 		txtArtist = (TextView) view.findViewById(R.id.post_fragment_txtArtist);
 		txtAlbum = (TextView) view.findViewById(R.id.post_fragment_txtAlbum);
@@ -315,20 +332,151 @@ public class PostFragment extends Fragment
 		postButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (spotifyTrack == null){
+				if (spotifyTrack == null) {
 					Toast.makeText(getActivity(), "No track selected!", Toast.LENGTH_SHORT).show();
 					return;
 				}
-				HHPost post = new HHPost(HHUser.getCurrentUser().getID(), spotifyTrack.getID(), lastLocation.getLatitude(), lastLocation.getLongitude(), txtMessage.getText().toString(), placeName, googlePlaceID);
-				new CreatePostTask(PostFragment.this, post).execute();
+				HHPostTagsArray post = new HHPostTagsArray(
+					HHUser.getCurrentUser().getUser().getID(),
+					spotifyTrack.getID(),
+					lastLocation.getLatitude(),
+					lastLocation.getLongitude(),
+					txtMessage.getText().toString(),
+					placeName,
+					googlePlaceID,
+					new long[]{1, 2, 3}
+				);
+				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
+					@Override
+					public void returnPostedPost(boolean success, HHPostFullProcess returnedPost) {
+						postFragmentPostedListener.onPostFragmentPosted();
+					}
+				});
 				postButton.setVisibility(View.INVISIBLE);
-				ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.post_fragment_progressBar);
+				ProgressBar progressBar = (ProgressBar) view
+					.findViewById(R.id.post_fragment_progressBar);
 				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
+
+		txtMessage.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+				if (txtMessage.isListenerBlocked())
+					return;
+
+				if (count == 0){ // deletion
+					if (txtMessage.isTagging() && start > 0 && s.charAt(start-1) != '@'){
+						txtMessage.setListenerBlock(true);
+						txtMessage.setText(
+							s.subSequence(0, s.subSequence(0, start).toString().lastIndexOf('@'))
+							 .toString() + txtMessage.getSuffix());
+						txtMessage.setSelection(s.subSequence(0, start).toString().lastIndexOf('@'));
+						txtMessage.setListenerBlock(false);
+					}
+					txtMessage.setIsTagging(false);
+					txtMessage.showSuggestions(false);
+					return;
+				}
+
+				if (!txtMessage.isTagging()) {
+					if (s.charAt(start) == '@'){
+						txtMessage.setIsTagging(true);
+						txtMessage.showSuggestions(true);
+						txtMessage.setPrefix(s.subSequence(0, start));
+						txtMessage.setSuffix(s.subSequence(start+1, s.length()));
+					}
+				} else {
+
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
+		txtMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (!hasFocus) {
+					txtMessage.showSuggestions(false);
+					txtMessage.setIsTagging(false);
+				}
+			}
+		});
+		final List<HHUser> userList = new ArrayList<>();
+		HHUserFull currentUser = HHUser.getCurrentUser();
+		for (HHFriendshipUser friendship: currentUser.getFriendships()){
+			userList.add(friendship.getUser());
+		}
+		final TagArrayAdapter tagArrayAdapter = new TagArrayAdapter(getActivity(), userList);
+		txtMessage.setAdapter(tagArrayAdapter);
+		txtMessage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				/*String str = txtMessage.getPrefix()
+					+ ((HHUser) tagArrayAdapter.getItem(position)).getName()
+					+ txtMessage.getSuffix();
+				txtMessage.setText(str);*/
+				//int tagNo = txtMessage.addTag((HHUser) tagArrayAdapter.getItem(position), true, txtMessage.getPrefix().length());
+				//String str = txtMessage.getPrefix() + "$tag" + String.format("%1$02d", tagNo) + "$" + txtMessage.getSuffix();
+
+				HHUser user = ((HHUser) tagArrayAdapter.getItem(position));
+				/*String strLink = "<a href=" + user.getID() + ">" + ((HHUser) tagArrayAdapter.getItem(position)).getName() + "</a>";
+				String strAll = txtMessage.getPrefix() + strLink + txtMessage.getSuffix();*/
+				HHUserSpan userSpan = new HHUserSpan(user);
+
+				int selectionEnd = setTaggableText(txtMessage, userSpan, user);
+				txtMessage.setSelection(selectionEnd);
+
+				txtMessage.setIsTagging(false);
+				txtMessage.showSuggestions(false);
 			}
 		});
 
 		return view;
 	}
+
+	private int setTaggableText(TaggableEditText text, HHUserSpan userSpan, HHUser user){
+		CharSequence prefix = txtMessage.getPrefix();
+		CharSequence spanStr = userSpan.toString();
+		SpannableStringBuilder ssb = new SpannableStringBuilder(prefix);
+		ssb.append(spanStr);
+		ssb.append(txtMessage.getSuffix());
+		ssb.setSpan(userSpan, prefix.length(), prefix.length() + spanStr.length(),
+					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+		HHUserSpan[] spans = ssb.getSpans(0, ssb.length(), HHUserSpan.class);
+		int selectionEnd = 0;
+		for (HHUserSpan span : spans){
+			//makeLinkClickable(ssb, span);
+			if (span.user.equals(user)){
+				selectionEnd = ssb.getSpanEnd(span);
+			}
+		}
+		text.setText(ssb);
+		return selectionEnd;
+	}
+
+	/*private void makeLinkClickable(SpannableStringBuilder ssb, final URLSpan span){
+		int start = ssb.getSpanStart(span);
+		int end = ssb.getSpanEnd(span);
+		int flags = ssb.getSpanFlags(span);
+		ClickableSpan clickable = new ClickableSpan(span.) {
+			@Override
+			public void onClick(View view) {
+				Toast.makeText(getActivity(), "Span Clicked!", Toast.LENGTH_SHORT).show();
+			}
+		};
+		ssb.setSpan(clickable, start, end, flags);
+		ssb.removeSpan(span);
+	}*/
 
 	protected void startIntentService() {
 		Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
@@ -389,14 +537,15 @@ public class PostFragment extends Fragment
 					llSearch.setVisibility(View.GONE);
 					llText.setVisibility(View.VISIBLE);
 
-					WebHelper.getSpotifyAlbumArt(spotifyTrack.getID(),
-												 spotifyTrack.getImages(0).getUrl(),
-												 new WebHelper.GetSpotifyAlbumArtCallback() {
-													 @Override
-													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-														 imgAlbumArt.setImageBitmap(bitmap);
-													 }
-												 });
+					WebHelper.getSpotifyAlbumArt(
+						spotifyTrack.getID(),
+						spotifyTrack.getImages(0).getUrl(),
+						new WebHelper.GetSpotifyAlbumArtCallback() {
+							@Override
+							public void returnSpotifyAlbumArt(Bitmap bitmap) {
+								imgAlbumArt.setImageBitmap(bitmap);
+							}
+						});
 				}
 				break;
 			}
@@ -414,14 +563,15 @@ public class PostFragment extends Fragment
 						searchViewArtist.clearFocus();
 					}
 
-					WebHelper.getSpotifyAlbumArt(spotifyArtist.getID(),
-												 spotifyArtist.getImages(0).getUrl(),
-												 new WebHelper.GetSpotifyAlbumArtCallback() {
-													 @Override
-													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-														 imgAlbumArt.setImageBitmap(bitmap);
-													 }
-												 });
+					WebHelper.getSpotifyAlbumArt(
+						spotifyArtist.getID(),
+						spotifyArtist.getImages(0).getUrl(),
+						new WebHelper.GetSpotifyAlbumArtCallback() {
+							@Override
+							public void returnSpotifyAlbumArt(Bitmap bitmap) {
+								imgAlbumArt.setImageBitmap(bitmap);
+							}
+						});
 				}
 				break;
 			}
@@ -437,14 +587,15 @@ public class PostFragment extends Fragment
 						searchViewArtist.setQueryHint(spotifyAlbum.getArtistName());
 					}
 
-					WebHelper.getSpotifyAlbumArt(spotifyAlbum.getID(),
-												 spotifyAlbum.getImages(0).getUrl(),
-												 new WebHelper.GetSpotifyAlbumArtCallback() {
-													 @Override
-													 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-														 imgAlbumArt.setImageBitmap(bitmap);
-													 }
-												 });
+					WebHelper.getSpotifyAlbumArt(
+						spotifyAlbum.getID(),
+						spotifyAlbum.getImages(0).getUrl(),
+						new WebHelper.GetSpotifyAlbumArtCallback() {
+							@Override
+							public void returnSpotifyAlbumArt(Bitmap bitmap) {
+								imgAlbumArt.setImageBitmap(bitmap);
+							}
+						});
 				}
 				break;
 			}
@@ -461,12 +612,155 @@ public class PostFragment extends Fragment
 
 	}
 
-	@Override
-	public void returnResultCreatePost(Boolean success, HHPostFull postReturned) {
-		if (success) {
-			Log.d(TAG, "New Post created!");
-			postFragmentPostedListener.onPostFragmentPosted();
+	private class TagArrayAdapter extends BaseAdapter implements Filterable {
+
+		private Activity context;
+		private List<HHUser> users;
+		private List<HHUser> filteredUsers;
+		private int maxLength = 5;
+
+		public TagArrayAdapter(Activity context, List<HHUser> users) {
+			this.context = context;
+			this.users = users;
 		}
+
+		@Override
+		public int getCount() {
+			if (filteredUsers == null)
+				return 0;
+			return filteredUsers.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			if (filteredUsers == null)
+				return null;
+			return filteredUsers.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			if (filteredUsers == null)
+				return -1;
+			return filteredUsers.get(position).getID();
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			LayoutInflater inflater = context.getLayoutInflater();
+			View rowView = inflater.inflate(R.layout.list_row_place, null, true);
+
+			TextView txtPlace = (TextView) rowView.findViewById(R.id.list_row_place_txtPlace);
+			txtPlace.setText(filteredUsers.get(position).getName());
+
+			return rowView;
+		}
+
+		Filter filter = new Filter() {
+			@Override
+			protected FilterResults performFiltering(CharSequence constraint) {
+				FilterResults filterResults = new FilterResults();
+
+				if (!txtMessage.isTagging() || users == null)
+					return null;
+
+				constraint = constraint.subSequence(txtMessage.getTagStart()+1, constraint.length() - txtMessage.getTagSuffixLength());
+
+				Spanned spanned = (Spanned) txtMessage.getText();
+				HHUserSpan[] spans = spanned.getSpans(0, spanned.length(), HHUserSpan.class);
+				ArrayList<HHUser> alreadyTagged = new ArrayList<>();
+				for (HHUserSpan span : spans){
+					alreadyTagged.add(span.user);
+				}
+
+				ArrayList<HHUser> filtered = new ArrayList<>();
+
+				for (int i = 0; i < users.size(); i++) {
+					HHUser testUser = users.get(i);
+					if (alreadyTagged(testUser, alreadyTagged))
+						continue;
+					if (constraint.toString().toLowerCase().equals(constraint.toString())) {
+						if (testUser.getName().toLowerCase().contains(constraint)) {
+							filtered.add(testUser);
+							if (filtered.size() > maxLength)
+								break;
+						}
+					} else {
+						if (testUser.getName().contains(constraint)) {
+							filtered.add(testUser);
+							if (filtered.size() > maxLength)
+								break;
+						}
+					}
+				}
+
+				Collections.sort(filtered, new Comparator<HHUser>() {
+					@Override
+					public int compare(HHUser lhs, HHUser rhs) {
+						return (lhs.getLastName()+lhs.getFirstName()).compareTo(rhs.getLastName()+rhs.getFirstName());
+					}
+				});
+				filterResults.values = filtered;
+				filterResults.count = filtered.size();
+
+				return filterResults;
+			}
+
+			private boolean alreadyTagged(HHUser testUser, List<HHUser> alreadyTagged){
+				for (HHUser taggedUser : alreadyTagged){
+					if (testUser.equals(taggedUser))
+						return true;
+				}
+				return false;
+			}
+
+			@Override
+			protected void publishResults(CharSequence constraint, FilterResults results) {
+				if (txtMessage.isTagging() && users != null) {
+					filteredUsers = (ArrayList<HHUser>) results.values;
+					notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public CharSequence convertResultToString(Object resultValue) {
+				if (resultValue instanceof HHUser){
+					return ((HHUser) resultValue).toCharSequence();
+				}
+				return super.convertResultToString(resultValue);
+			}
+		};
+
+		@Override
+		public Filter getFilter() {
+			return filter;
+		}
+
+	}
+
+	public static class HHUserSpan extends ClickableSpan {
+		private final HHUser user;
+
+		public HHUserSpan(HHUser user){
+			super();
+			this.user = user;
+		}
+
+		@Override
+		public void updateDrawState(TextPaint ds){
+			ds.setUnderlineText(true);
+			ds.setColor(Color.BLUE);
+		}
+
+		@Override
+		public void onClick(View view){
+		}
+
+		@Override
+		public String toString(){
+			return user.getName();
+		}
+
 	}
 
 }
