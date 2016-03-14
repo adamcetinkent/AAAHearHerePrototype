@@ -1,11 +1,10 @@
 package yosoyo.aaahearhereprototype.ZZZInterface;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 
@@ -16,14 +15,11 @@ public class TaggableEditText extends InstantAutoCompleteTextView {
 	private static final String TAG = "TaggableEditText";
 
 	boolean listenerBlock = false;
-	boolean showSuggestions = false;
 	boolean isTagging = false;
 	CharSequence suffix;
 	CharSequence prefix;
 	int tagStart;
 	int tagSuffixLength;
-	List<TextTag> tags = new ArrayList<>();
-	List<Object> blocks = new ArrayList<>();
 
 	private class TextTag{
 		private HHUser user;
@@ -63,11 +59,7 @@ public class TaggableEditText extends InstantAutoCompleteTextView {
 
 	@Override
 	public boolean enoughToFilter() {
-		return showSuggestions;
-	}
-
-	public void showSuggestions(boolean show){
-		showSuggestions = show;
+		return isTagging;
 	}
 
 	public boolean isTagging() {
@@ -107,10 +99,47 @@ public class TaggableEditText extends InstantAutoCompleteTextView {
 		return tagSuffixLength;
 	}
 
-	public int addTag(HHUser user, boolean fullName, int position){
-		tags.add(new TextTag(user, fullName, position));
-		Log.d(TAG, "added new Tag");
-		return tags.size();
-	}
+	@Override
+	protected void onSelectionChanged(int selStart, int selEnd) {
+		super.onSelectionChanged(selStart, selEnd);
+		Editable text = getText();
+		ClickableSpan[] spans = text.getSpans(0, text.length(), ClickableSpan.class);
+		if (spans.length > 0) {
+			for (ClickableSpan span : spans){
+				int spanStart = text.getSpanStart(span);
+				int spanEnd = text.getSpanEnd(span);
 
+				if ((selStart < spanStart && selEnd > spanEnd)
+					|| (selStart > spanEnd && selEnd > spanEnd)
+					|| (selStart < spanStart && selEnd < spanStart))
+					continue;
+
+				if (selStart == selEnd) {
+					if (selStart > spanStart && selEnd < spanEnd) {
+						if ((selStart - spanStart) < (spanEnd - selStart)) {
+							setSelection(spanEnd);
+						} else {
+							setSelection(spanStart);
+						}
+					}
+					continue;
+				}
+
+				int minStart = Math.min(spanStart, selStart);
+				int maxEnd = Math.max(spanEnd, selEnd);
+				int spanCutoffStart = spanStart + (spanEnd - spanStart)/3;
+				int spanCutoffEnd = spanStart + 2 * (spanEnd - spanStart)/3;
+				if (selStart > spanCutoffStart && selStart > spanStart){
+					setSelection(spanEnd, maxEnd);
+					Log.d(TAG, "spanEnd, maxEnd");
+				} else if (selEnd < spanCutoffEnd && selEnd > spanStart){
+					setSelection(minStart, spanStart);
+					Log.d(TAG, "minStart, spanStart");
+				} else {
+					setSelection(minStart, maxEnd);
+					Log.d(TAG, "minStart, maxEnd");
+				}
+			}
+		}
+	}
 }

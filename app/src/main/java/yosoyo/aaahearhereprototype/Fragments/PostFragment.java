@@ -17,9 +17,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextWatcher;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,6 +53,7 @@ import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHTag;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
@@ -336,15 +335,29 @@ public class PostFragment extends Fragment
 					Toast.makeText(getActivity(), "No track selected!", Toast.LENGTH_SHORT).show();
 					return;
 				}
+
+				Editable message = txtMessage.getText();
+				HHUser.HHUserSpan[] spans = message.getSpans(0, message.length(), HHUser.HHUserSpan.class);
+				HHTag[] tags = new HHTag[spans.length];
+				for (int i = 0; i < spans.length; i++){
+					HHUser.HHUserSpan span = spans[i];
+					message.replace(
+						message.getSpanStart(span),
+						message.getSpanEnd(span),
+						"{tag_"+String.format("%1$02d", i)+"}"
+					);
+					tags[i] = new HHTag(0, span.getUser().getID());
+				}
+
 				HHPostTagsArray post = new HHPostTagsArray(
 					HHUser.getCurrentUser().getUser().getID(),
 					spotifyTrack.getID(),
 					lastLocation.getLatitude(),
 					lastLocation.getLongitude(),
-					txtMessage.getText().toString(),
+					message.toString(),
 					placeName,
 					googlePlaceID,
-					new long[]{1, 2, 3}
+					tags
 				);
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
 					@Override
@@ -371,26 +384,42 @@ public class PostFragment extends Fragment
 				if (txtMessage.isListenerBlocked())
 					return;
 
-				if (count == 0){ // deletion
-					if (txtMessage.isTagging() && start > 0 && s.charAt(start-1) != '@'){
+				if (count == 0) { // deletion
+					if (txtMessage.isTagging() && start > 0 && s.charAt(start - 1) != '@') {
 						txtMessage.setListenerBlock(true);
 						txtMessage.setText(
 							s.subSequence(0, s.subSequence(0, start).toString().lastIndexOf('@'))
 							 .toString() + txtMessage.getSuffix());
-						txtMessage.setSelection(s.subSequence(0, start).toString().lastIndexOf('@'));
+						txtMessage
+							.setSelection(s.subSequence(0, start).toString().lastIndexOf('@'));
 						txtMessage.setListenerBlock(false);
+					} else {
+						Editable text = txtMessage.getText();
+						HHUser.HHUserSpan[] spans = text.getSpans(0, text.length(), HHUser.HHUserSpan.class);
+						if (spans.length > 0) {
+							for (HHUser.HHUserSpan span : spans) {
+								int spanStart = text.getSpanStart(span);
+								int spanEnd = text.getSpanEnd(span);
+								if (start > spanStart && start <= spanEnd) {
+									text.replace(
+										spanStart,
+										spanEnd,
+										""
+									);
+									text.removeSpan(span);
+								}
+							}
+						}
 					}
 					txtMessage.setIsTagging(false);
-					txtMessage.showSuggestions(false);
 					return;
 				}
 
 				if (!txtMessage.isTagging()) {
-					if (s.charAt(start) == '@'){
+					if (s.charAt(start) == '@') {
 						txtMessage.setIsTagging(true);
-						txtMessage.showSuggestions(true);
 						txtMessage.setPrefix(s.subSequence(0, start));
-						txtMessage.setSuffix(s.subSequence(start+1, s.length()));
+						txtMessage.setSuffix(s.subSequence(start + 1, s.length()));
 					}
 				} else {
 
@@ -406,11 +435,11 @@ public class PostFragment extends Fragment
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if (!hasFocus) {
-					txtMessage.showSuggestions(false);
 					txtMessage.setIsTagging(false);
 				}
 			}
 		});
+
 		final List<HHUser> userList = new ArrayList<>();
 		HHUserFull currentUser = HHUser.getCurrentUser();
 		for (HHFriendshipUser friendship: currentUser.getFriendships()){
@@ -421,30 +450,21 @@ public class PostFragment extends Fragment
 		txtMessage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				/*String str = txtMessage.getPrefix()
-					+ ((HHUser) tagArrayAdapter.getItem(position)).getName()
-					+ txtMessage.getSuffix();
-				txtMessage.setText(str);*/
-				//int tagNo = txtMessage.addTag((HHUser) tagArrayAdapter.getItem(position), true, txtMessage.getPrefix().length());
-				//String str = txtMessage.getPrefix() + "$tag" + String.format("%1$02d", tagNo) + "$" + txtMessage.getSuffix();
 
 				HHUser user = ((HHUser) tagArrayAdapter.getItem(position));
-				/*String strLink = "<a href=" + user.getID() + ">" + ((HHUser) tagArrayAdapter.getItem(position)).getName() + "</a>";
-				String strAll = txtMessage.getPrefix() + strLink + txtMessage.getSuffix();*/
-				HHUserSpan userSpan = new HHUserSpan(user);
+				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(user);
 
 				int selectionEnd = setTaggableText(txtMessage, userSpan, user);
 				txtMessage.setSelection(selectionEnd);
 
 				txtMessage.setIsTagging(false);
-				txtMessage.showSuggestions(false);
 			}
 		});
 
 		return view;
 	}
 
-	private int setTaggableText(TaggableEditText text, HHUserSpan userSpan, HHUser user){
+	private int setTaggableText(TaggableEditText text, HHUser.HHUserSpan userSpan, HHUser user){
 		CharSequence prefix = txtMessage.getPrefix();
 		CharSequence spanStr = userSpan.toString();
 		SpannableStringBuilder ssb = new SpannableStringBuilder(prefix);
@@ -452,31 +472,16 @@ public class PostFragment extends Fragment
 		ssb.append(txtMessage.getSuffix());
 		ssb.setSpan(userSpan, prefix.length(), prefix.length() + spanStr.length(),
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-		HHUserSpan[] spans = ssb.getSpans(0, ssb.length(), HHUserSpan.class);
+		HHUser.HHUserSpan[] spans = ssb.getSpans(0, ssb.length(), HHUser.HHUserSpan.class);
 		int selectionEnd = 0;
-		for (HHUserSpan span : spans){
-			//makeLinkClickable(ssb, span);
-			if (span.user.equals(user)){
+		for (HHUser.HHUserSpan span : spans){
+			if (span.getUser().equals(user)){
 				selectionEnd = ssb.getSpanEnd(span);
 			}
 		}
 		text.setText(ssb);
 		return selectionEnd;
 	}
-
-	/*private void makeLinkClickable(SpannableStringBuilder ssb, final URLSpan span){
-		int start = ssb.getSpanStart(span);
-		int end = ssb.getSpanEnd(span);
-		int flags = ssb.getSpanFlags(span);
-		ClickableSpan clickable = new ClickableSpan(span.) {
-			@Override
-			public void onClick(View view) {
-				Toast.makeText(getActivity(), "Span Clicked!", Toast.LENGTH_SHORT).show();
-			}
-		};
-		ssb.setSpan(clickable, start, end, flags);
-		ssb.removeSpan(span);
-	}*/
 
 	protected void startIntentService() {
 		Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
@@ -666,11 +671,11 @@ public class PostFragment extends Fragment
 
 				constraint = constraint.subSequence(txtMessage.getTagStart()+1, constraint.length() - txtMessage.getTagSuffixLength());
 
-				Spanned spanned = (Spanned) txtMessage.getText();
-				HHUserSpan[] spans = spanned.getSpans(0, spanned.length(), HHUserSpan.class);
+				Spanned spanned = txtMessage.getText();
+				HHUser.HHUserSpan[] spans = spanned.getSpans(0, spanned.length(), HHUser.HHUserSpan.class);
 				ArrayList<HHUser> alreadyTagged = new ArrayList<>();
-				for (HHUserSpan span : spans){
-					alreadyTagged.add(span.user);
+				for (HHUser.HHUserSpan span : spans){
+					alreadyTagged.add(span.getUser());
 				}
 
 				ArrayList<HHUser> filtered = new ArrayList<>();
@@ -734,31 +739,6 @@ public class PostFragment extends Fragment
 		@Override
 		public Filter getFilter() {
 			return filter;
-		}
-
-	}
-
-	public static class HHUserSpan extends ClickableSpan {
-		private final HHUser user;
-
-		public HHUserSpan(HHUser user){
-			super();
-			this.user = user;
-		}
-
-		@Override
-		public void updateDrawState(TextPaint ds){
-			ds.setUnderlineText(true);
-			ds.setColor(Color.BLUE);
-		}
-
-		@Override
-		public void onClick(View view){
-		}
-
-		@Override
-		public String toString(){
-			return user.getName();
 		}
 
 	}

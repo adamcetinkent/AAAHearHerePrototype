@@ -12,6 +12,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNe
  */
 public class HHTag extends HHLike {
 
+	public HHTag(long post_id, long user_id) {
+		super(post_id, user_id);
+	}
+
 	public HHTag(HHTagUserNested nested){
 		super(
 			nested.getID(),

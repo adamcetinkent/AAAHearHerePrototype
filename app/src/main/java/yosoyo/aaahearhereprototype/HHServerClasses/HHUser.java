@@ -2,14 +2,17 @@ package yosoyo.aaahearhereprototype.HHServerClasses;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.style.ClickableSpan;
+import android.view.View;
 
 import com.facebook.Profile;
 
 import java.sql.Timestamp;
 
-import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFriendshipsNested;
 
@@ -89,7 +92,7 @@ public class HHUser extends HHBase {
 		int length = spannable.length();
 		if (length > 0){
 			spannable.setSpan(
-				new PostFragment.HHUserSpan(this),
+				new HHUserSpan(this),
 				0,
 				length,
 				Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -112,6 +115,36 @@ public class HHUser extends HHBase {
 	}
 	public static Bitmap getProfilePicture(){
 		return profilePicture;
+	}
+
+	public static class HHUserSpan extends ClickableSpan {
+		private final HHUser user;
+
+		public HHUserSpan(HHUser user){
+			super();
+			this.user = user;
+		}
+
+		public HHUser getUser(){
+			return user;
+		}
+
+		@Override
+		public void updateDrawState(TextPaint ds){
+			ds.setColor(Color.BLACK);
+			ds.setFakeBoldText(true);
+			ds.bgColor = Color.LTGRAY;
+		}
+
+		@Override
+		public void onClick(View view){
+		}
+
+		@Override
+		public String toString(){
+			return user.getName();
+		}
+
 	}
 
 }

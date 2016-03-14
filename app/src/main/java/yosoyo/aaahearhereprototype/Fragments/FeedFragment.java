@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
@@ -404,12 +408,12 @@ public class FeedFragment extends Fragment {
 			// get Album Art
 			WebHelper.getSpotifyAlbumArt(
 				viewHolder.post.getTrack(),
-				 new WebHelper.GetSpotifyAlbumArtCallback() {
-					 @Override
-					 public void returnSpotifyAlbumArt(Bitmap bitmap) {
-						 viewHolder.imgAlbumArt.setImageBitmap(bitmap);
-					 }
-				 });
+				new WebHelper.GetSpotifyAlbumArtCallback() {
+					@Override
+					public void returnSpotifyAlbumArt(Bitmap bitmap) {
+						viewHolder.imgAlbumArt.setImageBitmap(bitmap);
+					}
+				});
 
 			// get User Image
 			WebHelper.getFacebookProfilePicture(
@@ -422,12 +426,39 @@ public class FeedFragment extends Fragment {
 				});
 
 			viewHolder.txtUserName.setText(viewHolder.post.getUser().getName());
-			viewHolder.txtLocation.setText(ZZZUtility.truncatedAddress(viewHolder.post.getPost().getPlaceName(),35));
-			viewHolder.txtDateTime.setText(ZZZUtility.formatDynamicDate(viewHolder.post.getPost().getCreatedAt()));
+			viewHolder.txtLocation.setText(ZZZUtility.truncatedAddress(
+				viewHolder.post.getPost().getPlaceName(), 35));
+			viewHolder.txtDateTime.setText(ZZZUtility.formatDynamicDate(
+				viewHolder.post.getPost().getCreatedAt()));
 			viewHolder.txtTrackName.setText(viewHolder.post.getTrack().getName());
 			viewHolder.txtArtist.setText(viewHolder.post.getTrack().getArtist());
 			viewHolder.txtAlbum.setText(viewHolder.post.getTrack().getAlbum());
+
 			viewHolder.txtMessage.setText(viewHolder.post.getPost().getMessage());
+			Editable message = Editable.Factory.getInstance().newEditable(viewHolder.txtMessage.getText());
+			Pattern pattern = Pattern.compile("\\{tag_\\d\\d\\}");
+			Matcher matcher = pattern.matcher(message);
+			int inlineTagged = 0;
+			while (matcher.find()){
+				int start = matcher.start();
+				int end = matcher.end();
+
+				if (inlineTagged >= viewHolder.post.getTags().size())
+					break;
+
+				HHUser tagUser = viewHolder.post.getTags().get(inlineTagged).getUser();
+				String userName = tagUser.getName();
+				message.replace(start, end, userName);
+				message.setSpan(
+					new HHUser.HHUserSpan(tagUser),
+					start,
+					start + userName.length(),
+					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+				matcher = pattern.matcher(message);
+				inlineTagged++;
+			}
+			viewHolder.txtMessage.setText(message);
 
 			updatePlayButton(viewHolder.btnPlayButton);
 
@@ -439,20 +470,20 @@ public class FeedFragment extends Fragment {
 			}
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(viewHolder.likeCheckListener);
 
-			if (viewHolder.post.getTags().size() > 0){
+			if (viewHolder.post.getTags().size() > inlineTagged){
 
 				viewHolder.llTags.setVisibility(View.VISIBLE);
 
 				List<HHTagUser> tags = viewHolder.post.getTags();
 				int youTag = -1;
 				StringBuilder sb;
-				if (tags.get(0).getUser().equals(HHUser.getCurrentUser())) {
-					youTag = 0;
+				if (tags.get(inlineTagged).getUser().equals(HHUser.getCurrentUser())) {
+					youTag = inlineTagged;
 					sb = new StringBuilder();
 				} else {
-					sb = new StringBuilder(tags.get(0).getUser().getName());
+					sb = new StringBuilder(tags.get(inlineTagged).getUser().getName());
 				}
-				for (int i = 1; i < tags.size(); i++){
+				for (int i = inlineTagged + 1; i < tags.size(); i++){
 					if (tags.get(i).getUser().equals(HHUser.getCurrentUser())){
 						youTag = i;
 					} else {

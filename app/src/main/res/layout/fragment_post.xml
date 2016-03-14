@@ -231,7 +231,7 @@
                 android:layout_gravity="top|left"
                 android:gravity="left|top"
                 android:minLines="1"
-                android:inputType="textMultiLine|textCapSentences"
+                android:inputType="textNoSuggestions|textMultiLine|textCapSentences"
                 />
 
         </LinearLayout>
