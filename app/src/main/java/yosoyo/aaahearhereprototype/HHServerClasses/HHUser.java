@@ -21,10 +21,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFrien
  */
 public class HHUser extends HHBase {
 
-	String first_name;
-	String last_name;
-	String fb_user_id;
-	String email;
+	private final String first_name;
+	private final String last_name;
+	private final String fb_user_id;
+	private String email;
 
 	public HHUser(HHUserFriendshipsNested nested){
 		super(
@@ -46,6 +46,7 @@ public class HHUser extends HHBase {
 			 );
 		this.first_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FIRST_NAME_NAME));
 		this.last_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
+		this.email = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_EMAIL_NAME));
 		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FB_USER_ID_NAME));
 	}
 
@@ -101,7 +102,7 @@ public class HHUser extends HHBase {
 		return spannable;
 	}
 
-	static HHUserFull currentUser;
+	private static HHUserFull currentUser;
 	public static HHUserFull getCurrentUser(){
 		return currentUser;
 	}
@@ -109,7 +110,7 @@ public class HHUser extends HHBase {
 		currentUser = user;
 	}
 
-	static Bitmap profilePicture;
+	private static Bitmap profilePicture;
 	public static void setProfilePicture(Bitmap bitmap){
 		profilePicture = bitmap;
 	}

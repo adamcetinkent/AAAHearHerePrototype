@@ -19,7 +19,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
+class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "CreateLikeTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
@@ -28,8 +28,8 @@ public class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
 		void returnResultCreateLike(Boolean success, HHLike like);
 	}
 
-	private CreateLikeTaskCallback callbackTo;
-	private HHLike like;
+	private final CreateLikeTaskCallback callbackTo;
+	private final HHLike like;
 	private HHLike likeReturned;
 
 	public CreateLikeTask(HHLike like, CreateLikeTaskCallback callbackTo) {

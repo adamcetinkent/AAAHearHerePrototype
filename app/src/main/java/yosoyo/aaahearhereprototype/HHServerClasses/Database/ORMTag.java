@@ -15,7 +15,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
 /**
  * Created by adam on 10/03/16.
  */
-public class ORMTag {
+class ORMTag {
 
 	private static final String TAG = "ORMTag";
 
@@ -23,7 +23,7 @@ public class ORMTag {
 
 	private static final String	COMMA_SEP = 				", ";
 
-	public static final String	COLUMN_ID_NAME = 			"_id";
+	private static final String	COLUMN_ID_NAME = 			"_id";
 	private static final String	COLUMN_ID_TYPE = 			"INTEGER PRIMARY KEY";
 
 	public static final String	COLUMN_POST_ID_NAME = 		"post_id";
@@ -32,15 +32,15 @@ public class ORMTag {
 	public static final String	COLUMN_USER_ID_NAME = 		"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 		"INTEGER";
 
-	public static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
+	private static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
+	private static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
+	private static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 	"TIMESTAMP";
-	public static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
@@ -83,9 +83,9 @@ public class ORMTag {
 
 	public static class DBTagInsertTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHTag tag;
-		private DBTagInsertTaskCallback callbackTo;
+		private final Context context;
+		private final HHTag tag;
+		private final DBTagInsertTaskCallback callbackTo;
 
 		public interface DBTagInsertTaskCallback {
 			void returnInsertedTag(Long tagID, HHTag tag);
@@ -124,9 +124,9 @@ public class ORMTag {
 
 	public static class DBTagDeleteTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private HHTag tag;
-		private DBTagDeleteTaskCallback callbackTo;
+		private final Context context;
+		private final HHTag tag;
+		private final DBTagDeleteTaskCallback callbackTo;
 
 		public interface DBTagDeleteTaskCallback {
 			void returnDeletedTag(boolean success);
@@ -166,9 +166,9 @@ public class ORMTag {
 
 	public static class DBTagInsertManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBTagInsertManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBTagInsertManyFromPostsTaskCallback callbackTo;
 
 		public interface DBTagInsertManyFromPostsTaskCallback {
 			void returnInsertedManyTags(List<HHPostFullProcess> postsToProcess);

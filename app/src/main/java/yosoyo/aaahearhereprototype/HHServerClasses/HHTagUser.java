@@ -9,8 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNe
  */
 public class HHTagUser {
 
-	private HHTag tag;
-	private HHUser user;
+	private final HHTag tag;
+	private final HHUser user;
 
 	public HHTagUser(HHTagUserNested nested){
 		this.tag = new HHTag(nested);

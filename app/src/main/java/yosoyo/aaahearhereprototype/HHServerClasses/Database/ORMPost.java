@@ -54,9 +54,9 @@ public class ORMPost {
 	public static final String 	COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
 
-	public static final String 	COLUMN_CACHED_AT_NAME =			"cached_at";
+	private static final String COLUMN_CACHED_AT_NAME =			"cached_at";
 	private static final String COLUMN_CACHED_AT_TYPE =			"TIMESTAMP";
-	public static final String 	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +
@@ -116,8 +116,8 @@ public class ORMPost {
 
 	public static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
 
-		private Context context;
-		private DBPostSelectTaskCallback callbackTo;
+		private final Context context;
+		private final DBPostSelectTaskCallback callbackTo;
 
 		public interface DBPostSelectTaskCallback {
 			void returnPosts(List<HHPost> posts);
@@ -163,9 +163,9 @@ public class ORMPost {
 
 	public static class DBPostInsertTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHPost post;
-		private DBPostInsertTaskCallback callbackTo;
+		private final Context context;
+		private final HHPost post;
+		private final DBPostInsertTaskCallback callbackTo;
 
 		public interface DBPostInsertTaskCallback {
 			void returnInsertedPostUserID(Long postID, HHPost post);
@@ -199,9 +199,9 @@ public class ORMPost {
 
 	public static class DBPostInsertManyTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBPostInsertManyTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBPostInsertManyTaskCallback callbackTo;
 
 		public interface DBPostInsertManyTaskCallback {
 			void returnInsertedManyPosts(List<HHPostFullProcess> postsToProcess);

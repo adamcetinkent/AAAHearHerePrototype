@@ -9,8 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHCommentUs
  */
 public class HHCommentUser {
 
-	HHComment comment;
-	HHUser user;
+	private final HHComment comment;
+	private final HHUser user;
 
 	public HHCommentUser(HHCommentUserNested nested){
 		this.comment = new HHComment(nested);

@@ -6,11 +6,11 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Created by adam on 08/03/16.
  */
-public class SimpleGooglePlace {
+class SimpleGooglePlace {
 
-	private String id;
-	private String name;
-	private LatLng latLng;
+	private final String id;
+	private final String name;
+	private final LatLng latLng;
 
 	public SimpleGooglePlace(Place place){
 		this.id = place.getId();

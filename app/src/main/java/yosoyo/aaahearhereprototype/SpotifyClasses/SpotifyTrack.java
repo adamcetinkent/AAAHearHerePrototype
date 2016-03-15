@@ -7,24 +7,24 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyTrack {
 
-	SpotifyAlbumSimple album;
-	SpotifyArtistSimple[] artists;
-	String[] available_markets;
-	int disc_number;
-	int duration_ms;
-	boolean explicit;
-	SpotifyExternalID external_ids;
-	SpotifyExternalURL external_urls;
-	String href;
-	String id;
-	boolean is_playable;
-	SpotifyTrackLink linked_from;
-	String name;
-	int popularity;
-	String preview_url;
-	int track_number;
-	String type;
-	String uri;
+	private SpotifyAlbumSimple album;
+	private SpotifyArtistSimple[] artists;
+	private String[] available_markets;
+	private int disc_number;
+	private int duration_ms;
+	private boolean explicit;
+	private SpotifyExternalID external_ids;
+	private SpotifyExternalURL external_urls;
+	private String href;
+	private String id;
+	private boolean is_playable;
+	private SpotifyTrackLink linked_from;
+	private String name;
+	private int popularity;
+	private String preview_url;
+	private int track_number;
+	private String type;
+	private String uri;
 
 	public SpotifyImage[] getImages() {
 		if (album != null)

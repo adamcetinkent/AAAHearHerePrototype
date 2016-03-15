@@ -31,8 +31,8 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	private static final String urlSpotifySearch = "https://api.spotify.com/v1/search?q=";
 	private static final String urlSpotifyType = "&type=";
 
-	private SpotifyAPIRequestCallback callbackTo = null;
-	private String searchType;
+	private final SpotifyAPIRequestCallback callbackTo;
+	private final String searchType;
 
 	public SpotifyAPIRequest(SpotifyAPIRequestCallback callbackTo, String searchType){
 		this.callbackTo = callbackTo;

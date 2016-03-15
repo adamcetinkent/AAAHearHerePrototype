@@ -28,8 +28,8 @@ public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
 		void returnResultCreateUser(Boolean success, HHUser userReturned);
 	}
 
-	private CreateUserTaskCallback callbackTo;
-	private HHUser user;
+	private final CreateUserTaskCallback callbackTo;
+	private final HHUser user;
 	private HHUser userReturned;
 
 	public CreateUserTask(HHUser user, CreateUserTaskCallback callbackTo) {

@@ -12,8 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserN
  */
 public class HHLike extends HHBase {
 
-	long post_id;
-	long user_id;
+	private final long post_id;
+	private final long user_id;
 
 	public HHLike(long post_id, long user_id){
 		super();

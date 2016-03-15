@@ -85,7 +85,7 @@ public class AsyncDataManager {
 		getAllWebPosts(callback);
 	}
 
-	public static void getAllCachedPosts(final GetAllPostsCallback callback){
+	private static void getAllCachedPosts(final GetAllPostsCallback callback){
 		DatabaseHelper.getAllCachedPosts(context, new DatabaseHelper.GetAllCachedPostsCallback() {
 			@Override
 			public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
@@ -94,7 +94,7 @@ public class AsyncDataManager {
 		});
 	}
 
-	public static void getAllWebPosts(final GetAllPostsCallback callback){
+	private static void getAllWebPosts(final GetAllPostsCallback callback){
 		WebHelper.getAllWebPosts(new WebHelper.GetAllWebPostsCallback() {
 			@Override
 			public void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {

@@ -5,9 +5,9 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an ExternalID
  */
-public class SpotifyExternalID {
+class SpotifyExternalID {
 
-	String key;
-	String value;
+	private String key;
+	private String value;
 
 }

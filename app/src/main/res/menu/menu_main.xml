@@ -3,7 +3,7 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="yosoyo.aaahearhereprototype.HolderActivity">
       <item android:id="@+id/post"
-            android:title="Post"
+            android:title="@string/action_create_post"
             android:icon="@android:drawable/ic_menu_add"
             appNamespace:showAsAction="ifRoom"
           />

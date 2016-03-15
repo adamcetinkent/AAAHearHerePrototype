@@ -7,8 +7,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshi
  */
 public class HHFriendship extends HHBase {
 
-	long user_id;
-	long friend_user_id;
+	private final long user_id;
+	private final long friend_user_id;
 
 	public HHFriendship(HHFriendshipUserNested nested){
 		super(

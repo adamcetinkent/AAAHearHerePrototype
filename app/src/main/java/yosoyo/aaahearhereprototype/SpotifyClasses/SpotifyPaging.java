@@ -8,13 +8,13 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyPaging<T> {
 
-	String href;
-	T items[];
-	int limit;
-	String next;
-	int offset;
-	String previous;
-	int total;
+	private String href;
+	private T items[];
+	private int limit;
+	private String next;
+	private int offset;
+	private String previous;
+	private int total;
 
 	public T[] getItems() {
 		return items;

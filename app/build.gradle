@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "yosoyo.aaahearhereprototype"
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -21,9 +21,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    //compile 'com.android.support:appcompat-v7:22.1.1'
-    //compile 'com.google.android.gms:play-services:7.3.0'
-    //compile 'com.koushikdutta.ion:ion:2.+'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.code.gson:gson:2.5'

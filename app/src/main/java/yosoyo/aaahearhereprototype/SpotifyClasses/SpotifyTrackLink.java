@@ -5,12 +5,12 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an Track Link
  */
-public class SpotifyTrackLink {
+class SpotifyTrackLink {
 
-	SpotifyExternalURL external_urls;
-	String href;
-	String id;
-	String type;
-	String uri;
+	private SpotifyExternalURL external_urls;
+	private String href;
+	private String id;
+	private String type;
+	private String uri;
 
 }

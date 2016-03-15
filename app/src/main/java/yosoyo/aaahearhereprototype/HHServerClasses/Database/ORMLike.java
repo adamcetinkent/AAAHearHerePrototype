@@ -15,7 +15,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
 /**
  * Created by adam on 02/03/16.
  */
-public class ORMLike {
+class ORMLike {
 
 	private static final String TAG = "ORMLike";
 
@@ -23,7 +23,7 @@ public class ORMLike {
 
 	private static final String	COMMA_SEP = 				", ";
 
-	public static final String	COLUMN_ID_NAME = 			"_id";
+	private static final String	COLUMN_ID_NAME = 			"_id";
 	private static final String	COLUMN_ID_TYPE = 			"INTEGER PRIMARY KEY";
 
 	public static final String	COLUMN_POST_ID_NAME = 		"post_id";
@@ -32,15 +32,15 @@ public class ORMLike {
 	public static final String	COLUMN_USER_ID_NAME = 		"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 		"INTEGER";
 
-	public static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
+	private static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
+	private static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
+	private static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 	"TIMESTAMP";
-	public static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
@@ -83,9 +83,9 @@ public class ORMLike {
 
 	public static class DBLikeInsertTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHLike like;
-		private DBLikeInsertTaskCallback callbackTo;
+		private final Context context;
+		private final HHLike like;
+		private final DBLikeInsertTaskCallback callbackTo;
 
 		public interface DBLikeInsertTaskCallback {
 			void returnInsertedLike(Long likeID, HHLike like);
@@ -124,9 +124,9 @@ public class ORMLike {
 
 	public static class DBLikeDeleteTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private HHLike like;
-		private DBLikeDeleteTaskCallback callbackTo;
+		private final Context context;
+		private final HHLike like;
+		private final DBLikeDeleteTaskCallback callbackTo;
 
 		public interface DBLikeDeleteTaskCallback {
 			void returnDeletedLike(boolean success);
@@ -166,9 +166,9 @@ public class ORMLike {
 
 	public static class DBLikeInsertManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBLikeInsertManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBLikeInsertManyFromPostsTaskCallback callbackTo;
 
 		public interface DBLikeInsertManyFromPostsTaskCallback {
 			void returnInsertedManyLikes(List<HHPostFullProcess> postsToProcess);

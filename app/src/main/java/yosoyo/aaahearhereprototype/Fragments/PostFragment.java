@@ -66,14 +66,14 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText;
+import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PostFragment extends Fragment
-	/*implements CreatePostTask.CreatePostTaskCallback*/ {
+public class PostFragment extends Fragment {
 
-	public static final String TAG = "PostFragment";
+	private static final String TAG = "PostFragment";
 
 	private PostFragmentPostedListener postFragmentPostedListener;
 
@@ -98,10 +98,10 @@ public class PostFragment extends Fragment
 	private ImageView btnLocationButton;
 
 	private AddressResultReceiver mResultReceiver;
-	protected boolean mAddressRequested;
+	private boolean mAddressRequested;
 	private Address address;
-	String placeName = new String();
-	String googlePlaceID = new String();
+	private String placeName = "";
+	private String googlePlaceID = "";
 
 	public PostFragment() {
 		// Required empty public constructor
@@ -151,16 +151,16 @@ public class PostFragment extends Fragment
 		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null){
 			lastLocation = HolderActivity.getLastLocation();
 			txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
-			txtLocation.setText(lastLocation.getLatitude() + " " + lastLocation.getLongitude());
-			placeName = lastLocation.getLatitude() + " " + lastLocation.getLongitude();
+			placeName = ZZZUtility.getLatLng(lastLocation);
+			txtLocation.setText(placeName);
 			mResultReceiver = new AddressResultReceiver(
 				new Handler(),
 				new AddressResultReceiver.AddressResultReceiverCallback() {
 					@Override
 					public void returnAddress(Address returnedAddress) {
 						address = returnedAddress;
-						txtLocation.setText(address.getThoroughfare().toString());
-						placeName = address.getThoroughfare().toString();
+						txtLocation.setText(address.getThoroughfare());
+						placeName = address.getThoroughfare();
 						btnLocationButton.setVisibility(View.VISIBLE);
 						mAddressRequested = false;
 					}
@@ -195,7 +195,7 @@ public class PostFragment extends Fragment
 				} else if (spotifyAlbum != null && spotifyArtist == null) {
 					intent.putExtra(SearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
 					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_TRACK_ALBUM);
-				} else if (spotifyArtist != null && spotifyAlbum == null) {
+				} else if (spotifyAlbum == null) {
 					intent.putExtra(SearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
 					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_TRACK_ARTIST);
 				} else {
@@ -387,9 +387,12 @@ public class PostFragment extends Fragment
 				if (count == 0) { // deletion
 					if (txtMessage.isTagging() && start > 0 && s.charAt(start - 1) != '@') {
 						txtMessage.setListenerBlock(true);
-						txtMessage.setText(
-							s.subSequence(0, s.subSequence(0, start).toString().lastIndexOf('@'))
-							 .toString() + txtMessage.getSuffix());
+						String newString = s.subSequence(
+							0,
+							s.subSequence(0, start).toString().lastIndexOf('@')
+						).toString()
+							+ txtMessage.getSuffix();
+						txtMessage.setText(newString);
 						txtMessage
 							.setSelection(s.subSequence(0, start).toString().lastIndexOf('@'));
 						txtMessage.setListenerBlock(false);
@@ -421,8 +424,6 @@ public class PostFragment extends Fragment
 						txtMessage.setPrefix(s.subSequence(0, start));
 						txtMessage.setSuffix(s.subSequence(start + 1, s.length()));
 					}
-				} else {
-
 				}
 			}
 
@@ -445,7 +446,7 @@ public class PostFragment extends Fragment
 		for (HHFriendshipUser friendship: currentUser.getFriendships()){
 			userList.add(friendship.getUser());
 		}
-		final TagArrayAdapter tagArrayAdapter = new TagArrayAdapter(getActivity(), userList);
+		final TagArrayAdapter tagArrayAdapter = new TagArrayAdapter(getActivity(), userList, txtMessage);
 		txtMessage.setAdapter(tagArrayAdapter);
 		txtMessage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -483,7 +484,7 @@ public class PostFragment extends Fragment
 		return selectionEnd;
 	}
 
-	protected void startIntentService() {
+	private void startIntentService() {
 		Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
 		intent.putExtra(FetchAddressIntentService.Constants.RECEIVER, mResultReceiver);
 		intent.putExtra(FetchAddressIntentService.Constants.LOCATION_DATA_EXTRA, lastLocation);
@@ -562,7 +563,7 @@ public class PostFragment extends Fragment
 					searchViewArtist.setQuery("", false);
 					searchViewArtist.clearFocus();
 
-					if (spotifyAlbum == null || spotifyAlbum.getArtistID() != spotifyArtist.getID()) {
+					if (spotifyAlbum == null || spotifyAlbum.getArtistID().equals(spotifyArtist.getID())) {
 						searchViewArtist.setQueryHint(spotifyArtist.getName());
 						searchViewArtist.setQuery("", false);
 						searchViewArtist.clearFocus();
@@ -617,16 +618,18 @@ public class PostFragment extends Fragment
 
 	}
 
-	private class TagArrayAdapter extends BaseAdapter implements Filterable {
+	private static class TagArrayAdapter extends BaseAdapter implements Filterable {
 
-		private Activity context;
-		private List<HHUser> users;
+		private final Activity context;
+		private final List<HHUser> users;
 		private List<HHUser> filteredUsers;
-		private int maxLength = 5;
+		private final TaggableEditText txtTags;
+		private final int maxLength = 5;
 
-		public TagArrayAdapter(Activity context, List<HHUser> users) {
+		public TagArrayAdapter(Activity context, List<HHUser> users, TaggableEditText txtTags) {
 			this.context = context;
 			this.users = users;
+			this.txtTags = txtTags;
 		}
 
 		@Override
@@ -650,28 +653,51 @@ public class PostFragment extends Fragment
 			return filteredUsers.get(position).getID();
 		}
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = context.getLayoutInflater();
-			View rowView = inflater.inflate(R.layout.list_row_place, null, true);
-
-			TextView txtPlace = (TextView) rowView.findViewById(R.id.list_row_place_txtPlace);
-			txtPlace.setText(filteredUsers.get(position).getName());
-
-			return rowView;
+		private static class ViewHolder{
+			int position;
+			HHUser user;
+			TextView txtUser;
 		}
 
-		Filter filter = new Filter() {
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final ViewHolder viewHolder;
+
+			if (convertView == null) {
+				LayoutInflater inflater = context.getLayoutInflater();
+				convertView = inflater.inflate(R.layout.list_row_tag, parent, false);
+
+				viewHolder = new ViewHolder();
+
+				viewHolder.position = position;
+				viewHolder.user = filteredUsers.get(position);
+
+				viewHolder.txtUser = (TextView) convertView.findViewById(R.id.list_row_tag_txtUser);
+
+				convertView.setTag(viewHolder);
+
+			} else {
+				viewHolder = (ViewHolder) convertView.getTag();
+				viewHolder.position = position;
+				viewHolder.user = filteredUsers.get(position);
+			}
+
+			viewHolder.txtUser.setText(viewHolder.user.getName());
+
+			return convertView;
+		}
+
+		final Filter filter = new Filter() {
 			@Override
 			protected FilterResults performFiltering(CharSequence constraint) {
 				FilterResults filterResults = new FilterResults();
 
-				if (!txtMessage.isTagging() || users == null)
+				if (!txtTags.isTagging() || users == null)
 					return null;
 
-				constraint = constraint.subSequence(txtMessage.getTagStart()+1, constraint.length() - txtMessage.getTagSuffixLength());
+				constraint = constraint.subSequence(txtTags.getTagStart()+1, constraint.length() - txtTags.getTagSuffixLength());
 
-				Spanned spanned = txtMessage.getText();
+				Spanned spanned = txtTags.getText();
 				HHUser.HHUserSpan[] spans = spanned.getSpans(0, spanned.length(), HHUser.HHUserSpan.class);
 				ArrayList<HHUser> alreadyTagged = new ArrayList<>();
 				for (HHUser.HHUserSpan span : spans){
@@ -721,7 +747,8 @@ public class PostFragment extends Fragment
 
 			@Override
 			protected void publishResults(CharSequence constraint, FilterResults results) {
-				if (txtMessage.isTagging() && users != null) {
+				if (txtTags.isTagging() && users != null) {
+					//noinspection unchecked
 					filteredUsers = (ArrayList<HHUser>) results.values;
 					notifyDataSetChanged();
 				}

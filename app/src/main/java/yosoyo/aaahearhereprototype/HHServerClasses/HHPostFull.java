@@ -1,6 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -11,20 +12,20 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
  */
 public class HHPostFull implements Comparable {
 
-	HHPost post;
-	HHUser user;
-	HHCachedSpotifyTrack track;
-	List<HHCommentUser> comments;
-	List<HHLikeUser> likes;
-	List<HHTagUser> tags;
+	private final HHPost post;
+	private final HHUser user;
+	private HHCachedSpotifyTrack track;
+	private List<HHCommentUser> comments;
+	private List<HHLikeUser> likes;
+	private List<HHTagUser> tags;
 
 	public HHPostFull(HHPostFullProcess that){
-		this.post = that.post;
-		this.user = that.user;
-		this.comments = that.comments;
-		this.track = that.track;
-		this.likes = that.likes;
-		this.tags = that.tags;
+		this.post = that.getPost();
+		this.user = that.getUser();
+		this.comments = that.getComments();
+		this.track = that.getTrack();
+		this.likes = that.getLikes();
+		this.tags = that.getTags();
 	}
 
 	public HHPostFull(HHPostFullNested nested){
@@ -82,7 +83,7 @@ public class HHPostFull implements Comparable {
 	}
 
 	@Override
-	public int compareTo(Object that) {
+	public int compareTo(@NonNull Object that) {
 		if (!(that instanceof HHPostFull))
 			return -1;
 

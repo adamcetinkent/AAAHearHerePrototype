@@ -130,8 +130,8 @@ public class LoginActivity extends Activity implements View.OnClickListener
 	}
 
 	private void facebookSignInFailed(){
-		facebookSignInName.setText("LOGIN FAILED");
-		Toast.makeText(this, "Facebook Sign In Failed!", Toast.LENGTH_LONG);
+		facebookSignInName.setText(R.string.placeholder_login_failed);
+		Toast.makeText(this, "Facebook Sign In Failed!", Toast.LENGTH_LONG).show();
 		continueButton.setEnabled(false);
 		progressDialog.dismiss();
 	}
@@ -211,15 +211,12 @@ public class LoginActivity extends Activity implements View.OnClickListener
 	private void updateUI(boolean loggedIn){
 		if (loggedIn){
 			Profile profile = Profile.getCurrentProfile();
-			facebookSignInName.setText(profile.getFirstName() + " " + profile.getLastName());
-			Toast.makeText(this,
-						   "Signed in as " + profile.getFirstName() + " " + profile.getLastName(),
-						   Toast.LENGTH_LONG);
+			facebookSignInName.setText(profile.getName());
 			continueButton.setEnabled(true);
 
 			final ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);
 			WebHelper.getFacebookProfilePicture(
-				profile.getCurrentProfile().getId(),
+				Profile.getCurrentProfile().getId(),
 				new WebHelper.GetFacebookProfilePictureCallback() {
 					@Override
 					public void returnFacebookProfilePicture(Bitmap bitmap) {
@@ -228,8 +225,7 @@ public class LoginActivity extends Activity implements View.OnClickListener
 				});
 
 		} else {
-			facebookSignInName.setText("Logged Out");
-			Toast.makeText(LoginActivity.this, "Logged out of Facebook", Toast.LENGTH_LONG);
+			facebookSignInName.setText(R.string.placeholder_logged_out);
 			continueButton.setEnabled(false);
 
 			ImageView imageView = (ImageView) findViewById(R.id.imgUserImage);

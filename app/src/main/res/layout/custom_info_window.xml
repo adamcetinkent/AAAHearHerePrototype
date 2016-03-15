@@ -26,7 +26,7 @@
             android:ellipsize="end"
             android:singleLine="false"
             android:textColor="#ff000000"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:textStyle="bold"
             />
 
@@ -38,7 +38,7 @@
             android:ellipsize="end"
             android:singleLine="false"
             android:textColor="#ff000000"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:textStyle="bold"
             />
 
@@ -50,7 +50,7 @@
             android:ellipsize="end"
             android:singleLine="false"
             android:textColor="#ff000000"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:textStyle="bold"
             />
 
@@ -61,7 +61,7 @@
             android:ellipsize="end"
             android:singleLine="false"
             android:textColor="#ff7f7f7f"
-            android:textSize="14dp"
+            android:textSize="14sp"
             />
 
         <ImageButton
@@ -75,11 +75,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/date_time"
             android:singleLine="true"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:textColor="#ffaaaaaa"
             android:layout_gravity="right"
             android:textAlignment="gravity"
-            android:text="DATE"
+            android:text="@string/placeholder_date"
             />
 
     </LinearLayout>

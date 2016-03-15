@@ -19,7 +19,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
+class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "CreateCommentTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/comments/";
 
@@ -28,8 +28,8 @@ public class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 		void returnResultCreateComment(Boolean success, HHComment comment);
 	}
 
-	private CreateCommentTaskCallback callbackTo;
-	private HHComment comment;
+	private final CreateCommentTaskCallback callbackTo;
+	private final HHComment comment;
 	private HHComment commentReturned;
 
 	public CreateCommentTask(HHComment comment, CreateCommentTaskCallback callbackTo) {

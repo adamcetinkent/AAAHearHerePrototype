@@ -17,7 +17,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
 /**
  * Created by adam on 02/03/16.
  */
-public class ORMPostFull {
+class ORMPostFull {
 
 	private static final String TAG = "ORMPostFull";
 
@@ -27,8 +27,8 @@ public class ORMPostFull {
 
 	public static class DBPostFullSelectAllTask extends AsyncTask<Void, Void, List<HHPostFull> > {
 
-		private Context context;
-		private DBPostFullSelectAllTaskCallback callbackTo;
+		private final Context context;
+		private final DBPostFullSelectAllTaskCallback callbackTo;
 
 		public interface DBPostFullSelectAllTaskCallback {
 			void returnPosts(List<HHPostFull> posts);

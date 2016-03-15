@@ -6,32 +6,18 @@ import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-
 /**
  * Created by adam on 11/03/16.
  */
 public class TaggableEditText extends InstantAutoCompleteTextView {
 	private static final String TAG = "TaggableEditText";
 
-	boolean listenerBlock = false;
-	boolean isTagging = false;
-	CharSequence suffix;
-	CharSequence prefix;
-	int tagStart;
-	int tagSuffixLength;
-
-	private class TextTag{
-		private HHUser user;
-		boolean fullName;
-		private int start;
-
-		public TextTag(HHUser user, boolean fullName, int start) {
-			this.user = user;
-			this.fullName = fullName;
-			this.start = start;
-		}
-	}
+	private boolean listenerBlock = false;
+	private boolean isTagging = false;
+	private CharSequence suffix;
+	private CharSequence prefix;
+	private int tagStart;
+	private int tagSuffixLength;
 
 	public TaggableEditText(Context context) {
 		super(context);

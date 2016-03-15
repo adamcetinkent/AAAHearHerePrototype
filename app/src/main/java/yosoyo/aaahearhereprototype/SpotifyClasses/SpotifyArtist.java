@@ -7,16 +7,16 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyArtist {
 
-	SpotifyExternalURL external_urls;
-	SpotifyFollowers followers;
-	String genres[];
-	String href;
-	String id;
-	SpotifyImage images[];
-	String name;
-	int popularity;
-	String type;
-	String uri;
+	private SpotifyExternalURL external_urls;
+	private SpotifyFollowers followers;
+	private String genres[];
+	private String href;
+	private String id;
+	private SpotifyImage images[];
+	private String name;
+	private int popularity;
+	private String type;
+	private String uri;
 
 	public SpotifyImage[] getImages() {
 		return images;
@@ -36,8 +36,8 @@ public class SpotifyArtist {
 
 	public String getGenres(){
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < genres.length; i++){
-			sb.append(genres[i]);
+		for (String genre : genres) {
+			sb.append(genre);
 		}
 		return sb.toString();
 	}

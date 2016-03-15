@@ -25,8 +25,8 @@ public class WebHelper {
 	//public static final String SERVER_IP = "http://192.168.0.63:3000";
 	//public static final String SERVER_IP = "http://10.72.100.185:3000";
 
-	public static Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
-	public static Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
+	private static final Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
+	private static final Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
 
 	public interface GetAllWebPostsCallback {
 		void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess);

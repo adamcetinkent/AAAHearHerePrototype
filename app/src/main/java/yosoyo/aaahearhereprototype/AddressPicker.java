@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -50,9 +51,9 @@ public class AddressPicker extends Activity {
 	private ImageButton btnContinue;
 
 	private PlaceArrayAdapter placeArrayAdapter;
-	List<SimpleGooglePlace> places = new ArrayList<>();
-	private String[] addressOutput = new String[4];
-	private String googlePlaceID = new String();
+	private final List<SimpleGooglePlace> places = new ArrayList<>();
+	private final String[] addressOutput = new String[4];
+	private String googlePlaceID = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +181,7 @@ public class AddressPicker extends Activity {
 			HolderActivity.mGoogleApiClient, null);
 		result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
 			@Override
-			public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
+			public void onResult(@NonNull PlaceLikelihoodBuffer placeLikelihoods) {
 				places.clear();
 				for (PlaceLikelihood placeLikelihood : placeLikelihoods){
 					places.add(new SimpleGooglePlace(placeLikelihood.getPlace()));
@@ -212,10 +213,10 @@ public class AddressPicker extends Activity {
 		return outputString;
 	}
 
-	private class PlaceArrayAdapter extends ArrayAdapter<SimpleGooglePlace> {
+	private static class PlaceArrayAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
-		private Activity context;
-		private List<SimpleGooglePlace> places;
+		private final Activity context;
+		private final List<SimpleGooglePlace> places;
 
 		public PlaceArrayAdapter(Activity context, List<SimpleGooglePlace> places) {
 			super(context, R.layout.list_row_track, places);
@@ -223,15 +224,38 @@ public class AddressPicker extends Activity {
 			this.places = places;
 		}
 
+		private static class ViewHolder {
+			int position;
+			SimpleGooglePlace place;
+			TextView txtPlace;
+		}
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = context.getLayoutInflater();
-			View rowView = inflater.inflate(R.layout.list_row_place, null, true);
+			final ViewHolder viewHolder;
 
-			TextView txtPlace = (TextView) rowView.findViewById(R.id.list_row_place_txtPlace);
-			txtPlace.setText(places.get(position).getName());
+			if (convertView == null) {
+				LayoutInflater inflater = context.getLayoutInflater();
+				convertView = inflater.inflate(R.layout.list_row_place, parent, false);
 
-			return rowView;
+				viewHolder = new ViewHolder();
+
+				viewHolder.position = position;
+				viewHolder.place = places.get(position);
+
+				viewHolder.txtPlace = (TextView) convertView.findViewById(R.id.list_row_place_txtPlace);
+
+				convertView.setTag(viewHolder);
+
+			} else {
+				viewHolder = (ViewHolder) convertView.getTag();
+				viewHolder.position = position;
+				viewHolder.place = places.get(position);
+			}
+
+			viewHolder.txtPlace.setText(viewHolder.place.getName());
+
+			return convertView;
 		}
 	}
 

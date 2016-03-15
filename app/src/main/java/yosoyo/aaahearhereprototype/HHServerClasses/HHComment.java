@@ -12,7 +12,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHCommentUs
  */
 public class HHComment extends HHLike {
 
-	String message;
+	private final String message;
 
 	public HHComment(long post_id, long user_id, String message){
 		super(post_id, user_id);

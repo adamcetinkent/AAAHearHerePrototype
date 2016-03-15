@@ -28,6 +28,37 @@
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
     <string name="action_reset_databse">Reset Databse</string>
+    <string name="action_create_post">Post</string>
+    <string name="placeholder_place_name">Place Name</string>
+    <string name="address_picker_location">Location:</string>
+    <string name="placholder_artist_desc">TextView</string>
+    <string name="placholder_facebook_sign_in">FACEBOOK SIGN IN</string>
+    <string name="address_picker_txtLocation_hint">Enter Location</string>
+    <string name="placholder_num_likes">100</string>
+    <string name="placholder_continue">Continue</string>
+    <string name="placeholder_user_name">USER NAME</string>
+    <string name="list_row_comment_add_txtAddComment_hint">Add your comment…</string>
+    <string name="placeholder_likers">Likers</string>
+    <string name="address_picker_street">Street:</string>
+    <string name="placeholder_message">Message</string>
+    <string name="placeholder_location">Location</string>
+    <string name="placeholder_shortcut">Shortcut</string>
+    <string name="address_picker_txtStreet_hint">Enter Street</string>
+    <string name="placeholder_date">DATE</string>
+    <string name="address_picker_locality">Locality:</string>
+    <string name="address_picker_txtLocality_hint">Enter Locality</string>
+    <string name="placeholder_track_name">Song Title</string>
+    <string name="placeholder_artist_name">Artist Name</string>
+    <string name="address_picker_country">Country:</string>
+    <string name="address_picker_txtCountry_hint">Enter Country</string>
+    <string name="placeholder_album_name">Album Name</string>
+    <string name="placeholder_comment">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et felis tempus, gravida dui id, pulvinar turpis. In tincidunt, quam at faucibus tincidunt, quam magna viverra ipsum, at ornare sem tortor convallis est. Mauris posuere vestibulum tortor id ornare.</string>
+    <string name="fragment_post_txtMessage_hint">Leave a message</string>
+    <string name="placeholder_tags">Tags go here</string>
+    <string name="placeholder_login_failed">LOGIN FAILED</string>
+    <string name="placeholder_logged_out">Logged Out</string>
+    <string name="placeholder_message_map">Message: %1$s</string>
+    <string name="placeholder_date_map">Posted: %1$s</string>
 
     <string-array name="navigation_options">
         <item>Home</item>

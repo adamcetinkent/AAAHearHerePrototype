@@ -3,9 +3,9 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
 /**
  * Created by adam on 01/03/16.
  */
-public class SpotifyCopyright {
+class SpotifyCopyright {
 
-	String text;
-	String type;
+	private String text;
+	private String type;
 
 }

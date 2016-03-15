@@ -8,12 +8,12 @@ import java.sql.Timestamp;
 public abstract class HHBase {
 
 	long id;
-	Timestamp created_at;
-	Timestamp updated_at;
+	private Timestamp created_at;
+	private Timestamp updated_at;
 
-	protected HHBase(){};
+	HHBase(){}
 
-	protected HHBase(long id, Timestamp created_at, Timestamp updated_at){
+	HHBase(long id, Timestamp created_at, Timestamp updated_at){
 		this.id = id;
 		this.created_at = created_at;
 		this.updated_at = updated_at;

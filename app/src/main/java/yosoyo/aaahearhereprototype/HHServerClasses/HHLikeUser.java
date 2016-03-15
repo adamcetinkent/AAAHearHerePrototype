@@ -9,8 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserN
  */
 public class HHLikeUser {
 
-	HHLike like;
-	HHUser user;
+	private final HHLike like;
+	private final HHUser user;
 
 	public HHLikeUser(HHLikeUserNested nested){
 		this.like = new HHLike(nested);

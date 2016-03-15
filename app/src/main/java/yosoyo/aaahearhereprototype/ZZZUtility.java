@@ -3,6 +3,7 @@ package yosoyo.aaahearhereprototype;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -30,8 +31,8 @@ public class ZZZUtility {
 	private static final int SECOND_MILLIS = 1000;
 	private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 	private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
-	private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
-	private static final int YEAR_MILLIS = 365 * DAY_MILLIS;
+	private static final long DAY_MILLIS = 24 * HOUR_MILLIS;
+	private static final long YEAR_MILLIS = 365 * DAY_MILLIS;
 
 	public static String formatDynamicDate(Timestamp timestamp){
 
@@ -67,7 +68,6 @@ public class ZZZUtility {
 			return inString;
 
 		maxLength = maxLength - 3;
-		int n = 0;
 		boolean spaceSplit = false;
 		String[] parts = inString.split(",");
 		if (parts[0].length()+1 > maxLength){
@@ -103,7 +103,7 @@ public class ZZZUtility {
 
 	public static <T> List<T> mergeLists(List<T> oldList, List<T> newList){
 		//TreeSet setBoth = new TreeSet(newList);
-		HashSet setBoth = new HashSet(newList);
+		HashSet<T> setBoth = new HashSet<>(newList);
 		setBoth.addAll(oldList);
 		oldList.clear();
 		oldList.addAll(setBoth);
@@ -127,5 +127,9 @@ public class ZZZUtility {
 				return false;
 		oldList.add(newItem);
 		return true;
+	}
+
+	public static String getLatLng(Location location){
+		return location.getLatitude() + " " + location.getLongitude();
 	}
 }

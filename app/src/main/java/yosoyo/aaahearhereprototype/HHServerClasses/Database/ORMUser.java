@@ -48,9 +48,9 @@ public class ORMUser {
 	public static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
+	private static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 	"TIMESTAMP";
-	public static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
@@ -97,9 +97,9 @@ public class ORMUser {
 
 	public static class DBUserInsertCurrentTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHUserFullProcess user;
-		private DBUserInsertCurrentTaskCallback callbackTo;
+		private final Context context;
+		private final HHUserFullProcess user;
+		private final DBUserInsertCurrentTaskCallback callbackTo;
 
 		public interface DBUserInsertCurrentTaskCallback {
 			void returnInsertedUser(long userID, HHUserFullProcess returnedUser);
@@ -148,9 +148,9 @@ public class ORMUser {
 
 	public static class DBUserInsertManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBUserInsertManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBUserInsertManyFromPostsTaskCallback callbackTo;
 
 		public interface DBUserInsertManyFromPostsTaskCallback {
 			void returnInsertedManyUsers(List<HHPostFullProcess> postsToProcess);

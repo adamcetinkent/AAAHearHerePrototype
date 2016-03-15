@@ -55,7 +55,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 public class MapViewFragment
 	extends Fragment
 	implements GoogleMap.OnInfoWindowClickListener
-	{
+{
 
 	private static final String TAG = "MapViewFragment";
 
@@ -71,11 +71,15 @@ public class MapViewFragment
 	private AddressResultReceiver mResultReceiver;
 	private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
 	private static final String LOCATION_ADDRESS_KEY = "location-address";
-	protected boolean mAddressRequested;
-	protected String mAddressOutput;
+	private boolean mAddressRequested;
+	private String mAddressOutput;
 	private ProgressBar mProgressBar;
 
 	private HHCachedSpotifyTrack currentTrack;
+
+	public MapViewFragment(){
+		//required empty public constructor
+	}
 
 	@Nullable
 	@Override
@@ -166,11 +170,6 @@ public class MapViewFragment
 		updateUIWidgets();
 
 		super.onStart();
-	}
-
-	public void onStop() {
-		//mGoogleApiClient.disconnect();
-		super.onStop();
 	}
 
 	@Override
@@ -271,10 +270,10 @@ public class MapViewFragment
 							   .icon(BitmapDescriptorFactory
 										 .fromResource(
 											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
-						   );
+		);
 	}
 
-	protected void startIntentService() {
+	private void startIntentService() {
 		Intent intent = new Intent(getActivity(), FetchAddressIntentService.class);
 		intent.putExtra(FetchAddressIntentService.Constants.RECEIVER, mResultReceiver);
 		intent.putExtra(FetchAddressIntentService.Constants.LOCATION_DATA_EXTRA, middleLocation);
@@ -345,7 +344,7 @@ public class MapViewFragment
 
 	}
 
-		class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter/*, DownloadImageTask.DownloadImageTaskCallback*/ {
+	class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
 		private final View mWindow;
 		private final View mContents;
@@ -412,9 +411,12 @@ public class MapViewFragment
 			titleUI.setText(spotifyTrack.getName());
 			artistUI.setText(spotifyTrack.getArtist());
 			albumUI.setText(spotifyTrack.getAlbum());
-			snippetUI.setText("Message: " + post.getPost().getMessage());
-			dateUI.setText("Posted: " + ZZZUtility.formatDynamicDate(
-				post.getPost().getCreatedAt()));
+			snippetUI.setText(getString(R.string.placeholder_message_map,
+										post.getPost().getMessage()));
+			dateUI.setText(
+				getString(
+					R.string.placeholder_date_map,
+					ZZZUtility.formatDynamicDate(post.getPost().getCreatedAt())));
 			userUI.setText(post.getUser().getName());
 
 			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);

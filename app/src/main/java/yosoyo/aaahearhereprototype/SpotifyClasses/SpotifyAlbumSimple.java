@@ -5,17 +5,17 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an simplified Album
  */
-public class SpotifyAlbumSimple {
+class SpotifyAlbumSimple {
 
-	String album_type;
-	String[] available_markets;
-	SpotifyExternalURL external_urls;
-	String href;
-	String id;
-	SpotifyImage[] images;
-	String name;
-	String type;
-	String uri;
+	private String album_type;
+	private String[] available_markets;
+	private SpotifyExternalURL external_urls;
+	private String href;
+	private String id;
+	private SpotifyImage[] images;
+	private String name;
+	private String type;
+	private String uri;
 
 	public SpotifyImage[] getImages() {
 		return images;

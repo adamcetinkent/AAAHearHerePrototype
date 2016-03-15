@@ -8,7 +8,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHTag;
  */
 public class HHPostTagsArray extends HHPost {
 
-	HHTag[] tags_attributes;
+	private final HHTag[] tags_attributes;
 
 	public HHPostTagsArray(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id, HHTag[] tags){
 		super(user_id, track, lat, lon, message, place_name, google_place_id);

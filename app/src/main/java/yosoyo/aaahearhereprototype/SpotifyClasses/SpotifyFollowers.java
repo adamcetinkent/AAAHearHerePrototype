@@ -5,9 +5,9 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for Followers.
  */
-public class SpotifyFollowers {
+class SpotifyFollowers {
 
-	String href;
-	int total;
+	private String href;
+	private int total;
 
 }

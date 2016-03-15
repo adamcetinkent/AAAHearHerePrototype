@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.Spanned;
 import android.util.Log;
@@ -112,37 +111,23 @@ public class FeedFragment extends Fragment {
 		}
 	}
 
-	@Override
-	public void onStart(){
-		super.onStart();
-
-		//View view = getView();
-
-	}
-
 	private static class TimelineCustomExpandableAdapter extends BaseExpandableListAdapter{
 
 		interface AdapterCallback {
 			void onDataChange();
 		}
 
-		private Activity context;
+		private final Activity context;
+		private final AdapterCallback callback;
+
 		private List<HHPostFull> posts;
-		private AdapterCallback callback;
 		int addingComment = -1;
-		int addingCommentFocus = -1;
-		private Handler handler = new Handler();
 
 		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback){
 			super();
 			this.context = context;
 			this.posts = posts;
 			this.callback = callback;
-		}
-
-		@Override
-		public void notifyDataSetChanged() {
-			super.notifyDataSetChanged();
 		}
 
 		@Override
@@ -224,7 +209,7 @@ public class FeedFragment extends Fragment {
 				viewHolder.post = posts.get(groupPosition);
 
 				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(HHUser.getCurrentUser())){
+					if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
 						viewHolder.myLike = like.getLike();
 						break;
 					}
@@ -398,7 +383,7 @@ public class FeedFragment extends Fragment {
 				viewHolder.post = posts.get(groupPosition);
 				viewHolder.myLike = null;
 				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(HHUser.getCurrentUser())){
+					if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
 						viewHolder.myLike = like.getLike();
 						break;
 					}
@@ -477,17 +462,17 @@ public class FeedFragment extends Fragment {
 				List<HHTagUser> tags = viewHolder.post.getTags();
 				int youTag = -1;
 				StringBuilder sb;
-				if (tags.get(inlineTagged).getUser().equals(HHUser.getCurrentUser())) {
+				if (tags.get(inlineTagged).getUser().equals(HHUser.getCurrentUser().getUser())) {
 					youTag = inlineTagged;
 					sb = new StringBuilder();
 				} else {
 					sb = new StringBuilder(tags.get(inlineTagged).getUser().getName());
 				}
 				for (int i = inlineTagged + 1; i < tags.size(); i++){
-					if (tags.get(i).getUser().equals(HHUser.getCurrentUser())){
+					if (tags.get(i).getUser().equals(HHUser.getCurrentUser().getUser())){
 						youTag = i;
 					} else {
-						sb.append(", " + tags.get(i).getUser().getName());
+						sb.append(", ").append(tags.get(i).getUser().getName());
 					}
 				}
 				viewHolder.txtTags.setText((youTag >= 0 ? "You" + ((youTag > 0) ? ", " : "") : "")
@@ -512,99 +497,18 @@ public class FeedFragment extends Fragment {
 		@Override
 		public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-			LayoutInflater inflater = context.getLayoutInflater();
-
 			if (childPosition == 0 && posts.get(groupPosition).getLikes().size() > 0){
 				// HEADER FOR LIKES
-				final View rowView = inflater.inflate(R.layout.list_row_comment_like, null, true);
-
-				TextView txtLikers = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtLikers);
-				List<HHLikeUser> likes = posts.get(groupPosition).getLikes();
-
-				int youLike = -1;
-				StringBuilder sb;
-				if (likes.get(0).getUser().equals(HHUser.getCurrentUser())) {
-					youLike = 0;
-					sb = new StringBuilder();
-				} else {
-					sb = new StringBuilder(likes.get(0).getUser().getName());
-				}
-				for (int i = 1; i < likes.size(); i++){
-					if (likes.get(i).getUser().equals(HHUser.getCurrentUser())){
-						youLike = i;
-					} else {
-						sb.append(", " + likes.get(i).getUser().getName());
-					}
-				}
-				txtLikers.setText(
-					(youLike >= 0 ? "You" + ((youLike > 0) ? ", " : "") : "") + sb.toString());
-
-				TextView txtNumber = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtNumber);
-				txtNumber.setText(String.valueOf(likes.size()));
-
-				return rowView;
+				return getChildViewLikes(groupPosition, parent);
 			}
 
 			if ((posts.get(groupPosition).getLikes().size() == 0 && childPosition >= posts.get(groupPosition).getComments().size())
 				|| (posts.get(groupPosition).getLikes().size() > 0 && childPosition >= posts.get(groupPosition).getComments().size() + 1)){
 				// FOOTER FOR ADDING COMMENT
-				final View rowView = inflater.inflate(R.layout.list_row_comment_add, null, true);
-
-				final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_comment_add_imgProfile);
-				WebHelper.getFacebookProfilePicture(
-					Profile.getCurrentProfile().getId(),
-					new WebHelper.GetFacebookProfilePictureCallback() {
-						@Override
-						public void returnFacebookProfilePicture(Bitmap bitmap) {
-							imgProfile.setImageBitmap(bitmap);
-						}
-					});
-
-				final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_comment_add_txtAddComment);
-				if (addingComment == groupPosition){
-					txtAddComment.requestFocus();
-				}
-
-				final ImageButton btnAddComment = (ImageButton) rowView.findViewById(R.id.list_row_comment_add_btnAddComment);
-				btnAddComment.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						String message = txtAddComment.getText().toString();
-						if (message.isEmpty())
-							return;
-						final long post_id = posts.get(groupPosition).getPost().getID();
-						HHComment comment = new HHComment(post_id,
-															  HHUser.getCurrentUser().getUser().getID(),
-															  message);
-						AsyncDataManager
-							.postComment(comment, new AsyncDataManager.PostCommentCallback() {
-								@Override
-								public void returnPostedComment(HHComment returnedComment) {
-									Log.d(TAG, "Posted new comment!");
-									AsyncDataManager.getWebPost(
-										post_id,
-										new AsyncDataManager.GetWebPostCallback() {
-											@Override
-											public void returnWebPost(HHPostFull webPost) {
-												posts = ZZZUtility.updateList(posts, webPost);
-												callback.onDataChange();
-											}
-										});
-									addingComment = -1;
-									InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
-										Context.INPUT_METHOD_SERVICE);
-									inputMethodManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
-								}
-							});
-						btnAddComment.setVisibility(View.INVISIBLE);
-						ProgressBar progressBar = (ProgressBar) rowView
-							.findViewById(R.id.list_row_comment_add_progressBar);
-						progressBar.setVisibility(View.VISIBLE);
-					}
-				});
-
-				return rowView;
+				return getChildViewComment(groupPosition, parent);
 			}
+
+			LayoutInflater inflater = context.getLayoutInflater();
 
 			if (posts.get(groupPosition).getLikes().size() > 0) {
 				childPosition--;
@@ -617,7 +521,7 @@ public class FeedFragment extends Fragment {
 				viewHolder = null;
 
 			if (viewHolder == null){
-				convertView = inflater.inflate(R.layout.list_row_comment, null, true);
+				convertView = inflater.inflate(R.layout.list_row_comment, parent, false);
 
 				viewHolder = new ViewHolderChildItem();
 				viewHolder.groupPosition = groupPosition;
@@ -653,6 +557,96 @@ public class FeedFragment extends Fragment {
 				});
 
 			return convertView;
+		}
+
+		private View getChildViewLikes(final int groupPosition, ViewGroup parent){
+			LayoutInflater inflater = context.getLayoutInflater();
+			final View rowView = inflater.inflate(R.layout.list_row_comment_like, parent, false);
+
+			TextView txtLikers = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtLikers);
+			List<HHLikeUser> likes = posts.get(groupPosition).getLikes();
+
+			int youLike = -1;
+			StringBuilder sb;
+			if (likes.get(0).getUser().equals(HHUser.getCurrentUser().getUser())) {
+				youLike = 0;
+				sb = new StringBuilder();
+			} else {
+				sb = new StringBuilder(likes.get(0).getUser().getName());
+			}
+			for (int i = 1; i < likes.size(); i++){
+				if (likes.get(i).getUser().equals(HHUser.getCurrentUser().getUser())){
+					youLike = i;
+				} else {
+					sb.append(", ").append(likes.get(i).getUser().getName());
+				}
+			}
+			txtLikers.setText(
+				(youLike >= 0 ? "You" + ((youLike > 0) ? ", " : "") : "") + sb.toString());
+
+			TextView txtNumber = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtNumber);
+			txtNumber.setText(String.valueOf(likes.size()));
+
+			return rowView;
+		}
+
+		private View getChildViewComment(final int groupPosition, ViewGroup parent){
+			LayoutInflater inflater = context.getLayoutInflater();
+			final View rowView = inflater.inflate(R.layout.list_row_comment_add, parent, false);
+
+			final ImageView imgProfile = (ImageView) rowView.findViewById(R.id.list_row_comment_add_imgProfile);
+			WebHelper.getFacebookProfilePicture(
+				Profile.getCurrentProfile().getId(),
+				new WebHelper.GetFacebookProfilePictureCallback() {
+					@Override
+					public void returnFacebookProfilePicture(Bitmap bitmap) {
+						imgProfile.setImageBitmap(bitmap);
+					}
+				});
+
+			final EditText txtAddComment = (EditText) rowView.findViewById(R.id.list_row_comment_add_txtAddComment);
+			if (addingComment == groupPosition){
+				txtAddComment.requestFocus();
+			}
+
+			final ImageButton btnAddComment = (ImageButton) rowView.findViewById(R.id.list_row_comment_add_btnAddComment);
+			btnAddComment.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					String message = txtAddComment.getText().toString();
+					if (message.isEmpty())
+						return;
+					final long post_id = posts.get(groupPosition).getPost().getID();
+					HHComment comment = new HHComment(post_id,
+													  HHUser.getCurrentUser().getUser().getID(),
+													  message);
+					AsyncDataManager
+						.postComment(comment, new AsyncDataManager.PostCommentCallback() {
+							@Override
+							public void returnPostedComment(HHComment returnedComment) {
+								Log.d(TAG, "Posted new comment!");
+								AsyncDataManager.getWebPost(
+									post_id,
+									new AsyncDataManager.GetWebPostCallback() {
+										@Override
+										public void returnWebPost(HHPostFull webPost) {
+											posts = ZZZUtility.updateList(posts, webPost);
+											callback.onDataChange();
+										}
+									});
+								addingComment = -1;
+								InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
+									Context.INPUT_METHOD_SERVICE);
+								inputMethodManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
+							}
+						});
+					btnAddComment.setVisibility(View.INVISIBLE);
+					ProgressBar progressBar = (ProgressBar) rowView
+						.findViewById(R.id.list_row_comment_add_progressBar);
+					progressBar.setVisibility(View.VISIBLE);
+				}
+			});
+			return rowView;
 		}
 
 		@Override

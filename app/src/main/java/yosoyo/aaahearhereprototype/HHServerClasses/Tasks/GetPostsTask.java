@@ -22,7 +22,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
+class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
 
@@ -30,7 +30,7 @@ public class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>>
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
-	private GetPostsTaskCallback callbackTo;
+	private final GetPostsTaskCallback callbackTo;
 
 	public GetPostsTask(GetPostsTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
@@ -48,8 +48,8 @@ public class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>>
 				String streamString = ZZZUtility.convertStreamToString(in);
 				HHPostFullNested[] postsNested = new Gson().fromJson(streamString, HHPostFullNested[].class);
 				List<HHPostFullProcess> posts = new ArrayList<>(postsNested.length);
-				for (int i = 0; i < postsNested.length; i++){
-					posts.add(new HHPostFullProcess(postsNested[i]));
+				for (HHPostFullNested postNested : postsNested) {
+					posts.add(new HHPostFullProcess(postNested));
 				}
 				return posts;
 			} finally {

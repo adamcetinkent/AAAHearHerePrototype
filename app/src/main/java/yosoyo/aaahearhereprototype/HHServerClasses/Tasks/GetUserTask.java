@@ -18,7 +18,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class GetUserTask extends AsyncTask<Integer, Void, HHUser> {
+class GetUserTask extends AsyncTask<Integer, Void, HHUser> {
 	private static final String TAG = "GetUserTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "users/";
 
@@ -27,8 +27,8 @@ public class GetUserTask extends AsyncTask<Integer, Void, HHUser> {
 		void returnUser(HHUser user);
 	}
 
-	private GetUserTaskCallback callbackTo;
-	private long id;
+	private final GetUserTaskCallback callbackTo;
+	private final long id;
 
 	public GetUserTask(GetUserTaskCallback callbackTo, long id) {
 		this.callbackTo = callbackTo;

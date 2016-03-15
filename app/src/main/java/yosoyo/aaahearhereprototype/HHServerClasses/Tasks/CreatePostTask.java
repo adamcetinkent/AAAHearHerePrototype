@@ -21,7 +21,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
+class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "CreatePostTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
 
@@ -30,8 +30,8 @@ public class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 		void returnResultCreatePost(Boolean success, HHPostFullProcess postReturned);
 	}
 
-	private CreatePostTaskCallback callbackTo;
-	private HHPostTagsArray post;
+	private final CreatePostTaskCallback callbackTo;
+	private final HHPostTagsArray post;
 	private HHPostFullNested postReturned;
 
 	public CreatePostTask(HHPostTagsArray post, CreatePostTaskCallback callbackTo) {

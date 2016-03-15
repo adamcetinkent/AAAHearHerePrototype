@@ -12,15 +12,15 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFrien
  */
 public class HHUserFull {
 
-	private HHUser user;
-	private List<HHFriendshipUser> friendships;
+	private final HHUser user;
+	private final List<HHFriendshipUser> friendships;
 
 	public HHUserFull(HHUserFullProcess process){
 		this.user = process.getUser();
 		this.friendships = process.getFriendships();
 	}
 
-	public HHUserFull(HHUserFriendshipsNested nested){
+	HHUserFull(HHUserFriendshipsNested nested){
 		this.user = new HHUser(nested);
 		this.friendships = nested.getFriendshipsList();
 	}

@@ -17,7 +17,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
  * Custom Adapter for ListView to show artwork (imageView), title and description (textViews).
  * imgArtwork is downloaded from URLs stored in images.
  */
-public class SearchResultsCustomListAdapter extends ArrayAdapter{
+class SearchResultsCustomListAdapter extends ArrayAdapter<String>{
 	private static final String TAG = "SearchResultsCustomListAdapter";
 
 	private final Activity context;
@@ -36,17 +36,38 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter{
 		this.descriptions = descriptions;
 	}
 
-	public View getView(int position, View view, ViewGroup parent){
-		LayoutInflater inflater=context.getLayoutInflater();
-		View rowView = inflater.inflate(R.layout.list_row_track, null, true);
+	private static class ViewHolder{
+		int position;
+		TextView txtArtistName;
+		TextView txtArtistDesc;
+		ImageView imgArtwork;
+	}
 
-		// Get views into which info will be put
-		TextView txtArtistName = (TextView) rowView.findViewById(R.id.artistname);
-		final ImageView imgArtwork = (ImageView) rowView.findViewById(R.id.artwork);
-		TextView txtArtistDesc = (TextView) rowView.findViewById(R.id.artistdesc);
+	public View getView(int position, View convertView, ViewGroup parent){
+		final ViewHolder viewHolder;
 
+		if (convertView == null) {
+			LayoutInflater inflater = context.getLayoutInflater();
+			convertView = inflater.inflate(R.layout.list_row_track, parent, false);
 
-		txtArtistName.setText(titles[position]); // Set artistName TextView
+			viewHolder = new ViewHolder();
+
+			viewHolder.position = position;
+
+			viewHolder.txtArtistName = (TextView) convertView.findViewById(R.id.list_row_track_artist_name);
+			viewHolder.txtArtistDesc = (TextView) convertView.findViewById(R.id.list_row_track_artist_desc);
+			viewHolder.imgArtwork = (ImageView) convertView.findViewById(R.id.list_row_track_artwork);
+
+			convertView.setTag(viewHolder);
+
+		} else {
+			viewHolder = (ViewHolder) convertView.getTag();
+			viewHolder.position = position;
+		}
+
+		viewHolder.txtArtistName.setText(titles[viewHolder.position]); // Set artistName TextView
+		if (descriptions[viewHolder.position] != null)
+			viewHolder.txtArtistDesc.setText(descriptions[viewHolder.position]); // Set artistDesc TextView
 
 		// Set artwork imgView bitmap
 		WebHelper.getSpotifyAlbumArt(
@@ -55,13 +76,11 @@ public class SearchResultsCustomListAdapter extends ArrayAdapter{
 			new WebHelper.GetSpotifyAlbumArtCallback() {
 				@Override
 				public void returnSpotifyAlbumArt(Bitmap bitmap) {
-				  imgArtwork.setImageBitmap(bitmap);
+					viewHolder.imgArtwork.setImageBitmap(bitmap);
 				}
 			});
-		if (descriptions[position] != null)
-			txtArtistDesc.setText(descriptions[position]); // Set artistDesc TextView
 
-		return rowView;
+		return convertView;
 	}
 
 }

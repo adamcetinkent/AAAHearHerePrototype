@@ -8,7 +8,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
  */
 public class HHLikeUserNested extends HHLike {
 
-	HHUser user;
+	private HHUser user;
 
 	protected HHLikeUserNested(HHLikeUserNested nested) {
 		super(nested);

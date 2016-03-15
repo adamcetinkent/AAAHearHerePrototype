@@ -7,9 +7,9 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyImage {
 
-	int height;
-	String url;
-	int width;
+	private int height;
+	private String url;
+	private int width;
 
 	public String getUrl() {
 		return url;

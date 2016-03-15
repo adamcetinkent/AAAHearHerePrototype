@@ -30,8 +30,8 @@ public class SpotifyAPIRequestTrack extends AsyncTask<Void, Void, SpotifyTrack> 
 
 	private static final String urlSpotifySearch = "https://api.spotify.com/v1/tracks/";
 
-	private SpotifyAPIRequestTrackCallback callback = null;
-	private String trackID;
+	private final SpotifyAPIRequestTrackCallback callback;
+	private final String trackID;
 
 	public SpotifyAPIRequestTrack(String trackID, SpotifyAPIRequestTrackCallback callback){
 		this.callback = callback;

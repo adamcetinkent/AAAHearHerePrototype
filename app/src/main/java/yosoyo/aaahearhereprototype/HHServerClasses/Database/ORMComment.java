@@ -41,9 +41,9 @@ public class ORMComment {
 	public static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
 
-	public static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
+	private static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 	"TIMESTAMP";
-	public static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
@@ -88,9 +88,9 @@ public class ORMComment {
 
 	public static class DBCommentInsertTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHComment comment;
-		private DBCommentInsertTaskCallback callbackTo;
+		private final Context context;
+		private final HHComment comment;
+		private final DBCommentInsertTaskCallback callbackTo;
 
 		public interface DBCommentInsertTaskCallback {
 			void returnInsertedComment(Long commentID, HHComment comment);
@@ -129,9 +129,9 @@ public class ORMComment {
 
 	public static class DBCommentInsertManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBCommentInsertManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBCommentInsertManyFromPostsTaskCallback callbackTo;
 
 		public interface DBCommentInsertManyFromPostsTaskCallback {
 			void returnInsertedManyComments(List<HHPostFullProcess> postsToProcess);

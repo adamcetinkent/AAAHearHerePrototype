@@ -46,13 +46,13 @@
                 android:id="@+id/list_row_timeline_txtUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USER NAME"/>
+                android:text="@string/placeholder_user_name"/>
 
             <TextView
                 android:id="@+id/list_row_timeline_txtLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="@string/placeholder_location"
                 android:layout_marginLeft="10dp"
                 />
 
@@ -60,14 +60,14 @@
 
         <TextView
             android:id="@+id/list_row_timeline_txtDateTime"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:textColor="#ffaaaaaa"
             android:layout_gravity="center_vertical|right"
             android:textAlignment="gravity"
-            android:text="DATE"
+            android:text="@string/placeholder_date"
             android:gravity="right"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
@@ -95,28 +95,28 @@
 
             <TextView
                 android:id="@+id/list_row_timeline_txtTrackName"
-                android:text="Song Title"
+                android:text="@string/placeholder_track_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
                 android:textColor="#ff000000"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"/>
 
             <TextView
                 android:id="@+id/list_row_timeline_txtArtist"
-                android:text="Artist Name"
+                android:text="@string/placeholder_artist_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
                 android:textColor="#ff000000"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="5dp"
@@ -124,14 +124,14 @@
 
             <TextView
                 android:id="@+id/list_row_timeline_txtAlbum"
-                android:text="Album Name"
+                android:text="@string/placeholder_album_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
                 android:textColor="#ff000000"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="5dp"
@@ -139,13 +139,13 @@
 
             <TextView
                 android:id="@+id/list_row_timeline_txtMessage"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et felis tempus, gravida dui id, pulvinar turpis. In tincidunt, quam at faucibus tincidunt, quam magna viverra ipsum, at ornare sem tortor convallis est. Mauris posuere vestibulum tortor id ornare. "
+                android:text="@string/placeholder_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="false"
                 android:textColor="#ff7f7f7f"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
@@ -218,7 +218,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tags go here"
+            android:text="@string/placeholder_tags"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="10dp"/>
@@ -259,8 +259,7 @@
             android:layout_marginLeft="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/share"
-            android:background="@android:color/transparent"
-            android:text="Share"/>
+            android:background="@android:color/transparent"/>
 
     </LinearLayout>
 

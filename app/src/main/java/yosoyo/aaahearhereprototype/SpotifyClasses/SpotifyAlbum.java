@@ -7,23 +7,23 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyAlbum {
 
-	String album_type;
-	SpotifyArtistSimple[] artists;
-	String[] available_markets;
-	SpotifyCopyright[] copyrights;
-	SpotifyExternalID externalIDs;
-	SpotifyExternalURL externalURLs;
-	String[] genres;
-	String href;
-	String id;
-	SpotifyImage[] images;
-	String name;
-	int popularity;
-	String release_date;
-	String release_date_precision;
-	SpotifyPaging<SpotifyTrackSimple> tracks;
-	String type;
-	String uri;
+	private String album_type;
+	private SpotifyArtistSimple[] artists;
+	private String[] available_markets;
+	private SpotifyCopyright[] copyrights;
+	private SpotifyExternalID externalIDs;
+	private SpotifyExternalURL externalURLs;
+	private String[] genres;
+	private String href;
+	private String id;
+	private SpotifyImage[] images;
+	private String name;
+	private int popularity;
+	private String release_date;
+	private String release_date_precision;
+	private SpotifyPaging<SpotifyTrackSimple> tracks;
+	private String type;
+	private String uri;
 
 	public SpotifyImage getImages(int index) {
 		if (index < images.length) {
@@ -53,7 +53,7 @@ public class SpotifyAlbum {
 	public String getArtistID(){
 		if (artists == null)
 			return null;
-		return artists[0].id;
+		return artists[0].getID();
 	}
 
 	public String getID(){

@@ -14,10 +14,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
  */
 public class HHPostFullNested extends HHPost {
 
-	HHUser user;
-	HHCommentUserNested[] comments;
-	HHLikeUserNested[] likes;
-	HHTagUserNested[] tags;
+	private HHUser user;
+	private HHCommentUserNested[] comments;
+	private HHLikeUserNested[] likes;
+	private HHTagUserNested[] tags;
 
 	public HHUser getUser(){
 		return user;

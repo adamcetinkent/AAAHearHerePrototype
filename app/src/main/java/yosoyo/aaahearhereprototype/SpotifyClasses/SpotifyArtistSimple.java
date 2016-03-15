@@ -7,14 +7,18 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  */
 public class SpotifyArtistSimple {
 
-	SpotifyExternalURL external_urls;
-	String href;
-	String id;
-	String name;
-	String type;
-	String uri;
+	private SpotifyExternalURL external_urls;
+	private String href;
+	private String id;
+	private String name;
+	private String type;
+	private String uri;
 
 	public String getName() {
 		return name;
+	}
+
+	public String getID() {
+		return id;
 	}
 }

@@ -8,7 +8,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
  */
 public class HHCommentUserNested extends HHComment {
 
-	HHUser user;
+	private final HHUser user;
 
 	protected HHCommentUserNested(long post_id, long user_id, String message, HHUser user){
 		super(post_id, user_id, message);

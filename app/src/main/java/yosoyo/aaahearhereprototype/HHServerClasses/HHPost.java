@@ -12,19 +12,19 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
  */
 public class HHPost extends HHBase {
 
-	long user_id;
-	String track;
-	double lat;
-	double lon;
-	String place_name;
-	String google_place_id;
-	String message;
+	private long user_id;
+	private String track;
+	private double lat;
+	private double lon;
+	private String place_name;
+	private String google_place_id;
+	private String message;
 
 	public String getTrack() {
 		return track;
 	}
 
-	public HHPost(){}
+	protected HHPost(){}
 
 	public HHPost(HHPostFullNested nested){
 		super(
@@ -41,7 +41,7 @@ public class HHPost extends HHBase {
 		this.google_place_id = nested.getGooglePlaceID();
 	}
 
-	public HHPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id) {
+	protected HHPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id) {
 		super();
 		this.user_id = user_id;
 		this.track = track;

@@ -46,9 +46,9 @@ public class ORMCachedSpotifyTrack {
 	public static final String	COLUMN_PREVIEW_URL_NAME =	"preview_url";
 	private static final String COLUMN_PREVIEW_URL_TYPE =	"TEXT";
 
-	public static final String 	COLUMN_CACHED_AT_NAME =		"cached_at";
+	private static final String COLUMN_CACHED_AT_NAME =		"cached_at";
 	private static final String COLUMN_CACHED_AT_TYPE =		"TIMESTAMP";
-	public static final String 	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +
@@ -100,8 +100,8 @@ public class ORMCachedSpotifyTrack {
 	}
 
 	public static class GetDBCachedSpotifyTracksTask extends AsyncTask<Void, Void, List<HHCachedSpotifyTrack>> {
-		private Context context;
-		private GetDBCachedSpotifyTracksCallback callbackTo;
+		private final Context context;
+		private final GetDBCachedSpotifyTracksCallback callbackTo;
 
 		public interface GetDBCachedSpotifyTracksCallback {
 			void returnCachedSpotifyTracks(List<HHCachedSpotifyTrack> cachedSpotifyTracks);
@@ -147,10 +147,10 @@ public class ORMCachedSpotifyTrack {
 
 	public static class InsertCachedSpotifyTrackTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHCachedSpotifyTrack cachedSpotifyTrack;
-		private int position;
-		private InsertCachedSpotifyTrackTaskCallback callbackTo;
+		private final Context context;
+		private final HHCachedSpotifyTrack cachedSpotifyTrack;
+		private final int position;
+		private final InsertCachedSpotifyTrackTaskCallback callbackTo;
 
 		public interface InsertCachedSpotifyTrackTaskCallback {
 			void returnInsertCachedSpotifyTrack(Long trackID, int position, HHCachedSpotifyTrack cachedSpotifyTrack);
@@ -196,9 +196,9 @@ public class ORMCachedSpotifyTrack {
 
 	public static class DBCachedSpotifyTrackSelectManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBCachedSpotifyTrackSelectManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBCachedSpotifyTrackSelectManyFromPostsTaskCallback callbackTo;
 
 		public interface DBCachedSpotifyTrackSelectManyFromPostsTaskCallback {
 			void returnSelectedManyCachedSpotifyTracks(List<HHPostFullProcess> postToProcess);
@@ -251,9 +251,9 @@ public class ORMCachedSpotifyTrack {
 
 	public static class DBCachedSpotifyTrackInsertFromPostTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private HHPostFullProcess post;
-		private DBCachedSpotifyTrackInsertFromPostTaskCallback callbackTo;
+		private final Context context;
+		private final HHPostFullProcess post;
+		private final DBCachedSpotifyTrackInsertFromPostTaskCallback callbackTo;
 
 		public interface DBCachedSpotifyTrackInsertFromPostTaskCallback {
 			void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess);
@@ -294,9 +294,9 @@ public class ORMCachedSpotifyTrack {
 
 	public static class DBCachedSpotifyTrackInsertManyFromPostsTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private List<HHPostFullProcess> posts;
-		private DBCachedSpotifyTrackInsertManyFromPostsTaskCallback callbackTo;
+		private final Context context;
+		private final List<HHPostFullProcess> posts;
+		private final DBCachedSpotifyTrackInsertManyFromPostsTaskCallback callbackTo;
 
 		public interface DBCachedSpotifyTrackInsertManyFromPostsTaskCallback {
 			void returnInsertedManyCachedSpotifyTracks(List<HHPostFullProcess> postsToProcess);

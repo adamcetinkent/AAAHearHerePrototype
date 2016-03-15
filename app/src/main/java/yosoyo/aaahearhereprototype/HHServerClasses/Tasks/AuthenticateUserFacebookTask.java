@@ -23,15 +23,15 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer> {
 	private static final String TAG = "FBAuthenticateUser";
-	public static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface AuthenticateUserFacebookTaskCallback {
 		void returnAuthenticationResult(Integer result, HHUserFullProcess user);
 	}
 
-	private AuthenticateUserFacebookTaskCallback callbackTo;
-	private AccessToken accessToken;
+	private final AuthenticateUserFacebookTaskCallback callbackTo;
+	private final AccessToken accessToken;
 	private HHUserFullProcess user;
 
 	public AuthenticateUserFacebookTask(AccessToken accessToken, AuthenticateUserFacebookTaskCallback callbackTo) {
@@ -60,8 +60,6 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 				out.close();
 
 				int httpResult = urlConnection.getResponseCode();
-
-				String httpResponse = urlConnection.getResponseMessage();
 
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String httpResponseStream = ZZZUtility.convertStreamToString(in);

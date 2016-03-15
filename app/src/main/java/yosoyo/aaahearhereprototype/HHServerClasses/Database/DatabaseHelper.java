@@ -31,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 
-	public static void createDatabase(SQLiteDatabase db){
+	private static void createDatabase(SQLiteDatabase db){
 		Log.d(TAG, "Creating database [" + DB_NAME + " v." + DB_VERSION + "]...");
 
 		db.execSQL(ORMPost.SQL_CREATE_TABLE);
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(ORMCachedSpotifyTrack.SQL_CREATE_TABLE);
 	}
 
-	public static void upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion){
+	private static void upgradeDatabase(SQLiteDatabase db, int oldVersion, int newVersion){
 		Log.d(TAG, "Updating database [" + DB_NAME + " v." + oldVersion + "] to [" + DB_NAME + " v." + newVersion + "]...");
 
 		db.execSQL(ORMPost.SQL_DROP_TABLE);
@@ -240,7 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			&& postToProcess.isCommentsProcessed()
 			&& postToProcess.isTagsProcessed()){
 
-			postsToProcess.remove(postsToProcess);
+			//postsToProcess.remove(postToProcess);
 			callback.returnWebPost(new HHPostFull(postToProcess));
 		}
 	}

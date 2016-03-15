@@ -7,8 +7,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshi
  */
 public class HHFriendshipUser {
 
-	HHFriendship friendship;
-	HHUser user;
+	private final HHFriendship friendship;
+	private final HHUser user;
 
 	public HHFriendshipUser(HHFriendshipUserNested nested){
 		this.friendship = new HHFriendship(nested);

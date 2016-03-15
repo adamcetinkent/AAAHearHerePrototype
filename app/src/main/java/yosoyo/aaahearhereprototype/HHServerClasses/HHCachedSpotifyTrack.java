@@ -10,12 +10,12 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
  */
 public class HHCachedSpotifyTrack {
 
-	String trackID;
-	String name;
-	String artist;
-	String album;
-	String image_url;
-	String preview_url;
+	private final String trackID;
+	private final String name;
+	private final String artist;
+	private final String album;
+	private final String image_url;
+	private final String preview_url;
 
 	public HHCachedSpotifyTrack(SpotifyTrack spotifyTrack){
 		this.trackID = spotifyTrack.getID();

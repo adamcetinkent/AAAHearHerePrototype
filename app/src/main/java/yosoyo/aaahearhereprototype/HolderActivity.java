@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -47,7 +47,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 	private int currentPosition = 0;
 
 	public static boolean apiExists = false;
-	public static MediaPlayer mediaPlayer = new MediaPlayer();
+	public static final MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public static GoogleApiClient mGoogleApiClient;
 
@@ -65,7 +65,6 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 
 		AsyncDataManager.setContext(this);
 
-		Intent intent = getIntent();
 		WebHelper.getFacebookProfilePicture(
 			Profile.getCurrentProfile().getId(),
 			new WebHelper.GetFacebookProfilePictureCallback() {
@@ -147,7 +146,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 			})
 			.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
 				@Override
-				public void onConnectionFailed(ConnectionResult connectionResult) {
+				public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
 				}
 			})

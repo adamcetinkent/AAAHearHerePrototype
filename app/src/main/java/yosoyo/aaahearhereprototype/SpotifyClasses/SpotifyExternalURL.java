@@ -5,9 +5,9 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an ExternalURL
  */
-public class SpotifyExternalURL {
+class SpotifyExternalURL {
 
-	String key;
-	String value;
+	private String key;
+	private String value;
 
 }

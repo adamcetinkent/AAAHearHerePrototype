@@ -117,9 +117,8 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 				break;
 			}
 		}
-		if (spotifyAPIRequest == null)
-			return;
-		else
+
+		if (spotifyAPIRequest != null)
 			spotifyAPIRequest.execute(query);
 	}
 
@@ -149,7 +148,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 
 	private void processTracks(final SpotifyAPIResponse result){
 		trackResults = result.getTracks().getItems();
-		Log.d(TAG, "JSON search results:\n" + trackResults);
+		//Log.d(TAG, "JSON search results:\n" + trackResults);
 		if (trackResults == null){
 			return;
 		}
@@ -187,7 +186,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 
 	private void processArtists(SpotifyAPIResponse result){
 		artistResults = result.getArtists().getItems();
-		Log.d(TAG, "JSON search results:\n" + artistResults);
+		//Log.d(TAG, "JSON search results:\n" + artistResults);
 		if (artistResults == null){
 			return;
 		}
@@ -224,7 +223,7 @@ public class SearchResultsActivity extends Activity implements SpotifyAPIRequest
 
 	private void processAlbums(SpotifyAPIResponse result){
 		albumResults = result.getAlbums().getItems();
-		Log.d(TAG, "JSON search results:\n" + albumResults);
+		//Log.d(TAG, "JSON search results:\n" + albumResults);
 		if (albumResults == null){
 			return;
 		}

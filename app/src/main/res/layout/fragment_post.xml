@@ -46,13 +46,13 @@
                 android:id="@+id/post_fragment_txtUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USER NAME"/>
+                android:text="@string/placeholder_user_name"/>
 
             <TextView
                 android:id="@+id/post_fragment_txtLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="@string/placeholder_location"
                 android:layout_marginLeft="10dp"
                 />
 
@@ -72,11 +72,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:textColor="#ffaaaaaa"
             android:layout_gravity="center_vertical|right"
             android:textAlignment="gravity"
-            android:text="DATE"
+            android:text="@string/placeholder_date"
             android:gravity="right"
             android:layout_marginRight="10dp"/>
 
@@ -87,7 +87,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/post_fragment_llTrackFrame"
@@ -107,14 +108,14 @@
 
                 <SearchView
                     android:id="@+id/post_fragment_searchTrackName"
-                    android:text="Song Title"
+                    android:text="@string/placeholder_track_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
@@ -123,14 +124,14 @@
 
                 <SearchView
                     android:id="@+id/post_fragment_searchArtist"
-                    android:text="Artist Name"
+                    android:text="@string/placeholder_artist_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
@@ -140,14 +141,14 @@
 
                 <SearchView
                     android:id="@+id/post_fragment_searchAlbum"
-                    android:text="Album Name"
+                    android:text="@string/placeholder_album_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
@@ -165,14 +166,14 @@
 
                 <TextView
                     android:id="@+id/post_fragment_txtTrackName"
-                    android:text="Song Title"
+                    android:text="@string/placeholder_track_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
@@ -181,14 +182,14 @@
 
                 <TextView
                     android:id="@+id/post_fragment_txtArtist"
-                    android:text="Artist Name"
+                    android:text="@string/placeholder_artist_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
@@ -198,14 +199,14 @@
 
                 <TextView
                     android:id="@+id/post_fragment_txtAlbum"
-                    android:text="Album Name"
+                    android:text="@string/placeholder_album_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
                     android:textColor="#ff000000"
-                    android:textSize="14dp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
@@ -217,13 +218,13 @@
 
             <yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText
                 android:id="@+id/post_fragment_txtMessage"
-                android:hint="Leave a message"
+                android:hint="@string/fragment_post_txtMessage_hint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="false"
                 android:textColor="#ff7f7f7f"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"

@@ -19,7 +19,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
+class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
 
@@ -28,8 +28,8 @@ public class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 		void returnPost(HHPostFullProcess post);
 	}
 
-	private GetPostTaskCallback callbackTo;
-	private long post_id;
+	private final GetPostTaskCallback callbackTo;
+	private final long post_id;
 
 	public GetPostTask(long post_id, GetPostTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;
@@ -47,8 +47,7 @@ public class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 				String streamString = ZZZUtility.convertStreamToString(in);
 				HHPostFullNested postNested = new Gson().fromJson(streamString,
 																		  HHPostFullNested.class);
-				HHPostFullProcess post = new HHPostFullProcess(postNested);
-				return post;
+				return new HHPostFullProcess(postNested);
 			} finally {
 				urlConnection.disconnect();
 			}

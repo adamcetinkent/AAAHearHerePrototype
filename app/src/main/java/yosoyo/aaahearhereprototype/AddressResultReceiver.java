@@ -18,7 +18,7 @@ public class AddressResultReceiver extends ResultReceiver {
 		void returnAddress(Address address);
 	}
 
-	private AddressResultReceiverCallback callback;
+	private final AddressResultReceiverCallback callback;
 
 	public AddressResultReceiver(Handler handler, AddressResultReceiverCallback callback){
 		super(handler);

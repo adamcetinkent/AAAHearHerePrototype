@@ -13,7 +13,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 /**
  * Created by adam on 18/02/16.
  */
-public class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
+class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "DeleteLikeTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
@@ -22,8 +22,8 @@ public class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 		void returnResultDeleteLike(Boolean success);
 	}
 
-	private DeleteLikeTaskCallback callbackTo;
-	private HHLike like;
+	private final DeleteLikeTaskCallback callbackTo;
+	private final HHLike like;
 
 	public DeleteLikeTask(HHLike like, DeleteLikeTaskCallback callbackTo) {
 		this.callbackTo = callbackTo;

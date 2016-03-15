@@ -29,8 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="1dp"
             android:layout_gravity="center"
-            android:text="100"
-            android:textSize="8dp"
+            android:text="@string/placholder_num_likes"
+            android:textSize="8sp"
             android:textColor="@android:color/white"/>
 
     </FrameLayout>
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginRight="10dp"
-            android:text="Likers"
+            android:text="@string/placeholder_likers"
             />
 
     </LinearLayout>

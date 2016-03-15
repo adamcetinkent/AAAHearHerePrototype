@@ -13,32 +13,32 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
 /**
  * Created by adam on 02/03/16.
  */
-public class ORMFriendship {
+class ORMFriendship {
 
 	private static final String TAG = "ORMFriendship";
 
-	public static final String	TABLE_NAME = 					"friendships";
+	private static final String	TABLE_NAME = 					"friendships";
 
 	private static final String	COMMA_SEP = 					", ";
 
-	public static final String	COLUMN_ID_NAME = 				"_id";
+	private static final String	COLUMN_ID_NAME = 				"_id";
 	private static final String	COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
 
-	public static final String	COLUMN_USER_ID_NAME = 			"user_id";
+	private static final String	COLUMN_USER_ID_NAME = 			"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 			"INTEGER";
 
-	public static final String	COLUMN_FRIEND_USER_ID_NAME = 	"post_id";
+	private static final String	COLUMN_FRIEND_USER_ID_NAME = 	"post_id";
 	private static final String	COLUMN_FRIEND_USER_ID_TYPE =	"INTEGER";
 
-	public static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
+	private static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
 
-	public static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
+	private static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
 
-	public static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";
+	private static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 		"TIMESTAMP";
-	public static final String	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
@@ -81,9 +81,9 @@ public class ORMFriendship {
 
 	public static class DBFriendshipInsertTask extends AsyncTask<Void, Void, Long> {
 
-		private Context context;
-		private HHFriendship friendship;
-		private DBFriendshipInsertTaskCallback callbackTo;
+		private final Context context;
+		private final HHFriendship friendship;
+		private final DBFriendshipInsertTaskCallback callbackTo;
 
 		public interface DBFriendshipInsertTaskCallback {
 			void returnInsertedFriendship(Long friendshipID, HHFriendship friendship);
@@ -164,9 +164,9 @@ public class ORMFriendship {
 
 	public static class DBFriendshipInsertManyFromUserTask extends AsyncTask<Void, Void, Boolean> {
 
-		private Context context;
-		private HHUserFullProcess user;
-		private DBFriendshipInsertManyFromUserTaskCallback callbackTo;
+		private final Context context;
+		private final HHUserFullProcess user;
+		private final DBFriendshipInsertManyFromUserTaskCallback callbackTo;
 
 		public interface DBFriendshipInsertManyFromUserTaskCallback {
 			void returnInsertedManyFriendships(HHUserFullProcess user);
