@@ -76,13 +76,13 @@ public class ORMCachedSpotifyTrack {
 		database.close();
 	}
 
-	public static void insertCachedSpotifyTrack(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
+	/*public static void insertCachedSpotifyTrack(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
 		new InsertCachedSpotifyTrackTask(context, cachedSpotifyTrack, -1, callbackTo).execute();
 	}
 
 	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
 		new InsertCachedSpotifyTrackTask(context, spotifyTrack, -1, callbackTo).execute();
-	}
+	}*/
 
 	private static ContentValues cachedSpotifyTrackToContentValues(HHCachedSpotifyTrack track){
 		ContentValues contentValues = new ContentValues();
@@ -93,6 +93,56 @@ public class ORMCachedSpotifyTrack {
 		contentValues.put(COLUMN_IMAGE_URL_NAME, 	track.getImageUrl());
 		contentValues.put(COLUMN_PREVIEW_URL_NAME, track.getPreviewUrl());
 		return contentValues;
+	}
+
+	public static void getCachedSpotifyTrack(Context context, String trackID, GetDBCachedSpotifyTrackTask.GetDBCachedSpotifyTrackCallback callback){
+		new GetDBCachedSpotifyTrackTask(context, trackID, callback).execute();
+	}
+
+	public static class GetDBCachedSpotifyTrackTask extends AsyncTask<Void, Void, HHCachedSpotifyTrack> {
+		private final Context context;
+		private final String trackID;
+		private final GetDBCachedSpotifyTrackCallback callbackTo;
+
+		public interface GetDBCachedSpotifyTrackCallback {
+			void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
+		}
+
+		public GetDBCachedSpotifyTrackTask(Context context, String trackID, GetDBCachedSpotifyTrackCallback callbackTo){
+			this.context = context;
+			this.trackID = trackID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected HHCachedSpotifyTrack doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_NAME +
+												  " WHERE " + COLUMN_TRACK_ID_NAME+"=?",
+											  new String[]{trackID});
+
+			int numTracks = cursor.getCount();
+			Log.d(TAG, "Loaded " + numTracks + " CachedSpotifyTracks...");
+
+			HHCachedSpotifyTrack track = null;
+			if (numTracks > 0){
+				cursor.moveToFirst();
+				track = new HHCachedSpotifyTrack(cursor);
+				Log.d(TAG, "CachedSpotifyTrack loaded successfully");
+			}
+
+			cursor.close();
+			database.close();
+
+			return track;
+		}
+
+		@Override
+		protected void onPostExecute(HHCachedSpotifyTrack cachedSpotifyTrack){
+			callbackTo.returnCachedSpotifyTrack(cachedSpotifyTrack);
+		}
 	}
 
 	public static void getCachedSpotifyTracks(Context context, GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback callbackTo){
@@ -145,28 +195,29 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
+	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callback){
+		new InsertCachedSpotifyTrackTask(context, spotifyTrack, callback);
+	}
+
 	public static class InsertCachedSpotifyTrackTask extends AsyncTask<Void, Void, Long> {
 
 		private final Context context;
 		private final HHCachedSpotifyTrack cachedSpotifyTrack;
-		private final int position;
 		private final InsertCachedSpotifyTrackTaskCallback callbackTo;
 
 		public interface InsertCachedSpotifyTrackTaskCallback {
-			void returnInsertCachedSpotifyTrack(Long trackID, int position, HHCachedSpotifyTrack cachedSpotifyTrack);
+			void returnInsertCachedSpotifyTrack(Long trackID, HHCachedSpotifyTrack cachedSpotifyTrack);
 		}
 
-		public InsertCachedSpotifyTrackTask(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, int position, InsertCachedSpotifyTrackTaskCallback callbackTo){
+		public InsertCachedSpotifyTrackTask(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTaskCallback callbackTo){
 			this.context = context;
 			this.cachedSpotifyTrack = cachedSpotifyTrack;
-			this.position = position;
 			this.callbackTo = callbackTo;
 		}
 
-		public InsertCachedSpotifyTrackTask(Context context, SpotifyTrack spotifyTrack, int position, InsertCachedSpotifyTrackTaskCallback callbackTo){
+		public InsertCachedSpotifyTrackTask(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTaskCallback callbackTo){
 			this.context = context;
 			this.cachedSpotifyTrack = new HHCachedSpotifyTrack(spotifyTrack);
-			this.position = position;
 			this.callbackTo = callbackTo;
 		}
 
@@ -186,7 +237,7 @@ public class ORMCachedSpotifyTrack {
 
 		@Override
 		protected void onPostExecute(Long trackID){
-			callbackTo.returnInsertCachedSpotifyTrack(trackID, position, cachedSpotifyTrack);
+			callbackTo.returnInsertCachedSpotifyTrack(trackID, cachedSpotifyTrack);
 		}
 	}
 

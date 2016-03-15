@@ -1,9 +1,13 @@
 package yosoyo.aaahearhereprototype;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -19,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.Profile;
 import com.google.android.gms.common.ConnectionResult;
@@ -33,6 +38,8 @@ import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
+import yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
 
 public class HolderActivity extends Activity implements PostFragmentPostedListener {
 
@@ -50,6 +57,8 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 	public static final MediaPlayer mediaPlayer = new MediaPlayer();
 
 	public static GoogleApiClient mGoogleApiClient;
+
+	private HHBroadcastReceiver broadcastReceiver;
 
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
@@ -130,7 +139,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 					drawerList.setItemChecked(currentPosition, true);
 				}
 			}
-														  );
+		);
 
 		mGoogleApiClient = new GoogleApiClient.Builder(this)
 			.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -155,6 +164,33 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 			.addApi(Places.GEO_DATA_API)
 			.build();
 
+		broadcastReceiver = new HHBroadcastReceiver(
+			new HHBroadcastReceiver.HHBroadCastReceiverCallback() {
+				@Override
+				public void returnNewLocation(double lat, double lng) {
+					Toast.makeText(HolderActivity.this, "NEW LOCATION: " + lat + " " + lng, Toast.LENGTH_SHORT).show();
+				}
+			});
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(LocationListenerService.LOCATION_UPDATE);
+		registerReceiver(broadcastReceiver, intentFilter);
+
+		if (!isServiceRunning(LocationListenerService.class)) {
+			Intent intent = new Intent(this, LocationListenerService.class);
+			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUser().getUser().getID());
+			startService(intent);
+		}
+
+	}
+
+	private boolean isServiceRunning(Class<?> serviceClass){
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)){
+			if (serviceClass.getName().equals(serviceInfo.service.getClassName())){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -172,6 +208,7 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 
 	protected void onStop() {
 		mGoogleApiClient.disconnect();
+		unregisterReceiver(broadcastReceiver);
 		super.onStop();
 	}
 

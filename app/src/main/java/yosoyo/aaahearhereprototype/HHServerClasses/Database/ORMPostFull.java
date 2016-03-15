@@ -3,6 +3,7 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -138,6 +139,77 @@ class ORMPostFull {
 			}
 
 			cursorPost.close();
+			database.close();
+
+			return posts;
+		}
+
+		@Override
+		protected void onPostExecute(List<HHPostFull> posts){
+			callbackTo.returnPosts(posts);
+		}
+	}
+
+	public static void getPostsAtLocation(Context context, Location location, DBPostSelectAtLocationTask.DBPostSelectAtLocationTaskCallback callbackTo){
+		new DBPostSelectAtLocationTask(context, location, callbackTo).execute();
+	}
+
+	public static class DBPostSelectAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull> > {
+
+		private final Context context;
+		private final Location location;
+		private final DBPostSelectAtLocationTaskCallback callbackTo;
+		private static final double RANGE = 0.001;
+
+		public interface DBPostSelectAtLocationTaskCallback {
+			void returnPosts(List<HHPostFull> posts);
+		}
+
+		public DBPostSelectAtLocationTask(Context context, Location location, DBPostSelectAtLocationTaskCallback callbackTo){
+			this.context = context;
+			this.location = location;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected List<HHPostFull> doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+
+			if (databaseHelper == null || context == null)
+				return null;
+
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery(
+				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE_NAME
+					+ " INNER JOIN ("
+					+ ORMPost.TABLE_NAME + " LEFT JOIN " + ORMUser.TABLE_NAME
+					+ " ON " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
+					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_TRACK_NAME
+					+ " WHERE " + ORMPost.COLUMN_LAT_NAME + ">? AND " + ORMPost.COLUMN_LAT_NAME + "<?"
+					+ " AND " + ORMPost.COLUMN_LON_NAME + ">? AND " + ORMPost.COLUMN_LON_NAME + "<?",
+				new String[]{
+					String.valueOf(location.getLatitude() - RANGE),
+					String.valueOf(location.getLatitude() + RANGE),
+					String.valueOf(location.getLongitude() - RANGE),
+					String.valueOf(location.getLongitude() + RANGE)
+				});
+
+			int numPosts = cursor.getCount();
+			Log.d(TAG, "Loaded " + numPosts + " Posts...");
+			List<HHPostFull> posts = new ArrayList<>(numPosts);
+
+			if (numPosts > 0){
+				cursor.moveToFirst();
+				while (!cursor.isAfterLast()){
+					HHPostFull post = new HHPostFull(cursor);
+					posts.add(post);
+					cursor.moveToNext();
+				}
+				Log.d(TAG, "Posts loaded successfully");
+			}
+
+			cursor.close();
 			database.close();
 
 			return posts;

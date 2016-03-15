@@ -1,6 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -50,6 +52,19 @@ public class WebHelper {
 			@Override
 			public void returnPost(HHPostFullProcess post) {
 				callback.returnWebPost(post);
+			}
+		}).execute();
+	}
+
+	public interface GetWebPostsAtLocationCallback {
+		void returnWebPostsAtLocation(List<HHPostFull> posts);
+	}
+
+	public static void getWebPostsAtLocation(Location location, long userID, final GetWebPostsAtLocationCallback callback){
+		new GetPostsAtLocationTask(location, userID, new GetPostsAtLocationTask.GetPostsAtLocationTaskCallback(){
+			@Override
+			public void returnPostsAtLocation(List<HHPostFull> posts){
+				callback.returnWebPostsAtLocation(posts);
 			}
 		}).execute();
 	}

@@ -3,6 +3,7 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.List;
@@ -245,6 +246,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	public interface GetPostsAtLocationCallback{
+		void returnCachedPostsAtLocation(Location location, List<HHPostFull> posts);
+	}
+
+	public static void getPostsAtLocation(Context context, final Location location, final GetPostsAtLocationCallback callback){
+		ORMPostFull.getPostsAtLocation(
+			context,
+			location,
+			new ORMPostFull.DBPostSelectAtLocationTask.DBPostSelectAtLocationTaskCallback() {
+				@Override
+				public void returnPosts(List<HHPostFull> posts) {
+					callback.returnCachedPostsAtLocation(location, posts);
+				}
+			});
+	}
 
 	public interface InsertCommentCallback{
 		void returnInsertedComment(Long commentID, HHComment comment);
@@ -292,6 +308,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					callback.returnDeletedLike(success);
 				}
 			});
+	}
+
+	public interface GetCachedSpotifyTrackCallback{
+		void returnCachedSpotifyTrack(HHCachedSpotifyTrack track);
+	}
+
+	public static void getCachedSpotifyTrack(Context context, String trackID, final GetCachedSpotifyTrackCallback callback){
+		ORMCachedSpotifyTrack.getCachedSpotifyTrack(
+			context,
+			trackID,
+			new ORMCachedSpotifyTrack.GetDBCachedSpotifyTrackTask.GetDBCachedSpotifyTrackCallback() {
+				@Override
+				public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {
+					callback.returnCachedSpotifyTrack(cachedSpotifyTrack);
+				}
+			});
+	}
+
+	public interface InsertCachedSpotifyTrackCallback{
+		void returnCachedSpotifyTrack(HHCachedSpotifyTrack track);
+	}
+
+	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, final InsertCachedSpotifyTrackCallback callback){
+		ORMCachedSpotifyTrack.insertSpotifyTrack(
+			context,
+			spotifyTrack,
+			new ORMCachedSpotifyTrack.InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback() {
+				@Override
+				public void returnInsertCachedSpotifyTrack(Long trackID, HHCachedSpotifyTrack cachedSpotifyTrack) {
+					callback.returnCachedSpotifyTrack(cachedSpotifyTrack);
+				}
+			}
+		);
 	}
 
 	@Override

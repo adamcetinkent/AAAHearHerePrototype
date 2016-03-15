@@ -1,6 +1,7 @@
 package yosoyo.aaahearhereprototype;
 
 import android.content.Context;
+import android.location.Location;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
@@ -21,6 +23,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFaceboo
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 /**
  * Created by adam on 02/03/16.
@@ -115,6 +118,46 @@ public class AsyncDataManager {
 		});
 	}
 
+	public interface GetPostsAtLocationCallback{
+		void returnPostsAtLocation(List<HHPostFull> returnedPosts);
+	}
+
+	public static void getPostsAtLocation(Location location, final GetPostsAtLocationCallback callback){
+		getPostsAtLocation(context, location, HHUser.getCurrentUser().getUser().getID(), callback);
+	}
+
+	public static void getPostsAtLocation(Location location, final long userID, final GetPostsAtLocationCallback callback) {
+		getPostsAtLocation(context, location, userID, callback);
+	}
+
+	public static void getPostsAtLocation(Context context, Location location, final long userID, final GetPostsAtLocationCallback callback){
+		DatabaseHelper.getPostsAtLocation(
+			context,
+			location,
+			new DatabaseHelper.GetPostsAtLocationCallback() {
+				@Override
+				public void returnCachedPostsAtLocation(Location location, List<HHPostFull> posts) {
+					if (posts != null && posts.size() > 0) {
+						callback.returnPostsAtLocation(posts);
+						return;
+					}
+
+					WebHelper.getWebPostsAtLocation(
+						location,
+						userID,
+						new WebHelper.GetWebPostsAtLocationCallback() {
+							@Override
+							public void returnWebPostsAtLocation(List<HHPostFull> webPosts) {
+								callback.returnPostsAtLocation(webPosts);
+							}
+						});
+
+				}
+			});
+	}
+
+
+
 	public interface PostPostCallback{
 		void returnPostedPost(boolean success, HHPostFullProcess returnedPost);
 	}
@@ -189,6 +232,46 @@ public class AsyncDataManager {
 					});
 			}
 		});
+	}
+
+	public interface  GetSpotifyTrackCallback{
+		void returnSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
+	}
+
+	public static void getSpotifyTrack(final String trackID, final GetSpotifyTrackCallback callback){
+		getSpotifyTrack(context, trackID, callback);
+	}
+
+	public static void getSpotifyTrack(final Context context, final String trackID, final GetSpotifyTrackCallback callback){
+
+		DatabaseHelper.getCachedSpotifyTrack(
+			context,
+			trackID,
+			new DatabaseHelper.GetCachedSpotifyTrackCallback() {
+				@Override
+				public void returnCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+					if (track != null) {
+						callback.returnSpotifyTrack(track);
+						return;
+					}
+
+					WebHelper.getSpotifyTrack(trackID, new WebHelper.GetSpotifyTrackCallback() {
+						@Override
+						public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+							DatabaseHelper.insertSpotifyTrack(
+								context,
+								spotifyTrack,
+								new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
+									@Override
+									public void returnCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+										callback.returnSpotifyTrack(track);
+									}
+								});
+						}
+					});
+
+				}
+			});
 	}
 
 }

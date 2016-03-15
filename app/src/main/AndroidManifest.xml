@@ -21,9 +21,11 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
-        <!--<meta-data
+        <!--
+            <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_maps_key"/>-->
+            android:value="@string/google_maps_key"/>
+        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_places_key"/>
@@ -61,15 +63,23 @@
             android:name=".FetchAddressIntentService"
             android:exported="false"/>
 
-        <activity android:name=".HolderActivity"
+        <activity
+            android:name=".HolderActivity"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
-        <activity android:name=".AddressPicker"
+        <activity
+            android:name=".AddressPicker"
             android:theme="@android:style/Theme.Holo.Light.Dialog">
         </activity>
+
+        <service
+            android:name=".LocationService.LocationListenerService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>
