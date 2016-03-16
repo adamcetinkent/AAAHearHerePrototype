@@ -59,7 +59,6 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
-import yosoyo.aaahearhereprototype.PostFragmentPostedListener;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.SearchResultsActivity;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
@@ -75,7 +74,7 @@ public class PostFragment extends Fragment {
 
 	private static final String TAG = "PostFragment";
 
-	private PostFragmentPostedListener postFragmentPostedListener;
+	private FragmentChangeRequestListener fragmentChangeRequestListener;
 
 	private SpotifyTrack spotifyTrack;
 	private SpotifyArtist spotifyArtist;
@@ -350,7 +349,7 @@ public class PostFragment extends Fragment {
 				}
 
 				HHPostTagsArray post = new HHPostTagsArray(
-					HHUser.getCurrentUser().getUser().getID(),
+					HHUser.getCurrentUserID(),
 					spotifyTrack.getID(),
 					lastLocation.getLatitude(),
 					lastLocation.getLongitude(),
@@ -362,7 +361,7 @@ public class PostFragment extends Fragment {
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
 					@Override
 					public void returnPostedPost(boolean success, HHPostFullProcess returnedPost) {
-						postFragmentPostedListener.onPostFragmentPosted();
+						fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.MAP_VIEW_REQUEST, null);
 					}
 				});
 				postButton.setVisibility(View.INVISIBLE);
@@ -453,7 +452,7 @@ public class PostFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 				HHUser user = ((HHUser) tagArrayAdapter.getItem(position));
-				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(user);
+				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(user, null);
 
 				int selectionEnd = setTaggableText(txtMessage, userSpan, user);
 				txtMessage.setSelection(selectionEnd);
@@ -520,7 +519,7 @@ public class PostFragment extends Fragment {
 	public void onAttach(Context context) {
 		super.onAttach(context);
 		try {
-			postFragmentPostedListener = (PostFragmentPostedListener) context;
+			fragmentChangeRequestListener = (FragmentChangeRequestListener) context;
 		} catch (ClassCastException e){
 			e.printStackTrace();
 		}

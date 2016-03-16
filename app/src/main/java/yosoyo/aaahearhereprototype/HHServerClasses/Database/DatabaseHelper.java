@@ -121,6 +121,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 								});
 	}
 
+	public static void getUserCachedPosts(Context context, long userID, final GetAllCachedPostsCallback callback){
+		// GET CACHED POSTS FROM DATABASE
+		ORMPostFull.getUserPosts(context,
+								 userID,
+								 new ORMPostFull.DBPostFullSelectUserTask.DBPostFullSelectUserTaskCallback() {
+									 @Override
+									 public void returnPosts(List<HHPostFull> posts) {
+										 callback.returnAllCachedPosts(posts);
+									 }
+								 });
+	}
+
 	public static void processWebPosts(final Context context, final AsyncDataManager.GetWebPostCallback callback, final List<HHPostFullProcess> webPostsToProcess){
 		// INSERT POSTS INTO DATABASE
 		ORMPost.insertPosts(

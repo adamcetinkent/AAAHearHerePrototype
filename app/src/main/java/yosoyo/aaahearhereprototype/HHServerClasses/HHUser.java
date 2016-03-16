@@ -93,7 +93,7 @@ public class HHUser extends HHBase {
 		int length = spannable.length();
 		if (length > 0){
 			spannable.setSpan(
-				new HHUserSpan(this),
+				new HHUserSpan(this, null),
 				0,
 				length,
 				Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -105,6 +105,9 @@ public class HHUser extends HHBase {
 	private static HHUserFull currentUser;
 	public static HHUserFull getCurrentUser(){
 		return currentUser;
+	}
+	public static long getCurrentUserID(){
+		return currentUser.getUser().getID();
 	}
 	public static void setCurrentUser(HHUserFull user){
 		currentUser = user;
@@ -120,9 +123,15 @@ public class HHUser extends HHBase {
 
 	public static class HHUserSpan extends ClickableSpan {
 		private final HHUser user;
+		private final HHUserSpanClickCallback clickCallback;
 
-		public HHUserSpan(HHUser user){
+		public interface HHUserSpanClickCallback{
+			void onClickSpan(HHUser hhUser);
+		}
+
+		public HHUserSpan(HHUser user, HHUserSpanClickCallback clickCallback){
 			super();
+			this.clickCallback = clickCallback;
 			this.user = user;
 		}
 
@@ -134,11 +143,12 @@ public class HHUser extends HHBase {
 		public void updateDrawState(TextPaint ds){
 			ds.setColor(Color.BLACK);
 			ds.setFakeBoldText(true);
-			ds.bgColor = Color.LTGRAY;
+			ds.bgColor = 0xFFDDDDDD;
 		}
 
 		@Override
 		public void onClick(View view){
+			clickCallback.onClickSpan(user);
 		}
 
 		@Override

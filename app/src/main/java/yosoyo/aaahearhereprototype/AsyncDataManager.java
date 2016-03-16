@@ -107,6 +107,35 @@ public class AsyncDataManager {
 		});
 	}
 
+	public static void getUserPosts(long userID, GetAllPostsCallback callback){
+		getUserCachedPosts(userID, callback);
+		getUserWebPosts(userID, callback);
+	}
+
+	private static void getUserCachedPosts(long userID, final GetAllPostsCallback callback){
+		DatabaseHelper.getUserCachedPosts(
+			context,
+			userID,
+			new DatabaseHelper.GetAllCachedPostsCallback() {
+				@Override
+				public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
+					callback.returnAllCachedPosts(cachedPosts);
+				}
+			});
+	}
+
+	private static void getUserWebPosts(long userID, final GetAllPostsCallback callback){
+		WebHelper.getUserWebPosts(
+			userID,
+			new WebHelper.GetAllWebPostsCallback() {
+				@Override
+				public void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
+					if (webPostsToProcess != null)
+						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+				}
+			});
+	}
+
 	public static void getWebPost(long post_id, final GetWebPostCallback callback){
 		WebHelper.getWebPost(post_id, new WebHelper.GetWebPostCallback() {
 			@Override
@@ -123,7 +152,7 @@ public class AsyncDataManager {
 	}
 
 	public static void getPostsAtLocation(Location location, final GetPostsAtLocationCallback callback){
-		getPostsAtLocation(context, location, HHUser.getCurrentUser().getUser().getID(), callback);
+		getPostsAtLocation(context, location, HHUser.getCurrentUserID(), callback);
 	}
 
 	public static void getPostsAtLocation(Location location, final long userID, final GetPostsAtLocationCallback callback) {

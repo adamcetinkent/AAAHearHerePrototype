@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,12 +56,68 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 public class FeedFragment extends Fragment {
 
 	private static final String TAG = FeedFragment.class.getSimpleName();
+
+	private int feedType;
+	public static final String FEED_TYPE = "feed_type";
+	public static final int GENERAL_FEED = 0;
+	public static final int USER_FEED = 1;
+
+	public static final String USER_ID = "user_id";
+	private long userID = -1;
+
+	private FragmentChangeRequestListener fragmentChangeRequestListener;
+
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	private List<HHPostFull> posts = new ArrayList<>();
 
+	public static FeedFragment newInstance(){
+		return newInstance(GENERAL_FEED, -1);
+	}
+
+	public static FeedFragment newInstance(int feedType, long userID){
+		FeedFragment feedFragment = new FeedFragment();
+
+		Bundle arguments = new Bundle();
+		arguments.putInt(FEED_TYPE, feedType);
+		arguments.putLong(USER_ID, userID);
+		feedFragment.setArguments(arguments);
+
+		return feedFragment;
+	}
+
 	public FeedFragment() {
 		// Required empty public constructor
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		Bundle arguments = getArguments();
+		if (arguments != null){
+			handleArguments(arguments);
+		}
+
+	}
+
+	private void handleArguments(Bundle arguments){
+		feedType = arguments.getInt(FEED_TYPE);
+
+		if (feedType == USER_FEED){
+			userID = arguments.getLong(USER_ID);
+		}
+
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		try {
+			fragmentChangeRequestListener = (FragmentChangeRequestListener) context;
+		} catch (ClassCastException e){
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -70,36 +128,70 @@ public class FeedFragment extends Fragment {
 
 		lstTimeline = (ExpandableListView) view.findViewById(R.id.lstTimeline);
 		lstTimelineAdapter = new TimelineCustomExpandableAdapter(
-			getActivity(), posts,
+			getActivity(),
+			posts,
 			new TimelineCustomExpandableAdapter.AdapterCallback() {
 				@Override
 				public void onDataChange() {
 					notifyAdapter();
 				}
+
+				@Override
+				public void onUserClick(HHUser user) {
+					if (user.getID() != userID)
+						requestUserFeed(user);
+				}
+			},
+			new HHUser.HHUserSpan.HHUserSpanClickCallback() {
+				@Override
+				public void onClickSpan(HHUser user) {
+					if (user.getID() != userID)
+						requestUserFeed(user);
+				}
 			});
 		lstTimeline.setAdapter(lstTimelineAdapter);
 
-		getAllData();
+		switch (feedType){
+			case 0: {
+				getAllData();
+				break;
+			}
+			case 1:{
+				getUserData();
+			}
+		}
 
 		return view;
 	}
 
-	private void getAllData(){
-		AsyncDataManager.getAllPosts(new AsyncDataManager.GetAllPostsCallback() {
-			@Override
-			public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
-				Log.d(TAG, "Cached posts returned");
-				posts = ZZZUtility.mergeLists(posts, cachedPosts);
-				notifyAdapter();
-			}
+	private void requestUserFeed(HHUser user){
+		Bundle bundle = new Bundle();
+		bundle.putLong(USER_ID, user.getID());
+		fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.USER_FEED_REQUEST, bundle);
+	}
 
-			@Override
-			public void returnWebPost(HHPostFull webPost) {
-				Log.d(TAG, "Web post returned!");
-				posts = ZZZUtility.updateList(posts, webPost);
-				notifyAdapter();
-			}
-		});
+	private AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
+		@Override
+		public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
+			Log.d(TAG, "Cached posts returned");
+			posts = ZZZUtility.mergeLists(posts, cachedPosts);
+			notifyAdapter();
+		}
+
+		@Override
+		public void returnWebPost(HHPostFull webPost) {
+			Log.d(TAG, "Web post returned!");
+			posts = ZZZUtility.updateList(posts, webPost);
+			notifyAdapter();
+		}
+	};
+
+	private void getAllData(){
+		AsyncDataManager.getAllPosts(getAllPostsCallback);
+	}
+
+	private void getUserData(){
+		AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
 	}
 
 	private void notifyAdapter(){
@@ -111,23 +203,47 @@ public class FeedFragment extends Fragment {
 		}
 	}
 
-	private static class TimelineCustomExpandableAdapter extends BaseExpandableListAdapter{
+	public static class TimelineCustomExpandableAdapter extends BaseExpandableListAdapter{
 
-		interface AdapterCallback {
+		private class OnClickUserListener implements View.OnClickListener {
+
+			private HHUser user;
+			private final FeedFragment.TimelineCustomExpandableAdapter.AdapterCallback adapterCallback;
+
+			public OnClickUserListener(HHUser user, AdapterCallback adapterCallback){
+				this.user = user;
+				this.adapterCallback = adapterCallback;
+			}
+
+			public void setUser(HHUser user) {
+				this.user = user;
+			}
+
+			@Override
+			public void onClick(View v) {
+				adapterCallback.onUserClick(user);
+			}
+
+		}
+
+		public interface AdapterCallback {
 			void onDataChange();
+			void onUserClick(HHUser user);
 		}
 
 		private final Activity context;
 		private final AdapterCallback callback;
+		private final HHUser.HHUserSpan.HHUserSpanClickCallback userSpanClickCallback;
 
 		private List<HHPostFull> posts;
 		int addingComment = -1;
 
-		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback){
+		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback, HHUser.HHUserSpan.HHUserSpanClickCallback userSpanClickCallback){
 			super();
 			this.context = context;
 			this.posts = posts;
 			this.callback = callback;
+			this.userSpanClickCallback = userSpanClickCallback;
 		}
 
 		@Override
@@ -192,6 +308,7 @@ public class FeedFragment extends Fragment {
 			HHLike myLike;
 			CompoundButton.OnCheckedChangeListener likeCheckListener;
 			View.OnClickListener commentClickListener;
+			OnClickUserListener onClickUserListener;
 		}
 
 		@Override
@@ -237,7 +354,7 @@ public class FeedFragment extends Fragment {
 						viewHolder.btnLikeButton.setEnabled(false);
 						if (isChecked) {
 							HHLike like = new HHLike(viewHolder.post.getPost().getID(),
-														 HHUser.getCurrentUser().getUser().getID());
+													 HHUser.getCurrentUserID());
 							AsyncDataManager
 								.postLike(like, new AsyncDataManager.PostLikeCallback() {
 									@Override
@@ -375,12 +492,17 @@ public class FeedFragment extends Fragment {
 					}
 				});
 
+				viewHolder.onClickUserListener = new OnClickUserListener(viewHolder.post.getUser(), callback);
+				viewHolder.imgProfile.setOnClickListener(viewHolder.onClickUserListener);
+				viewHolder.txtUserName.setOnClickListener(viewHolder.onClickUserListener);
+
 				convertView.setTag(viewHolder);
 
 			} else {
 				viewHolder = (ViewHolderGroupItem) convertView.getTag();
 				viewHolder.groupPosition = groupPosition;
 				viewHolder.post = posts.get(groupPosition);
+				viewHolder.onClickUserListener.setUser(viewHolder.post.getUser());
 				viewHolder.myLike = null;
 				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
 					if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
@@ -435,7 +557,7 @@ public class FeedFragment extends Fragment {
 				String userName = tagUser.getName();
 				message.replace(start, end, userName);
 				message.setSpan(
-					new HHUser.HHUserSpan(tagUser),
+					new HHUser.HHUserSpan(tagUser, userSpanClickCallback),
 					start,
 					start + userName.length(),
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -444,6 +566,7 @@ public class FeedFragment extends Fragment {
 				inlineTagged++;
 			}
 			viewHolder.txtMessage.setText(message);
+			viewHolder.txtMessage.setMovementMethod(LinkMovementMethod.getInstance());
 
 			updatePlayButton(viewHolder.btnPlayButton);
 
@@ -492,6 +615,7 @@ public class FeedFragment extends Fragment {
 			int groupPosition;
 			int childPosition;
 			HHCommentUser comment;
+			OnClickUserListener onClickUserListener;
 		}
 
 		@Override
@@ -533,12 +657,17 @@ public class FeedFragment extends Fragment {
 				viewHolder.txtComment = (TextView) convertView.findViewById(R.id.list_row_comment_txtComment);
 				viewHolder.imgProfile = (ImageView) convertView.findViewById(R.id.list_row_comment_imgProfile);
 
+				viewHolder.onClickUserListener = new OnClickUserListener(viewHolder.comment.getUser(), callback);
+				viewHolder.imgProfile.setOnClickListener(viewHolder.onClickUserListener);
+				viewHolder.txtUserName.setOnClickListener(viewHolder.onClickUserListener);
+
 				convertView.setTag(viewHolder);
 
 			} else {
 				viewHolder.groupPosition = groupPosition;
 				viewHolder.childPosition = childPosition;
 				viewHolder.comment = posts.get(groupPosition).getComments().get(childPosition);
+				viewHolder.onClickUserListener.setUser(viewHolder.comment.getUser());
 			}
 
 			viewHolder.txtUserName.setText(viewHolder.comment.getUser().getName());
@@ -567,22 +696,48 @@ public class FeedFragment extends Fragment {
 			List<HHLikeUser> likes = posts.get(groupPosition).getLikes();
 
 			int youLike = -1;
-			StringBuilder sb;
+			SpannableStringBuilder sb;
 			if (likes.get(0).getUser().equals(HHUser.getCurrentUser().getUser())) {
 				youLike = 0;
-				sb = new StringBuilder();
+				sb = new SpannableStringBuilder("You");
+				sb.setSpan(
+					new HHUser.HHUserSpan(HHUser.getCurrentUser().getUser(), userSpanClickCallback),
+					0,
+					3,
+					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
 			} else {
-				sb = new StringBuilder(likes.get(0).getUser().getName());
+				sb = new SpannableStringBuilder(likes.get(0).getUser().getName());
+				sb.setSpan(
+					new HHUser.HHUserSpan(likes.get(0).getUser(), userSpanClickCallback),
+					0,
+					sb.length(),
+					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 			for (int i = 1; i < likes.size(); i++){
-				if (likes.get(i).getUser().equals(HHUser.getCurrentUser().getUser())){
+				HHUser user = likes.get(i).getUser();
+				if (user.equals(HHUser.getCurrentUser().getUser())){
 					youLike = i;
 				} else {
-					sb.append(", ").append(likes.get(i).getUser().getName());
+					sb.append(", ").append(user.getName());
+					sb.setSpan(
+						new HHUser.HHUserSpan(user, userSpanClickCallback),
+						sb.length()-user.getName().length(),
+						sb.length(),
+						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 			}
-			txtLikers.setText(
-				(youLike >= 0 ? "You" + ((youLike > 0) ? ", " : "") : "") + sb.toString());
+			if (youLike > 0){
+				sb.insert(0, "You, ");
+				sb.setSpan(
+					new HHUser.HHUserSpan(HHUser.getCurrentUser().getUser(), userSpanClickCallback),
+					0,
+					3,
+					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				);
+			}
+			txtLikers.setText(sb);
+			txtLikers.setMovementMethod(LinkMovementMethod.getInstance());
 
 			TextView txtNumber = (TextView) rowView.findViewById(R.id.list_row_comment_like_txtNumber);
 			txtNumber.setText(String.valueOf(likes.size()));
@@ -618,7 +773,7 @@ public class FeedFragment extends Fragment {
 						return;
 					final long post_id = posts.get(groupPosition).getPost().getID();
 					HHComment comment = new HHComment(post_id,
-													  HHUser.getCurrentUser().getUser().getID(),
+													  HHUser.getCurrentUserID(),
 													  message);
 					AsyncDataManager
 						.postComment(comment, new AsyncDataManager.PostCommentCallback() {

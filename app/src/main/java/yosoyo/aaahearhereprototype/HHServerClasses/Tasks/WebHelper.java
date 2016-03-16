@@ -43,6 +43,17 @@ public class WebHelper {
 		}).execute();
 	}
 
+	public static void getUserWebPosts(long userID, final GetAllWebPostsCallback callback){
+		new GetPostsUserTask(
+			userID,
+			new GetPostsUserTask.GetPostsUserTaskCallback() {
+				@Override
+				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
+					callback.returnAllWebPosts(postsToProcess);
+				}
+			}).execute();
+	}
+
 	public interface GetWebPostCallback {
 		void returnWebPost(HHPostFullProcess webPostToProcess);
 	}

@@ -60,12 +60,9 @@
     <string name="placeholder_message_map">Message: %1$s</string>
     <string name="placeholder_date_map">Posted: %1$s</string>
 
-    <string-array name="navigation_options">
-        <item>Home</item>
-        <item>Map</item>
-        <!--<item>Post</item>-->
-        <item>Profile</item>
-    </string-array>
-
+    <string name="navigation_option_home">Home</string>
+    <string name="navigation_option_map">Map</string>
+    <string name="navigation_option_profile">Profile</string>
+    <string name="navigation_option_user_profile">User Profile: %1$s</string>
 
 </resources>

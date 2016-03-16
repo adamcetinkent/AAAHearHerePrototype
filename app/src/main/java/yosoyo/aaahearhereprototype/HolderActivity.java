@@ -31,7 +31,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
+import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
@@ -41,13 +45,14 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
 import yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
 
-public class HolderActivity extends Activity implements PostFragmentPostedListener {
+public class HolderActivity extends Activity implements FragmentChangeRequestListener {
 
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
 
-	private String[] navigationOptions;
+	//private String[] navigationOptions;
+	private Map<Integer, Integer> navigationOptions;
 	private ListView drawerList;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
@@ -63,7 +68,9 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-			selectItem(position);
+			Fragment fragment = selectItem(ZZZUtility.getKeyByValue(navigationOptions, position));
+			if (fragment != null)
+				commitFragmentTransaction(fragment);
 		}
 	}
 
@@ -83,17 +90,34 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 				}
 			});
 
-		navigationOptions = getResources().getStringArray(R.array.navigation_options);
+		int[] navOptions = new int[]{
+			R.string.navigation_option_home,
+			R.string.navigation_option_map,
+			R.string.navigation_option_profile,
+			R.string.navigation_option_user_profile
+		};
+
+		String[] navStrings = new String[3];
+		for (int i = 0; i < 3; i++){
+			navStrings[i] = getString(navOptions[i]);
+		}
+
+		navigationOptions = new HashMap<>();
+		for (int i = 0; i < navOptions.length; i++){
+			navigationOptions.put(navOptions[i], i);
+		}
+
 		drawerList = (ListView) findViewById(R.id.drawer);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
 		drawerList.setAdapter(
 			new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1,
-							   navigationOptions));
+							   navStrings));
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		if (savedInstanceState == null){
-			selectItem(0);
+			Fragment fragment = selectItem(R.string.navigation_option_home);
+			commitFragmentTransaction(fragment);
 		} else {
 			currentPosition = savedInstanceState.getInt(KEY_POSITION);
 			setActionBarTitle(currentPosition);
@@ -124,16 +148,13 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 					FragmentManager fragmentManager = getFragmentManager();
 					Fragment fragment = fragmentManager.findFragmentByTag(VISIBLE_FRAGMENT);
 					if (fragment instanceof FeedFragment) {
-						currentPosition = 0;
+						currentPosition = navigationOptions.get(R.string.navigation_option_home);
 					}
 					if (fragment instanceof MapViewFragment) {
-						currentPosition = 1;
+						currentPosition = navigationOptions.get(R.string.navigation_option_map);
 					}
-					/*if (fragment instanceof PostFragment) {
-						currentPosition = 2;
-					}*/
 					if (fragment instanceof ProfileFragment) {
-						currentPosition = 2;
+						currentPosition = navigationOptions.get(R.string.navigation_option_profile);
 					}
 					setActionBarTitle(currentPosition);
 					drawerList.setItemChecked(currentPosition, true);
@@ -164,20 +185,9 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 			.addApi(Places.GEO_DATA_API)
 			.build();
 
-		broadcastReceiver = new HHBroadcastReceiver(
-			new HHBroadcastReceiver.HHBroadCastReceiverCallback() {
-				@Override
-				public void returnNewLocation(double lat, double lng) {
-					Toast.makeText(HolderActivity.this, "NEW LOCATION: " + lat + " " + lng, Toast.LENGTH_SHORT).show();
-				}
-			});
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(LocationListenerService.LOCATION_UPDATE);
-		registerReceiver(broadcastReceiver, intentFilter);
-
 		if (!isServiceRunning(LocationListenerService.class)) {
 			Intent intent = new Intent(this, LocationListenerService.class);
-			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUser().getUser().getID());
+			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
 			startService(intent);
 		}
 
@@ -208,49 +218,75 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 
 	protected void onStop() {
 		mGoogleApiClient.disconnect();
-		unregisterReceiver(broadcastReceiver);
 		super.onStop();
 	}
 
-	private void selectItem(int position){
-		currentPosition = position;
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (broadcastReceiver == null){
+			broadcastReceiver = new HHBroadcastReceiver(
+				new HHBroadcastReceiver.HHBroadCastReceiverCallback() {
+					@Override
+					public void returnNewLocation(double lat, double lng) {
+						Toast.makeText(HolderActivity.this, "NEW LOCATION: " + lat + " " + lng, Toast.LENGTH_SHORT).show();
+					}
+				});
+			IntentFilter intentFilter = new IntentFilter();
+			intentFilter.addAction(LocationListenerService.LOCATION_UPDATE);
+			registerReceiver(broadcastReceiver, intentFilter);
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unregisterReceiver(broadcastReceiver);
+		broadcastReceiver = null;
+	}
+
+	private Fragment selectItem(int resourceID){
+
+		currentPosition = navigationOptions.get(resourceID);
+
 		Fragment fragment;
-		switch (position) {
-			case 1: {
+		switch (resourceID) {
+			case R.string.navigation_option_map: {
 				fragment = new MapViewFragment();
 				break;
 			}
-			/*case 2: {
-				fragment = new PostFragment();
-				break;
-			}*/
-			case 2: {
-				fragment = new ProfileFragment();
+			case R.string.navigation_option_profile: {
+				//fragment = new ProfileFragment();
+				fragment = FeedFragment.newInstance(FeedFragment.USER_FEED, HHUser.getCurrentUserID());
 				break;
 			}
 			default: {
-				fragment = new FeedFragment();
+				fragment = FeedFragment.newInstance();
 			}
 		}
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		ft.replace(R.id.content_frame, fragment, VISIBLE_FRAGMENT);
-		ft.addToBackStack(null);
-		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		ft.commit();
 
-		setActionBarTitle(position);
-
+		setActionBarTitle(getString(resourceID));
 		drawerLayout.closeDrawer(drawerList);
+
+		return fragment;
 	}
 
 	private void setActionBarTitle(int position){
 		String title;
-		title = navigationOptions[position];
+		title = getString(ZZZUtility.getKeyByValue(navigationOptions, position));
 		getActionBar().setTitle(title);
 	}
 
 	private void setActionBarTitle(String string){
 		getActionBar().setTitle(string);
+	}
+
+	private void commitFragmentTransaction(Fragment fragment){
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.content_frame, fragment, VISIBLE_FRAGMENT);
+		ft.addToBackStack(null);
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+		ft.commit();
 	}
 
 	@Override
@@ -263,11 +299,8 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 
 				drawerLayout.closeDrawers();
 
-				FragmentTransaction ft = getFragmentManager().beginTransaction();
-				ft.replace(R.id.content_frame, new PostFragment(), VISIBLE_FRAGMENT);
-				ft.addToBackStack(null);
-				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-				ft.commit();
+				Fragment fragment = new PostFragment();
+				commitFragmentTransaction(fragment);
 
 				setActionBarTitle("Post to Hear Here");
 				break;
@@ -312,8 +345,29 @@ public class HolderActivity extends Activity implements PostFragmentPostedListen
 	}
 
 	@Override
-	public void onPostFragmentPosted(){
-		selectItem(1);
+	public void requestFragmentChange(int fragmentChange, Bundle bundle) {
+		Fragment fragment = null;
+		switch (fragmentChange){
+			case FragmentChangeRequestListener.MAP_VIEW_REQUEST:{
+				if (bundle == null){
+					fragment = selectItem(R.string.navigation_option_map);
+				}
+				break;
+			}
+			case FragmentChangeRequestListener.USER_FEED_REQUEST:{
+				if (bundle == null){
+					fragment = selectItem(R.string.navigation_option_profile);
+				} else {
+					long userID = bundle.getLong(FeedFragment.USER_ID);
+					selectItem(R.string.navigation_option_user_profile);
+					fragment = FeedFragment.newInstance(FeedFragment.USER_FEED, userID);
+				}
+				break;
+			}
+		}
+		if (fragment != null){
+			commitFragmentTransaction(fragment);
+		}
 	}
 
 	/*@Override

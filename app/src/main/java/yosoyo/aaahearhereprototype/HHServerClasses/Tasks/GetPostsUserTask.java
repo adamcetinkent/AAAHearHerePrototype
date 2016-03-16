@@ -22,23 +22,25 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
+class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/";
 
-	public interface GetPostsTaskCallback {
+	public interface GetPostsUserTaskCallback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
-	private final GetPostsTaskCallback callbackTo;
+	private final long userID;
+	private final GetPostsUserTaskCallback callbackTo;
 
-	public GetPostsTask(GetPostsTaskCallback callbackTo) {
+	public GetPostsUserTask(long userID, GetPostsUserTaskCallback callbackTo) {
+		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		Log.d(TAG, "Fetching Posts from " + VM_SERVER_ADDRESS + HHUser.getCurrentUserID());
+		Log.d(TAG, "Fetching Posts by " + VM_SERVER_ADDRESS + userID);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + HHUser.getCurrentUserID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

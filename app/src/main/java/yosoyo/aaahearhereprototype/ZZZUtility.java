@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by Adam Kent on 10/02/2016.
@@ -132,4 +134,14 @@ public class ZZZUtility {
 	public static String getLatLng(Location location){
 		return location.getLatitude() + " " + location.getLongitude();
 	}
+
+	public static <T, E> T getKeyByValue(Map<T, E> map, E value){
+		for (Map.Entry<T,E> entry: map.entrySet()){
+			if (Objects.equals(value, entry.getValue())){
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
+
 }
