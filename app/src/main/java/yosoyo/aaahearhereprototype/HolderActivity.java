@@ -39,6 +39,7 @@ import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
+import yosoyo.aaahearhereprototype.Fragments.RequestFollowFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
@@ -51,7 +52,6 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
 
-	//private String[] navigationOptions;
 	private Map<Integer, Integer> navigationOptions;
 	private ListView drawerList;
 	private DrawerLayout drawerLayout;
@@ -65,12 +65,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	private HHBroadcastReceiver broadcastReceiver;
 
+	private static MenuItem menuRequests;
+
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 			Fragment fragment = selectItem(ZZZUtility.getKeyByValue(navigationOptions, position));
 			if (fragment != null)
-				commitFragmentTransaction(fragment);
+				commitFragmentTransaction(fragment, true);
 		}
 	}
 
@@ -94,7 +96,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_home,
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
-			R.string.navigation_option_user_profile
+			R.string.navigation_option_user_profile,
+			R.string.action_create_post,
+			R.string.action_user_requests
 		};
 
 		String[] navStrings = new String[3];
@@ -117,7 +121,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 		if (savedInstanceState == null){
 			Fragment fragment = selectItem(R.string.navigation_option_home);
-			commitFragmentTransaction(fragment);
+			commitFragmentTransaction(fragment, false);
 		} else {
 			currentPosition = savedInstanceState.getInt(KEY_POSITION);
 			setActionBarTitle(currentPosition);
@@ -206,8 +210,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		getMenuInflater().inflate(R.menu.menu_main, menu);
-		MenuItem menuItem = menu.findItem(R.id.post);
-		menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem menuPost = menu.findItem(R.id.action_post);
+		menuPost.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem menuRequests = menu.findItem(R.id.action_user_requests);
+		menuRequests.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		HolderActivity.menuRequests = menuRequests;
+		if (HHUser.getCurrentUser().getFollowInRequests().size() > 0){
+			menuRequests.setIcon(R.drawable.add_user_full);
+		}
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -247,7 +257,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	private Fragment selectItem(int resourceID){
 
-		currentPosition = navigationOptions.get(resourceID);
+		if (navigationOptions.containsKey(resourceID))
+			currentPosition = navigationOptions.get(resourceID);
 
 		Fragment fragment;
 		switch (resourceID) {
@@ -256,8 +267,15 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				break;
 			}
 			case R.string.navigation_option_profile: {
-				//fragment = new ProfileFragment();
 				fragment = FeedFragment.newInstance(FeedFragment.USER_FEED, HHUser.getCurrentUserID());
+				break;
+			}
+			case R.string.action_create_post: {
+				fragment = new PostFragment();
+				break;
+			}
+			case R.string.action_user_requests: {
+				fragment = new RequestFollowFragment();
 				break;
 			}
 			default: {
@@ -281,10 +299,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		getActionBar().setTitle(string);
 	}
 
-	private void commitFragmentTransaction(Fragment fragment){
+	private void commitFragmentTransaction(Fragment fragment, boolean backStack){
+		if (drawerToggle != null)
+			drawerToggle.setDrawerIndicatorEnabled(false);
+
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.replace(R.id.content_frame, fragment, VISIBLE_FRAGMENT);
-		ft.addToBackStack(null);
+		if (backStack)
+			ft.addToBackStack(null);
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 		ft.commit();
 	}
@@ -295,30 +317,33 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			return true;
 		}
 		switch (menuItem.getItemId()){
-			case (R.id.post):{
+			case (R.id.action_post):{
 
-				drawerLayout.closeDrawers();
+				Fragment fragment = selectItem(R.string.action_create_post);
+				commitFragmentTransaction(fragment, true);
 
-				Fragment fragment = new PostFragment();
-				commitFragmentTransaction(fragment);
+				return true;
+			}
+			case (R.id.action_user_requests):{
 
-				setActionBarTitle("Post to Hear Here");
-				break;
+				Fragment fragment = selectItem(R.string.action_user_requests);
+				commitFragmentTransaction(fragment, true);
+
+				return true;
 			}
 			case (R.id.action_reset_database):{
 				DatabaseHelper.resetDatabase(this);
-				break;
+				return true;
 			}
 			default:
 				return super.onOptionsItemSelected(menuItem);
 		}
-		return super.onOptionsItemSelected(menuItem);
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu){
 		boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
-		// use drawerOpen to determine what is visible
+		menu.findItem(R.id.action_post).setVisible(!drawerOpen);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -366,12 +391,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 		}
 		if (fragment != null){
-			commitFragmentTransaction(fragment);
+			commitFragmentTransaction(fragment, true);
 		}
 	}
 
-	/*@Override
+	@Override
 	public void onBackPressed() {
-		selectItem(0);
-	}*/
+		super.onBackPressed();
+		drawerToggle.setDrawerIndicatorEnabled(true);
+	}
 }

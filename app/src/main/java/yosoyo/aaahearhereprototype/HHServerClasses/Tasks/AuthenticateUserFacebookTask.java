@@ -15,7 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFriendshipsNested;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -26,15 +26,15 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
-	public interface AuthenticateUserFacebookTaskCallback {
+	public interface Callback {
 		void returnAuthenticationResult(Integer result, HHUserFullProcess user);
 	}
 
-	private final AuthenticateUserFacebookTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final AccessToken accessToken;
 	private HHUserFullProcess user;
 
-	public AuthenticateUserFacebookTask(AccessToken accessToken, AuthenticateUserFacebookTaskCallback callbackTo) {
+	public AuthenticateUserFacebookTask(AccessToken accessToken, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.accessToken = accessToken;
 	}
@@ -67,7 +67,7 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 				if (httpResult == HttpURLConnection.HTTP_OK){
 
 					Log.d(TAG, httpResponseStream);
-					user = new HHUserFullProcess(new Gson().fromJson(httpResponseStream, HHUserFriendshipsNested.class));
+					user = new HHUserFullProcess(new Gson().fromJson(httpResponseStream, HHUserFullNested.class));
 					return httpResult;
 
 				} else if (httpResult == HttpURLConnection.HTTP_ACCEPTED) {

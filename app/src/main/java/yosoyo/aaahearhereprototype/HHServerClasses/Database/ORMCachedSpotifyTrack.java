@@ -76,11 +76,11 @@ public class ORMCachedSpotifyTrack {
 		database.close();
 	}
 
-	/*public static void insertCachedSpotifyTrack(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
+	/*public static void insertCachedSpotifyTrack(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.Callback callbackTo){
 		new InsertCachedSpotifyTrackTask(context, cachedSpotifyTrack, -1, callbackTo).execute();
 	}
 
-	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callbackTo){
+	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.Callback callbackTo){
 		new InsertCachedSpotifyTrackTask(context, spotifyTrack, -1, callbackTo).execute();
 	}*/
 
@@ -95,20 +95,20 @@ public class ORMCachedSpotifyTrack {
 		return contentValues;
 	}
 
-	public static void getCachedSpotifyTrack(Context context, String trackID, GetDBCachedSpotifyTrackTask.GetDBCachedSpotifyTrackCallback callback){
+	public static void getCachedSpotifyTrack(Context context, String trackID, GetDBCachedSpotifyTrackTask.Callback callback){
 		new GetDBCachedSpotifyTrackTask(context, trackID, callback).execute();
 	}
 
 	public static class GetDBCachedSpotifyTrackTask extends AsyncTask<Void, Void, HHCachedSpotifyTrack> {
 		private final Context context;
 		private final String trackID;
-		private final GetDBCachedSpotifyTrackCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface GetDBCachedSpotifyTrackCallback {
+		public interface Callback {
 			void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
 		}
 
-		public GetDBCachedSpotifyTrackTask(Context context, String trackID, GetDBCachedSpotifyTrackCallback callbackTo){
+		public GetDBCachedSpotifyTrackTask(Context context, String trackID, Callback callbackTo){
 			this.context = context;
 			this.trackID = trackID;
 			this.callbackTo = callbackTo;
@@ -145,19 +145,19 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
-	public static void getCachedSpotifyTracks(Context context, GetDBCachedSpotifyTracksTask.GetDBCachedSpotifyTracksCallback callbackTo){
+	public static void getCachedSpotifyTracks(Context context, GetDBCachedSpotifyTracksTask.Callback callbackTo){
 		new GetDBCachedSpotifyTracksTask(context, callbackTo).execute();
 	}
 
 	public static class GetDBCachedSpotifyTracksTask extends AsyncTask<Void, Void, List<HHCachedSpotifyTrack>> {
 		private final Context context;
-		private final GetDBCachedSpotifyTracksCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface GetDBCachedSpotifyTracksCallback {
+		public interface Callback {
 			void returnCachedSpotifyTracks(List<HHCachedSpotifyTrack> cachedSpotifyTracks);
 		}
 
-		public GetDBCachedSpotifyTracksTask(Context context, GetDBCachedSpotifyTracksCallback callbackTo){
+		public GetDBCachedSpotifyTracksTask(Context context, Callback callbackTo){
 			this.context = context;
 			this.callbackTo = callbackTo;
 		}
@@ -195,7 +195,7 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
-	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.InsertCachedSpotifyTrackTaskCallback callback){
+	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.Callback callback){
 		new InsertCachedSpotifyTrackTask(context, spotifyTrack, callback);
 	}
 
@@ -203,19 +203,19 @@ public class ORMCachedSpotifyTrack {
 
 		private final Context context;
 		private final HHCachedSpotifyTrack cachedSpotifyTrack;
-		private final InsertCachedSpotifyTrackTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface InsertCachedSpotifyTrackTaskCallback {
+		public interface Callback {
 			void returnInsertCachedSpotifyTrack(Long trackID, HHCachedSpotifyTrack cachedSpotifyTrack);
 		}
 
-		public InsertCachedSpotifyTrackTask(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTaskCallback callbackTo){
+		public InsertCachedSpotifyTrackTask(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, Callback callbackTo){
 			this.context = context;
 			this.cachedSpotifyTrack = cachedSpotifyTrack;
 			this.callbackTo = callbackTo;
 		}
 
-		public InsertCachedSpotifyTrackTask(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTaskCallback callbackTo){
+		public InsertCachedSpotifyTrackTask(Context context, SpotifyTrack spotifyTrack, Callback callbackTo){
 			this.context = context;
 			this.cachedSpotifyTrack = new HHCachedSpotifyTrack(spotifyTrack);
 			this.callbackTo = callbackTo;
@@ -241,7 +241,7 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
-	public static void getTracksFromPosts(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackSelectManyFromPostsTask.DBCachedSpotifyTrackSelectManyFromPostsTaskCallback callbackTo){
+	public static void getTracksFromPosts(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackSelectManyFromPostsTask.Callback callbackTo){
 		new DBCachedSpotifyTrackSelectManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -249,13 +249,13 @@ public class ORMCachedSpotifyTrack {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBCachedSpotifyTrackSelectManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBCachedSpotifyTrackSelectManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnSelectedManyCachedSpotifyTracks(List<HHPostFullProcess> postToProcess);
 		}
 
-		public DBCachedSpotifyTrackSelectManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackSelectManyFromPostsTaskCallback callbackTo){
+		public DBCachedSpotifyTrackSelectManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;
@@ -296,7 +296,7 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
-	public static void insertTrackFromPosts(Context context, HHPostFullProcess postProcess, DBCachedSpotifyTrackInsertFromPostTask.DBCachedSpotifyTrackInsertFromPostTaskCallback callback) {
+	public static void insertTrackFromPosts(Context context, HHPostFullProcess postProcess, DBCachedSpotifyTrackInsertFromPostTask.Callback callback) {
 		new DBCachedSpotifyTrackInsertFromPostTask(context, postProcess, callback).execute();
 	}
 
@@ -304,13 +304,13 @@ public class ORMCachedSpotifyTrack {
 
 		private final Context context;
 		private final HHPostFullProcess post;
-		private final DBCachedSpotifyTrackInsertFromPostTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBCachedSpotifyTrackInsertFromPostTaskCallback {
+		public interface Callback {
 			void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess);
 		}
 
-		public DBCachedSpotifyTrackInsertFromPostTask(Context context, HHPostFullProcess post, DBCachedSpotifyTrackInsertFromPostTaskCallback callbackTo){
+		public DBCachedSpotifyTrackInsertFromPostTask(Context context, HHPostFullProcess post, Callback callbackTo){
 			this.context = context;
 			this.post = post;
 			this.callbackTo = callbackTo;
@@ -339,7 +339,7 @@ public class ORMCachedSpotifyTrack {
 		}
 	}
 
-	public static void insertTracksFromPosts(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackInsertManyFromPostsTask.DBCachedSpotifyTrackInsertManyFromPostsTaskCallback callbackTo){
+	public static void insertTracksFromPosts(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackInsertManyFromPostsTask.Callback callbackTo){
 		new DBCachedSpotifyTrackInsertManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -347,13 +347,13 @@ public class ORMCachedSpotifyTrack {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBCachedSpotifyTrackInsertManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBCachedSpotifyTrackInsertManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnInsertedManyCachedSpotifyTracks(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBCachedSpotifyTrackInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBCachedSpotifyTrackInsertManyFromPostsTaskCallback callbackTo){
+		public DBCachedSpotifyTrackInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;

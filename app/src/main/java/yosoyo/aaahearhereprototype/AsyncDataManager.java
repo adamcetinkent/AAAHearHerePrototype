@@ -13,6 +13,7 @@ import java.util.List;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
@@ -21,6 +22,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.GetUserTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -44,7 +46,7 @@ public class AsyncDataManager {
 	public static void authenticateUser(AccessToken accessToken, final AuthenticateUserCallback callback){
 		new AuthenticateUserFacebookTask(
 			accessToken,
-			new AuthenticateUserFacebookTask.AuthenticateUserFacebookTaskCallback() {
+			new AuthenticateUserFacebookTask.Callback() {
 				@Override
 				public void returnAuthenticationResult(Integer result, HHUserFullProcess returnedUser) {
 					if (result == HttpURLConnection.HTTP_OK) {
@@ -62,7 +64,7 @@ public class AsyncDataManager {
 						HHUser user = new HHUser(Profile.getCurrentProfile());
 						new CreateUserTask(
 							user,
-							new CreateUserTask.CreateUserTaskCallback() {
+							new CreateUserTask.Callback() {
 								@Override
 								public void returnResultCreateUser(Boolean success, HHUser userReturned) {
 									callback.returnAuthenticationResult(true);
@@ -73,6 +75,35 @@ public class AsyncDataManager {
 					}
 				}
 			}).execute();
+	}
+
+	public interface UpdateCurrentUserCallback{
+		void returnUpdateCurrentUser(boolean success);
+	}
+
+	public static void updateCurrentUser(final UpdateCurrentUserCallback callback){
+		new GetUserTask(
+			HHUser.getCurrentUserID(),
+			new GetUserTask.Callback() {
+				@Override
+				public void returnUser(final boolean success, HHUserFullProcess returnedUser) {
+					if (success){
+						HHUser.setCurrentUser(returnedUser);
+						DatabaseHelper.processCurrentUser(
+							context,
+							returnedUser,
+							new DatabaseHelper.ProcessCurrentUserCallback() {
+								@Override
+								public void returnProcessedCurrentUser(HHUserFull hhUserFull) {
+									callback.returnUpdateCurrentUser(success);
+								}
+							});
+					} else {
+						callback.returnUpdateCurrentUser(success);
+					}
+				}
+			}
+		).execute();
 	}
 
 	public interface GetWebPostCallback {
@@ -185,8 +216,6 @@ public class AsyncDataManager {
 			});
 	}
 
-
-
 	public interface PostPostCallback{
 		void returnPostedPost(boolean success, HHPostFullProcess returnedPost);
 	}
@@ -250,15 +279,45 @@ public class AsyncDataManager {
 		WebHelper.deleteLike(like, new WebHelper.DeleteLikeCallback() {
 			@Override
 			public void returnDeletedLike(boolean success) {
-				DatabaseHelper.deleteLike(
-					context,
-					like,
-					new DatabaseHelper.DeleteLikeCallback() {
-						@Override
-						public void returnDeletedLike(boolean success) {
-							callback.returnDeletedLike(success);
+				if (success) {
+					DatabaseHelper.deleteLike(
+						context,
+						like,
+						new DatabaseHelper.DeleteLikeCallback() {
+							@Override
+							public void returnDeletedLike(boolean success) {
+								callback.returnDeletedLike(success);
+							}
+						});
+				} else {
+					callback.returnDeletedLike(success);
+				}
+			}
+		});
+	}
+
+	public interface AcceptFollowRequestCallback{
+		void returnAcceptFollowRequest(boolean success, HHFollowRequestUser followRequest);
+	}
+
+	public static void acceptFollowRequest(final HHFollowRequestUser followRequest, final AcceptFollowRequestCallback callback){
+		WebHelper.acceptFollowRequest(followRequest, new WebHelper.AcceptFollowRequestCallback() {
+			@Override
+			public void returnAcceptFollowRequest(boolean success) {
+				if (success) {
+					DatabaseHelper.deleteFollowRequest(
+						context,
+						followRequest,
+						new DatabaseHelper.DeleteFollowRequestCallback() {
+							@Override
+							public void returnDeletedFollowRequest(boolean success) {
+								callback.returnAcceptFollowRequest(success, followRequest);
+							}
 						}
-					});
+					);
+				} else {
+					callback.returnAcceptFollowRequest(success, followRequest);
+				}
 			}
 		});
 	}

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -26,14 +25,14 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/";
 
-	public interface GetPostsUserTaskCallback {
+	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
 	private final long userID;
-	private final GetPostsUserTaskCallback callbackTo;
+	private final Callback callbackTo;
 
-	public GetPostsUserTask(long userID, GetPostsUserTaskCallback callbackTo) {
+	public GetPostsUserTask(long userID, Callback callbackTo) {
 		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
@@ -42,7 +41,7 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		Log.d(TAG, "Fetching Posts by " + VM_SERVER_ADDRESS + userID);
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS + HHUser.getCurrentUserID());
+			URL url = new URL(VM_SERVER_ADDRESS + userID);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

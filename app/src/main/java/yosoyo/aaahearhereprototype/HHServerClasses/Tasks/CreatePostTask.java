@@ -26,15 +26,15 @@ class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface CreatePostTaskCallback {
+	public interface Callback {
 		void returnResultCreatePost(Boolean success, HHPostFullProcess postReturned);
 	}
 
-	private final CreatePostTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final HHPostTagsArray post;
 	private HHPostFullNested postReturned;
 
-	public CreatePostTask(HHPostTagsArray post, CreatePostTaskCallback callbackTo) {
+	public CreatePostTask(HHPostTagsArray post, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.post = post;
 	}

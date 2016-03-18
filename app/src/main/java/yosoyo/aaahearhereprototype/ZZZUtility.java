@@ -132,6 +132,8 @@ public class ZZZUtility {
 	}
 
 	public static String getLatLng(Location location){
+		if (location == null)
+			return null;
 		return location.getLatitude() + " " + location.getLongitude();
 	}
 

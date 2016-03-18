@@ -87,11 +87,11 @@ public class ORMPost {
 		database.close();
 	}
 
-	public static void insertPost(Context context, HHPost post, DBPostInsertTask.DBPostInsertTaskCallback callbackTo){
+	public static void insertPost(Context context, HHPost post, DBPostInsertTask.Callback callbackTo){
 		new DBPostInsertTask(context, post, callbackTo).execute();
 	}
 
-	public static void insertPosts(Context context, List<HHPostFullProcess> posts, DBPostInsertManyTask.DBPostInsertManyTaskCallback callbackTo){
+	public static void insertPosts(Context context, List<HHPostFullProcess> posts, DBPostInsertManyTask.Callback callbackTo){
 		new DBPostInsertManyTask(context, posts, callbackTo).execute();
 	}
 
@@ -110,20 +110,20 @@ public class ORMPost {
 		return contentValues;
 	}
 
-	public static void getPosts(Context context, DBPostSelectTask.DBPostSelectTaskCallback callbackTo){
+	public static void getPosts(Context context, DBPostSelectTask.Callback callbackTo){
 		new DBPostSelectTask(context, callbackTo).execute();
 	}
 
 	public static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
 
 		private final Context context;
-		private final DBPostSelectTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBPostSelectTaskCallback {
+		public interface Callback {
 			void returnPosts(List<HHPost> posts);
 		}
 
-		public DBPostSelectTask(Context context, DBPostSelectTaskCallback callbackTo){
+		public DBPostSelectTask(Context context, Callback callbackTo){
 			this.context = context;
 			this.callbackTo = callbackTo;
 		}
@@ -165,13 +165,13 @@ public class ORMPost {
 
 		private final Context context;
 		private final HHPost post;
-		private final DBPostInsertTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBPostInsertTaskCallback {
+		public interface Callback {
 			void returnInsertedPostUserID(Long postID, HHPost post);
 		}
 
-		public DBPostInsertTask(Context context, HHPost post, DBPostInsertTaskCallback callbackTo){
+		public DBPostInsertTask(Context context, HHPost post, Callback callbackTo){
 			this.context = context;
 			this.post = post;
 			this.callbackTo = callbackTo;
@@ -201,13 +201,13 @@ public class ORMPost {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBPostInsertManyTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBPostInsertManyTaskCallback {
+		public interface Callback {
 			void returnInsertedManyPosts(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBPostInsertManyTask(Context context, List<HHPostFullProcess> posts, DBPostInsertManyTaskCallback callbackTo){
+		public DBPostInsertManyTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;

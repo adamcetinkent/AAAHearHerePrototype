@@ -24,15 +24,15 @@ class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/comments/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface CreateCommentTaskCallback {
+	public interface Callback {
 		void returnResultCreateComment(Boolean success, HHComment comment);
 	}
 
-	private final CreateCommentTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final HHComment comment;
 	private HHComment commentReturned;
 
-	public CreateCommentTask(HHComment comment, CreateCommentTaskCallback callbackTo) {
+	public CreateCommentTask(HHComment comment, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.comment = comment;
 	}

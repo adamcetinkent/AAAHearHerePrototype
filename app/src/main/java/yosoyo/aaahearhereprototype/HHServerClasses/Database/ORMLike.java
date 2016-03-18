@@ -77,7 +77,7 @@ class ORMLike {
 		return contentValues;
 	}
 
-	public static void insertLike(Context context, HHLike like, DBLikeInsertTask.DBLikeInsertTaskCallback callbackTo){
+	public static void insertLike(Context context, HHLike like, DBLikeInsertTask.Callback callbackTo){
 		new DBLikeInsertTask(context, like, callbackTo).execute();
 	}
 
@@ -85,13 +85,13 @@ class ORMLike {
 
 		private final Context context;
 		private final HHLike like;
-		private final DBLikeInsertTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBLikeInsertTaskCallback {
+		public interface Callback {
 			void returnInsertedLike(Long likeID, HHLike like);
 		}
 
-		public DBLikeInsertTask(Context context, HHLike like, DBLikeInsertTaskCallback callbackTo){
+		public DBLikeInsertTask(Context context, HHLike like, Callback callbackTo){
 			this.context = context;
 			this.like = like;
 			this.callbackTo = callbackTo;
@@ -118,7 +118,7 @@ class ORMLike {
 		}
 	}
 
-	public static void deleteLike(Context context, HHLike like, DBLikeDeleteTask.DBLikeDeleteTaskCallback callbackTo){
+	public static void deleteLike(Context context, HHLike like, DBLikeDeleteTask.Callback callbackTo){
 		new DBLikeDeleteTask(context, like, callbackTo).execute();
 	}
 
@@ -126,13 +126,13 @@ class ORMLike {
 
 		private final Context context;
 		private final HHLike like;
-		private final DBLikeDeleteTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBLikeDeleteTaskCallback {
+		public interface Callback {
 			void returnDeletedLike(boolean success);
 		}
 
-		public DBLikeDeleteTask(Context context, HHLike like, DBLikeDeleteTaskCallback callbackTo){
+		public DBLikeDeleteTask(Context context, HHLike like, Callback callbackTo){
 			this.context = context;
 			this.like = like;
 			this.callbackTo = callbackTo;
@@ -160,7 +160,7 @@ class ORMLike {
 		}
 	}
 
-	public static void insertLikesFromPosts(Context context, List<HHPostFullProcess> posts, DBLikeInsertManyFromPostsTask.DBLikeInsertManyFromPostsTaskCallback callbackTo){
+	public static void insertLikesFromPosts(Context context, List<HHPostFullProcess> posts, DBLikeInsertManyFromPostsTask.Callback callbackTo){
 		new DBLikeInsertManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -168,13 +168,13 @@ class ORMLike {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBLikeInsertManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBLikeInsertManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnInsertedManyLikes(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBLikeInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBLikeInsertManyFromPostsTaskCallback callbackTo){
+		public DBLikeInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;

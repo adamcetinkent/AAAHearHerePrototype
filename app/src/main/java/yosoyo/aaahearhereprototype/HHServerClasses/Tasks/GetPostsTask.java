@@ -26,13 +26,13 @@ class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
 
-	public interface GetPostsTaskCallback {
+	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
-	private final GetPostsTaskCallback callbackTo;
+	private final Callback callbackTo;
 
-	public GetPostsTask(GetPostsTaskCallback callbackTo) {
+	public GetPostsTask(Callback callbackTo) {
 		this.callbackTo = callbackTo;
 	}
 

@@ -82,7 +82,7 @@ public class ORMComment {
 		return contentValues;
 	}
 
-	public static void insertComment(Context context, HHComment comment, DBCommentInsertTask.DBCommentInsertTaskCallback callbackTo){
+	public static void insertComment(Context context, HHComment comment, DBCommentInsertTask.Callback callbackTo){
 		new DBCommentInsertTask(context, comment, callbackTo).execute();
 	}
 
@@ -90,13 +90,13 @@ public class ORMComment {
 
 		private final Context context;
 		private final HHComment comment;
-		private final DBCommentInsertTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBCommentInsertTaskCallback {
+		public interface Callback {
 			void returnInsertedComment(Long commentID, HHComment comment);
 		}
 
-		public DBCommentInsertTask(Context context, HHComment comment, DBCommentInsertTaskCallback callbackTo){
+		public DBCommentInsertTask(Context context, HHComment comment, Callback callbackTo){
 			this.context = context;
 			this.comment = comment;
 			this.callbackTo = callbackTo;
@@ -123,7 +123,7 @@ public class ORMComment {
 		}
 	}
 
-	public static void insertCommentsFromPosts(Context context, List<HHPostFullProcess> posts, DBCommentInsertManyFromPostsTask.DBCommentInsertManyFromPostsTaskCallback callbackTo){
+	public static void insertCommentsFromPosts(Context context, List<HHPostFullProcess> posts, DBCommentInsertManyFromPostsTask.Callback callbackTo){
 		new DBCommentInsertManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -131,13 +131,13 @@ public class ORMComment {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBCommentInsertManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBCommentInsertManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnInsertedManyComments(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBCommentInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBCommentInsertManyFromPostsTaskCallback callbackTo){
+		public DBCommentInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;

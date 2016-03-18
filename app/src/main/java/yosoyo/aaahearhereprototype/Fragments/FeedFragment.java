@@ -14,6 +14,7 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -94,6 +95,8 @@ public class FeedFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setHasOptionsMenu(true);
+
 		Bundle arguments = getArguments();
 		if (arguments != null){
 			handleArguments(arguments);
@@ -106,8 +109,20 @@ public class FeedFragment extends Fragment {
 
 		if (feedType == USER_FEED){
 			userID = arguments.getLong(USER_ID);
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()){
+			case android.R.id.home: {
+				getActivity().onBackPressed();
+				return true;
+			}
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -152,12 +167,13 @@ public class FeedFragment extends Fragment {
 		lstTimeline.setAdapter(lstTimelineAdapter);
 
 		switch (feedType){
-			case 0: {
+			case GENERAL_FEED: {
 				getAllData();
 				break;
 			}
-			case 1:{
+			case USER_FEED:{
 				getUserData();
+				break;
 			}
 		}
 

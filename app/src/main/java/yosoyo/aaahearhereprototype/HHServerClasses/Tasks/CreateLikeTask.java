@@ -24,15 +24,15 @@ class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface CreateLikeTaskCallback {
+	public interface Callback {
 		void returnResultCreateLike(Boolean success, HHLike like);
 	}
 
-	private final CreateLikeTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final HHLike like;
 	private HHLike likeReturned;
 
-	public CreateLikeTask(HHLike like, CreateLikeTaskCallback callbackTo) {
+	public CreateLikeTask(HHLike like, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.like = like;
 	}

@@ -18,20 +18,8 @@ public class HHPostFullProcess extends HHPostFull {
 		super(nested);
 	}
 
-	public boolean isPostProcessed() {
-		return postProcessed;
-	}
-
-	public boolean isCommentsProcessed() {
-		return commentsProcessed;
-	}
-
-	public boolean isLikesProcessed() {
-		return likesProcessed;
-	}
-
-	public boolean isUsersProcessed() {
-		return usersProcessed;
+	public boolean isProcessed(){
+		return postProcessed && commentsProcessed && likesProcessed && usersProcessed && trackProcessed && tagsProcessed;
 	}
 
 	public boolean isTrackProcessed() {
@@ -56,10 +44,6 @@ public class HHPostFullProcess extends HHPostFull {
 
 	public void setTrackProcessed(boolean trackProcessed) {
 		this.trackProcessed = trackProcessed;
-	}
-
-	public boolean isTagsProcessed() {
-		return tagsProcessed;
 	}
 
 	public void setTagsProcessed(boolean tagsProcessed) {

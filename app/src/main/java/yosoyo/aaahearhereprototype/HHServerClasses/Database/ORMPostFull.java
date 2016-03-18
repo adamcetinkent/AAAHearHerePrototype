@@ -14,6 +14,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 
 /**
  * Created by adam on 02/03/16.
@@ -22,20 +23,20 @@ class ORMPostFull {
 
 	private static final String TAG = "ORMPostFull";
 
-	public static void getAllPosts(Context context, DBPostFullSelectAllTask.DBPostFullSelectAllTaskCallback callbackTo){
+	public static void getAllPosts(Context context, DBPostFullSelectAllTask.Callback callbackTo){
 		new DBPostFullSelectAllTask(context, callbackTo).execute();
 	}
 
 	public static class DBPostFullSelectAllTask extends AsyncTask<Void, Void, List<HHPostFull> > {
 
 		private final Context context;
-		private final DBPostFullSelectAllTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBPostFullSelectAllTaskCallback {
+		public interface Callback {
 			void returnPosts(List<HHPostFull> posts);
 		}
 
-		public DBPostFullSelectAllTask(Context context, DBPostFullSelectAllTaskCallback callbackTo){
+		public DBPostFullSelectAllTask(Context context, Callback callbackTo){
 			this.context = context;
 			this.callbackTo = callbackTo;
 		}
@@ -45,12 +46,32 @@ class ORMPostFull {
 			DatabaseHelper databaseHelper = new DatabaseHelper(context);
 			SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
+			Cursor cursorFollows = database.rawQuery(
+				"SELECT " + ORMFollow.COLUMN_FOLLOWED_USER_ID_NAME + " FROM " + ORMFollow.TABLE_NAME
+					+ " WHERE " + ORMFollow.COLUMN_USER_ID_NAME + "=?"
+				, new String[]{String.valueOf(HHUser.getCurrentUserID())});
+
+			StringBuilder followIDs = new StringBuilder(String.valueOf(HHUser.getCurrentUserID())).append(",");
+			int numFollows = cursorFollows.getCount();
+			if (numFollows > 0){
+				cursorFollows.moveToFirst();
+				while (!cursorFollows.isAfterLast()){
+					long id = cursorFollows.getLong(cursorFollows.getColumnIndex(ORMFollow.COLUMN_FOLLOWED_USER_ID_NAME));
+					followIDs.append(id).append(",");
+					cursorFollows.moveToNext();
+				}
+			} else {
+				return new ArrayList<>();
+			}
+			String followsInArray = "(" + followIDs.substring(0, followIDs.length()-1) + ")";
+
 			Cursor cursorPost = database.rawQuery(
 				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE_NAME
 					+ " INNER JOIN ("
 					+ ORMPost.TABLE_NAME + " LEFT JOIN " + ORMUser.TABLE_NAME
 					+ " ON " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
 					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_TRACK_NAME
+					+ " WHERE " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " IN " + followsInArray
 				, null);
 
 			int numPosts = cursorPost.getCount();
@@ -150,7 +171,7 @@ class ORMPostFull {
 		}
 	}
 
-	public static void getUserPosts(Context context, long userID, DBPostFullSelectUserTask.DBPostFullSelectUserTaskCallback callbackTo){
+	public static void getUserPosts(Context context, long userID, DBPostFullSelectUserTask.Callback callbackTo){
 		new DBPostFullSelectUserTask(context, userID, callbackTo).execute();
 	}
 
@@ -158,13 +179,13 @@ class ORMPostFull {
 
 		private final Context context;
 		private final long userID;
-		private final DBPostFullSelectUserTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBPostFullSelectUserTaskCallback {
+		public interface Callback {
 			void returnPosts(List<HHPostFull> posts);
 		}
 
-		public DBPostFullSelectUserTask(Context context, long userID, DBPostFullSelectUserTaskCallback callbackTo){
+		public DBPostFullSelectUserTask(Context context, long userID, Callback callbackTo){
 			this.context = context;
 			this.userID = userID;
 			this.callbackTo = callbackTo;
@@ -281,7 +302,7 @@ class ORMPostFull {
 		}
 	}
 
-	public static void getPostsAtLocation(Context context, Location location, DBPostSelectAtLocationTask.DBPostSelectAtLocationTaskCallback callbackTo){
+	public static void getPostsAtLocation(Context context, Location location, DBPostSelectAtLocationTask.Callback callbackTo){
 		new DBPostSelectAtLocationTask(context, location, callbackTo).execute();
 	}
 
@@ -289,14 +310,14 @@ class ORMPostFull {
 
 		private final Context context;
 		private final Location location;
-		private final DBPostSelectAtLocationTaskCallback callbackTo;
+		private final Callback callbackTo;
 		private static final double RANGE = 0.001;
 
-		public interface DBPostSelectAtLocationTaskCallback {
+		public interface Callback {
 			void returnPosts(List<HHPostFull> posts);
 		}
 
-		public DBPostSelectAtLocationTask(Context context, Location location, DBPostSelectAtLocationTaskCallback callbackTo){
+		public DBPostSelectAtLocationTask(Context context, Location location, Callback callbackTo){
 			this.context = context;
 			this.location = location;
 			this.callbackTo = callbackTo;

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingTop="5dp"
+              android:paddingBottom="5dp"
+              android:gravity="center_vertical"
+              android:background="#fff4f4f4"
+    >
+
+    <FrameLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="right"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="5dp"
+        >
+
+        <ImageView
+            android:id="@+id/rv_row_follow_request_imgProfile"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/frame"
+            />
+
+    </FrameLayout>
+
+
+    <TextView
+        android:id="@+id/rv_row_follow_request_txtUserName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="@string/placeholder_user_name"/>
+
+    <ImageView
+        android:id="@+id/rv_row_follow_request_btnDelete"
+        android:layout_height="30dp"
+        android:layout_width="30dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:src="@drawable/cross_button"
+        />
+
+    <FrameLayout
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
+
+        <ImageView
+            android:id="@+id/rv_row_follow_request_btnAccept"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:src="@drawable/tick_button"
+            />
+
+        <ProgressBar
+            android:id="@+id/rv_row_follow_request_btnAccept_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            />
+
+    </FrameLayout>
+
+</LinearLayout>

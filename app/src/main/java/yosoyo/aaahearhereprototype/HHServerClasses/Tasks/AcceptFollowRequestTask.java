@@ -3,45 +3,38 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.ZZZUtility;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
 
 /**
  * Created by adam on 18/02/16.
  */
-public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "CreatePostTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/users/";
+class AcceptFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "AcceptFollowRequestTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/follows/accept/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnResultCreateUser(Boolean success, HHUser userReturned);
+		void returnAcceptFollowRequest(Boolean success);
 	}
 
 	private final Callback callbackTo;
-	private final HHUser user;
-	private HHUser userReturned;
+	private final HHFollowRequestUser followRequest;
 
-	public CreateUserTask(HHUser user, Callback callbackTo) {
+	public AcceptFollowRequestTask(HHFollowRequestUser followRequest, Callback callbackTo) {
 		this.callbackTo = callbackTo;
-		this.user = user;
+		this.followRequest = followRequest;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting User to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Posting Follow Request to " + VM_SERVER_ADDRESS + followRequest.getFollowRequest().getID());
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS);
+			URL url = new URL(VM_SERVER_ADDRESS + followRequest.getFollowRequest().getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				urlConnection.setDoOutput(true);
@@ -50,28 +43,14 @@ public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(user, HHUser.class);
-				String jsonplus = "{\"user\": "+json+"}";
-
-				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
-				out.write(jsonplus);
-				out.close();
-
 				int httpResult = urlConnection.getResponseCode();
 				if (httpResult == HttpURLConnection.HTTP_OK){
-
-					InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-					String inString = ZZZUtility.convertStreamToString(in);
-					in.close();
-
-					userReturned = new Gson().fromJson(inString, HHUser.class);
-
 					return true;
 				} else {
 					Log.e(TAG, "HTTP ERROR! " + httpResult);
 				}
 
-				return true;
+				return false;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -86,7 +65,7 @@ public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreateUser(result, userReturned);	// sends results back
+		callbackTo.returnAcceptFollowRequest(result);	// sends results back
 	}
 
 }

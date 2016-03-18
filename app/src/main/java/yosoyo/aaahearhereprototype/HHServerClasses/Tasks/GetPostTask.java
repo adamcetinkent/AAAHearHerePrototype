@@ -24,14 +24,14 @@ class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
-	public interface GetPostTaskCallback {
+	public interface Callback {
 		void returnPost(HHPostFullProcess post);
 	}
 
-	private final GetPostTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final long post_id;
 
-	public GetPostTask(long post_id, GetPostTaskCallback callbackTo) {
+	public GetPostTask(long post_id, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.post_id = post_id;
 	}

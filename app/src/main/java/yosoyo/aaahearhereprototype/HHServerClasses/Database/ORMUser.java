@@ -6,9 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.HashSet;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
@@ -91,7 +94,7 @@ public class ORMUser {
 		return contentValues;
 	}
 
-	public static void insertCurrentUser(Context context, HHUserFullProcess user, DBUserInsertCurrentTask.DBUserInsertCurrentTaskCallback callbackTo){
+	/*public static void insertCurrentUser(Context context, HHUserFullProcess user, DBUserInsertCurrentTask.DBUserInsertCurrentTaskCallback callbackTo){
 		new DBUserInsertCurrentTask(context, user, callbackTo).execute();
 	}
 
@@ -140,9 +143,77 @@ public class ORMUser {
 		protected void onPostExecute(Long userID){
 			callbackTo.returnInsertedUser(userID, user);
 		}
+	}*/
+
+	public static void insertUsersFromUser(Context context, HHUserFullProcess user, DBUserInsertManyFromUserTask.Callback callbackTo){
+		new DBUserInsertManyFromUserTask(context, user, callbackTo).execute();
 	}
 
-	public static void insertUsersFromPosts(Context context, List<HHPostFullProcess> posts, DBUserInsertManyFromPostsTask.DBUserInsertManyFromPostsTaskCallback callbackTo){
+	public static class DBUserInsertManyFromUserTask extends AsyncTask<Void, Void, Long> {
+
+		private final Context context;
+		private final HHUserFullProcess user;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnInsertedManyFromUser(long userID, HHUserFullProcess returnedUser);
+		}
+
+		public DBUserInsertManyFromUserTask(Context context, HHUserFullProcess user, Callback callbackTo){
+			this.context = context;
+			this.user = user;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Long doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			ContentValues values = userToContentValues(user.getUser());
+			long userID = database.insertWithOnConflict(TABLE_NAME, "null", values,
+														SQLiteDatabase.CONFLICT_REPLACE);
+			Log.d(TAG, "Inserted new HHUser with ID:" + userID);
+
+			HashSet<HHUser> userSet = new HashSet<>();
+
+			for (HHFriendshipUser friendship : user.getFriendships()){
+				userSet.add(friendship.getUser());
+			}
+			for (HHFollowUser follow : user.getFollowOuts()){
+				userSet.add(follow.getUser());
+			}
+			for (HHFollowUser follow : user.getFollowIns()){
+				userSet.add(follow.getUser());
+			}
+			for (HHFollowRequestUser followRequest : user.getFollowOutRequests()){
+				userSet.add(followRequest.getUser());
+			}
+			for (HHFollowRequestUser followRequest : user.getFollowInRequests()){
+				userSet.add(followRequest.getUser());
+			}
+
+			long subUserID;
+			for (HHUser user : userSet){
+				values = userToContentValues(user);
+				subUserID = database.insertWithOnConflict(TABLE_NAME, "null", values, SQLiteDatabase.CONFLICT_REPLACE);
+				Log.d(TAG, "Inserted new HHUser with ID:" + subUserID);
+			}
+
+			user.setUserProcessed(true);
+
+			database.close();
+
+			return userID;
+		}
+
+		@Override
+		protected void onPostExecute(Long userID){
+			callbackTo.returnInsertedManyFromUser(userID, user);
+		}
+	}
+
+	public static void insertUsersFromPosts(Context context, List<HHPostFullProcess> posts, DBUserInsertManyFromPostsTask.Callback callbackTo){
 		new DBUserInsertManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -150,13 +221,13 @@ public class ORMUser {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBUserInsertManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBUserInsertManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnInsertedManyUsers(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBUserInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBUserInsertManyFromPostsTaskCallback callbackTo){
+		public DBUserInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;
@@ -168,33 +239,25 @@ public class ORMUser {
 			SQLiteDatabase database = databaseHelper.getWritableDatabase();
 
 			long userID;
+			ContentValues values;
 			for (int i = 0; i < posts.size(); i++) {
 				HHPostFullProcess post = posts.get(i);
-				ContentValues values = userToContentValues(post.getUser());
-				userID = database.insertWithOnConflict(TABLE_NAME, "null", values,
-													   SQLiteDatabase.CONFLICT_REPLACE);
-				Log.d(TAG, "Inserted new HHUser with ID:" + userID);
 
-				List<HHCommentUser> comments = post.getComments();
-				for (int j = 0; j < comments.size(); j++){
-					HHCommentUser comment = comments.get(j);
-					values = userToContentValues(comment.getUser());
-					userID = database.insertWithOnConflict(TABLE_NAME, "null", values, SQLiteDatabase.CONFLICT_REPLACE);
-					Log.d(TAG, "Inserted new HHUser with ID:" + userID);
+				HashSet<HHUser> userSet = new HashSet<>();
+				userSet.add(post.getUser());
+
+				for (HHCommentUser comment : post.getComments()){
+					userSet.add(comment.getUser());
+				}
+				for (HHLikeUser like : post.getLikes()){
+					userSet.add(like.getUser());
+				}
+				for (HHTagUser tag : post.getTags()){
+					userSet.add(tag.getUser());
 				}
 
-				List<HHLikeUser> likes = post.getLikes();
-				for (int j = 0; j < likes.size(); j++){
-					HHLikeUser likeUser = likes.get(j);
-					values = userToContentValues(likeUser.getUser());
-					userID = database.insertWithOnConflict(TABLE_NAME, "null", values, SQLiteDatabase.CONFLICT_REPLACE);
-					Log.d(TAG, "Inserted new HHUser with ID:" + userID);
-				}
-
-				List<HHTagUser> tags = post.getTags();
-				for (int j = 0; j < tags.size(); j++){
-					HHTagUser tagUser = tags.get(j);
-					values = userToContentValues(tagUser.getUser());
+				for (HHUser user : userSet){
+					values = userToContentValues(user);
 					userID = database.insertWithOnConflict(TABLE_NAME, "null", values, SQLiteDatabase.CONFLICT_REPLACE);
 					Log.d(TAG, "Inserted new HHUser with ID:" + userID);
 				}

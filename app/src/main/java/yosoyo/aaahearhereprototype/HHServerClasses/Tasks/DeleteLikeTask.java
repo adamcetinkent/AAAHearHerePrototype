@@ -18,21 +18,21 @@ class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
-	public interface DeleteLikeTaskCallback {
+	public interface Callback {
 		void returnResultDeleteLike(Boolean success);
 	}
 
-	private final DeleteLikeTaskCallback callbackTo;
+	private final Callback callbackTo;
 	private final HHLike like;
 
-	public DeleteLikeTask(HHLike like, DeleteLikeTaskCallback callbackTo) {
+	public DeleteLikeTask(HHLike like, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.like = like;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Deleting Like to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Deleting Like to " + VM_SERVER_ADDRESS + like.getID());
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + like.getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

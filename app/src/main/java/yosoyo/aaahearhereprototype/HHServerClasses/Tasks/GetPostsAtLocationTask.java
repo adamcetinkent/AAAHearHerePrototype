@@ -26,15 +26,15 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/at/%2$.6f/%3$.6f";
 
-	public interface GetPostsAtLocationTaskCallback {
+	public interface Callback {
 		void returnPostsAtLocation(List<HHPostFull> posts);
 	}
 
 	private final Location location;
 	private final long userID;
-	private final GetPostsAtLocationTaskCallback callbackTo;
+	private final Callback callbackTo;
 
-	public GetPostsAtLocationTask(Location location, long userID, GetPostsAtLocationTaskCallback callbackTo) {
+	public GetPostsAtLocationTask(Location location, long userID, Callback callbackTo) {
 		this.location = location;
 		this.userID = userID;
 		this.callbackTo = callbackTo;

@@ -51,7 +51,7 @@ import yosoyo.aaahearhereprototype.AddressPicker;
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHTag;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
@@ -115,7 +115,7 @@ public class PostFragment extends Fragment {
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		MenuItem menuItem = menu.findItem(R.id.post);
+		MenuItem menuItem = menu.findItem(R.id.action_post);
 		menuItem.setVisible(false);
 	}
 
@@ -442,8 +442,11 @@ public class PostFragment extends Fragment {
 
 		final List<HHUser> userList = new ArrayList<>();
 		HHUserFull currentUser = HHUser.getCurrentUser();
-		for (HHFriendshipUser friendship: currentUser.getFriendships()){
-			userList.add(friendship.getUser());
+		for (HHFollowUser followUser: currentUser.getFollowOuts()){
+			userList.add(followUser.getUser());
+		}
+		for (HHFollowUser followUser: currentUser.getFollowIns()){
+			userList.add(followUser.getUser());
 		}
 		final TagArrayAdapter tagArrayAdapter = new TagArrayAdapter(getActivity(), userList, txtMessage);
 		txtMessage.setAdapter(tagArrayAdapter);

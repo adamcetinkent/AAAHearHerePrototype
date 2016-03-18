@@ -14,7 +14,7 @@ import com.facebook.Profile;
 import java.sql.Timestamp;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFriendshipsNested;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
 
 /**
  * Created by adam on 18/02/16.
@@ -26,7 +26,7 @@ public class HHUser extends HHBase {
 	private final String fb_user_id;
 	private String email;
 
-	public HHUser(HHUserFriendshipsNested nested){
+	public HHUser(HHUserFullNested nested){
 		super(
 			nested.getID(),
 			nested.getUpdatedAt(),

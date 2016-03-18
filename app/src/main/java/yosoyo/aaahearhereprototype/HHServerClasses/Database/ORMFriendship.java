@@ -27,7 +27,7 @@ class ORMFriendship {
 	private static final String	COLUMN_USER_ID_NAME = 			"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 			"INTEGER";
 
-	private static final String	COLUMN_FRIEND_USER_ID_NAME = 	"post_id";
+	private static final String	COLUMN_FRIEND_USER_ID_NAME = 	"friend_user_id";
 	private static final String	COLUMN_FRIEND_USER_ID_TYPE =	"INTEGER";
 
 	private static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
@@ -75,7 +75,7 @@ class ORMFriendship {
 		return contentValues;
 	}
 
-	public static void insertFriendship(Context context, HHFriendship friendship, DBFriendshipInsertTask.DBFriendshipInsertTaskCallback callbackTo){
+	public static void insertFriendship(Context context, HHFriendship friendship, DBFriendshipInsertTask.Callback callbackTo){
 		new DBFriendshipInsertTask(context, friendship, callbackTo).execute();
 	}
 
@@ -83,13 +83,13 @@ class ORMFriendship {
 
 		private final Context context;
 		private final HHFriendship friendship;
-		private final DBFriendshipInsertTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBFriendshipInsertTaskCallback {
+		public interface Callback {
 			void returnInsertedFriendship(Long friendshipID, HHFriendship friendship);
 		}
 
-		public DBFriendshipInsertTask(Context context, HHFriendship friendship, DBFriendshipInsertTaskCallback callbackTo){
+		public DBFriendshipInsertTask(Context context, HHFriendship friendship, Callback callbackTo){
 			this.context = context;
 			this.friendship = friendship;
 			this.callbackTo = callbackTo;
@@ -158,7 +158,7 @@ class ORMFriendship {
 		}
 	}*/
 
-	public static void insertFriendshipsFromUser(Context context, HHUserFullProcess user, DBFriendshipInsertManyFromUserTask.DBFriendshipInsertManyFromUserTaskCallback callbackTo){
+	public static void insertFriendshipsFromUser(Context context, HHUserFullProcess user, DBFriendshipInsertManyFromUserTask.Callback callbackTo){
 		new DBFriendshipInsertManyFromUserTask(context, user, callbackTo).execute();
 	}
 
@@ -166,13 +166,13 @@ class ORMFriendship {
 
 		private final Context context;
 		private final HHUserFullProcess user;
-		private final DBFriendshipInsertManyFromUserTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBFriendshipInsertManyFromUserTaskCallback {
+		public interface Callback {
 			void returnInsertedManyFriendships(HHUserFullProcess user);
 		}
 
-		public DBFriendshipInsertManyFromUserTask(Context context, HHUserFullProcess user, DBFriendshipInsertManyFromUserTaskCallback callbackTo){
+		public DBFriendshipInsertManyFromUserTask(Context context, HHUserFullProcess user, Callback callbackTo){
 			this.context = context;
 			this.user = user;
 			this.callbackTo = callbackTo;

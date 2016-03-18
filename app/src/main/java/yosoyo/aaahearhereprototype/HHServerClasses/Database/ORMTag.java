@@ -77,7 +77,7 @@ class ORMTag {
 		return contentValues;
 	}
 
-	public static void insertTag(Context context, HHTag tag, DBTagInsertTask.DBTagInsertTaskCallback callbackTo){
+	public static void insertTag(Context context, HHTag tag, DBTagInsertTask.Callback callbackTo){
 		new DBTagInsertTask(context, tag, callbackTo).execute();
 	}
 
@@ -85,13 +85,13 @@ class ORMTag {
 
 		private final Context context;
 		private final HHTag tag;
-		private final DBTagInsertTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBTagInsertTaskCallback {
+		public interface Callback {
 			void returnInsertedTag(Long tagID, HHTag tag);
 		}
 
-		public DBTagInsertTask(Context context, HHTag tag, DBTagInsertTaskCallback callbackTo){
+		public DBTagInsertTask(Context context, HHTag tag, Callback callbackTo){
 			this.context = context;
 			this.tag = tag;
 			this.callbackTo = callbackTo;
@@ -118,7 +118,7 @@ class ORMTag {
 		}
 	}
 
-	public static void deleteTag(Context context, HHTag tag, DBTagDeleteTask.DBTagDeleteTaskCallback callbackTo){
+	public static void deleteTag(Context context, HHTag tag, DBTagDeleteTask.Callback callbackTo){
 		new DBTagDeleteTask(context, tag, callbackTo).execute();
 	}
 
@@ -126,13 +126,13 @@ class ORMTag {
 
 		private final Context context;
 		private final HHTag tag;
-		private final DBTagDeleteTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBTagDeleteTaskCallback {
+		public interface Callback {
 			void returnDeletedTag(boolean success);
 		}
 
-		public DBTagDeleteTask(Context context, HHTag tag, DBTagDeleteTaskCallback callbackTo){
+		public DBTagDeleteTask(Context context, HHTag tag, Callback callbackTo){
 			this.context = context;
 			this.tag = tag;
 			this.callbackTo = callbackTo;
@@ -160,7 +160,7 @@ class ORMTag {
 		}
 	}
 
-	public static void insertTagsFromPosts(Context context, List<HHPostFullProcess> posts, DBTagInsertManyFromPostsTask.DBTagInsertManyFromPostsTaskCallback callbackTo){
+	public static void insertTagsFromPosts(Context context, List<HHPostFullProcess> posts, DBTagInsertManyFromPostsTask.Callback callbackTo){
 		new DBTagInsertManyFromPostsTask(context, posts, callbackTo).execute();
 	}
 
@@ -168,13 +168,13 @@ class ORMTag {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
-		private final DBTagInsertManyFromPostsTaskCallback callbackTo;
+		private final Callback callbackTo;
 
-		public interface DBTagInsertManyFromPostsTaskCallback {
+		public interface Callback {
 			void returnInsertedManyTags(List<HHPostFullProcess> postsToProcess);
 		}
 
-		public DBTagInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, DBTagInsertManyFromPostsTaskCallback callbackTo){
+		public DBTagInsertManyFromPostsTask(Context context, List<HHPostFullProcess> posts, Callback callbackTo){
 			this.context = context;
 			this.posts = posts;
 			this.callbackTo = callbackTo;
