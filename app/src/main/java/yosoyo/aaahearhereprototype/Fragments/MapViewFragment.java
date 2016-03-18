@@ -227,13 +227,13 @@ public class MapViewFragment
 		AsyncDataManager.getAllPosts(
 			new AsyncDataManager.GetAllPostsCallback() {
 				@Override
-				public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
+				public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
 					posts = ZZZUtility.mergeLists(posts, cachedPosts);
 					addMapMarkers();
 				}
 
 				@Override
-				public void returnWebPost(HHPostFull webPost) {
+				public void returnGetWebPost(HHPostFull webPost) {
 					if (ZZZUtility.addItemToList(posts, webPost))
 						addMapMarker(webPost, true);
 				}

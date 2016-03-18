@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
@@ -20,20 +22,20 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
+import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RequestFollowFragment extends Fragment {
+public class RequestFollowFragment extends FeedbackFragment {
 
-	private RecyclerView recyclerView;
+	private RecyclerView lstRequests;
 	private RecyclerView.Adapter adapter;
 	private RecyclerView.LayoutManager layoutManager;
 
 	public RequestFollowFragment() {
 		// Required empty public constructor
 	}
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,10 +48,10 @@ public class RequestFollowFragment extends Fragment {
 							 Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_request_follow, container, false);
 
-		recyclerView = (RecyclerView) view.findViewById(R.id.fragment_request_follow_recycler_view);
+		lstRequests = (RecyclerView) view.findViewById(R.id.fragment_request_follow_lstRequests);
 
 		layoutManager = new LinearLayoutManager(getActivity());
-		recyclerView.setLayoutManager(layoutManager);
+		lstRequests.setLayoutManager(layoutManager);
 
 		FollowRequestAdapter.AdapterCallback adapterCallback = new FollowRequestAdapter.AdapterCallback() {
 			@Override
@@ -71,8 +73,27 @@ public class RequestFollowFragment extends Fragment {
 			}
 
 			@Override
-			public void onUserClick(HHUser user) {
+			public void requestDeleted(final HHFollowRequestUser followRequest, final int position) {
 
+				HHUser.getCurrentUser().getFollowInRequests().remove(followRequest);
+				adapter.notifyItemRemoved(position);
+
+				AsyncDataManager.updateCurrentUser(
+					new AsyncDataManager.UpdateCurrentUserCallback() {
+						@Override
+						public void returnUpdateCurrentUser(boolean success) {
+							if (success) {
+								getActivity().invalidateOptionsMenu();
+							}
+						}
+					}
+				);
+			}
+
+			@Override
+			public void onUserClick(HHUser user) {
+				if (user != null)
+					requestUserFeed(user);
 			}
 		};
 
@@ -80,7 +101,7 @@ public class RequestFollowFragment extends Fragment {
 			HHUser.getCurrentUser().getFollowInRequests(),
 			adapterCallback);
 
-		recyclerView.setAdapter(adapter);
+		lstRequests.setAdapter(adapter);
 
 		return view;
 	}
@@ -91,6 +112,7 @@ public class RequestFollowFragment extends Fragment {
 
 		interface AdapterCallback {
 			void requestAccepted(HHFollowRequestUser followRequest, int position);
+			void requestDeleted(HHFollowRequestUser followRequest, int position);
 			void onUserClick(HHUser user);
 		}
 
@@ -105,27 +127,59 @@ public class RequestFollowFragment extends Fragment {
 		}
 
 		static class ViewHolder extends RecyclerView.ViewHolder{
+
+			private class OnClickUserListener implements View.OnClickListener {
+
+				private HHUser user;
+				private final AdapterCallback adapterCallback;
+
+				public OnClickUserListener(HHUser user, AdapterCallback adapterCallback){
+					this.user = user;
+					this.adapterCallback = adapterCallback;
+				}
+
+				public void setUser(HHUser user) {
+					this.user = user;
+				}
+
+				@Override
+				public void onClick(View v) {
+					adapterCallback.onUserClick(user);
+				}
+
+			}
+
 			public TextView txtUserName;
 			public ImageView imgProfile;
 			public ImageView btnAccept;
 			public ImageView btnDelete;
 			public ProgressBar btnAcceptProgressBar;
+			public ProgressBar btnDeleteProgressBar;
 			public OnClickFollowRequestListener btnAcceptOnClickListener;
+			public OnClickFollowRequestListener btnDeleteOnClickListener;
+			public OnClickUserListener onClickUserListener;
 			public int position;
-			private final AdapterCallback adapterCallback;
+			//private final AdapterCallback adapterCallback;
 
 			public ViewHolder(View view, final AdapterCallback adapterCallback){
 				super(view);
-				this.adapterCallback = adapterCallback;
+				//this.adapterCallback = adapterCallback;
 				txtUserName = (TextView) view.findViewById(R.id.rv_row_follow_request_txtUserName);
 				imgProfile = (ImageView) view.findViewById(R.id.rv_row_follow_request_imgProfile);
+				onClickUserListener = new OnClickUserListener(null, adapterCallback);
+				txtUserName.setOnClickListener(onClickUserListener);
+				imgProfile.setOnClickListener(onClickUserListener);
+
 				btnAccept = (ImageView) view.findViewById(R.id.rv_row_follow_request_btnAccept);
 				btnDelete = (ImageView) view.findViewById(R.id.rv_row_follow_request_btnDelete);
 				btnAcceptProgressBar = (ProgressBar) view.findViewById(R.id.rv_row_follow_request_btnAccept_progress);
+				btnDeleteProgressBar = (ProgressBar) view.findViewById(R.id.rv_row_follow_request_btnDelete_progress);
 				btnAcceptOnClickListener = new OnClickFollowRequestListener(){
 					@Override
 					public void onClick(View v) {
 						btnAccept.setVisibility(View.GONE);
+						btnDelete.setColorFilter(ZZZUtility.greyOut);
+						btnDelete.setEnabled(false);
 						btnAcceptProgressBar.setVisibility(View.VISIBLE);
 						AsyncDataManager.acceptFollowRequest(
 							this.followRequest,
@@ -137,17 +191,50 @@ public class RequestFollowFragment extends Fragment {
 									}
 									btnAccept.setVisibility(View.VISIBLE);
 									btnAcceptProgressBar.setVisibility(View.GONE);
+									btnDelete.clearColorFilter();
+									btnDelete.setEnabled(true);
 								}
 							});
 					}
 				};
 				btnAccept.setOnClickListener(btnAcceptOnClickListener);
+				btnDeleteOnClickListener = new OnClickFollowRequestListener() {
+					@Override
+					public void onClick(View v) {
+						btnDelete.setVisibility(View.GONE);
+						btnAccept.setColorFilter(ZZZUtility.greyOut);
+						btnAccept.setEnabled(false);
+						btnDeleteProgressBar.setVisibility(View.VISIBLE);
+						AsyncDataManager.deleteFollowRequest(
+							this.followRequest,
+							new AsyncDataManager.DeleteFollowRequestCallback() {
+								@Override
+								public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
+									if (success){
+										adapterCallback.requestDeleted(followRequest, position);
+									}
+									btnDelete.setVisibility(View.VISIBLE);
+									btnDeleteProgressBar.setVisibility(View.GONE);
+									btnAccept.clearColorFilter();
+									btnAccept.setEnabled(true);
+								}
+							});
+					}
+				};
+				btnDelete.setOnClickListener(btnDeleteOnClickListener);
 			}
 		}
 
 		public FollowRequestAdapter(List<HHFollowRequestUser> followRequests, AdapterCallback adapterCallback){
 			this.followRequests = followRequests;
 			this.adapterCallback = adapterCallback;
+
+			Collections.sort(this.followRequests, new Comparator<HHFollowRequestUser>() {
+				@Override
+				public int compare(HHFollowRequestUser lhs, HHFollowRequestUser rhs) {
+					return lhs.getFollowRequest().getUpdatedAt().compareTo(rhs.getFollowRequest().getUpdatedAt());
+				}
+			});
 		}
 
 		@Override
@@ -164,7 +251,9 @@ public class RequestFollowFragment extends Fragment {
 			HHFollowRequestUser followRequest = followRequests.get(position);
 			holder.position = position;
 			holder.btnAcceptOnClickListener.setFollowRequest(followRequest);
+			holder.btnDeleteOnClickListener.setFollowRequest(followRequest);
 			holder.txtUserName.setText(followRequest.getUser().getName());
+			holder.onClickUserListener.setUser(followRequest.getUser());
 
 			// get User Image
 			WebHelper.getFacebookProfilePicture(

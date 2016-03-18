@@ -18,7 +18,7 @@
         >
 
         <ImageView
-            android:id="@+id/rv_row_follow_request_imgProfile"
+            android:id="@+id/rv_row_friendship_imgProfile"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
@@ -34,7 +34,7 @@
 
 
     <TextView
-        android:id="@+id/rv_row_follow_request_txtUserName"
+        android:id="@+id/rv_row_friendship_txtUserName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -42,27 +42,11 @@
         android:layout_marginBottom="5dp"
         android:text="@string/placeholder_user_name"/>
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/rv_row_friendship_imgFollowStatus"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp">
-
-        <ImageView
-            android:id="@+id/rv_row_follow_request_btnDelete"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/cross_button"
-            />
-
-        <ProgressBar
-            android:id="@+id/rv_row_follow_request_btnDelete_progress"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            />
-
-    </FrameLayout>
+        android:src="@drawable/follow_none"/>
 
     <FrameLayout
         android:layout_width="50dp"
@@ -71,14 +55,23 @@
         android:layout_marginRight="5dp">
 
         <ImageView
-            android:id="@+id/rv_row_follow_request_btnAccept"
+            android:id="@+id/rv_row_friendship_btnUnfollow"
+            android:layout_height="30dp"
+            android:layout_width="30dp"
+            android:src="@drawable/minus_button"
+            android:layout_gravity="center"
+            />
+
+        <ImageView
+            android:id="@+id/rv_row_friendship_btnFollow"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:src="@drawable/tick_button"
+            android:src="@drawable/add_user_full"
+            android:visibility="gone"
             />
 
         <ProgressBar
-            android:id="@+id/rv_row_follow_request_btnAccept_progress"
+            android:id="@+id/rv_row_friendship_btnFollow_progress"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"

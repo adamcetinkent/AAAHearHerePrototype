@@ -13,33 +13,35 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowRequestUserNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "CreateCommentTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/comments/";
+class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "PostFollowRequestTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/follows/request/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnResultCreateComment(Boolean success, HHComment comment);
+		void returnPostFollowRequest(Boolean success, HHFollowRequestUser followRequestUser);
 	}
 
 	private final Callback callbackTo;
-	private final HHComment comment;
-	private HHComment commentReturned;
+	private final HHFollowRequest followRequest;
+	private HHFollowRequestUser followRequestReturned;
 
-	public CreateCommentTask(HHComment comment, Callback callbackTo) {
+	public PostFollowRequestTask(HHFollowRequest followRequest, Callback callbackTo) {
 		this.callbackTo = callbackTo;
-		this.comment = comment;
+		this.followRequest = followRequest;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting comment to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Posting Follow Request to " + VM_SERVER_ADDRESS);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -50,8 +52,8 @@ class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(comment, HHComment.class);
-				String jsonplus = "{\"comment\": "+json+"}";
+				String json = new Gson().toJson(followRequest, HHFollowRequest.class);
+				String jsonplus = "{\"follow_request\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
 				out.write(jsonplus);
@@ -64,7 +66,7 @@ class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					commentReturned = new Gson().fromJson(inString, HHComment.class);
+					followRequestReturned = new HHFollowRequestUser(new Gson().fromJson(inString, HHFollowRequestUserNested.class));
 
 					return true;
 				} else {
@@ -86,7 +88,7 @@ class CreateCommentTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreateComment(result, commentReturned);	// sends results back
+		callbackTo.returnPostFollowRequest(result, followRequestReturned);	// sends results back
 	}
 
 }

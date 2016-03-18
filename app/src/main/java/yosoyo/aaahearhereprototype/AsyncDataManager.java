@@ -13,7 +13,9 @@ import java.util.List;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
@@ -21,8 +23,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.CreateUserTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.GetUserTask;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.PostUserTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -56,17 +58,17 @@ public class AsyncDataManager {
 							returnedUser,
 							new DatabaseHelper.ProcessCurrentUserCallback() {
 								@Override
-								public void returnProcessedCurrentUser(HHUserFull hhUserFull) {
+								public void returnProcessCurrentUser(HHUserFull hhUserFull) {
 									callback.returnAuthenticationResult(true);
 								}
 							});
 					} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
 						HHUser user = new HHUser(Profile.getCurrentProfile());
-						new CreateUserTask(
+						new PostUserTask(
 							user,
-							new CreateUserTask.Callback() {
+							new PostUserTask.Callback() {
 								@Override
-								public void returnResultCreateUser(Boolean success, HHUser userReturned) {
+								public void returnPostUser(Boolean success, HHUser userReturned) {
 									callback.returnAuthenticationResult(true);
 								}
 							}).execute();
@@ -94,7 +96,7 @@ public class AsyncDataManager {
 							returnedUser,
 							new DatabaseHelper.ProcessCurrentUserCallback() {
 								@Override
-								public void returnProcessedCurrentUser(HHUserFull hhUserFull) {
+								public void returnProcessCurrentUser(HHUserFull hhUserFull) {
 									callback.returnUpdateCurrentUser(success);
 								}
 							});
@@ -107,11 +109,11 @@ public class AsyncDataManager {
 	}
 
 	public interface GetWebPostCallback {
-		void returnWebPost(HHPostFull webPost);
+		void returnGetWebPost(HHPostFull webPost);
 	}
 
 	public interface GetAllPostsCallback extends GetWebPostCallback {
-		void returnAllCachedPosts(List<HHPostFull> cachedPosts);
+		void returnGetAllCachedPosts(List<HHPostFull> cachedPosts);
 	}
 
 	public static void getAllPosts(GetAllPostsCallback callback){
@@ -122,8 +124,8 @@ public class AsyncDataManager {
 	private static void getAllCachedPosts(final GetAllPostsCallback callback){
 		DatabaseHelper.getAllCachedPosts(context, new DatabaseHelper.GetAllCachedPostsCallback() {
 			@Override
-			public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
-				callback.returnAllCachedPosts(cachedPosts);
+			public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
+				callback.returnGetAllCachedPosts(cachedPosts);
 			}
 		});
 	}
@@ -131,7 +133,7 @@ public class AsyncDataManager {
 	private static void getAllWebPosts(final GetAllPostsCallback callback){
 		WebHelper.getAllWebPosts(new WebHelper.GetAllWebPostsCallback() {
 			@Override
-			public void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
+			public void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
 				if (webPostsToProcess != null)
 					DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
 			}
@@ -149,8 +151,8 @@ public class AsyncDataManager {
 			userID,
 			new DatabaseHelper.GetAllCachedPostsCallback() {
 				@Override
-				public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
-					callback.returnAllCachedPosts(cachedPosts);
+				public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
+					callback.returnGetAllCachedPosts(cachedPosts);
 				}
 			});
 	}
@@ -160,7 +162,7 @@ public class AsyncDataManager {
 			userID,
 			new WebHelper.GetAllWebPostsCallback() {
 				@Override
-				public void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
+				public void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
 					if (webPostsToProcess != null)
 						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
 				}
@@ -170,7 +172,7 @@ public class AsyncDataManager {
 	public static void getWebPost(long post_id, final GetWebPostCallback callback){
 		WebHelper.getWebPost(post_id, new WebHelper.GetWebPostCallback() {
 			@Override
-			public void returnWebPost(HHPostFullProcess webPostToProcess) {
+			public void returnGetWebPost(HHPostFullProcess webPostToProcess) {
 				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
 				webPostsToProcess.add(webPostToProcess);
 				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
@@ -196,7 +198,7 @@ public class AsyncDataManager {
 			location,
 			new DatabaseHelper.GetPostsAtLocationCallback() {
 				@Override
-				public void returnCachedPostsAtLocation(Location location, List<HHPostFull> posts) {
+				public void returnGetCachedPostsAtLocation(Location location, List<HHPostFull> posts) {
 					if (posts != null && posts.size() > 0) {
 						callback.returnPostsAtLocation(posts);
 						return;
@@ -207,7 +209,7 @@ public class AsyncDataManager {
 						userID,
 						new WebHelper.GetWebPostsAtLocationCallback() {
 							@Override
-							public void returnWebPostsAtLocation(List<HHPostFull> webPosts) {
+							public void returnGetWebPostsAtLocation(List<HHPostFull> webPosts) {
 								callback.returnPostsAtLocation(webPosts);
 							}
 						});
@@ -217,33 +219,33 @@ public class AsyncDataManager {
 	}
 
 	public interface PostPostCallback{
-		void returnPostedPost(boolean success, HHPostFullProcess returnedPost);
+		void returnPostPost(boolean success, HHPostFullProcess returnedPost);
 	}
 
 	public static void postPost(final HHPostTagsArray post, final PostPostCallback callback){
 		WebHelper.postPost(post, new WebHelper.PostPostCallback() {
 			@Override
-			public void returnPostedPost(boolean success, HHPostFullProcess webPostToProcess) {
-				callback.returnPostedPost(success, webPostToProcess);
+			public void returnPostPost(boolean success, HHPostFullProcess webPostToProcess) {
+				callback.returnPostPost(success, webPostToProcess);
 			}
 		});
 	}
 
 	public interface PostCommentCallback{
-		void returnPostedComment(HHComment returnedComment);
+		void returnPostComment(HHComment returnedComment);
 	}
 
 	public static void postComment(final HHComment comment, final PostCommentCallback callback){
 		WebHelper.postComment(comment, new WebHelper.PostCommentCallback() {
 			@Override
-			public void returnPostedComment(final HHComment returnedComment) {
+			public void returnPostComment(final HHComment returnedComment) {
 				DatabaseHelper.insertComment(
 					context,
 					returnedComment,
 					new DatabaseHelper.InsertCommentCallback() {
 						@Override
-						public void returnInsertedComment(Long commentID, HHComment comment) {
-							callback.returnPostedComment(returnedComment);
+						public void returnInsertComment(Long commentID, HHComment comment) {
+							callback.returnPostComment(returnedComment);
 						}
 					});
 			}
@@ -251,20 +253,20 @@ public class AsyncDataManager {
 	}
 
 	public interface PostLikeCallback{
-		void returnPostedLike(HHLike returnedLike);
+		void returnPostLike(HHLike returnedLike);
 	}
 
 	public static void postLike(final HHLike like, final PostLikeCallback callback){
 		WebHelper.postLike(like, new WebHelper.PostLikeCallback() {
 			@Override
-			public void returnPostedLike(final HHLike returnedLike) {
+			public void returnPostLike(final HHLike returnedLike) {
 				DatabaseHelper.insertLike(
 					context,
 					returnedLike,
 					new DatabaseHelper.InsertLikeCallback() {
 						@Override
-						public void returnInsertedLike(Long likeID, HHLike like) {
-							callback.returnPostedLike(returnedLike);
+						public void returnInsertLike(Long likeID, HHLike like) {
+							callback.returnPostLike(returnedLike);
 						}
 					});
 			}
@@ -272,26 +274,55 @@ public class AsyncDataManager {
 	}
 
 	public interface DeleteLikeCallback{
-		void returnDeletedLike(boolean success);
+		void returnDeletLike(boolean success);
 	}
 
 	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
 		WebHelper.deleteLike(like, new WebHelper.DeleteLikeCallback() {
 			@Override
-			public void returnDeletedLike(boolean success) {
+			public void returnDeleteLike(boolean success) {
 				if (success) {
 					DatabaseHelper.deleteLike(
 						context,
 						like,
 						new DatabaseHelper.DeleteLikeCallback() {
 							@Override
-							public void returnDeletedLike(boolean success) {
-								callback.returnDeletedLike(success);
+							public void returnDeleteLike(boolean success) {
+								callback.returnDeletLike(success);
 							}
 						});
 				} else {
-					callback.returnDeletedLike(success);
+					callback.returnDeletLike(success);
 				}
+			}
+		});
+	}
+
+	public interface PostFollowRequestCallback{
+		void returnPostFollowRequest(boolean success, HHFollowRequestUser returnedFollowRequest);
+		void returnPostFollowRequestAccepted(boolean success, HHFollowUser returnedFollowUser);
+	}
+
+	public static void postFollowRequest(final HHFollowRequest followRequest, final PostFollowRequestCallback callback){
+		WebHelper.postFollowRequest(followRequest, new WebHelper.PostFollowRequestCallback() {
+			@Override
+			public void returnPostFollowRequest(boolean success, HHFollowRequestUser returnedFollowRequest) {
+				if (success) {
+					DatabaseHelper.insertFollowRequest(
+						context,
+						returnedFollowRequest,
+						new DatabaseHelper.InsertFollowRequestCallback() {
+							@Override
+							public void returnInsertFollowRequest(Long followRequestID, HHFollowRequestUser returnedFollowRequest) {
+								callback.returnPostFollowRequest(followRequestID != -1, returnedFollowRequest);
+							}
+						});
+				}
+			}
+
+			@Override
+			public void returnPostFollowRequestAccepted(boolean success, HHFollowUser follow) {
+
 			}
 		});
 	}
@@ -310,13 +341,39 @@ public class AsyncDataManager {
 						followRequest,
 						new DatabaseHelper.DeleteFollowRequestCallback() {
 							@Override
-							public void returnDeletedFollowRequest(boolean success) {
+							public void returnDeleteFollowRequest(boolean success) {
 								callback.returnAcceptFollowRequest(success, followRequest);
 							}
 						}
 					);
 				} else {
 					callback.returnAcceptFollowRequest(success, followRequest);
+				}
+			}
+		});
+	}
+
+	public interface DeleteFollowRequestCallback{
+		void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest);
+	}
+
+	public static void deleteFollowRequest(final HHFollowRequestUser followRequest, final DeleteFollowRequestCallback callback){
+		WebHelper.deleteFollowRequest(followRequest, new WebHelper.DeleteFollowRequestCallback() {
+			@Override
+			public void returnDeleteFollowRequest(boolean success) {
+				if (success) {
+					DatabaseHelper.deleteFollowRequest(
+						context,
+						followRequest,
+						new DatabaseHelper.DeleteFollowRequestCallback() {
+							@Override
+							public void returnDeleteFollowRequest(boolean success) {
+								callback.returnDeleteFollowRequest(success, followRequest);
+							}
+						}
+					);
+				} else {
+					callback.returnDeleteFollowRequest(success, followRequest);
 				}
 			}
 		});
@@ -337,7 +394,7 @@ public class AsyncDataManager {
 			trackID,
 			new DatabaseHelper.GetCachedSpotifyTrackCallback() {
 				@Override
-				public void returnCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+				public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
 					if (track != null) {
 						callback.returnSpotifyTrack(track);
 						return;
@@ -351,7 +408,7 @@ public class AsyncDataManager {
 								spotifyTrack,
 								new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
 									@Override
-									public void returnCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+									public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
 										callback.returnSpotifyTrack(track);
 									}
 								});

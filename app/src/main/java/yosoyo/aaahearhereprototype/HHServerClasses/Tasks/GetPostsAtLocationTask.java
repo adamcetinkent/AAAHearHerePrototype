@@ -56,7 +56,7 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 				HHPostFullNested[] posts = new Gson().fromJson(streamString,HHPostFullNested[].class);
 				List<HHPostFull> postsFull = new ArrayList<>();
 				for (HHPostFullNested post : posts){
-					postsFull.add(new HHPostFull(post));
+					postsFull.add(new HHPostFull(post, post.getUser()));
 				}
 				return postsFull;
 			} finally {

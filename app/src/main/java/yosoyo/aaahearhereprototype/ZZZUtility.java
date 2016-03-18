@@ -2,6 +2,9 @@ package yosoyo.aaahearhereprototype;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.widget.ImageView;
@@ -145,5 +148,11 @@ public class ZZZUtility {
 		}
 		return null;
 	}
+
+	public static ColorFilter screen(int c){
+		return new LightingColorFilter(0xFFFFFFFF -c, c);
+	}
+
+	public static ColorFilter greyOut = screen(Color.LTGRAY);
 
 }

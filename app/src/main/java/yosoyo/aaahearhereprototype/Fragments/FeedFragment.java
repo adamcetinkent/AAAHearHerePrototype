@@ -54,7 +54,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FeedFragment extends Fragment {
+public class FeedFragment extends FeedbackFragment {
 
 	private static final String TAG = FeedFragment.class.getSimpleName();
 
@@ -63,10 +63,7 @@ public class FeedFragment extends Fragment {
 	public static final int GENERAL_FEED = 0;
 	public static final int USER_FEED = 1;
 
-	public static final String USER_ID = "user_id";
 	private long userID = -1;
-
-	private FragmentChangeRequestListener fragmentChangeRequestListener;
 
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
@@ -126,16 +123,6 @@ public class FeedFragment extends Fragment {
 	}
 
 	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		try {
-			fragmentChangeRequestListener = (FragmentChangeRequestListener) context;
-		} catch (ClassCastException e){
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
@@ -180,22 +167,16 @@ public class FeedFragment extends Fragment {
 		return view;
 	}
 
-	private void requestUserFeed(HHUser user){
-		Bundle bundle = new Bundle();
-		bundle.putLong(USER_ID, user.getID());
-		fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.USER_FEED_REQUEST, bundle);
-	}
-
 	private AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
 		@Override
-		public void returnAllCachedPosts(List<HHPostFull> cachedPosts) {
+		public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
 			Log.d(TAG, "Cached posts returned");
 			posts = ZZZUtility.mergeLists(posts, cachedPosts);
 			notifyAdapter();
 		}
 
 		@Override
-		public void returnWebPost(HHPostFull webPost) {
+		public void returnGetWebPost(HHPostFull webPost) {
 			Log.d(TAG, "Web post returned!");
 			posts = ZZZUtility.updateList(posts, webPost);
 			notifyAdapter();
@@ -374,13 +355,13 @@ public class FeedFragment extends Fragment {
 							AsyncDataManager
 								.postLike(like, new AsyncDataManager.PostLikeCallback() {
 									@Override
-									public void returnPostedLike(HHLike returnedLike) {
+									public void returnPostLike(HHLike returnedLike) {
 										Log.d(TAG, "Posted new comment!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),
 											new AsyncDataManager.GetWebPostCallback() {
 												@Override
-												public void returnWebPost(HHPostFull webPost) {
+												public void returnGetWebPost(HHPostFull webPost) {
 													posts = ZZZUtility.updateList(posts, webPost);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
@@ -398,13 +379,13 @@ public class FeedFragment extends Fragment {
 								viewHolder.myLike,
 								new AsyncDataManager.DeleteLikeCallback() {
 									@Override
-									public void returnDeletedLike(boolean success) {
+									public void returnDeletLike(boolean success) {
 										Log.d(TAG, "Deleted like!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),
 											new AsyncDataManager.GetWebPostCallback() {
 												@Override
-												public void returnWebPost(HHPostFull webPost) {
+												public void returnGetWebPost(HHPostFull webPost) {
 													posts = ZZZUtility.updateList(posts, webPost);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
@@ -794,13 +775,13 @@ public class FeedFragment extends Fragment {
 					AsyncDataManager
 						.postComment(comment, new AsyncDataManager.PostCommentCallback() {
 							@Override
-							public void returnPostedComment(HHComment returnedComment) {
+							public void returnPostComment(HHComment returnedComment) {
 								Log.d(TAG, "Posted new comment!");
 								AsyncDataManager.getWebPost(
 									post_id,
 									new AsyncDataManager.GetWebPostCallback() {
 										@Override
-										public void returnWebPost(HHPostFull webPost) {
+										public void returnGetWebPost(HHPostFull webPost) {
 											posts = ZZZUtility.updateList(posts, webPost);
 											callback.onDataChange();
 										}

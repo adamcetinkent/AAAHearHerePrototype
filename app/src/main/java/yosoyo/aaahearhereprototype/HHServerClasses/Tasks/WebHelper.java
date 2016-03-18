@@ -10,7 +10,9 @@ import java.util.Map;
 import yosoyo.aaahearhereprototype.DownloadImageTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
@@ -33,14 +35,14 @@ public class WebHelper {
 	private static final Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
 
 	public interface GetAllWebPostsCallback {
-		void returnAllWebPosts(List<HHPostFullProcess> webPostsToProcess);
+		void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess);
 	}
 
 	public static void getAllWebPosts(final GetAllWebPostsCallback callback){
 		new GetPostsTask(new GetPostsTask.Callback() {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
-				callback.returnAllWebPosts(postsToProcess);
+				callback.returnGetAllWebPosts(postsToProcess);
 			}
 		}).execute();
 	}
@@ -51,46 +53,46 @@ public class WebHelper {
 			new GetPostsUserTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
-					callback.returnAllWebPosts(postsToProcess);
+					callback.returnGetAllWebPosts(postsToProcess);
 				}
 			}).execute();
 	}
 
 	public interface GetWebPostCallback {
-		void returnWebPost(HHPostFullProcess webPostToProcess);
+		void returnGetWebPost(HHPostFullProcess webPostToProcess);
 	}
 
 	public static void getWebPost(long post_id, final GetWebPostCallback callback){
 		new GetPostTask(post_id, new GetPostTask.Callback(){
 			@Override
 			public void returnPost(HHPostFullProcess post) {
-				callback.returnWebPost(post);
+				callback.returnGetWebPost(post);
 			}
 		}).execute();
 	}
 
 	public interface GetWebPostsAtLocationCallback {
-		void returnWebPostsAtLocation(List<HHPostFull> posts);
+		void returnGetWebPostsAtLocation(List<HHPostFull> posts);
 	}
 
 	public static void getWebPostsAtLocation(Location location, long userID, final GetWebPostsAtLocationCallback callback){
 		new GetPostsAtLocationTask(location, userID, new GetPostsAtLocationTask.Callback(){
 			@Override
 			public void returnPostsAtLocation(List<HHPostFull> posts){
-				callback.returnWebPostsAtLocation(posts);
+				callback.returnGetWebPostsAtLocation(posts);
 			}
 		}).execute();
 	}
 
 	public interface PostPostCallback {
-		void returnPostedPost(boolean success, HHPostFullProcess webPostToProcess);
+		void returnPostPost(boolean success, HHPostFullProcess webPostToProcess);
 	}
 
 	public static void postPost(HHPostTagsArray post, final PostPostCallback callback){
-		new CreatePostTask(post, new CreatePostTask.Callback() {
+		new PostPostTask(post, new PostPostTask.Callback() {
 			@Override
-			public void returnResultCreatePost(Boolean success, HHPostFullProcess postToProcess) {
-				callback.returnPostedPost(success, postToProcess);
+			public void returnPostPost(Boolean success, HHPostFullProcess postToProcess) {
+				callback.returnPostPost(success, postToProcess);
 			}
 		}).execute();
 	}
@@ -157,37 +159,37 @@ public class WebHelper {
 	}
 
 	public interface PostCommentCallback{
-		void returnPostedComment(HHComment returnedComment);
+		void returnPostComment(HHComment returnedComment);
 	}
 
 	public static void postComment(final HHComment comment, final PostCommentCallback callback){
-		new CreateCommentTask(
+		new PostCommentTask(
 			comment,
-			new CreateCommentTask.Callback() {
+			new PostCommentTask.Callback() {
 				  @Override
-				  public void returnResultCreateComment(Boolean success, HHComment comment) {
-					  callback.returnPostedComment(comment);
+				  public void returnPostComment(Boolean success, HHComment comment) {
+					  callback.returnPostComment(comment);
 				  }
 			  }).execute();
 	}
 
 	public interface PostLikeCallback{
-		void returnPostedLike(HHLike returnedLike);
+		void returnPostLike(HHLike returnedLike);
 	}
 
 	public static void postLike(final HHLike like, final PostLikeCallback callback){
-		new CreateLikeTask(
+		new PostLikeTask(
 			like,
-			new CreateLikeTask.Callback() {
+			new PostLikeTask.Callback() {
 				@Override
-				public void returnResultCreateLike(Boolean success, HHLike like) {
-					callback.returnPostedLike(like);
+				public void returnPostLike(Boolean success, HHLike like) {
+					callback.returnPostLike(like);
 				}
 			}).execute();
 	}
 
 	public interface DeleteLikeCallback{
-		void returnDeletedLike(boolean success);
+		void returnDeleteLike(boolean success);
 	}
 
 	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
@@ -196,7 +198,23 @@ public class WebHelper {
 			new DeleteLikeTask.Callback() {
 				@Override
 				public void returnResultDeleteLike(Boolean success) {
-					callback.returnDeletedLike(success);
+					callback.returnDeleteLike(success);
+				}
+			}).execute();
+	}
+
+	public interface PostFollowRequestCallback{
+		void returnPostFollowRequest(boolean success, HHFollowRequestUser followRequest);
+		void returnPostFollowRequestAccepted(boolean success, HHFollowUser follow);
+	}
+
+	public static void postFollowRequest(final HHFollowRequest followRequest, final PostFollowRequestCallback callback){
+		new PostFollowRequestTask(
+			followRequest,
+			new PostFollowRequestTask.Callback() {
+				@Override
+				public void returnPostFollowRequest(Boolean success, HHFollowRequestUser returnedFollowRequest) {
+					callback.returnPostFollowRequest(success, returnedFollowRequest);
 				}
 			}).execute();
 	}
@@ -206,13 +224,29 @@ public class WebHelper {
 	}
 
 	public static void acceptFollowRequest(final HHFollowRequestUser followRequest, final AcceptFollowRequestCallback callback){
-		new AcceptFollowRequestTask(
+		new PostAcceptFollowRequestTask(
 			followRequest,
-			new AcceptFollowRequestTask.Callback() {
+			new PostAcceptFollowRequestTask.Callback() {
 				@Override
-				public void returnAcceptFollowRequest(Boolean success) {
+				public void returnPostAcceptFollowRequest(Boolean success) {
 					callback.returnAcceptFollowRequest(success);
 				}
 			}).execute();
 	}
+
+	public interface DeleteFollowRequestCallback{
+		void returnDeleteFollowRequest(boolean success);
+	}
+
+	public static void deleteFollowRequest(final HHFollowRequestUser followRequest, final DeleteFollowRequestCallback callback){
+		new DeleteFollowRequestTask(
+			followRequest,
+			new DeleteFollowRequestTask.Callback() {
+				@Override
+				public void returnDeleteFollowRequest(Boolean success) {
+					callback.returnDeleteFollowRequest(success);
+				}
+			}).execute();
+	}
+
 }

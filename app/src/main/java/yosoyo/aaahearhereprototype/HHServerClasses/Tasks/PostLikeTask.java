@@ -14,25 +14,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "CreateLikeTask";
+class PostLikeTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "PostLikeTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnResultCreateLike(Boolean success, HHLike like);
+		void returnPostLike(Boolean success, HHLike like);
 	}
 
 	private final Callback callbackTo;
 	private final HHLike like;
 	private HHLike likeReturned;
 
-	public CreateLikeTask(HHLike like, Callback callbackTo) {
+	public PostLikeTask(HHLike like, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.like = like;
 	}
@@ -64,7 +65,7 @@ class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					likeReturned = new Gson().fromJson(inString, HHLike.class);
+					likeReturned = new Gson().fromJson(inString, HHLikeUserNested.class);
 
 					return true;
 				} else {
@@ -86,7 +87,7 @@ class CreateLikeTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreateLike(result, likeReturned);	// sends results back
+		callbackTo.returnPostLike(result, likeReturned);	// sends results back
 	}
 
 }

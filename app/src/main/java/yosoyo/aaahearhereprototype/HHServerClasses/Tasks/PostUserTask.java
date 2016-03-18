@@ -19,20 +19,20 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 /**
  * Created by adam on 18/02/16.
  */
-public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "CreatePostTask";
+public class PostUserTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "PostPostTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/users/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnResultCreateUser(Boolean success, HHUser userReturned);
+		void returnPostUser(Boolean success, HHUser userReturned);
 	}
 
 	private final Callback callbackTo;
 	private final HHUser user;
 	private HHUser userReturned;
 
-	public CreateUserTask(HHUser user, Callback callbackTo) {
+	public PostUserTask(HHUser user, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.user = user;
 	}
@@ -86,7 +86,7 @@ public class CreateUserTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreateUser(result, userReturned);	// sends results back
+		callbackTo.returnPostUser(result, userReturned);	// sends results back
 	}
 
 }

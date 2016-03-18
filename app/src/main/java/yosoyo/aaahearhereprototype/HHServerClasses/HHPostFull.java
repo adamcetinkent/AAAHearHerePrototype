@@ -36,6 +36,14 @@ public class HHPostFull implements Comparable {
 		this.tags = nested.getTagsList();
 	}
 
+	public HHPostFull(HHPostFullNested nested, HHUser user){
+		this.post = new HHPost(nested);
+		this.user = user;
+		this.comments = null;
+		this.likes = null;
+		this.tags = null;
+	}
+
 	public HHPostFull(Cursor cursor){
 		this.post = new HHPost(cursor);
 		this.user = new HHUser(cursor);

@@ -36,6 +36,7 @@ import java.util.Map;
 
 import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
+import yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
@@ -98,7 +99,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_profile,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
-			R.string.action_user_requests
+			R.string.action_user_requests,
+			R.string.action_friends
 		};
 
 		String[] navStrings = new String[3];
@@ -210,14 +212,20 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+
 		MenuItem menuPost = menu.findItem(R.id.action_post);
 		menuPost.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		MenuItem menuRequests = menu.findItem(R.id.action_user_requests);
 		menuRequests.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		HolderActivity.menuRequests = menuRequests;
 		if (HHUser.getCurrentUser().getFollowInRequests().size() > 0){
 			menuRequests.setIcon(R.drawable.add_user_full);
 		}
+
+		MenuItem menuFriensd = menu.findItem(R.id.action_friends);
+		menuFriensd.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -278,6 +286,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				fragment = new RequestFollowFragment();
 				break;
 			}
+			case R.string.action_friends: {
+				fragment = new FriendsListFragment();
+				break;
+			}
 			default: {
 				fragment = FeedFragment.newInstance();
 			}
@@ -327,6 +339,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			case (R.id.action_user_requests):{
 
 				Fragment fragment = selectItem(R.string.action_user_requests);
+				commitFragmentTransaction(fragment, true);
+
+				return true;
+			}
+			case (R.id.action_friends):{
+
+				Fragment fragment = selectItem(R.string.action_friends);
 				commitFragmentTransaction(fragment, true);
 
 				return true;

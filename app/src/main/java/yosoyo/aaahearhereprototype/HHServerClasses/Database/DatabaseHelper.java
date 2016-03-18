@@ -80,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	public interface ProcessCurrentUserCallback{
-		void returnProcessedCurrentUser(HHUserFull hhUserFull);
+		void returnProcessCurrentUser(HHUserFull hhUserFull);
 	}
 
 	public static void processCurrentUser(Context context, HHUserFullProcess user, final ProcessCurrentUserCallback callback){
@@ -131,12 +131,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static void testProcessUser(final ProcessCurrentUserCallback callback, HHUserFullProcess userToProcess){
 		if (userToProcess.isProcessed()){
-			callback.returnProcessedCurrentUser(new HHUserFull(userToProcess));
+			callback.returnProcessCurrentUser(new HHUserFull(userToProcess));
 		}
 	}
 
 	public interface GetAllCachedPostsCallback {
-		void returnAllCachedPosts(List<HHPostFull> cachedPosts);
+		void returnGetAllCachedPosts(List<HHPostFull> cachedPosts);
 	}
 
 	public static void getAllCachedPosts(Context context, final GetAllCachedPostsCallback callback){
@@ -146,7 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMPostFull.DBPostFullSelectAllTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFull> posts) {
-					callback.returnAllCachedPosts(posts);
+					callback.returnGetAllCachedPosts(posts);
 				}
 			});
 	}
@@ -159,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMPostFull.DBPostFullSelectUserTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFull> posts) {
-					callback.returnAllCachedPosts(posts);
+					callback.returnGetAllCachedPosts(posts);
 				}
 			});
 	}
@@ -281,12 +281,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (postToProcess.isProcessed()){
 
 			//postsToProcess.remove(postToProcess);
-			callback.returnWebPost(new HHPostFull(postToProcess));
+			callback.returnGetWebPost(new HHPostFull(postToProcess));
 		}
 	}
 
 	public interface GetPostsAtLocationCallback{
-		void returnCachedPostsAtLocation(Location location, List<HHPostFull> posts);
+		void returnGetCachedPostsAtLocation(Location location, List<HHPostFull> posts);
 	}
 
 	public static void getPostsAtLocation(Context context, final Location location, final GetPostsAtLocationCallback callback){
@@ -296,13 +296,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMPostFull.DBPostSelectAtLocationTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFull> posts) {
-					callback.returnCachedPostsAtLocation(location, posts);
+					callback.returnGetCachedPostsAtLocation(location, posts);
 				}
 			});
 	}
 
 	public interface InsertCommentCallback{
-		void returnInsertedComment(Long commentID, HHComment comment);
+		void returnInsertComment(Long commentID, HHComment comment);
 	}
 
 	public static void insertComment(Context context, HHComment comment, final InsertCommentCallback callback){
@@ -312,13 +312,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMComment.DBCommentInsertTask.Callback() {
 				@Override
 				public void returnInsertedComment(Long commentID, HHComment comment) {
-					callback.returnInsertedComment(commentID, comment);
+					callback.returnInsertComment(commentID, comment);
 				}
 			});
 	}
 
 	public interface InsertLikeCallback{
-		void returnInsertedLike(Long likeID, HHLike like);
+		void returnInsertLike(Long likeID, HHLike like);
 	}
 
 	public static void insertLike(Context context, HHLike like, final InsertLikeCallback callback){
@@ -328,13 +328,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMLike.DBLikeInsertTask.Callback() {
 				@Override
 				public void returnInsertedLike(Long likeID, HHLike like) {
-					callback.returnInsertedLike(likeID, like);
+					callback.returnInsertLike(likeID, like);
 				}
 			});
 	}
 
 	public interface DeleteLikeCallback{
-		void returnDeletedLike(boolean success);
+		void returnDeleteLike(boolean success);
 	}
 
 	public static void deleteLike(Context context, HHLike like, final DeleteLikeCallback callback){
@@ -344,13 +344,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMLike.DBLikeDeleteTask.Callback() {
 				@Override
 				public void returnDeletedLike(boolean success) {
-					callback.returnDeletedLike(success);
+					callback.returnDeleteLike(success);
+				}
+			});
+	}
+
+	public interface InsertFollowRequestCallback{
+		void returnInsertFollowRequest(Long followRequestID, HHFollowRequestUser followRequest);
+	}
+
+	public static void insertFollowRequest(Context context, HHFollowRequestUser followRequest, final InsertFollowRequestCallback callback){
+		ORMFollowRequest.insertFollowRequest(
+			context,
+			followRequest,
+			new ORMFollowRequest.DBFollowRequestInsertTask.Callback() {
+				@Override
+				public void returnInsertFollowRequest(Long followRequestID, HHFollowRequestUser followRequest) {
+					callback.returnInsertFollowRequest(followRequestID, followRequest);
 				}
 			});
 	}
 
 	public interface DeleteFollowRequestCallback{
-		void returnDeletedFollowRequest(boolean success);
+		void returnDeleteFollowRequest(boolean success);
 	}
 
 	public static void deleteFollowRequest(Context context, HHFollowRequestUser followRequest, final DeleteFollowRequestCallback callback){
@@ -360,13 +376,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMFollowRequest.DBFollowRequestDelete.Callback() {
 				@Override
 				public void returnDeletedLike(boolean success) {
-					callback.returnDeletedFollowRequest(success);
+					callback.returnDeleteFollowRequest(success);
 				}
 			});
 	}
 
 	public interface GetCachedSpotifyTrackCallback{
-		void returnCachedSpotifyTrack(HHCachedSpotifyTrack track);
+		void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track);
 	}
 
 	public static void getCachedSpotifyTrack(Context context, String trackID, final GetCachedSpotifyTrackCallback callback){
@@ -376,13 +392,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMCachedSpotifyTrack.GetDBCachedSpotifyTrackTask.Callback() {
 				@Override
 				public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {
-					callback.returnCachedSpotifyTrack(cachedSpotifyTrack);
+					callback.returnGetCachedSpotifyTrack(cachedSpotifyTrack);
 				}
 			});
 	}
 
 	public interface InsertCachedSpotifyTrackCallback{
-		void returnCachedSpotifyTrack(HHCachedSpotifyTrack track);
+		void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track);
 	}
 
 	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, final InsertCachedSpotifyTrackCallback callback){
@@ -392,7 +408,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			new ORMCachedSpotifyTrack.InsertCachedSpotifyTrackTask.Callback() {
 				@Override
 				public void returnInsertCachedSpotifyTrack(Long trackID, HHCachedSpotifyTrack cachedSpotifyTrack) {
-					callback.returnCachedSpotifyTrack(cachedSpotifyTrack);
+					callback.returnGetCachedSpotifyTrack(cachedSpotifyTrack);
 				}
 			}
 		);

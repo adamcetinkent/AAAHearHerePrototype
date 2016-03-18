@@ -12,6 +12,11 @@
             android:icon="@drawable/add_user_empty"
             appNamespace:showAsAction="ifRoom"
           />
+      <item android:id="@+id/action_friends"
+            android:title="@string/action_friends"
+            android:icon="@drawable/friends_empty"
+            appNamespace:showAsAction="ifRoom"
+          />
       <!--<item android:id="@+id/search"
             android:title="Search"
             android:icon="@android:drawable/ic_menu_search"

@@ -11,6 +11,12 @@ public class HHFollowRequest extends HHBase {
 	private final long user_id;
 	private final long requested_user_id;
 
+	public HHFollowRequest(long user_id, long requested_user_id) {
+		super();
+		this.user_id = user_id;
+		this.requested_user_id = requested_user_id;
+	}
+
 	public HHFollowRequest(HHFollowRequestUserNested nested){
 		super(
 			nested.getID(),

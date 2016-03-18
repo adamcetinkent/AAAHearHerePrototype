@@ -13,26 +13,26 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
 /**
  * Created by adam on 18/02/16.
  */
-class AcceptFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "AcceptFollowRequestTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/follows/accept/";
+class DeleteFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "DeleteFollowRequestTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/follows/refuse/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnAcceptFollowRequest(Boolean success);
+		void returnDeleteFollowRequest(Boolean success);
 	}
 
 	private final Callback callbackTo;
 	private final HHFollowRequestUser followRequest;
 
-	public AcceptFollowRequestTask(HHFollowRequestUser followRequest, Callback callbackTo) {
+	public DeleteFollowRequestTask(HHFollowRequestUser followRequest, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.followRequest = followRequest;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting Follow Request to " + VM_SERVER_ADDRESS + followRequest.getFollowRequest().getID());
+		Log.d(TAG, "Deleting Follow Request to " + VM_SERVER_ADDRESS + followRequest.getFollowRequest().getID());
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + followRequest.getFollowRequest().getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -41,7 +41,14 @@ class AcceptFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
-				urlConnection.setRequestMethod("POST");
+				urlConnection.setRequestMethod("DELETE");
+
+				/*String json = new Gson().toJson(followRequest, HHLike.class);
+				String jsonplus = "{\"followRequest\": "+json+"}";
+
+				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
+				out.write(jsonplus);
+				out.close();*/
 
 				int httpResult = urlConnection.getResponseCode();
 				if (httpResult == HttpURLConnection.HTTP_OK){
@@ -65,7 +72,7 @@ class AcceptFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnAcceptFollowRequest(result);	// sends results back
+		callbackTo.returnDeleteFollowRequest(result);	// sends results back
 	}
 
 }

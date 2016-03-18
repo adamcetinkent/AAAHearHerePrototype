@@ -75,6 +75,48 @@ class ORMFollowRequest {
 		return contentValues;
 	}
 
+	public static void insertFollowRequest(Context context, HHFollowRequestUser followRequest, DBFollowRequestInsertTask.Callback callbackTo){
+		new DBFollowRequestInsertTask(context, followRequest, callbackTo).execute();
+	}
+
+	public static class DBFollowRequestInsertTask extends AsyncTask<Void, Void, Long> {
+
+		private final Context context;
+		private final HHFollowRequestUser followRequest;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnInsertFollowRequest(Long followRequestID, HHFollowRequestUser followRequest);
+		}
+
+		public DBFollowRequestInsertTask(Context context, HHFollowRequestUser followRequest, Callback callbackTo){
+			this.context = context;
+			this.followRequest = followRequest;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Long doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			ContentValues values = followRequestToContentValues(followRequest.getFollowRequest());
+			Long followRequestID = database.insertWithOnConflict(TABLE_NAME, "null", values,
+														SQLiteDatabase.CONFLICT_REPLACE);
+
+			Log.d(TAG, "Inserted new FollowRequest with ID:" + followRequestID);
+
+			database.close();
+
+			return followRequestID;
+		}
+
+		@Override
+		protected void onPostExecute(Long followRequestID){
+			callbackTo.returnInsertFollowRequest(followRequestID, followRequest);
+		}
+	}
+
 	public static void insertFollowRequestsFromUser(Context context, HHUserFullProcess user, DBFollowRequestInsertManyFromUserTask.Callback callbackTo){
 		new DBFollowRequestInsertManyFromUserTask(context, user, callbackTo).execute();
 	}

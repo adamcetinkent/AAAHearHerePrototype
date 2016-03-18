@@ -360,7 +360,7 @@ public class PostFragment extends Fragment {
 				);
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
 					@Override
-					public void returnPostedPost(boolean success, HHPostFullProcess returnedPost) {
+					public void returnPostPost(boolean success, HHPostFullProcess returnedPost) {
 						fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.MAP_VIEW_REQUEST, null);
 					}
 				});

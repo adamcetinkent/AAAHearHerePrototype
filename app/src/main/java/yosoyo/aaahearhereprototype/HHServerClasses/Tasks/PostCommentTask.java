@@ -13,35 +13,33 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "CreatePostTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/";
+class PostCommentTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "PostCommentTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/comments/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnResultCreatePost(Boolean success, HHPostFullProcess postReturned);
+		void returnPostComment(Boolean success, HHComment comment);
 	}
 
 	private final Callback callbackTo;
-	private final HHPostTagsArray post;
-	private HHPostFullNested postReturned;
+	private final HHComment comment;
+	private HHComment commentReturned;
 
-	public CreatePostTask(HHPostTagsArray post, Callback callbackTo) {
+	public PostCommentTask(HHComment comment, Callback callbackTo) {
 		this.callbackTo = callbackTo;
-		this.post = post;
+		this.comment = comment;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Posting Post to " + VM_SERVER_ADDRESS);
+		Log.d(TAG, "Posting comment to " + VM_SERVER_ADDRESS);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -52,8 +50,8 @@ class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("POST");
 
-				String json = new Gson().toJson(post, HHPostTagsArray.class);
-				String jsonplus = "{\"post\": "+json+"}";
+				String json = new Gson().toJson(comment, HHComment.class);
+				String jsonplus = "{\"comment\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
 				out.write(jsonplus);
@@ -66,7 +64,7 @@ class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					postReturned = new Gson().fromJson(inString, HHPostFullNested.class);
+					commentReturned = new Gson().fromJson(inString, HHComment.class);
 
 					return true;
 				} else {
@@ -88,7 +86,7 @@ class CreatePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnResultCreatePost(result, new HHPostFullProcess(postReturned));	// sends results back
+		callbackTo.returnPostComment(result, commentReturned);	// sends results back
 	}
 
 }
