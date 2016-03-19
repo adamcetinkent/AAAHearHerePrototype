@@ -60,8 +60,6 @@ class ORMPostFull {
 					followIDs.append(id).append(",");
 					cursorFollows.moveToNext();
 				}
-			} else {
-				return new ArrayList<>();
 			}
 			String followsInArray = "(" + followIDs.substring(0, followIDs.length()-1) + ")";
 

@@ -15,11 +15,11 @@ import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
@@ -28,6 +28,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  * A simple {@link Fragment} subclass.
  */
 public class RequestFollowFragment extends FeedbackFragment {
+
+	private HHUserFull currentUser;
 
 	private RecyclerView lstRequests;
 	private RecyclerView.Adapter adapter;
@@ -41,6 +43,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		currentUser = HHUser.getCurrentUser();
 	}
 
 	@Override
@@ -53,12 +56,13 @@ public class RequestFollowFragment extends FeedbackFragment {
 		layoutManager = new LinearLayoutManager(getActivity());
 		lstRequests.setLayoutManager(layoutManager);
 
-		FollowRequestAdapter.AdapterCallback adapterCallback = new FollowRequestAdapter.AdapterCallback() {
+		final FollowRequestAdapter.AdapterCallback adapterCallback = new FollowRequestAdapter.AdapterCallback() {
 			@Override
 			public void requestAccepted(final HHFollowRequestUser followRequest, final int position) {
 
-				HHUser.getCurrentUser().getFollowInRequests().remove(followRequest);
+				currentUser.getFollowInRequests().remove(followRequest);
 				adapter.notifyItemRemoved(position);
+				adapter.notifyItemRangeChanged(position, adapter.getItemCount());
 
 				AsyncDataManager.updateCurrentUser(
 					new AsyncDataManager.UpdateCurrentUserCallback() {
@@ -75,8 +79,9 @@ public class RequestFollowFragment extends FeedbackFragment {
 			@Override
 			public void requestDeleted(final HHFollowRequestUser followRequest, final int position) {
 
-				HHUser.getCurrentUser().getFollowInRequests().remove(followRequest);
+				currentUser.getFollowInRequests().remove(followRequest);
 				adapter.notifyItemRemoved(position);
+				adapter.notifyItemRangeChanged(position, adapter.getItemCount());
 
 				AsyncDataManager.updateCurrentUser(
 					new AsyncDataManager.UpdateCurrentUserCallback() {
@@ -98,7 +103,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 		};
 
 		adapter = new FollowRequestAdapter(
-			HHUser.getCurrentUser().getFollowInRequests(),
+			currentUser,
 			adapterCallback);
 
 		lstRequests.setAdapter(adapter);
@@ -107,7 +112,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 	}
 
 	static class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdapter.ViewHolder> {
-		private final List<HHFollowRequestUser> followRequests;
+		private final HHUserFull user;
 		private final AdapterCallback adapterCallback;
 
 		interface AdapterCallback {
@@ -188,11 +193,12 @@ public class RequestFollowFragment extends FeedbackFragment {
 								public void returnAcceptFollowRequest(boolean success, HHFollowRequestUser followRequest) {
 									if (success){
 										adapterCallback.requestAccepted(followRequest, position);
+									} else {
+										btnAccept.setVisibility(View.VISIBLE);
+										btnDelete.clearColorFilter();
+										btnDelete.setEnabled(true);
 									}
-									btnAccept.setVisibility(View.VISIBLE);
 									btnAcceptProgressBar.setVisibility(View.GONE);
-									btnDelete.clearColorFilter();
-									btnDelete.setEnabled(true);
 								}
 							});
 					}
@@ -212,11 +218,12 @@ public class RequestFollowFragment extends FeedbackFragment {
 								public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
 									if (success){
 										adapterCallback.requestDeleted(followRequest, position);
+									} else {
+										btnDelete.setVisibility(View.VISIBLE);
+										btnAccept.clearColorFilter();
+										btnAccept.setEnabled(true);
 									}
-									btnDelete.setVisibility(View.VISIBLE);
 									btnDeleteProgressBar.setVisibility(View.GONE);
-									btnAccept.clearColorFilter();
-									btnAccept.setEnabled(true);
 								}
 							});
 					}
@@ -225,11 +232,11 @@ public class RequestFollowFragment extends FeedbackFragment {
 			}
 		}
 
-		public FollowRequestAdapter(List<HHFollowRequestUser> followRequests, AdapterCallback adapterCallback){
-			this.followRequests = followRequests;
+		public FollowRequestAdapter(HHUserFull user, AdapterCallback adapterCallback){
+			this.user = user;
 			this.adapterCallback = adapterCallback;
 
-			Collections.sort(this.followRequests, new Comparator<HHFollowRequestUser>() {
+			Collections.sort(this.user.getFollowInRequests(), new Comparator<HHFollowRequestUser>() {
 				@Override
 				public int compare(HHFollowRequestUser lhs, HHFollowRequestUser rhs) {
 					return lhs.getFollowRequest().getUpdatedAt().compareTo(rhs.getFollowRequest().getUpdatedAt());
@@ -248,7 +255,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 
 		@Override
 		public void onBindViewHolder(final ViewHolder holder, int position) {
-			HHFollowRequestUser followRequest = followRequests.get(position);
+			HHFollowRequestUser followRequest = this.user.getFollowInRequests().get(position);
 			holder.position = position;
 			holder.btnAcceptOnClickListener.setFollowRequest(followRequest);
 			holder.btnDeleteOnClickListener.setFollowRequest(followRequest);
@@ -268,7 +275,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 
 		@Override
 		public int getItemCount() {
-			return followRequests.size();
+			return this.user.getFollowInRequests().size();
 		}
 
 	}

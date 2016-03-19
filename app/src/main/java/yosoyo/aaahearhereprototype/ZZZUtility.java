@@ -122,6 +122,7 @@ public class ZZZUtility {
 				return oldList;
 			}
 		}
+		oldList.add(newItem);
 		return oldList;
 	}
 

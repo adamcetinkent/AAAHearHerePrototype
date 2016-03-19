@@ -58,8 +58,16 @@
             android:id="@+id/rv_row_friendship_btnUnfollow"
             android:layout_height="30dp"
             android:layout_width="30dp"
-            android:src="@drawable/minus_button"
             android:layout_gravity="center"
+            android:src="@drawable/minus_button"
+            />
+
+        <ProgressBar
+            android:id="@+id/rv_row_friendship_btnUnfollow_progress"
+            android:layout_height="30dp"
+            android:layout_width="30dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
             />
 
         <ImageView

@@ -68,11 +68,95 @@ class ORMFollow {
 	private static ContentValues followToContentValues(HHFollow follow){
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(COLUMN_ID_NAME, 				follow.getID());
-		contentValues.put(COLUMN_USER_ID_NAME, 			follow.getUserID());
-		contentValues.put(COLUMN_FOLLOWED_USER_ID_NAME,	follow.getFollowedUserID());
-		contentValues.put(COLUMN_CREATED_AT_NAME, 		String.valueOf(follow.getCreatedAt()));
-		contentValues.put(COLUMN_UPDATED_AT_NAME,		String.valueOf(follow.getUpdatedAt()));
+		contentValues.put(COLUMN_USER_ID_NAME, follow.getUserID());
+		contentValues.put(COLUMN_FOLLOWED_USER_ID_NAME, follow.getFollowedUserID());
+		contentValues.put(COLUMN_CREATED_AT_NAME, String.valueOf(follow.getCreatedAt()));
+		contentValues.put(COLUMN_UPDATED_AT_NAME, String.valueOf(follow.getUpdatedAt()));
 		return contentValues;
+	}
+
+	public static void insertFollow(Context context, HHFollowUser follow, DBFollowInsertTask.Callback callbackTo){
+		new DBFollowInsertTask(context, follow, callbackTo).execute();
+	}
+
+	public static class DBFollowInsertTask extends AsyncTask<Void, Void, Long> {
+
+		private final Context context;
+		private final HHFollowUser follow;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnInsertFollow(Long followID, HHFollowUser follow);
+		}
+
+		public DBFollowInsertTask(Context context, HHFollowUser follow, Callback callbackTo){
+			this.context = context;
+			this.follow = follow;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Long doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			ContentValues values = followToContentValues(follow.getFollow());
+			Long followID = database.insertWithOnConflict(TABLE_NAME, "null", values,
+																 SQLiteDatabase.CONFLICT_REPLACE);
+
+			Log.d(TAG, "Inserted new Follow with ID:" + followID);
+
+			database.close();
+
+			return followID;
+		}
+
+		@Override
+		protected void onPostExecute(Long followID){
+			callbackTo.returnInsertFollow(followID, follow);
+		}
+	}
+
+	public static void deleteFollow(Context context, HHFollowUser like, DBFollowDeleteTask.Callback callbackTo){
+		new DBFollowDeleteTask(context, like, callbackTo).execute();
+	}
+
+	public static class DBFollowDeleteTask extends AsyncTask<Void, Void, Boolean> {
+
+		private final Context context;
+		private final HHFollowUser follow;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnDeleteFollow(boolean success);
+		}
+
+		public DBFollowDeleteTask(Context context, HHFollowUser follow, Callback callbackTo){
+			this.context = context;
+			this.follow = follow;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getWritableDatabase();
+
+			int deletedRows = database.delete(
+				TABLE_NAME, COLUMN_USER_ID_NAME + "=? AND " + COLUMN_FOLLOWED_USER_ID_NAME + "=?",
+				new String[]{String.valueOf(follow.getFollow().getUserID()), String.valueOf(follow.getFollow().getFollowedUserID())});
+
+			Log.d(TAG, "Deleted " + deletedRows + " rows with ID:" + follow.getFollow().getID());
+
+			database.close();
+
+			return (deletedRows > 0);
+		}
+
+		@Override
+		protected void onPostExecute(Boolean success){
+			callbackTo.returnDeleteFollow(success);
+		}
 	}
 
 	public static void insertFollowsFromUser(Context context, HHUserFullProcess user, DBFollowInsertManyFromUserTask.Callback callbackTo){

@@ -12,6 +12,7 @@ import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
@@ -343,8 +344,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			like,
 			new ORMLike.DBLikeDeleteTask.Callback() {
 				@Override
-				public void returnDeletedLike(boolean success) {
+				public void returnDeleteLike(boolean success) {
 					callback.returnDeleteLike(success);
+				}
+			});
+	}
+
+	public interface InsertFollowCallback{
+		void returnInsertFollow(Long followID, HHFollowUser follow);
+	}
+
+	public static void insertFollow(Context context, HHFollowUser follow, final InsertFollowCallback callback){
+		ORMFollow.insertFollow(
+			context,
+			follow,
+			new ORMFollow.DBFollowInsertTask.Callback() {
+				@Override
+				public void returnInsertFollow(Long followID, HHFollowUser follow) {
+					callback.returnInsertFollow(followID, follow);
+				}
+			});
+	}
+
+	public interface DeleteFollowCallback{
+		void returnDeleteFollow(boolean success);
+	}
+
+	public static void deleteFollow(Context context, HHFollowUser follow, final DeleteFollowCallback callback){
+		ORMFollow.deleteFollow(
+			context,
+			follow,
+			new ORMFollow.DBFollowDeleteTask.Callback() {
+				@Override
+				public void returnDeleteFollow(boolean success) {
+					callback.returnDeleteFollow(success);
 				}
 			});
 	}

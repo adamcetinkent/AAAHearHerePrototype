@@ -15,7 +15,9 @@ import java.net.URL;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowRequestUserNested;
+import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowUserNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -27,12 +29,14 @@ class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnPostFollowRequest(Boolean success, HHFollowRequestUser followRequestUser);
+		void returnPostFollowRequest(Boolean success, HHFollowRequestUser followRequest);
+		void returnPostFollowRequestAccepted(Boolean success, HHFollowUser follow);
 	}
 
 	private final Callback callbackTo;
 	private final HHFollowRequest followRequest;
 	private HHFollowRequestUser followRequestReturned;
+	private HHFollowUser followReturned;
 
 	public PostFollowRequestTask(HHFollowRequest followRequest, Callback callbackTo) {
 		this.callbackTo = callbackTo;
@@ -67,8 +71,17 @@ class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 					in.close();
 
 					followRequestReturned = new HHFollowRequestUser(new Gson().fromJson(inString, HHFollowRequestUserNested.class));
+					if (followRequestReturned.getFollowRequest().getRequestedUserID() <= 0){
+						followReturned = new HHFollowUser(new Gson().fromJson(inString,HHFollowUserNested.class));
+						if (followReturned != null) {
+							return true;
+						} else {
+							return false;
+						}
+					}
 
 					return true;
+
 				} else {
 					Log.e(TAG, "HTTP ERROR! " + httpResult);
 				}
@@ -88,7 +101,11 @@ class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnPostFollowRequest(result, followRequestReturned);	// sends results back
+		if (followReturned != null){
+			callbackTo.returnPostFollowRequestAccepted(result, followReturned);
+		} else {
+			callbackTo.returnPostFollowRequest(result, followRequestReturned);    // sends results back
+		}
 	}
 
 }

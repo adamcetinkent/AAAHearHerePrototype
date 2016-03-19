@@ -8,33 +8,33 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 
 /**
  * Created by adam on 18/02/16.
  */
-class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "DeleteLikeTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/likes/";
+class DeleteFollowTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "DeleteFollowTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/follows/";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnDeleteLike(Boolean success);
+		void returnDeleteFollow(Boolean success);
 	}
 
 	private final Callback callbackTo;
-	private final HHLike like;
+	private final HHFollowUser follow;
 
-	public DeleteLikeTask(HHLike like, Callback callbackTo) {
+	public DeleteFollowTask(HHFollowUser follow, Callback callbackTo) {
 		this.callbackTo = callbackTo;
-		this.like = like;
+		this.follow = follow;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		Log.d(TAG, "Deleting Like to " + VM_SERVER_ADDRESS + like.getID());
+		Log.d(TAG, "Deleting Follow to " + VM_SERVER_ADDRESS + follow.getFollow().getID());
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS + like.getID());
+			URL url = new URL(VM_SERVER_ADDRESS + follow.getFollow().getID());
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				urlConnection.setDoOutput(true);
@@ -43,8 +43,8 @@ class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("DELETE");
 
-				/*String json = new Gson().toJson(like, HHLike.class);
-				String jsonplus = "{\"like\": "+json+"}";
+				/*String json = new Gson().toJson(follow, HHLike.class);
+				String jsonplus = "{\"follow\": "+json+"}";
 
 				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
 				out.write(jsonplus);
@@ -72,7 +72,7 @@ class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnDeleteLike(result);	// sends results back
+		callbackTo.returnDeleteFollow(result);	// sends results back
 	}
 
 }

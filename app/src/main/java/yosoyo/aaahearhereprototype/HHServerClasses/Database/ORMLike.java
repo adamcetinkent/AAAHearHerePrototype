@@ -129,7 +129,7 @@ class ORMLike {
 		private final Callback callbackTo;
 
 		public interface Callback {
-			void returnDeletedLike(boolean success);
+			void returnDeleteLike(boolean success);
 		}
 
 		public DBLikeDeleteTask(Context context, HHLike like, Callback callbackTo){
@@ -156,7 +156,7 @@ class ORMLike {
 
 		@Override
 		protected void onPostExecute(Boolean success){
-			callbackTo.returnDeletedLike(success);
+			callbackTo.returnDeleteLike(success);
 		}
 	}
 

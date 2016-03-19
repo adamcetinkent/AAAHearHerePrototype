@@ -197,8 +197,23 @@ public class WebHelper {
 			like,
 			new DeleteLikeTask.Callback() {
 				@Override
-				public void returnResultDeleteLike(Boolean success) {
+				public void returnDeleteLike(Boolean success) {
 					callback.returnDeleteLike(success);
+				}
+			}).execute();
+	}
+
+	public interface DeleteFollowCallback{
+		void returnDeleteFollow(boolean success);
+	}
+
+	public static void deleteFollow(final HHFollowUser follow, final DeleteFollowCallback callback){
+		new DeleteFollowTask(
+			follow,
+			new DeleteFollowTask.Callback() {
+				@Override
+				public void returnDeleteFollow(Boolean success) {
+					callback.returnDeleteFollow(success);
 				}
 			}).execute();
 	}
@@ -215,6 +230,11 @@ public class WebHelper {
 				@Override
 				public void returnPostFollowRequest(Boolean success, HHFollowRequestUser returnedFollowRequest) {
 					callback.returnPostFollowRequest(success, returnedFollowRequest);
+				}
+
+				@Override
+				public void returnPostFollowRequestAccepted(Boolean success, HHFollowUser follow) {
+					callback.returnPostFollowRequestAccepted(success, follow);
 				}
 			}).execute();
 	}

@@ -379,7 +379,7 @@ public class FeedFragment extends FeedbackFragment {
 								viewHolder.myLike,
 								new AsyncDataManager.DeleteLikeCallback() {
 									@Override
-									public void returnDeletLike(boolean success) {
+									public void returnDeleteLike(boolean success) {
 										Log.d(TAG, "Deleted like!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),

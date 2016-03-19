@@ -274,7 +274,7 @@ public class AsyncDataManager {
 	}
 
 	public interface DeleteLikeCallback{
-		void returnDeletLike(boolean success);
+		void returnDeleteLike(boolean success);
 	}
 
 	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
@@ -288,11 +288,36 @@ public class AsyncDataManager {
 						new DatabaseHelper.DeleteLikeCallback() {
 							@Override
 							public void returnDeleteLike(boolean success) {
-								callback.returnDeletLike(success);
+								callback.returnDeleteLike(success);
 							}
 						});
 				} else {
-					callback.returnDeletLike(success);
+					callback.returnDeleteLike(success);
+				}
+			}
+		});
+	}
+
+	public interface DeleteFollowCallback {
+		void returnDeleteFollow(boolean success, HHFollowUser deletedFollow);
+	}
+
+	public static void deleteFollow(final HHFollowUser follow, final DeleteFollowCallback callback){
+		WebHelper.deleteFollow(follow, new WebHelper.DeleteFollowCallback() {
+			@Override
+			public void returnDeleteFollow(boolean success) {
+				if (success) {
+					DatabaseHelper.deleteFollow(
+						context,
+						follow,
+						new DatabaseHelper.DeleteFollowCallback() {
+							@Override
+							public void returnDeleteFollow(boolean success) {
+								callback.returnDeleteFollow(success, follow);
+							}
+						});
+				} else {
+					callback.returnDeleteFollow(success, follow);
 				}
 			}
 		});
@@ -314,15 +339,27 @@ public class AsyncDataManager {
 						new DatabaseHelper.InsertFollowRequestCallback() {
 							@Override
 							public void returnInsertFollowRequest(Long followRequestID, HHFollowRequestUser returnedFollowRequest) {
-								callback.returnPostFollowRequest(followRequestID != -1, returnedFollowRequest);
+								callback.returnPostFollowRequest(followRequestID != -1,
+																 returnedFollowRequest);
 							}
 						});
 				}
 			}
 
 			@Override
-			public void returnPostFollowRequestAccepted(boolean success, HHFollowUser follow) {
-
+			public void returnPostFollowRequestAccepted(boolean success, final HHFollowUser returnedFollow) {
+				if (success) {
+					DatabaseHelper.insertFollow(
+						context,
+						returnedFollow,
+						new DatabaseHelper.InsertFollowCallback() {
+							@Override
+							public void returnInsertFollow(Long followID, HHFollowUser follow) {
+								callback.returnPostFollowRequestAccepted(followID != -1, returnedFollow);
+							}
+						}
+					);
+				}
 			}
 		});
 	}

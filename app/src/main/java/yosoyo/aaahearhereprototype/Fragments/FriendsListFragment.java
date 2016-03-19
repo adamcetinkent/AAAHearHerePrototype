@@ -60,10 +60,44 @@ public class FriendsListFragment extends FeedbackFragment {
 		layoutManager = new LinearLayoutManager(getActivity());
 		lstFriends.setLayoutManager(layoutManager);
 
-		FriendsListAdapter.AdapterCallback adapterCallback = new FriendsListAdapter.AdapterCallback() {
+		final FriendsListAdapter.AdapterCallback adapterCallback = new FriendsListAdapter.AdapterCallback() {
 			@Override
 			public void madeFollowRequest(HHFollowRequestUser followRequest, int position) {
 				currentUser.getFollowOutRequests().add(followRequest);
+				adapter.notifyItemChanged(position);
+
+				AsyncDataManager.updateCurrentUser(
+					new AsyncDataManager.UpdateCurrentUserCallback() {
+						@Override
+						public void returnUpdateCurrentUser(boolean success) {
+							if (success) {
+								getActivity().invalidateOptionsMenu();
+							}
+						}
+					}
+				);
+			}
+
+			@Override
+			public void madeFollowRequestAccepted(HHFollowUser follow, int position) {
+				currentUser.getFollowOuts().add(follow);
+				adapter.notifyItemChanged(position);
+
+				AsyncDataManager.updateCurrentUser(
+					new AsyncDataManager.UpdateCurrentUserCallback() {
+						@Override
+						public void returnUpdateCurrentUser(boolean success) {
+							if (success) {
+								getActivity().invalidateOptionsMenu();
+							}
+						}
+					}
+				);
+			}
+
+			@Override
+			public void deleteFollow(HHFollowUser deletedFollow, int position) {
+				currentUser.getFollowOuts().remove(deletedFollow);
 				adapter.notifyItemChanged(position);
 
 				AsyncDataManager.updateCurrentUser(
@@ -99,6 +133,8 @@ public class FriendsListFragment extends FeedbackFragment {
 
 		interface AdapterCallback {
 			void madeFollowRequest(HHFollowRequestUser followRequest, int position);
+			void madeFollowRequestAccepted(HHFollowUser follow, int position);
+			void deleteFollow(HHFollowUser deletedFollow, int position);
 			void onUserClick(HHUser user);
 		}
 
@@ -141,7 +177,9 @@ public class FriendsListFragment extends FeedbackFragment {
 			public ImageView btnFollow;
 			public ImageView btnUnfollow;
 			public ProgressBar btnFollowProgressBar;
+			public ProgressBar btnUnfollowProgressBar;
 			public OnClickFollowRequestListener btnFollowOnClickListener;
+			public OnClickFollowRequestListener btnUnfollowOnClickListener;
 			public OnClickUserListener onClickUserListener;
 			public int position;
 			//private final AdapterCallback adapterCallback;
@@ -159,6 +197,7 @@ public class FriendsListFragment extends FeedbackFragment {
 				btnFollow = (ImageView) view.findViewById(R.id.rv_row_friendship_btnFollow);
 				btnUnfollow = (ImageView) view.findViewById(R.id.rv_row_friendship_btnUnfollow);
 				btnFollowProgressBar = (ProgressBar) view.findViewById(R.id.rv_row_friendship_btnFollow_progress);
+				btnUnfollowProgressBar = (ProgressBar) view.findViewById(R.id.rv_row_friendship_btnUnfollow_progress);
 				btnFollowOnClickListener = new OnClickFollowRequestListener(){
 					@Override
 					public void onClick(View v) {
@@ -171,19 +210,63 @@ public class FriendsListFragment extends FeedbackFragment {
 								public void returnPostFollowRequest(boolean success, HHFollowRequestUser returnedFollowRequest) {
 									if (success) {
 										adapterCallback.madeFollowRequest(returnedFollowRequest, position);
+									} else {
+										btnFollow.setVisibility(View.VISIBLE);
 									}
-									btnFollow.setVisibility(View.VISIBLE);
 									btnFollowProgressBar.setVisibility(View.GONE);
 								}
 
 								@Override
 								public void returnPostFollowRequestAccepted(boolean success,HHFollowUser returnedFollowUser) {
-
+									if (success){
+										adapterCallback.madeFollowRequestAccepted(returnedFollowUser, position);
+										btnUnfollow.setVisibility(View.VISIBLE);
+									} else {
+										btnFollow.setVisibility(View.VISIBLE);
+									}
+									btnFollowProgressBar.setVisibility(View.GONE);
 								}
 							});
 					}
 				};
 				btnFollow.setOnClickListener(btnFollowOnClickListener);
+
+				btnUnfollowOnClickListener = new OnClickFollowRequestListener(){
+					@Override
+					public void onClick(View v) {
+						btnUnfollow.setVisibility(View.GONE);
+						btnUnfollowProgressBar.setVisibility(View.VISIBLE);
+						HHFollowUser deleteFollow = null;
+						for (HHFollowUser follow : user.getFollowOuts()){
+							if (follow.getUser().equals(this.friendship.getUser())){
+								deleteFollow = follow;
+								break;
+							}
+						}
+
+						if (deleteFollow == null) {
+							btnUnfollow.setVisibility(View.VISIBLE);
+							btnUnfollowProgressBar.setVisibility(View.GONE);
+							return;
+						}
+
+						AsyncDataManager.deleteFollow(
+							deleteFollow,
+							new AsyncDataManager.DeleteFollowCallback() {
+								@Override
+								public void returnDeleteFollow(boolean success, HHFollowUser deletedFollow) {
+									if (success) {
+										adapterCallback.deleteFollow(deletedFollow, position);
+										btnFollow.setVisibility(View.VISIBLE);
+									} else {
+										btnUnfollow.setVisibility(View.VISIBLE);
+									}
+									btnUnfollowProgressBar.setVisibility(View.GONE);
+								}
+							});
+					}
+				};
+				btnUnfollow.setOnClickListener(btnUnfollowOnClickListener);
 			}
 		}
 
@@ -227,6 +310,7 @@ public class FriendsListFragment extends FeedbackFragment {
 			HHFriendshipUser friendship = user.getFriendships().get(position);
 			holder.position = position;
 			holder.btnFollowOnClickListener.setFriendship(friendship);
+			holder.btnUnfollowOnClickListener.setFriendship(friendship);
 			holder.txtUserName.setText(friendship.getUser().getName());
 			holder.onClickUserListener.setUser(friendship.getUser());
 
