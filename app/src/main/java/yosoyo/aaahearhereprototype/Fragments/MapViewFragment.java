@@ -1,8 +1,10 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -11,6 +13,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,8 +57,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  */
 public class MapViewFragment
 	extends Fragment
-	implements GoogleMap.OnInfoWindowClickListener
-{
+	implements GoogleMap.OnInfoWindowClickListener {
 
 	private static final String TAG = "MapViewFragment";
 
@@ -77,7 +79,7 @@ public class MapViewFragment
 
 	private HHCachedSpotifyTrack currentTrack;
 
-	public MapViewFragment(){
+	public MapViewFragment() {
 		//required empty public constructor
 	}
 
@@ -155,7 +157,8 @@ public class MapViewFragment
 						addressFragments.add(address.getAddressLine(i));
 					}
 					Log.i(TAG, getString(R.string.address_found));
-					mAddressOutput = TextUtils.join(System.getProperty("line.separator"), addressFragments);
+					mAddressOutput = TextUtils
+						.join(System.getProperty("line.separator"), addressFragments);
 
 					displayAddressOutput();
 
@@ -196,7 +199,30 @@ public class MapViewFragment
 		mMapView.onDestroy();
 	}
 
-	private void setUpMap(){
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		switch (requestCode){
+			case HolderActivity.LOCATION_PERMISSIONS:{
+				if (grantResults.length > 0
+					&& grantResults[0] == PackageManager.PERMISSION_GRANTED
+					&& grantResults[1] == PackageManager.PERMISSION_GRANTED){
+					setUpMap();
+				}
+			}
+		}
+	}
+
+	private void setUpMap() {
+		if (ActivityCompat.checkSelfPermission(
+			getContext(),
+			Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+			&& ActivityCompat.checkSelfPermission(
+			getContext(),
+			Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, HolderActivity.LOCATION_PERMISSIONS);
+
+			return;
+		}
 		googleMap.setMyLocationEnabled(true);
 
 		googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -245,7 +271,12 @@ public class MapViewFragment
 		if (!(HolderActivity.apiExists && mapExists))
 			return;
 
-		lastLocation = HolderActivity.getLastLocation();
+		lastLocation = HolderActivity.getLastLocation(getActivity());
+		if (lastLocation == null){
+			Log.e(TAG, "No last location!");
+			return;
+		}
+
 		LatLng myLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
 
 		addMapMarkers();

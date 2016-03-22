@@ -148,7 +148,7 @@ public class PostFragment extends Fragment {
 		});
 
 		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null){
-			lastLocation = HolderActivity.getLastLocation();
+			lastLocation = HolderActivity.getLastLocation(getActivity());
 			txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
 			placeName = ZZZUtility.getLatLng(lastLocation);
 			txtLocation.setText(placeName);

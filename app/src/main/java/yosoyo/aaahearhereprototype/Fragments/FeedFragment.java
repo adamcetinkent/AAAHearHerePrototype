@@ -426,7 +426,7 @@ public class FeedFragment extends FeedbackFragment {
 					public void onClick(View v) {
 						if (HolderActivity.mediaPlayer.isPlaying()) {
 							HolderActivity.mediaPlayer.reset();
-							updatePlayButton(viewHolder.btnPlayButton);
+							updatePlayButton(viewHolder.btnPlayButton, viewHolder.post.getTrack().getPreviewUrl());
 							return;
 						}
 
@@ -446,7 +446,7 @@ public class FeedFragment extends FeedbackFragment {
 									@Override
 									public boolean onError(MediaPlayer mp, int what, int extra) {
 										HolderActivity.mediaPlayer.reset();
-										updatePlayButton(viewHolder.btnPlayButton);
+										updatePlayButton(viewHolder.btnPlayButton, viewHolder.post.getTrack().getPreviewUrl());
 										return false;
 									}
 								});
@@ -457,7 +457,7 @@ public class FeedFragment extends FeedbackFragment {
 									public void onPrepared(MediaPlayer mp) {
 										HolderActivity.mediaPlayer.start();
 										progressDialog.dismiss();
-										updatePlayButton(viewHolder.btnPlayButton);
+										updatePlayButton(viewHolder.btnPlayButton, viewHolder.post.getTrack().getPreviewUrl());
 									}
 								});
 
@@ -465,7 +465,7 @@ public class FeedFragment extends FeedbackFragment {
 								.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 									@Override
 									public void onCompletion(MediaPlayer mp) {
-										updatePlayButton(viewHolder.btnPlayButton);
+										updatePlayButton(viewHolder.btnPlayButton, viewHolder.post.getTrack().getPreviewUrl());
 									}
 								});
 
@@ -565,7 +565,7 @@ public class FeedFragment extends FeedbackFragment {
 			viewHolder.txtMessage.setText(message);
 			viewHolder.txtMessage.setMovementMethod(LinkMovementMethod.getInstance());
 
-			updatePlayButton(viewHolder.btnPlayButton);
+			updatePlayButton(viewHolder.btnPlayButton, viewHolder.post.getTrack().getPreviewUrl());
 
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(null);
 			if (viewHolder.myLike != null) {
@@ -806,7 +806,13 @@ public class FeedFragment extends FeedbackFragment {
 			return true;
 		}
 
-		private void updatePlayButton(ImageView btnPlayButton){
+		private void updatePlayButton(ImageView btnPlayButton, String previewURL){
+			if (previewURL == null) {
+				btnPlayButton.setVisibility(View.GONE);
+			} else {
+				btnPlayButton.setVisibility(View.VISIBLE);
+			}
+
 			if (HolderActivity.mediaPlayer.isPlaying()) {
 				btnPlayButton.setImageResource(R.drawable.pause_overlay);
 			} else {

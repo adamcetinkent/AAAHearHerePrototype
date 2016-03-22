@@ -50,11 +50,6 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	}
 
 	@Override
-	protected void onPreExecute(){
-
-	}
-
-	@Override
 	// The actual process which makes the HTTP request
 	protected SpotifyAPIResponse doInBackground(String... strings) {
 		try {

@@ -25,6 +25,8 @@ public class HHUser extends HHBase {
 	private final String last_name;
 	private final String fb_user_id;
 	private String email;
+	private int auto_accept;
+	private int privacy;
 
 	public HHUser(HHUserFullNested nested){
 		super(

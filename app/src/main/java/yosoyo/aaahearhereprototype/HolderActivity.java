@@ -1,5 +1,6 @@
 package yosoyo.aaahearhereprototype;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
@@ -8,6 +9,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -15,6 +17,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
@@ -41,6 +44,7 @@ import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import yosoyo.aaahearhereprototype.Fragments.RequestFollowFragment;
+import yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
@@ -49,6 +53,7 @@ import yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
 
 public class HolderActivity extends Activity implements FragmentChangeRequestListener {
 
+	public static final int LOCATION_PERMISSIONS = 16442103;
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
@@ -97,14 +102,16 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_home,
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
+			R.string.action_search_users,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
 			R.string.action_friends
 		};
 
-		String[] navStrings = new String[3];
-		for (int i = 0; i < 3; i++){
+		final int NUM_NAV_STRINGS = 4;
+		String[] navStrings = new String[NUM_NAV_STRINGS];
+		for (int i = 0; i < NUM_NAV_STRINGS; i++){
 			navStrings[i] = getString(navOptions[i]);
 		}
 
@@ -214,17 +221,17 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 
 		MenuItem menuPost = menu.findItem(R.id.action_post);
-		menuPost.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menuPost.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 		MenuItem menuRequests = menu.findItem(R.id.action_user_requests);
-		menuRequests.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menuRequests.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		HolderActivity.menuRequests = menuRequests;
 		if (HHUser.getCurrentUser().getFollowInRequests().size() > 0){
 			menuRequests.setIcon(R.drawable.add_user_full);
 		}
 
 		MenuItem menuFriensd = menu.findItem(R.id.action_friends);
-		menuFriensd.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menuFriensd.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -288,6 +295,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 			case R.string.action_friends: {
 				fragment = new FriendsListFragment();
+				break;
+			}
+			case R.string.action_search_users: {
+				fragment = new UserSearchFragment();
 				break;
 			}
 			default: {
@@ -384,7 +395,17 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		bundle.putInt(KEY_POSITION, currentPosition);
 	}
 
-	public static Location getLastLocation(){
+	public static Location getLastLocation(Activity activity){
+		if (ActivityCompat.checkSelfPermission(
+			activity,
+			Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+			&& ActivityCompat.checkSelfPermission(
+			activity,
+			Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, HolderActivity.LOCATION_PERMISSIONS);
+
+			return null;
+		}
 		return LocationServices.FusedLocationApi.getLastLocation(HolderActivity.mGoogleApiClient);
 	}
 

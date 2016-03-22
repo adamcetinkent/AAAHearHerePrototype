@@ -456,4 +456,17 @@ public class AsyncDataManager {
 			});
 	}
 
+	public interface SearchUsersCallback {
+		void returnSearchUsers(final String query, final List<HHUser> foundUsers);
+	}
+
+	public static void searchUsers(final String query, final SearchUsersCallback callback){
+		WebHelper.searchUsers(query, new WebHelper.SearchUsersCallback() {
+			@Override
+			public void returnSearchUsers(List<HHUser> foundUsers) {
+				callback.returnSearchUsers(query, foundUsers);
+			}
+		});
+	}
+
 }

@@ -16,6 +16,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
@@ -265,6 +266,21 @@ public class WebHelper {
 				@Override
 				public void returnDeleteFollowRequest(Boolean success) {
 					callback.returnDeleteFollowRequest(success);
+				}
+			}).execute();
+	}
+
+	public interface SearchUsersCallback{
+		void returnSearchUsers(List<HHUser> foundUsers);
+	}
+
+	public static void searchUsers(final String query, final SearchUsersCallback callback){
+		new SearchUsersTask(
+			query,
+			new SearchUsersTask.Callback() {
+				@Override
+				public void returnSearchUsers(List<HHUser> foundUsers) {
+					callback.returnSearchUsers(foundUsers);
 				}
 			}).execute();
 	}
