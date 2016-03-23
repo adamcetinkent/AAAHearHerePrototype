@@ -6,34 +6,34 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendship;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFriendship;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 
 /**
  * Created by adam on 02/03/16.
  */
-class ORMFriendship {
+public class ORMFriendship {
 
 	private static final String TAG = "ORMFriendship";
 
-	private static final String	TABLE_NAME = 					"friendships";
+	public static final String	TABLE_NAME = 					"friendships";
 
 	private static final String	COMMA_SEP = 					", ";
 
-	private static final String	COLUMN_ID_NAME = 				"_id";
+	public static final String	COLUMN_ID_NAME = 				"_id";
 	private static final String	COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
 
-	private static final String	COLUMN_USER_ID_NAME = 			"user_id";
+	public static final String	COLUMN_USER_ID_NAME = 			"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 			"INTEGER";
 
-	private static final String	COLUMN_FRIEND_USER_ID_NAME = 	"friend_user_id";
+	public static final String	COLUMN_FRIEND_USER_ID_NAME = 	"friend_user_id";
 	private static final String	COLUMN_FRIEND_USER_ID_TYPE =	"INTEGER";
 
-	private static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
+	public static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
 
-	private static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
+	public static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
 
 	private static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";

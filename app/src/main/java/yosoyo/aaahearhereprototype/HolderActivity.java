@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
+import yosoyo.aaahearhereprototype.Fragments.FeedbackFragment;
 import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
@@ -46,7 +47,7 @@ import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import yosoyo.aaahearhereprototype.Fragments.RequestFollowFragment;
 import yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
 import yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
@@ -282,7 +283,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				break;
 			}
 			case R.string.navigation_option_profile: {
-				fragment = FeedFragment.newInstance(FeedFragment.USER_FEED, HHUser.getCurrentUserID());
+				fragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, HHUser.getCurrentUserID());
 				break;
 			}
 			case R.string.action_create_post: {
@@ -373,7 +374,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu){
 		boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
-		menu.findItem(R.id.action_post).setVisible(!drawerOpen);
+
+		if (currentPosition != navigationOptions.get(R.string.action_search_users)) {
+			menu.findItem(R.id.action_post).setVisible(!drawerOpen);
+			menu.findItem(R.id.action_friends).setVisible(!drawerOpen);
+			menu.findItem(R.id.action_user_requests).setVisible(!drawerOpen);
+		}
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -419,13 +426,17 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				}
 				break;
 			}
-			case FragmentChangeRequestListener.USER_FEED_REQUEST:{
+			case FragmentChangeRequestListener.USER_PROFILE_REQUEST:{
 				if (bundle == null){
 					fragment = selectItem(R.string.navigation_option_profile);
 				} else {
-					long userID = bundle.getLong(FeedFragment.USER_ID);
+					long userID = bundle.getLong(FeedbackFragment.USER_ID);
 					selectItem(R.string.navigation_option_user_profile);
-					fragment = FeedFragment.newInstance(FeedFragment.USER_FEED, userID);
+					if (userID == HHUser.getCurrentUserID()){
+						fragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, userID);
+					} else {
+						fragment = FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, userID);
+					}
 				}
 				break;
 			}

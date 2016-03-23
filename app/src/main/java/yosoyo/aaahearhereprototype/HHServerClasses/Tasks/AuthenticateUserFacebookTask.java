@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 

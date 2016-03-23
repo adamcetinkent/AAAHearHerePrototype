@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 

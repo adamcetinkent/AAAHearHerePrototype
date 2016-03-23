@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import yosoyo.aaahearhereprototype.DownloadImageTask;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
@@ -35,52 +37,65 @@ public class WebHelper {
 	private static final Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
 	private static final Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
 
-	public interface GetAllWebPostsCallback {
-		void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess);
+	public interface GetAllPostsCallback {
+		void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess);
 	}
 
-	public static void getAllWebPosts(final GetAllWebPostsCallback callback){
+	public static void getAllPosts(final GetAllPostsCallback callback){
 		new GetPostsTask(new GetPostsTask.Callback() {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
-				callback.returnGetAllWebPosts(postsToProcess);
+				callback.returnGetAllPosts(postsToProcess);
 			}
 		}).execute();
 	}
 
-	public static void getUserWebPosts(long userID, final GetAllWebPostsCallback callback){
+	public static void getUserPosts(long userID, final GetAllPostsCallback callback){
 		new GetPostsUserTask(
 			userID,
 			new GetPostsUserTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
-					callback.returnGetAllWebPosts(postsToProcess);
+					callback.returnGetAllPosts(postsToProcess);
 				}
 			}).execute();
 	}
 
-	public interface GetWebPostCallback {
-		void returnGetWebPost(HHPostFullProcess webPostToProcess);
+	public interface GetPostCallback {
+		void returnGetPost(HHPostFullProcess webPostToProcess);
 	}
 
-	public static void getWebPost(long post_id, final GetWebPostCallback callback){
+	public static void getPost(long post_id, final GetPostCallback callback){
 		new GetPostTask(post_id, new GetPostTask.Callback(){
 			@Override
 			public void returnPost(HHPostFullProcess post) {
-				callback.returnGetWebPost(post);
+				callback.returnGetPost(post);
 			}
 		}).execute();
 	}
 
-	public interface GetWebPostsAtLocationCallback {
-		void returnGetWebPostsAtLocation(List<HHPostFull> posts);
+	public interface GetUserPostCountCallback {
+		void returnGetUserPostCount(int postCount);
 	}
 
-	public static void getWebPostsAtLocation(Location location, long userID, final GetWebPostsAtLocationCallback callback){
+	public static void getUserPostCount(final long user_id, final GetUserPostCountCallback callback){
+		new GetUserPostCountTask(user_id, new GetUserPostCountTask.Callback(){
+			@Override
+			public void returnUserPostCount(int postCount) {
+				callback.returnGetUserPostCount(postCount);
+			}
+		}).execute();
+	}
+
+	public interface GetPostsAtLocationCallback {
+		void returnGetPostsAtLocation(List<HHPostFull> posts);
+	}
+
+	public static void getPostsAtLocation(Location location, long userID, final GetPostsAtLocationCallback callback){
 		new GetPostsAtLocationTask(location, userID, new GetPostsAtLocationTask.Callback(){
 			@Override
 			public void returnPostsAtLocation(List<HHPostFull> posts){
-				callback.returnGetWebPostsAtLocation(posts);
+				callback.returnGetPostsAtLocation(posts);
 			}
 		}).execute();
 	}
@@ -266,6 +281,21 @@ public class WebHelper {
 				@Override
 				public void returnDeleteFollowRequest(Boolean success) {
 					callback.returnDeleteFollowRequest(success);
+				}
+			}).execute();
+	}
+
+	public interface GetUserCallback{
+		void returnGetUser(HHUserFull user);
+	}
+
+	public static void getUser(final long userID, final GetUserCallback callback){
+		new GetUserTask(
+			userID,
+			new GetUserTask.Callback() {
+				@Override
+				public void returnGetUser(boolean success, HHUserFullProcess user) {
+					callback.returnGetUser(new HHUserFull(user));
 				}
 			}).execute();
 	}

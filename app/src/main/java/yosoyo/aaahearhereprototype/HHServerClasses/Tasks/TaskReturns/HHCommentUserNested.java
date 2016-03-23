@@ -1,7 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 02/03/16.

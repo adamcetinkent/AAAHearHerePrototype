@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 

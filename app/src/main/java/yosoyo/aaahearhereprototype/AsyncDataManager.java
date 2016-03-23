@@ -11,17 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.AuthenticateUserFacebookTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.GetUserTask;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.PostUserTask;
@@ -88,7 +88,7 @@ public class AsyncDataManager {
 			HHUser.getCurrentUserID(),
 			new GetUserTask.Callback() {
 				@Override
-				public void returnUser(final boolean success, HHUserFullProcess returnedUser) {
+				public void returnGetUser(final boolean success, HHUserFullProcess returnedUser) {
 					if (success){
 						HHUser.setCurrentUser(returnedUser);
 						DatabaseHelper.processCurrentUser(
@@ -131,9 +131,9 @@ public class AsyncDataManager {
 	}
 
 	private static void getAllWebPosts(final GetAllPostsCallback callback){
-		WebHelper.getAllWebPosts(new WebHelper.GetAllWebPostsCallback() {
+		WebHelper.getAllPosts(new WebHelper.GetAllPostsCallback() {
 			@Override
-			public void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
+			public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
 				if (webPostsToProcess != null)
 					DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
 			}
@@ -158,11 +158,11 @@ public class AsyncDataManager {
 	}
 
 	private static void getUserWebPosts(long userID, final GetAllPostsCallback callback){
-		WebHelper.getUserWebPosts(
+		WebHelper.getUserPosts(
 			userID,
-			new WebHelper.GetAllWebPostsCallback() {
+			new WebHelper.GetAllPostsCallback() {
 				@Override
-				public void returnGetAllWebPosts(List<HHPostFullProcess> webPostsToProcess) {
+				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
 					if (webPostsToProcess != null)
 						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
 				}
@@ -170,9 +170,9 @@ public class AsyncDataManager {
 	}
 
 	public static void getWebPost(long post_id, final GetWebPostCallback callback){
-		WebHelper.getWebPost(post_id, new WebHelper.GetWebPostCallback() {
+		WebHelper.getPost(post_id, new WebHelper.GetPostCallback() {
 			@Override
-			public void returnGetWebPost(HHPostFullProcess webPostToProcess) {
+			public void returnGetPost(HHPostFullProcess webPostToProcess) {
 				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
 				webPostsToProcess.add(webPostToProcess);
 				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
@@ -204,18 +204,56 @@ public class AsyncDataManager {
 						return;
 					}
 
-					WebHelper.getWebPostsAtLocation(
+					WebHelper.getPostsAtLocation(
 						location,
 						userID,
-						new WebHelper.GetWebPostsAtLocationCallback() {
+						new WebHelper.GetPostsAtLocationCallback() {
 							@Override
-							public void returnGetWebPostsAtLocation(List<HHPostFull> webPosts) {
+							public void returnGetPostsAtLocation(List<HHPostFull> webPosts) {
 								callback.returnPostsAtLocation(webPosts);
 							}
 						});
 
 				}
 			});
+	}
+
+	public interface GetUserPostCountCallback{
+		void returnCachedUserPostCount(int postCount);
+		void returnWebUserPostCount(int postCount);
+	}
+
+	public static void getUserPostCount(final long userID, final GetUserPostCountCallback callback) {
+		getUserPostCount(context, userID, callback);
+	}
+
+	public static void getUserPostCount(Context context, final long userID, final GetUserPostCountCallback callback){
+		getUserCachedPostCount(context, userID, callback);
+		getUserWebPostCount(userID, callback);
+	}
+
+	private static void getUserCachedPostCount(Context context, final long userID, final  GetUserPostCountCallback callback){
+		DatabaseHelper.getUserCachedPostCount(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCachedPostCountCallback() {
+				@Override
+				public void returnUserCachedPostCount(int postCount) {
+					callback.returnCachedUserPostCount(postCount);
+				}
+			}
+		);
+	}
+
+	private static void getUserWebPostCount(final long userID, final GetUserPostCountCallback callback){
+		WebHelper.getUserPostCount(
+			userID, new WebHelper.GetUserPostCountCallback() {
+				@Override
+				public void returnGetUserPostCount(int postCount) {
+					callback.returnWebUserPostCount(postCount);
+				}
+			}
+		);
 	}
 
 	public interface PostPostCallback{
@@ -454,6 +492,41 @@ public class AsyncDataManager {
 
 				}
 			});
+	}
+
+	public interface GetUserCallback {
+		void returnGetCachedUser(final HHUserFull returnedUser);
+		void returnGetWebUser(final HHUserFull returnedUser);
+	}
+
+	public static void getUser(final long userID, final GetUserCallback callback){
+		getCachedUser(userID, callback);
+		getWebUser(userID, callback);
+	}
+
+	private static void getCachedUser(final long userID, final GetUserCallback callback){
+		DatabaseHelper.getUser(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCallback() {
+				@Override
+				public void returnGetUser(HHUserFull user) {
+					callback.returnGetCachedUser(user);
+				}
+			}
+		);
+	}
+
+	private static void getWebUser(final long userID, final GetUserCallback callback){
+		WebHelper.getUser(
+			userID,
+			new WebHelper.GetUserCallback() {
+				@Override
+				public void returnGetUser(HHUserFull user) {
+					callback.returnGetWebUser(user);
+				}
+			}
+		);
 	}
 
 	public interface SearchUsersCallback {

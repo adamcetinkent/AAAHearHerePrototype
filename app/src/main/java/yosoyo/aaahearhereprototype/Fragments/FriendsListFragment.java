@@ -17,12 +17,12 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
@@ -270,7 +270,7 @@ public class FriendsListFragment extends FeedbackFragment {
 			}
 		}
 
-		public FriendsListAdapter(HHUserFull user, AdapterCallback adapterCallback){
+		public FriendsListAdapter(final HHUserFull user, AdapterCallback adapterCallback){
 			this.user = user;
 			this.adapterCallback = adapterCallback;
 
@@ -278,15 +278,15 @@ public class FriendsListFragment extends FeedbackFragment {
 				@Override
 				public int compare(HHFriendshipUser lhs, HHFriendshipUser rhs) {
 					int lhsScore =
-						(friendRequestedMe(lhs.getUser()) ? 1 : 0)
-						+ (friendIsRequested(lhs.getUser()) ? 2 : 0)
-						+ (friendFollowsMe(lhs.getUser()) ? 4 : 0)
-						+ (friendIsFollowed(lhs.getUser()) ? 8 : 0);
+						(HHUser.friendRequestedMe(user, lhs.getUser()) ? 1 : 0)
+						+ (HHUser.friendIsRequested(user, lhs.getUser()) ? 2 : 0)
+						+ (HHUser.friendFollowsMe(user, lhs.getUser()) ? 4 : 0)
+						+ (HHUser.friendIsFollowed(user, lhs.getUser()) ? 8 : 0);
 					int rhsScore =
-						(friendRequestedMe(rhs.getUser()) ? 1 : 0)
-							+ (friendIsRequested(rhs.getUser()) ? 2 : 0)
-							+ (friendFollowsMe(rhs.getUser()) ? 4 : 0)
-							+ (friendIsFollowed(rhs.getUser()) ? 8 : 0);
+						(HHUser.friendRequestedMe(user, rhs.getUser()) ? 1 : 0)
+							+ (HHUser.friendIsRequested(user, rhs.getUser()) ? 2 : 0)
+							+ (HHUser.friendFollowsMe(user, rhs.getUser()) ? 4 : 0)
+							+ (HHUser.friendIsFollowed(user, rhs.getUser()) ? 8 : 0);
 
 					if (lhsScore != rhsScore)
 						return rhsScore - lhsScore;
@@ -314,10 +314,10 @@ public class FriendsListFragment extends FeedbackFragment {
 			holder.txtUserName.setText(friendship.getUser().getName());
 			holder.onClickUserListener.setUser(friendship.getUser());
 
-			boolean friendIsFollowed = friendIsFollowed(friendship.getUser());
-			boolean friendFollowsMe = friendFollowsMe(friendship.getUser());
-			boolean friendIsRequested = friendIsRequested(friendship.getUser());
-			boolean friendRequestedMe = friendRequestedMe(friendship.getUser());
+			boolean friendIsFollowed = HHUser.friendIsFollowed(user, friendship.getUser());
+			boolean friendFollowsMe = HHUser.friendFollowsMe(user, friendship.getUser());
+			boolean friendIsRequested = HHUser.friendIsRequested(user, friendship.getUser());
+			//boolean friendRequestedMe = HHUser.friendRequestedMe(user, friendship.getUser());
 
 			if (friendIsFollowed){
 				holder.btnFollow.setVisibility(View.GONE);
@@ -353,42 +353,6 @@ public class FriendsListFragment extends FeedbackFragment {
 						holder.imgProfile.setImageBitmap(bitmap);
 					}
 				});
-		}
-
-		private boolean friendIsFollowed(HHUser friend){
-			for (HHFollowUser follow : user.getFollowOuts()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendFollowsMe(HHUser friend){
-			for (HHFollowUser follow : user.getFollowIns()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendIsRequested(HHUser friend){
-			for (HHFollowRequestUser follow : user.getFollowOutRequests()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendRequestedMe(HHUser friend){
-			for (HHFollowRequestUser follow : user.getFollowInRequests()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
 		}
 
 		@Override

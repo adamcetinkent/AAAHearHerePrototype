@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 18/03/16.
@@ -28,7 +28,7 @@ public abstract class FeedbackFragment extends Fragment {
 		Bundle bundle = new Bundle();
 		bundle.putLong(USER_ID, user.getID());
 		fragmentChangeRequestListener.requestFragmentChange(
-			FragmentChangeRequestListener.USER_FEED_REQUEST, bundle);
+			FragmentChangeRequestListener.USER_PROFILE_REQUEST, bundle);
 	}
 
 }

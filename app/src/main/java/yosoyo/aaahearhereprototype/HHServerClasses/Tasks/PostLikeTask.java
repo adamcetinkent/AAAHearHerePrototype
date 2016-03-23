@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 

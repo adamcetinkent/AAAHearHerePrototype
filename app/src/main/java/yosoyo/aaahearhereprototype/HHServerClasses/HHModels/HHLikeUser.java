@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
 

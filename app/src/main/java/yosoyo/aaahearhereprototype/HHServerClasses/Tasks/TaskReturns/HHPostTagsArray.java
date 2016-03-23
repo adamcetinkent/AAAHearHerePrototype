@@ -1,7 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTag;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTag;
 
 /**
  * Created by adam on 10/03/16.

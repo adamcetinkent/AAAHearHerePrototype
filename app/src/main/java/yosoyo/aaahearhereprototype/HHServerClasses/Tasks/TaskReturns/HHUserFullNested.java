@@ -5,10 +5,10 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 10/03/16.

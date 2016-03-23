@@ -11,47 +11,39 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
-	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/";
+class GetUserPostCountTask extends AsyncTask<Void, Void, Integer> {
+	private static final String TAG = "GetUserPostCountTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/count/by/";
 
 	public interface Callback {
-		void returnPosts(List<HHPostFullProcess> postsToProcess);
+		void returnUserPostCount(int postCount);
 	}
 
 	private final long userID;
 	private final Callback callbackTo;
 
-	public GetPostsUserTask(long userID, Callback callbackTo) {
+	public GetUserPostCountTask(long userID, Callback callbackTo) {
 		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
 
 	@Override
-	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		Log.d(TAG, "Fetching Posts by " + VM_SERVER_ADDRESS + userID);
+	protected Integer doInBackground(Void... params) {
+		Log.d(TAG, "Fetching Post Count by " + VM_SERVER_ADDRESS + userID);
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + userID);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				HHPostFullNested[] postsNested = new Gson().fromJson(streamString, HHPostFullNested[].class);
-				List<HHPostFullProcess> posts = new ArrayList<>(postsNested.length);
-				for (HHPostFullNested postNested : postsNested) {
-					posts.add(new HHPostFullProcess(postNested));
-				}
-				return posts;
+				Integer postCount = new Gson().fromJson(streamString, Integer.class);
+				return postCount;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -65,8 +57,8 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 
 	@Override
 	// Fires once doInBackground is completed
-	protected void onPostExecute(List<HHPostFullProcess> result) {
-		callbackTo.returnPosts(result);	// sends results back
+	protected void onPostExecute(Integer result) {
+		callbackTo.returnUserPostCount(result);	// sends results back
 	}
 
 }

@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -25,7 +25,7 @@ public class GetUserTask extends AsyncTask<Integer, Void, Boolean> {
 
 	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface Callback {
-		void returnUser(boolean success, HHUserFullProcess user);
+		void returnGetUser(boolean success, HHUserFullProcess user);
 	}
 
 	private final Callback callbackTo;
@@ -74,7 +74,7 @@ public class GetUserTask extends AsyncTask<Integer, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnUser(result, user);	// sends results back
+		callbackTo.returnGetUser(result, user);	// sends results back
 	}
 
 }

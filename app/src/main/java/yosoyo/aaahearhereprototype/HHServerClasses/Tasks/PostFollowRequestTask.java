@@ -13,9 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowRequestUserNested;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowUserNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;

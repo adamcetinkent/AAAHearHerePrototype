@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
 
 /**
  * Created by adam on 18/02/16.

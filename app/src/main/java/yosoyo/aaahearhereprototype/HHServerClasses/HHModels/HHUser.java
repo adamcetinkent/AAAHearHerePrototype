@@ -1,4 +1,4 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -25,6 +25,7 @@ public class HHUser extends HHBase {
 	private final String last_name;
 	private final String fb_user_id;
 	private String email;
+	private String bio;
 	private int auto_accept;
 	private int privacy;
 
@@ -38,6 +39,9 @@ public class HHUser extends HHBase {
 		this.last_name = nested.getLastName();
 		this.fb_user_id = nested.getFBUserID();
 		this.email = nested.getEmail();
+		this.bio = nested.getBio();
+		this.auto_accept = nested.getAutoAccept();
+		this.privacy = nested.getPrivacy();
 	}
 
 	public HHUser(Cursor cursor){
@@ -50,6 +54,9 @@ public class HHUser extends HHBase {
 		this.last_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
 		this.email = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_EMAIL_NAME));
 		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FB_USER_ID_NAME));
+		this.bio = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_BIO_NAME));
+		this.auto_accept = cursor.getInt(cursor.getColumnIndex(ORMUser.COLUMN_AUTO_ACCEPT_NAME));
+		this.privacy = cursor.getInt(cursor.getColumnIndex(ORMUser.COLUMN_PRIVACY_NAME));
 	}
 
 	public HHUser(Profile profile){
@@ -76,6 +83,18 @@ public class HHUser extends HHBase {
 
 	public String  getFBUserID(){
 		return fb_user_id;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public int getAutoAccept() {
+		return auto_accept;
+	}
+
+	public int getPrivacy() {
+		return privacy;
 	}
 
 	@Override
@@ -121,6 +140,42 @@ public class HHUser extends HHBase {
 	}
 	public static Bitmap getProfilePicture(){
 		return profilePicture;
+	}
+
+	public static boolean friendIsFollowed(HHUserFull user, HHUser friend){
+		for (HHFollowUser follow : user.getFollowOuts()){
+			if (follow.getUser().equals(friend)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean friendFollowsMe(HHUserFull user, HHUser friend){
+		for (HHFollowUser follow : user.getFollowIns()){
+			if (follow.getUser().equals(friend)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean friendIsRequested(HHUserFull user, HHUser friend){
+		for (HHFollowRequestUser follow : user.getFollowOutRequests()){
+			if (follow.getUser().equals(friend)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean friendRequestedMe(HHUserFull user, HHUser friend){
+		for (HHFollowRequestUser follow : user.getFollowInRequests()){
+			if (follow.getUser().equals(friend)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static class HHUserSpan extends ClickableSpan {

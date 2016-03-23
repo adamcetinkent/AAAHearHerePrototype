@@ -9,15 +9,15 @@ import android.util.Log;
 import java.util.HashSet;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFriendshipUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFriendshipUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 
 /**
  * Created by adam on 02/03/16.
@@ -45,6 +45,15 @@ public class ORMUser {
 	public static final String	COLUMN_FB_USER_ID_NAME = 	"fb_user_id";
 	private static final String	COLUMN_FB_USER_ID_TYPE = 	"TEXT";
 
+	public static final String	COLUMN_PRIVACY_NAME = 		"privacy";
+	private static final String	COLUMN_PRIVACY_TYPE = 		"INTEGER";
+
+	public static final String	COLUMN_AUTO_ACCEPT_NAME = 	"auto_accept";
+	private static final String	COLUMN_AUTO_ACCEPT_TYPE = 	"INTEGER";
+
+	public static final String	COLUMN_BIO_NAME = 			"bio";
+	private static final String	COLUMN_BIO_TYPE = 			"TEXT";
+
 	public static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 	"TIMESTAMP";
 
@@ -63,6 +72,9 @@ public class ORMUser {
 		COLUMN_LAST_NAME_NAME 	+ " " 	+ COLUMN_LAST_NAME_TYPE 	+ COMMA_SEP	+
 		COLUMN_EMAIL_NAME 		+ " " 	+ COLUMN_EMAIL_TYPE 		+ COMMA_SEP	+
 		COLUMN_FB_USER_ID_NAME 	+ " " 	+ COLUMN_FB_USER_ID_TYPE 	+ COMMA_SEP	+
+		COLUMN_BIO_NAME 		+ " " 	+ COLUMN_BIO_TYPE 			+ COMMA_SEP	+
+		COLUMN_AUTO_ACCEPT_NAME + " " 	+ COLUMN_AUTO_ACCEPT_TYPE 	+ COMMA_SEP	+
+		COLUMN_PRIVACY_NAME 	+ " " 	+ COLUMN_PRIVACY_TYPE 		+ COMMA_SEP	+
 		COLUMN_CREATED_AT_NAME 	+ " " 	+ COLUMN_CREATED_AT_TYPE 	+ COMMA_SEP	+
 		COLUMN_UPDATED_AT_NAME 	+ " " 	+ COLUMN_UPDATED_AT_TYPE 	+ COMMA_SEP	+
 		COLUMN_CACHED_AT_NAME 	+ " " 	+ COLUMN_CACHED_AT_TYPE 	+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
@@ -87,63 +99,16 @@ public class ORMUser {
 		contentValues.put(COLUMN_ID_NAME, 			user.getID());
 		contentValues.put(COLUMN_FIRST_NAME_NAME, 	user.getFirstName());
 		contentValues.put(COLUMN_LAST_NAME_NAME, 	user.getLastName());
-		contentValues.put(COLUMN_EMAIL_NAME, user.getEmail());
-		contentValues.put(COLUMN_FB_USER_ID_NAME, user.getFBUserID());
-		contentValues.put(COLUMN_CREATED_AT_NAME, String.valueOf(user.getCreatedAt()));
-		contentValues.put(COLUMN_UPDATED_AT_NAME, String.valueOf(user.getUpdatedAt()));
+		contentValues.put(COLUMN_FB_USER_ID_NAME, 	user.getFBUserID());
+		contentValues.put(COLUMN_EMAIL_NAME, 		user.getEmail());
+		contentValues.put(COLUMN_BIO_NAME, 			user.getBio());
+		contentValues.put(COLUMN_PRIVACY_NAME, 		user.getPrivacy());
+		contentValues.put(COLUMN_AUTO_ACCEPT_NAME, 	user.getAutoAccept());
+		contentValues.put(COLUMN_CREATED_AT_NAME, 	String.valueOf(user.getCreatedAt()));
+		contentValues.put(COLUMN_UPDATED_AT_NAME, 	String.valueOf(user.getUpdatedAt()));
 		return contentValues;
 	}
 
-	/*public static void insertCurrentUser(Context context, HHUserFullProcess user, DBUserInsertCurrentTask.DBUserInsertCurrentTaskCallback callbackTo){
-		new DBUserInsertCurrentTask(context, user, callbackTo).execute();
-	}
-
-	public static class DBUserInsertCurrentTask extends AsyncTask<Void, Void, Long> {
-
-		private final Context context;
-		private final HHUserFullProcess user;
-		private final DBUserInsertCurrentTaskCallback callbackTo;
-
-		public interface DBUserInsertCurrentTaskCallback {
-			void returnInsertedUser(long userID, HHUserFullProcess returnedUser);
-		}
-
-		public DBUserInsertCurrentTask(Context context, HHUserFullProcess user, DBUserInsertCurrentTaskCallback callbackTo){
-			this.context = context;
-			this.user = user;
-			this.callbackTo = callbackTo;
-		}
-
-		@Override
-		protected Long doInBackground(Void... params) {
-			DatabaseHelper databaseHelper = new DatabaseHelper(context);
-			SQLiteDatabase database = databaseHelper.getWritableDatabase();
-
-			ContentValues values = userToContentValues(user.getUser());
-			long userID = database.insertWithOnConflict(TABLE_NAME, "null", values,
-														SQLiteDatabase.CONFLICT_REPLACE);
-			Log.d(TAG, "Inserted new HHUser with ID:" + userID);
-
-			List<HHFriendshipUser> friendships = user.getFriendships();
-			for (int j = 0; j < friendships.size(); j++){
-				HHFriendshipUser friendship = friendships.get(j);
-				values = userToContentValues(friendship.getUser());
-				userID = database.insertWithOnConflict(TABLE_NAME, "null", values, SQLiteDatabase.CONFLICT_REPLACE);
-				Log.d(TAG, "Inserted new HHUser with ID:" + userID);
-			}
-
-			database.close();
-
-			user.setUserProcessed(true);
-
-			return userID;
-		}
-
-		@Override
-		protected void onPostExecute(Long userID){
-			callbackTo.returnInsertedUser(userID, user);
-		}
-	}*/
 
 	public static void insertUsersFromUser(Context context, HHUserFullProcess user, DBUserInsertManyFromUserTask.Callback callbackTo){
 		new DBUserInsertManyFromUserTask(context, user, callbackTo).execute();

@@ -10,8 +10,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 
 /**
  * Created by adam on 22/02/16.
@@ -114,7 +114,7 @@ public class ORMPost {
 		new DBPostSelectTask(context, callbackTo).execute();
 	}
 
-	public static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
+	protected static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
 
 		private final Context context;
 		private final Callback callbackTo;
@@ -161,7 +161,7 @@ public class ORMPost {
 		}
 	}
 
-	public static class DBPostInsertTask extends AsyncTask<Void, Void, Long> {
+	protected static class DBPostInsertTask extends AsyncTask<Void, Void, Long> {
 
 		private final Context context;
 		private final HHPost post;
@@ -197,7 +197,7 @@ public class ORMPost {
 		}
 	}
 
-	public static class DBPostInsertManyTask extends AsyncTask<Void, Void, Boolean> {
+	protected static class DBPostInsertManyTask extends AsyncTask<Void, Void, Boolean> {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
@@ -238,6 +238,53 @@ public class ORMPost {
 		@Override
 		protected void onPostExecute(Boolean result){
 			callbackTo.returnInsertedManyPosts(posts);
+		}
+	}
+
+	public static void getUserPostCount(Context context, final long userID, DBUserPostCountTask.Callback callbackTo){
+		new DBUserPostCountTask(context, userID, callbackTo).execute();
+	}
+
+	protected static class DBUserPostCountTask extends AsyncTask<Void, Void, Integer> {
+
+		private final Context context;
+		private final long userID;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnPostCount(final int postCount);
+		}
+
+		public DBUserPostCountTask(Context context, final long userID, Callback callbackTo){
+			this.context = context;
+			this.userID = userID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery(
+				"SELECT ? FROM " + TABLE_NAME +
+					" WHERE " + COLUMN_USER_ID_NAME + "=?"
+				, new String[]{
+					COLUMN_USER_ID_NAME,
+					String.valueOf(userID)
+				});
+
+			int postCount = cursor.getCount();
+
+			cursor.close();
+			database.close();
+
+			return postCount;
+		}
+
+		@Override
+		protected void onPostExecute(Integer postCount){
+			callbackTo.returnPostCount(postCount);
 		}
 	}
 

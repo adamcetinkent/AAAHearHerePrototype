@@ -3,6 +3,7 @@ package yosoyo.aaahearhereprototype.Fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -39,13 +40,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
@@ -61,7 +62,8 @@ public class FeedFragment extends FeedbackFragment {
 	private int feedType;
 	public static final String FEED_TYPE = "feed_type";
 	public static final int GENERAL_FEED = 0;
-	public static final int USER_FEED = 1;
+	public static final int HOME_PROFILE_FEED = 1;
+	public static final int USER_PROFILE_FEED = 2;
 
 	private long userID = -1;
 
@@ -104,7 +106,7 @@ public class FeedFragment extends FeedbackFragment {
 	private void handleArguments(Bundle arguments){
 		feedType = arguments.getInt(FEED_TYPE);
 
-		if (feedType == USER_FEED){
+		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
 			userID = arguments.getLong(USER_ID);
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
@@ -129,6 +131,24 @@ public class FeedFragment extends FeedbackFragment {
 		View view = inflater.inflate(R.layout.fragment_home, container, false);
 
 		lstTimeline = (ExpandableListView) view.findViewById(R.id.lstTimeline);
+
+		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
+			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
+			ProfileFragment profileFragment;
+			if (userID == HHUser.getCurrentUserID()) {
+				 profileFragment = ProfileFragment.newInstance(ProfileFragment.HOME_PROFILE, userID);
+			} else {
+				profileFragment = ProfileFragment.newInstance(ProfileFragment.USER_PROFILE, userID);
+			}
+
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.replace(R.id.fragment_frame_frame, profileFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			ft.commit();
+
+			lstTimeline.addHeaderView(headerView);
+		}
+
 		lstTimelineAdapter = new TimelineCustomExpandableAdapter(
 			getActivity(),
 			posts,
@@ -158,7 +178,8 @@ public class FeedFragment extends FeedbackFragment {
 				getAllData();
 				break;
 			}
-			case USER_FEED:{
+			case HOME_PROFILE_FEED:
+			case USER_PROFILE_FEED:{
 				getUserData();
 				break;
 			}

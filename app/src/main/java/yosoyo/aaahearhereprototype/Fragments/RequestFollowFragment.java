@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;

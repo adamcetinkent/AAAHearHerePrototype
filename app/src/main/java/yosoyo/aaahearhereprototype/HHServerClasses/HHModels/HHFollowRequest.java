@@ -1,5 +1,10 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
+import android.database.Cursor;
+
+import java.sql.Timestamp;
+
+import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMFollowRequest;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowRequestUserNested;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowedRequestUserNested;
 
@@ -35,6 +40,17 @@ public class HHFollowRequest extends HHBase {
 		);
 		this.user_id = nested.getUserID();
 		this.requested_user_id = nested.getRequestedUserID();
+	}
+
+
+	public HHFollowRequest(Cursor cursor){
+		super(
+			cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_ID_NAME)),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_UPDATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_CREATED_AT_NAME)))
+		);
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_USER_ID_NAME));
+		this.requested_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_REQUESTED_USER_ID_NAME));
 	}
 
 	public long getUserID() {

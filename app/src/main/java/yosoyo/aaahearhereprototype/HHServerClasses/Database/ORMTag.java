@@ -8,9 +8,9 @@ import android.util.Log;
 
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTag;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTag;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 
 /**
  * Created by adam on 10/03/16.

@@ -3,7 +3,6 @@ package yosoyo.aaahearhereprototype.Fragments;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequest;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
@@ -56,11 +55,22 @@ public class UserSearchFragment extends FeedbackFragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem item = menu.findItem(R.id.action_post);
+		item.setVisible(false);
+		item = menu.findItem(R.id.action_friends);
+		item.setVisible(false);
+		item = menu.findItem(R.id.action_user_requests);
+		item.setVisible(false);
+
 		inflater.inflate(R.menu.menu_search, menu);
-		MenuItem item = menu.findItem(R.id.action_search);
+		item = menu.findItem(R.id.action_search);
 		SearchView searchView = new SearchView(getActivity().getActionBar().getThemedContext());
-		MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-		MenuItemCompat.setActionView(item, searchView);
+		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		item.setActionView(searchView);
+		searchView.setIconified(false);
+		searchView.requestFocusFromTouch();
+		//MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		//MenuItemCompat.setActionView(item, searchView);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
@@ -363,10 +373,10 @@ public class UserSearchFragment extends FeedbackFragment {
 			holder.txtUserName.setText(foundUser.getName());
 			holder.onClickUserListener.setFoundUser(foundUser);
 
-			boolean friendIsFollowed = friendIsFollowed(foundUser);
-			boolean friendFollowsMe = friendFollowsMe(foundUser);
-			boolean friendIsRequested = friendIsRequested(foundUser);
-			boolean friendRequestedMe = friendRequestedMe(foundUser);
+			boolean friendIsFollowed = HHUser.friendIsFollowed(currentUser, foundUser);
+			boolean friendFollowsMe = HHUser.friendFollowsMe(currentUser, foundUser);
+			boolean friendIsRequested = HHUser.friendIsRequested(currentUser, foundUser);
+			//boolean friendRequestedMe = HHUser.friendRequestedMe(currentUser, foundUser);
 
 			if (friendIsFollowed){
 				holder.btnFollow.setVisibility(View.GONE);
@@ -402,42 +412,6 @@ public class UserSearchFragment extends FeedbackFragment {
 						holder.imgProfile.setImageBitmap(bitmap);
 					}
 				});
-		}
-
-		private boolean friendIsFollowed(HHUser friend){
-			for (HHFollowUser follow : currentUser.getFollowOuts()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendFollowsMe(HHUser friend){
-			for (HHFollowUser follow : currentUser.getFollowIns()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendIsRequested(HHUser friend){
-			for (HHFollowRequestUser follow : currentUser.getFollowOutRequests()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean friendRequestedMe(HHUser friend){
-			for (HHFollowRequestUser follow : currentUser.getFollowInRequests()){
-				if (follow.getUser().equals(friend)){
-					return true;
-				}
-			}
-			return false;
 		}
 
 		@Override

@@ -10,8 +10,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 /**
@@ -75,14 +75,6 @@ public class ORMCachedSpotifyTrack {
 
 		database.close();
 	}
-
-	/*public static void insertCachedSpotifyTrack(Context context, HHCachedSpotifyTrack cachedSpotifyTrack, InsertCachedSpotifyTrackTask.Callback callbackTo){
-		new InsertCachedSpotifyTrackTask(context, cachedSpotifyTrack, -1, callbackTo).execute();
-	}
-
-	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.Callback callbackTo){
-		new InsertCachedSpotifyTrackTask(context, spotifyTrack, -1, callbackTo).execute();
-	}*/
 
 	private static ContentValues cachedSpotifyTrackToContentValues(HHCachedSpotifyTrack track){
 		ContentValues contentValues = new ContentValues();

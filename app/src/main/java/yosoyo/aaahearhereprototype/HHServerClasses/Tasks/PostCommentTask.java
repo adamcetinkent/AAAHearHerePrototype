@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**

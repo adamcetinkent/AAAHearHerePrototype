@@ -1,4 +1,6 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
+
+import android.database.Cursor;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowRequestUserNested;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowedRequestUserNested;
@@ -19,6 +21,11 @@ public class HHFollowRequestUser {
 	public HHFollowRequestUser(HHFollowedRequestUserNested nested){
 		this.followRequest = new HHFollowRequest(nested);
 		this.user = nested.getUser();
+	}
+
+	public HHFollowRequestUser(Cursor cursor){
+		this.followRequest = new HHFollowRequest(cursor);
+		this.user = new HHUser(cursor);
 	}
 
 	public HHFollowRequest getFollowRequest() {

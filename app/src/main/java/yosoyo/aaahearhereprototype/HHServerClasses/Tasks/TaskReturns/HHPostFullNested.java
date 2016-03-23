@@ -3,11 +3,11 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns;
 import java.util.ArrayList;
 import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCommentUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLikeUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPost;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHTagUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 02/03/16.

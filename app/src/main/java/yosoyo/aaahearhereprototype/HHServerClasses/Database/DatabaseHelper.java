@@ -9,15 +9,15 @@ import android.util.Log;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHComment;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowRequestUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHFollowUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHLike;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFull;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHUserFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String TAG = "DatabaseHelper";
 	private static final String DB_NAME = "AAAHereHerePrototype";
-	private static final int DB_VERSION = 14;
+	private static final int DB_VERSION = 15;
 
 	public DatabaseHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
@@ -134,6 +134,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (userToProcess.isProcessed()){
 			callback.returnProcessCurrentUser(new HHUserFull(userToProcess));
 		}
+	}
+
+	public interface GetUserCallback{
+		void returnGetUser(HHUserFull user);
+	}
+
+	public static void getUser(Context context, final long userID, final GetUserCallback callback){
+		ORMUserFull.getUser(
+			context,
+			userID,
+			new ORMUserFull.DBGetUserTask.Callback() {
+				@Override
+				public void returnGetUser(HHUserFull user) {
+					callback.returnGetUser(user);
+				}
+			}
+		);
 	}
 
 	public interface GetAllCachedPostsCallback {
@@ -442,6 +459,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				@Override
 				public void returnInsertCachedSpotifyTrack(Long trackID, HHCachedSpotifyTrack cachedSpotifyTrack) {
 					callback.returnGetCachedSpotifyTrack(cachedSpotifyTrack);
+				}
+			}
+		);
+	}
+
+	public interface GetUserCachedPostCountCallback{
+		void returnUserCachedPostCount(int postCount);
+	}
+
+	public static void getUserCachedPostCount(Context context, final long userID, final GetUserCachedPostCountCallback callback){
+		ORMPost.getUserPostCount(
+			context,
+			userID,
+			new ORMPost.DBUserPostCountTask.Callback() {
+				@Override
+				public void returnPostCount(int postCount) {
+					callback.returnUserCachedPostCount(postCount);
 				}
 			}
 		);

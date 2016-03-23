@@ -18,8 +18,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHCachedSpotifyTrack;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import yosoyo.aaahearhereprototype.R;
 
 public class LocationListenerService extends Service implements HHLocationListener.HHLocationListenerCallback {

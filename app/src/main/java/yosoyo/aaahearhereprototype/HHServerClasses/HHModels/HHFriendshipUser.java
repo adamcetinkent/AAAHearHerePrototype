@@ -1,4 +1,6 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
+
+import android.database.Cursor;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshipUserNested;
 
@@ -15,6 +17,11 @@ public class HHFriendshipUser {
 		this.user = nested.getUser();
 	}
 
+	public HHFriendshipUser(Cursor cursor){
+		this.friendship = new HHFriendship(cursor);
+		this.user = new HHUser(cursor);
+	}
+
 	public HHFriendship getFriendship() {
 		return friendship;
 	}
@@ -22,4 +29,5 @@ public class HHFriendshipUser {
 	public HHUser getUser() {
 		return user;
 	}
+
 }

@@ -1,4 +1,6 @@
-package yosoyo.aaahearhereprototype.HHServerClasses;
+package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
+
+import android.database.Cursor;
 
 import com.facebook.Profile;
 
@@ -13,11 +15,11 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 public class HHUserFull {
 
 	private final HHUser user;
-	private final List<HHFriendshipUser> friendships;
-	private final List<HHFollowUser> followOuts;
-	private final List<HHFollowUser> followIns;
-	private final List<HHFollowRequestUser> followOutRequests;
-	private final List<HHFollowRequestUser> followInRequests;
+	private List<HHFriendshipUser> friendships;
+	private List<HHFollowUser> followOuts;
+	private List<HHFollowUser> followIns;
+	private List<HHFollowRequestUser> followOutRequests;
+	private List<HHFollowRequestUser> followInRequests;
 
 	public HHUserFull(HHUserFullProcess process){
 		this.user = process.getUser();
@@ -46,6 +48,10 @@ public class HHUserFull {
 		followInRequests = new ArrayList<>();
 	}
 
+	public HHUserFull(Cursor cursor){
+		this.user = new HHUser(cursor);
+	}
+
 	public HHUser getUser() {
 		return user;
 	}
@@ -70,4 +76,23 @@ public class HHUserFull {
 		return followInRequests;
 	}
 
+	public void setFriendships(List<HHFriendshipUser> friendships) {
+		this.friendships = friendships;
+	}
+
+	public void setFollowOuts(List<HHFollowUser> followOuts) {
+		this.followOuts = followOuts;
+	}
+
+	public void setFollowIns(List<HHFollowUser> followIns) {
+		this.followIns = followIns;
+	}
+
+	public void setFollowOutRequests(List<HHFollowRequestUser> followOutRequests) {
+		this.followOutRequests = followOutRequests;
+	}
+
+	public void setFollowInRequests(List<HHFollowRequestUser> followInRequests) {
+		this.followInRequests = followInRequests;
+	}
 }

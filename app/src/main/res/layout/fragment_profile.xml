@@ -1,13 +1,329 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="yosoyo.aaahearhereprototype.Fragments.ProfileFragment">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                   xmlns:tools="http://schemas.android.com/tools"
+                                   tools:context="yosoyo.aaahearhereprototype.Fragments.ProfileFragment"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="match_parent"
+                                   android:orientation="vertical"
+                                   android:background="#ffffffff">
 
-    <TextView
-        android:id="@+id/title_profile"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/profile_fragment_title"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:paddingTop="25dp"
+        android:paddingRight="25dp">
 
-</FrameLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+
+            <FrameLayout
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="right"
+                android:layout_marginRight="25dp"
+                android:layout_marginLeft="25dp"
+                >
+
+                <ImageView
+                    android:id="@+id/fragment_profile_imgProfile"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/frame_white"
+                    />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fragment_profile_flFollow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center"
+                >
+
+                <ImageView
+                    android:id="@+id/fragment_profile_btnUnfollow"
+                    android:layout_height="30dp"
+                    android:layout_width="30dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/minus_button"
+                    android:visibility="gone"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/fragment_profile_btnUnfollow_progress"
+                    android:layout_height="30dp"
+                    android:layout_width="30dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    />
+
+                <ImageView
+                    android:id="@+id/fragment_profile_btnFollow"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:src="@drawable/add_user_full"
+                    android:visibility="gone"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/fragment_profile_btnFollow_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/fragment_profile_llRequestResponse"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp">
+
+                    <ImageView
+                        android:id="@+id/fragment_profile_btnDelete"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/cross_button"/>
+
+                    <ProgressBar
+                        android:id="@+id/fragment_profile_btnDelete_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp">
+
+                    <ImageView
+                        android:id="@+id/fragment_profile_btnAccept"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:src="@drawable/tick_button"/>
+
+                    <ProgressBar
+                        android:id="@+id/fragment_profile_btnAccept_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:layout_gravity="top">
+
+                <ImageView
+                    android:id="@+id/fragment_profile_imgFollowStatus"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/follow_none"
+                    android:layout_gravity="center_vertical"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal|top"
+                    android:gravity="center_horizontal">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/fragment_profile_txtPostsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100"
+                            android:textSize="25sp"
+                            android:visibility="invisible"/>
+
+                        <ProgressBar
+                            android:id="@+id/fragment_profile_txtPostsCount_progress"
+                            android:layout_height="25sp"
+                            android:layout_width="25sp"
+                            android:layout_gravity="center"
+                            />
+
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/fragment_profile_txtPostsCountDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Posts"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal|top"
+                    android:gravity="center_horizontal">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/fragment_profile_txtFollowsInCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100"
+                            android:textSize="25sp"
+                            android:visibility="invisible"/>
+
+                        <ProgressBar
+                            android:id="@+id/fragment_profile_txtFollowsInCount_progress"
+                            android:layout_height="25sp"
+                            android:layout_width="25sp"
+                            android:layout_gravity="center"
+                            />
+
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/fragment_profile_txtFollowsInCountDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Followers"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal|top"
+                    android:gravity="center_horizontal">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/fragment_profile_txtFollowsOutCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100"
+                            android:textSize="25sp"
+                            android:visibility="invisible"/>
+
+                        <ProgressBar
+                            android:id="@+id/fragment_profile_txtFollowsOutCount_progress"
+                            android:layout_height="25sp"
+                            android:layout_width="25sp"
+                            android:layout_gravity="center"
+                            />
+
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/fragment_profile_txtFollowsOutCountDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Following"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/fragment_profile_txtUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/placeholder_user_name"/>
+
+            <TextView
+                android:id="@+id/fragment_profile_txtBio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="__________________________________________________________________________________________________________________________________________________________"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff4f4f4"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/fragment_profile_btnFeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/comment"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/fragment_profile_btnMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/location"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <!--<FrameLayout
+        android:id="@+id/fragment_profile_childFragmentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </FrameLayout>-->
+
+</LinearLayout>
