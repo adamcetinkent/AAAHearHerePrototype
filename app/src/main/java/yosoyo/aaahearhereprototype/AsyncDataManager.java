@@ -218,6 +218,50 @@ public class AsyncDataManager {
 			});
 	}
 
+	public interface GetUserPrivacyCallback{
+		void returnCachedUserPrivacy(boolean userPrivacy);
+		void returnWebUserPrivacy(boolean userPrivacy);
+	}
+
+	public static void getUserPrivacy(final long userID, final GetUserPrivacyCallback callback) {
+		getUserPrivacy(context, userID, false, callback);
+	}
+
+	public static void getUserPrivacy(final long userID, final boolean webOnly, final GetUserPrivacyCallback callback) {
+		getUserPrivacy(context, userID, webOnly, callback);
+	}
+
+	public static void getUserPrivacy(Context context, final long userID, final boolean webOnly, final GetUserPrivacyCallback callback){
+		if (!webOnly) {
+			getUserCachedPrivacy(context, userID, callback);
+		}
+		getUserWebPrivacy(userID, callback);
+	}
+
+	private static void getUserCachedPrivacy(Context context, final long userID, final  GetUserPrivacyCallback callback){
+		DatabaseHelper.getUserCachedPrivacy(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCachedPrivacyCallback() {
+				@Override
+				public void returnUserCachedPrivacy(boolean userPrivacy) {
+					callback.returnCachedUserPrivacy(userPrivacy);
+				}
+			}
+		);
+	}
+
+	private static void getUserWebPrivacy(final long userID, final GetUserPrivacyCallback callback){
+		WebHelper.getUserPrivacy(
+			userID, new WebHelper.GetUserPrivacyCallback() {
+				@Override
+				public void returnGetUserPrivacy(boolean userPrivacy) {
+					callback.returnWebUserPrivacy(userPrivacy);
+				}
+			}
+		);
+	}
+
 	public interface GetUserPostCountCallback{
 		void returnCachedUserPostCount(int postCount);
 		void returnWebUserPostCount(int postCount);
@@ -286,7 +330,7 @@ public class AsyncDataManager {
 		DatabaseHelper.getUserCachedFollowersInCount(
 			context,
 			userID,
-			new DatabaseHelper.GetUserCachedFollowersInCallback() {
+			new DatabaseHelper.GetUserCachedFollowersInCountCallback() {
 				@Override
 				public void returnUserCachedFollowersInCount(int followersInCount) {
 					callback.returnCachedUserFollowersInCount(followersInCount);
@@ -330,7 +374,7 @@ public class AsyncDataManager {
 		DatabaseHelper.getUserCachedFollowersOutCount(
 			context,
 			userID,
-			new DatabaseHelper.GetUserCachedFollowersOutCallback() {
+			new DatabaseHelper.GetUserCachedFollowersOutCountCallback() {
 				@Override
 				public void returnUserCachedFollowersOutCount(int followersOutCount) {
 					callback.returnCachedUserFollowersOutCount(followersOutCount);

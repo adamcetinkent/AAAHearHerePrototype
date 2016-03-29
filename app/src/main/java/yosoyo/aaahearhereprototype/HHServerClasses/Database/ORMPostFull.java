@@ -79,7 +79,7 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursorPost.moveToFirst();
 				while (!cursorPost.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursorPost);
+					HHPostFull post = new HHPostFull(cursorPost, ORMPost.COLUMN_USER_ID_NAME);
 					posts.add(post);
 
 					{
@@ -96,8 +96,7 @@ class ORMPostFull {
 						if (numComments > 0) {
 							cursorComment.moveToFirst();
 							while (!cursorComment.isAfterLast()) {
-								HHCommentUser commentUser = new HHCommentUser(
-									cursorComment);
+								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.COLUMN_USER_ID_NAME);
 								comments.add(commentUser);
 								cursorComment.moveToNext();
 							}
@@ -120,7 +119,7 @@ class ORMPostFull {
 						if (numLikes > 0) {
 							cursorLike.moveToFirst();
 							while (!cursorLike.isAfterLast()) {
-								HHLikeUser likeUser = new HHLikeUser(cursorLike);
+								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.COLUMN_USER_ID_NAME);
 								likes.add(likeUser);
 								cursorLike.moveToNext();
 							}
@@ -143,7 +142,7 @@ class ORMPostFull {
 						if (numTags > 0) {
 							cursorTag.moveToFirst();
 							while (!cursorTag.isAfterLast()) {
-								HHTagUser tagUser = new HHTagUser(cursorTag);
+								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.COLUMN_USER_ID_NAME);
 								tags.add(tagUser);
 								cursorTag.moveToNext();
 							}
@@ -210,7 +209,7 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursorPost.moveToFirst();
 				while (!cursorPost.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursorPost);
+					HHPostFull post = new HHPostFull(cursorPost, ORMPost.COLUMN_USER_ID_NAME);
 					posts.add(post);
 
 					{
@@ -227,8 +226,7 @@ class ORMPostFull {
 						if (numComments > 0) {
 							cursorComment.moveToFirst();
 							while (!cursorComment.isAfterLast()) {
-								HHCommentUser commentUser = new HHCommentUser(
-									cursorComment);
+								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.COLUMN_USER_ID_NAME);
 								comments.add(commentUser);
 								cursorComment.moveToNext();
 							}
@@ -251,7 +249,7 @@ class ORMPostFull {
 						if (numLikes > 0) {
 							cursorLike.moveToFirst();
 							while (!cursorLike.isAfterLast()) {
-								HHLikeUser likeUser = new HHLikeUser(cursorLike);
+								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.COLUMN_USER_ID_NAME);
 								likes.add(likeUser);
 								cursorLike.moveToNext();
 							}
@@ -274,7 +272,7 @@ class ORMPostFull {
 						if (numTags > 0) {
 							cursorTag.moveToFirst();
 							while (!cursorTag.isAfterLast()) {
-								HHTagUser tagUser = new HHTagUser(cursorTag);
+								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.COLUMN_USER_ID_NAME);
 								tags.add(tagUser);
 								cursorTag.moveToNext();
 							}
@@ -352,7 +350,7 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursor.moveToFirst();
 				while (!cursor.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursor);
+					HHPostFull post = new HHPostFull(cursor, ORMPost.COLUMN_USER_ID_NAME);
 					posts.add(post);
 					cursor.moveToNext();
 				}

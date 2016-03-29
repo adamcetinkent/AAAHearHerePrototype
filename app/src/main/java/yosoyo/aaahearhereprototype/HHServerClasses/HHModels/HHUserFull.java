@@ -48,8 +48,8 @@ public class HHUserFull {
 		followInRequests = new ArrayList<>();
 	}
 
-	public HHUserFull(Cursor cursor){
-		this.user = new HHUser(cursor);
+	public HHUserFull(Cursor cursor, String idColumnIndex){
+		this.user = new HHUser(cursor, idColumnIndex);
 	}
 
 	public HHUser getUser() {

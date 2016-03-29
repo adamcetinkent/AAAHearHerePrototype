@@ -62,14 +62,13 @@ public class ProfileFragment extends FeedbackFragment {
 	private ImageView btnDelete;
 	private ProgressBar btnDeleteProgressBar;
 
+	private LinearLayout llPrivacy;
+	private boolean privacy = false;
+
 	private boolean friendIsFollowed;
 	private boolean friendFollowsMe;
 	private boolean friendIsRequested;
 	private boolean friendRequestedMe;
-
-	public static ProfileFragment newInstance(){
-		return newInstance(PROFILE_TYPE_CURRENT_USER, -1);
-	}
 
 	public static ProfileFragment newInstance(int profileType, long userID){
 		ProfileFragment profileFragment = new ProfileFragment();
@@ -423,6 +422,7 @@ public class ProfileFragment extends FeedbackFragment {
 
 		final TextView txtUserName = (TextView) view.findViewById(R.id.fragment_profile_txtUserName);
 		final TextView txtBio = (TextView) view.findViewById(R.id.fragment_profile_txtBio);
+		final TextView txtURL = (TextView) view.findViewById(R.id.fragment_profile_txtURL);
 		imgFollowStatus = (ImageView) view.findViewById(R.id.fragment_profile_imgFollowStatus);
 
 		final LinearLayout llPostsCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llPostsCount);
@@ -449,6 +449,8 @@ public class ProfileFragment extends FeedbackFragment {
 		btnUnfollow = (ImageView) view.findViewById(R.id.fragment_profile_btnUnfollow);
 		btnUnfollowProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnUnfollow_progress);
 
+		llPrivacy = (LinearLayout) view.findViewById(R.id.fragment_profile_llPrivacy);
+
 		final ImageView btnFeed = (ImageView) view.findViewById(R.id.fragment_profile_btnFeed);
 		final ImageView btnMap = (ImageView) view.findViewById(R.id.fragment_profile_btnMap);
 
@@ -462,7 +464,19 @@ public class ProfileFragment extends FeedbackFragment {
 			});
 
 		txtUserName.setText(user.getUser().getName());
-		txtBio.setText(user.getUser().getBio());
+
+		if (user.getUser().getBio().isEmpty())
+			txtBio.setVisibility(View.GONE);
+		else
+			txtBio.setText(user.getUser().getBio());
+
+		if (user.getUser().getURL().isEmpty())
+			txtURL.setVisibility(View.GONE);
+		else
+			txtURL.setText(user.getUser().getURL());
+
+		if (privacy = true)
+			llPrivacy.setVisibility(View.VISIBLE);
 
 		llFollowsInCount.setOnClickListener(onClickFollowsInListener);
 		llFollowsOutCount.setOnClickListener(onClickFollowsOutListener);
@@ -497,10 +511,10 @@ public class ProfileFragment extends FeedbackFragment {
 	}
 
 	private void updateFollowStatus(){
-		friendIsFollowed = HHUser.friendIsFollowed(HHUser.getCurrentUser(), user.getUser());
-		friendFollowsMe = HHUser.friendFollowsMe(HHUser.getCurrentUser(), user.getUser());
-		friendIsRequested = HHUser.friendIsRequested(HHUser.getCurrentUser(), user.getUser());
-		friendRequestedMe = HHUser.friendRequestedMe(HHUser.getCurrentUser(), user.getUser());
+		friendIsFollowed = HHUser.userIsFollowed(user.getUser());
+		friendFollowsMe = HHUser.userFollowsMe(user.getUser());
+		friendIsRequested = HHUser.userIsRequested(user.getUser());
+		friendRequestedMe = HHUser.userRequestedMe(user.getUser());
 
 		if (friendIsFollowed && friendFollowsMe) {
 			imgFollowStatus.setImageResource(R.drawable.follow_in_out);
@@ -613,6 +627,12 @@ public class ProfileFragment extends FeedbackFragment {
 					txtFollowsOutCountProgressBar.setVisibility(View.GONE);
 				}
 			});
+	}
+
+	void setPrivate(){
+		if (llPrivacy != null)
+			llPrivacy.setVisibility(View.VISIBLE);
+		privacy = true;
 	}
 
 }

@@ -2,6 +2,7 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -26,58 +27,66 @@ public class ORMUser {
 
 	private static final String TAG = "ORMUser";
 
-	public static final String	TABLE_NAME = 				"users";
+	public static final String	TABLE_NAME = 					"users";
 
-	private static final String	COMMA_SEP = 				", ";
+	private static final String	COMMA_SEP = 					", ";
 
-	public static final String	COLUMN_ID_NAME = 			"_id";
-	private static final String	COLUMN_ID_TYPE = 			"INTEGER PRIMARY KEY";
+	public static final String	COLUMN_ID_NAME = 				"_id";
+	private static final String	COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
 
-	public static final String	COLUMN_FIRST_NAME_NAME =	"first_name";
-	private static final String	COLUMN_FIRST_NAME_TYPE =	"TEXT";
+	public static final String	COLUMN_FIRST_NAME_NAME =		"first_name";
+	private static final String	COLUMN_FIRST_NAME_TYPE =		"TEXT";
 
-	public static final String	COLUMN_LAST_NAME_NAME =		"last_name";
-	private static final String	COLUMN_LAST_NAME_TYPE =		"TEXT";
+	public static final String	COLUMN_LAST_NAME_NAME =			"last_name";
+	private static final String	COLUMN_LAST_NAME_TYPE =			"TEXT";
 
-	public static final String	COLUMN_EMAIL_NAME = 		"email";
-	private static final String	COLUMN_EMAIL_TYPE = 		"TEXT";
+	public static final String	COLUMN_EMAIL_NAME = 			"email";
+	private static final String	COLUMN_EMAIL_TYPE = 			"TEXT";
 
-	public static final String	COLUMN_FB_USER_ID_NAME = 	"fb_user_id";
-	private static final String	COLUMN_FB_USER_ID_TYPE = 	"TEXT";
+	public static final String	COLUMN_FB_USER_ID_NAME = 		"fb_user_id";
+	private static final String	COLUMN_FB_USER_ID_TYPE = 		"TEXT";
 
-	public static final String	COLUMN_PRIVACY_NAME = 		"privacy";
-	private static final String	COLUMN_PRIVACY_TYPE = 		"INTEGER";
+	public static final String	COLUMN_PROFILE_PRIVACY_NAME =	"profile_privacy";
+	private static final String	COLUMN_PROFILE_PRIVACY_TYPE =	"INTEGER";
 
-	public static final String	COLUMN_AUTO_ACCEPT_NAME = 	"auto_accept";
-	private static final String	COLUMN_AUTO_ACCEPT_TYPE = 	"INTEGER";
+	public static final String	COLUMN_SEARCH_PRIVACY_NAME = 	"search_privacy";
+	private static final String	COLUMN_SEARCH_PRIVACY_TYPE = 	"INTEGER";
 
-	public static final String	COLUMN_BIO_NAME = 			"bio";
-	private static final String	COLUMN_BIO_TYPE = 			"TEXT";
+	public static final String	COLUMN_AUTO_ACCEPT_NAME = 		"auto_accept";
+	private static final String	COLUMN_AUTO_ACCEPT_TYPE = 		"INTEGER";
 
-	public static final String	COLUMN_CREATED_AT_NAME = 	"created_at";
-	private static final String	COLUMN_CREATED_AT_TYPE = 	"TIMESTAMP";
+	public static final String	COLUMN_BIO_NAME = 				"bio";
+	private static final String	COLUMN_BIO_TYPE = 				"TEXT";
 
-	public static final String	COLUMN_UPDATED_AT_NAME = 	"updated_at";
-	private static final String	COLUMN_UPDATED_AT_TYPE = 	"TIMESTAMP";
+	public static final String	COLUMN_URL_NAME = 				"url";
+	private static final String	COLUMN_URL_TYPE = 				"TEXT";
 
-	private static final String	COLUMN_CACHED_AT_NAME = 	"cached_at";
-	private static final String	COLUMN_CACHED_AT_TYPE = 	"TIMESTAMP";
-	private static final String	COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	public static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
+	private static final String	COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
+
+	public static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
+	private static final String	COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
+
+	private static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";
+	private static final String	COLUMN_CACHED_AT_TYPE = 		"TIMESTAMP";
+	private static final String	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
 
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +
-		COLUMN_ID_NAME 			+ " " 	+ COLUMN_ID_TYPE 			+ COMMA_SEP	+
-		COLUMN_FIRST_NAME_NAME 	+ " " 	+ COLUMN_FIRST_NAME_TYPE 	+ COMMA_SEP	+
-		COLUMN_LAST_NAME_NAME 	+ " " 	+ COLUMN_LAST_NAME_TYPE 	+ COMMA_SEP	+
-		COLUMN_EMAIL_NAME 		+ " " 	+ COLUMN_EMAIL_TYPE 		+ COMMA_SEP	+
-		COLUMN_FB_USER_ID_NAME 	+ " " 	+ COLUMN_FB_USER_ID_TYPE 	+ COMMA_SEP	+
-		COLUMN_BIO_NAME 		+ " " 	+ COLUMN_BIO_TYPE 			+ COMMA_SEP	+
-		COLUMN_AUTO_ACCEPT_NAME + " " 	+ COLUMN_AUTO_ACCEPT_TYPE 	+ COMMA_SEP	+
-		COLUMN_PRIVACY_NAME 	+ " " 	+ COLUMN_PRIVACY_TYPE 		+ COMMA_SEP	+
-		COLUMN_CREATED_AT_NAME 	+ " " 	+ COLUMN_CREATED_AT_TYPE 	+ COMMA_SEP	+
-		COLUMN_UPDATED_AT_NAME 	+ " " 	+ COLUMN_UPDATED_AT_TYPE 	+ COMMA_SEP	+
-		COLUMN_CACHED_AT_NAME 	+ " " 	+ COLUMN_CACHED_AT_TYPE 	+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
+		COLUMN_ID_NAME 				+ " " 	+ COLUMN_ID_TYPE 				+ COMMA_SEP	+
+		COLUMN_FIRST_NAME_NAME 		+ " " 	+ COLUMN_FIRST_NAME_TYPE 		+ COMMA_SEP	+
+		COLUMN_LAST_NAME_NAME 		+ " " 	+ COLUMN_LAST_NAME_TYPE 		+ COMMA_SEP	+
+		COLUMN_EMAIL_NAME 			+ " " 	+ COLUMN_EMAIL_TYPE 			+ COMMA_SEP	+
+		COLUMN_FB_USER_ID_NAME 		+ " " 	+ COLUMN_FB_USER_ID_TYPE 		+ COMMA_SEP	+
+		COLUMN_BIO_NAME 			+ " " 	+ COLUMN_BIO_TYPE 				+ COMMA_SEP	+
+		COLUMN_URL_NAME 			+ " " 	+ COLUMN_URL_TYPE 				+ COMMA_SEP	+
+		COLUMN_AUTO_ACCEPT_NAME 	+ " " 	+ COLUMN_AUTO_ACCEPT_TYPE 		+ COMMA_SEP	+
+		COLUMN_PROFILE_PRIVACY_NAME	+ " " 	+ COLUMN_PROFILE_PRIVACY_TYPE	+ COMMA_SEP	+
+		COLUMN_SEARCH_PRIVACY_NAME	+ " "	+ COLUMN_SEARCH_PRIVACY_TYPE 	+ COMMA_SEP	+
+		COLUMN_CREATED_AT_NAME 		+ " " 	+ COLUMN_CREATED_AT_TYPE 		+ COMMA_SEP	+
+		COLUMN_UPDATED_AT_NAME 		+ " " 	+ COLUMN_UPDATED_AT_TYPE 		+ COMMA_SEP	+
+		COLUMN_CACHED_AT_NAME 		+ " " 	+ COLUMN_CACHED_AT_TYPE 		+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
 	");";
 
 	public static final String SQL_DROP_TABLE =
@@ -96,16 +105,18 @@ public class ORMUser {
 
 	private static ContentValues userToContentValues(HHUser user){
 		ContentValues contentValues = new ContentValues();
-		contentValues.put(COLUMN_ID_NAME, 			user.getID());
-		contentValues.put(COLUMN_FIRST_NAME_NAME, 	user.getFirstName());
-		contentValues.put(COLUMN_LAST_NAME_NAME, 	user.getLastName());
-		contentValues.put(COLUMN_FB_USER_ID_NAME, 	user.getFBUserID());
-		contentValues.put(COLUMN_EMAIL_NAME, 		user.getEmail());
-		contentValues.put(COLUMN_BIO_NAME, 			user.getBio());
-		contentValues.put(COLUMN_PRIVACY_NAME, 		user.getPrivacy());
-		contentValues.put(COLUMN_AUTO_ACCEPT_NAME, 	user.getAutoAccept());
-		contentValues.put(COLUMN_CREATED_AT_NAME, 	String.valueOf(user.getCreatedAt()));
-		contentValues.put(COLUMN_UPDATED_AT_NAME, 	String.valueOf(user.getUpdatedAt()));
+		contentValues.put(COLUMN_ID_NAME, 				user.getID());
+		contentValues.put(COLUMN_FIRST_NAME_NAME, 		user.getFirstName());
+		contentValues.put(COLUMN_LAST_NAME_NAME, 		user.getLastName());
+		contentValues.put(COLUMN_FB_USER_ID_NAME, 		user.getFBUserID());
+		contentValues.put(COLUMN_EMAIL_NAME, 			user.getEmail());
+		contentValues.put(COLUMN_BIO_NAME, 				user.getBio());
+		contentValues.put(COLUMN_URL_NAME, 				user.getURL());
+		contentValues.put(COLUMN_PROFILE_PRIVACY_NAME,	user.getProfilePrivacy());
+		contentValues.put(COLUMN_SEARCH_PRIVACY_NAME, user.getSearchPrivacy());
+		contentValues.put(COLUMN_AUTO_ACCEPT_NAME, user.getAutoAccept());
+		contentValues.put(COLUMN_CREATED_AT_NAME, String.valueOf(user.getCreatedAt()));
+		contentValues.put(COLUMN_UPDATED_AT_NAME, String.valueOf(user.getUpdatedAt()));
 		return contentValues;
 	}
 
@@ -238,6 +249,63 @@ public class ORMUser {
 		@Override
 		protected void onPostExecute(Boolean result){
 			callbackTo.returnInsertedManyUsers(posts);
+		}
+	}
+
+	public static void getUserPrivacy(Context context, final long userID, DBUserPrivacyTask.Callback callbackTo){
+		new DBUserPrivacyTask(context, userID, callbackTo).execute();
+	}
+
+	protected static class DBUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
+
+		private final Context context;
+		private final long userID;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnUserPrivacy(final boolean userPrivacy);
+		}
+
+		public DBUserPrivacyTask(Context context, final long userID, Callback callbackTo){
+			this.context = context;
+			this.userID = userID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery(
+				"SELECT ? FROM " + TABLE_NAME +
+					" WHERE " + COLUMN_ID_NAME + "=?"
+				, new String[]{
+					COLUMN_PROFILE_PRIVACY_NAME,
+					String.valueOf(userID)
+				});
+
+			int privacyLevel = cursor.getInt(cursor.getColumnIndex(COLUMN_PROFILE_PRIVACY_NAME));
+
+			cursor.close();
+			database.close();
+
+			if (privacyLevel == 0) {
+				return true;
+			} else if (privacyLevel == 1){
+				if (HHUser.userIsFollowed(userID) || HHUser.userIsFriend(userID))
+					return true;
+			} else if (privacyLevel == 2){
+				if (HHUser.userIsFollowed(userID))
+					return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean userPrivacy){
+			callbackTo.returnUserPrivacy(userPrivacy);
 		}
 	}
 

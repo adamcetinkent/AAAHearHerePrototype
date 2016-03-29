@@ -61,6 +61,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	// The actual process which downloads the bitmap;
 	protected Bitmap doInBackground(String... urls) {
 		Log.d(TAG, "Fetching image from " + urls[0]);
+		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		try {
 			URL url = new URL(urls[0]);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

@@ -335,15 +335,15 @@ public class UserSearchFragment extends FeedbackFragment {
 				@Override
 				public int compare(HHFriendshipUser lhs, HHFriendshipUser rhs) {
 					int lhsScore =
-						(friendRequestedMe(lhs.getUser()) ? 1 : 0)
-							+ (friendIsRequested(lhs.getUser()) ? 2 : 0)
-							+ (friendFollowsMe(lhs.getUser()) ? 4 : 0)
-							+ (friendIsFollowed(lhs.getUser()) ? 8 : 0);
+						(userRequestedMe(lhs.getUser()) ? 1 : 0)
+							+ (userIsRequested(lhs.getUser()) ? 2 : 0)
+							+ (userFollowsMe(lhs.getUser()) ? 4 : 0)
+							+ (userIsFollowed(lhs.getUser()) ? 8 : 0);
 					int rhsScore =
-						(friendRequestedMe(rhs.getUser()) ? 1 : 0)
-							+ (friendIsRequested(rhs.getUser()) ? 2 : 0)
-							+ (friendFollowsMe(rhs.getUser()) ? 4 : 0)
-							+ (friendIsFollowed(rhs.getUser()) ? 8 : 0);
+						(userRequestedMe(rhs.getUser()) ? 1 : 0)
+							+ (userIsRequested(rhs.getUser()) ? 2 : 0)
+							+ (userFollowsMe(rhs.getUser()) ? 4 : 0)
+							+ (userIsFollowed(rhs.getUser()) ? 8 : 0);
 
 					if (lhsScore != rhsScore)
 						return rhsScore - lhsScore;
@@ -371,10 +371,10 @@ public class UserSearchFragment extends FeedbackFragment {
 			holder.txtUserName.setText(foundUser.getName());
 			holder.onClickUserListener.setFoundUser(foundUser);
 
-			boolean friendIsFollowed = HHUser.friendIsFollowed(currentUser, foundUser);
-			boolean friendFollowsMe = HHUser.friendFollowsMe(currentUser, foundUser);
-			boolean friendIsRequested = HHUser.friendIsRequested(currentUser, foundUser);
-			//boolean friendRequestedMe = HHUser.friendRequestedMe(currentUser, foundUser);
+			boolean friendIsFollowed = HHUser.userIsFollowed(currentUser, foundUser);
+			boolean friendFollowsMe = HHUser.userFollowsMe(currentUser, foundUser);
+			boolean friendIsRequested = HHUser.userIsRequested(currentUser, foundUser);
+			//boolean userRequestedMe = HHUser.userRequestedMe(currentUser, foundUser);
 
 			if (friendIsFollowed){
 				holder.btnFollow.setVisibility(View.GONE);

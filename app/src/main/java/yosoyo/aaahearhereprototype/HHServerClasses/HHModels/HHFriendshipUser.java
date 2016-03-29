@@ -17,9 +17,9 @@ public class HHFriendshipUser {
 		this.user = nested.getUser();
 	}
 
-	public HHFriendshipUser(Cursor cursor){
+	public HHFriendshipUser(Cursor cursor, String userIDColumnIndex){
 		this.friendship = new HHFriendship(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 	}
 
 	public HHFriendship getFriendship() {

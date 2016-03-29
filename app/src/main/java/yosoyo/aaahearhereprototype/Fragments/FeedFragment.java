@@ -67,6 +67,8 @@ public class FeedFragment extends FeedbackFragment {
 
 	private long userID = -1;
 
+	private ProfileFragment profileFragment;
+
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	private List<HHPostFull> posts = new ArrayList<>();
@@ -134,7 +136,6 @@ public class FeedFragment extends FeedbackFragment {
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
 			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
-			ProfileFragment profileFragment;
 			if (userID == HHUser.getCurrentUserID()) {
 				 profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
 			} else {
@@ -209,7 +210,26 @@ public class FeedFragment extends FeedbackFragment {
 	}
 
 	private void getUserData(){
-		AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
+		AsyncDataManager.getUserPrivacy(
+			userID,
+			true,
+			new AsyncDataManager.GetUserPrivacyCallback() {
+				@Override
+				public void returnCachedUserPrivacy(boolean userPrivacy) {}
+
+				@Override
+				public void returnWebUserPrivacy(boolean userPrivacy) {
+					if (userPrivacy){
+						AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
+					} else {
+						setPrivateProfile();
+					}
+				}
+			});
+	}
+
+	private void setPrivateProfile(){
+		profileFragment.setPrivate();
 	}
 
 	private void notifyAdapter(){

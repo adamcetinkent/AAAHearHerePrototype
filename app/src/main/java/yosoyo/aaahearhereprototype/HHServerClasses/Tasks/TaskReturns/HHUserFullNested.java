@@ -21,8 +21,8 @@ public class HHUserFullNested extends HHUser {
 	private HHFollowRequestUserNested[] follow_requests;
 	private HHFollowedRequestUserNested[] followed_requests;
 
-	public HHUserFullNested(Cursor cursor) {
-		super(cursor);
+	public HHUserFullNested(Cursor cursor, String userIDColumnIndex) {
+		super(cursor, userIDColumnIndex);
 	}
 
 	public List<HHFriendshipUser> getFriendshipsList(){

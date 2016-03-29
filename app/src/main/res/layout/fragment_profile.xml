@@ -293,6 +293,35 @@
                 android:layout_marginBottom="10dp"
                 />
 
+            <TextView
+                android:id="@+id/fragment_profile_txtURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="__________________________________________________________________________________________________________________________________________________________"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:lines="1"/>
+
+            <LinearLayout
+                android:id="@+id/fragment_profile_llPrivacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/lock"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This user's privacy settings prevent you from seeing all their posts. Send them a follow request!"/>
+
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 
@@ -319,14 +348,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:src="@drawable/location"
+            android:src="@drawable/map"
             android:layout_weight="1"/>
     </LinearLayout>
-
-    <!--<FrameLayout
-        android:id="@+id/fragment_profile_childFragmentFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </FrameLayout>-->
 
 </LinearLayout>

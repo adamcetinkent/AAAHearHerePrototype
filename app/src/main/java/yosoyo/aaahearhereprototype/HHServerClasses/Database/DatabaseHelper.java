@@ -28,7 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String TAG = "DatabaseHelper";
 	private static final String DB_NAME = "AAAHereHerePrototype";
-	private static final int DB_VERSION = 15;
+	private static final int DB_VERSION = 16;
 
 	public DatabaseHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
@@ -481,11 +481,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		);
 	}
 
-	public interface GetUserCachedFollowersInCallback{
+	public interface GetUserCachedFollowersInCountCallback {
 		void returnUserCachedFollowersInCount(int followersInCount);
 	}
 
-	public static void getUserCachedFollowersInCount(Context context, final long userID, final GetUserCachedFollowersInCallback callback){
+	public static void getUserCachedFollowersInCount(Context context, final long userID, final GetUserCachedFollowersInCountCallback callback){
 		ORMFollow.getUserFollowersInCount(
 			context,
 			userID,
@@ -498,11 +498,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		);
 	}
 
-	public interface GetUserCachedFollowersOutCallback{
+	public interface GetUserCachedFollowersOutCountCallback {
 		void returnUserCachedFollowersOutCount(int followersOutCount);
 	}
 
-	public static void getUserCachedFollowersOutCount(Context context, final long userID, final GetUserCachedFollowersOutCallback callback){
+	public static void getUserCachedFollowersOutCount(Context context, final long userID, final GetUserCachedFollowersOutCountCallback callback){
 		ORMFollow.getUserFollowersOutCount(
 			context,
 			userID,
@@ -510,6 +510,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				@Override
 				public void returnFollowersOutCount(int followersOutCount) {
 					callback.returnUserCachedFollowersOutCount(followersOutCount);
+				}
+			}
+		);
+	}
+
+	public interface GetUserCachedPrivacyCallback {
+		void returnUserCachedPrivacy(boolean userPrivacy);
+	}
+
+	public static void getUserCachedPrivacy(Context context, final long userID, final GetUserCachedPrivacyCallback callback){
+		ORMUser.getUserPrivacy(
+			context,
+			userID,
+			new ORMUser.DBUserPrivacyTask.Callback() {
+				@Override
+				public void returnUserPrivacy(boolean userPrivacy) {
+					callback.returnUserCachedPrivacy(userPrivacy);
 				}
 			}
 		);

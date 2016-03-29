@@ -17,9 +17,9 @@ public class HHLikeUser {
 		this.user = nested.getUser();
 	}
 
-	public HHLikeUser(Cursor cursor){
+	public HHLikeUser(Cursor cursor, String userIDColumnIndex){
 		this.like = new HHLike(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 	}
 
 	public HHLike getLike() {

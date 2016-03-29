@@ -17,9 +17,9 @@ public class HHCommentUser {
 		this.user = nested.getUser();
 	}
 
-	public HHCommentUser(Cursor cursor){
+	public HHCommentUser(Cursor cursor, String userIDColumnIndex){
 		this.comment = new HHComment(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 	}
 
 	public HHComment getComment() {

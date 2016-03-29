@@ -114,6 +114,20 @@ public class WebHelper {
 		}).execute();
 	}
 
+
+	public interface GetUserPrivacyCallback {
+		void returnGetUserPrivacy(boolean userPrivacy);
+	}
+
+	public static void getUserPrivacy(final long user_id, final GetUserPrivacyCallback callback){
+		new GetUserPrivacyTask(user_id, new GetUserPrivacyTask.Callback(){
+			@Override
+			public void returnUserPrivacy(boolean userPrivacy) {
+				callback.returnGetUserPrivacy(userPrivacy);
+			}
+		}).execute();
+	}
+
 	public interface GetPostsAtLocationCallback {
 		void returnGetPostsAtLocation(List<HHPostFull> posts);
 	}

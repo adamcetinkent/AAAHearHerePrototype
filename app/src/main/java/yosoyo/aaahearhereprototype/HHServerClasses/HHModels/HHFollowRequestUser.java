@@ -23,9 +23,9 @@ public class HHFollowRequestUser {
 		this.user = nested.getUser();
 	}
 
-	public HHFollowRequestUser(Cursor cursor){
+	public HHFollowRequestUser(Cursor cursor, String userIDColumnIndex){
 		this.followRequest = new HHFollowRequest(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 	}
 
 	public HHFollowRequest getFollowRequest() {

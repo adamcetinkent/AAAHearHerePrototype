@@ -26,8 +26,10 @@ public class HHUser extends HHBase {
 	private final String fb_user_id;
 	private String email;
 	private String bio;
+	private String url;
 	private int auto_accept;
-	private int privacy;
+	private int profile_privacy;
+	private int search_privacy;
 
 	public HHUser(HHUserFullNested nested){
 		super(
@@ -35,28 +37,40 @@ public class HHUser extends HHBase {
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
 			 );
-		this.first_name = nested.getFirstName();
-		this.last_name = nested.getLastName();
-		this.fb_user_id = nested.getFBUserID();
-		this.email = nested.getEmail();
-		this.bio = nested.getBio();
-		this.auto_accept = nested.getAutoAccept();
-		this.privacy = nested.getPrivacy();
+		this.first_name = 		nested.getFirstName();
+		this.last_name = 		nested.getLastName();
+		this.fb_user_id = 		nested.getFBUserID();
+		this.email = 			nested.getEmail();
+		this.bio = 				nested.getBio();
+		this.url = 				nested.getURL();
+		this.auto_accept = 		nested.getAutoAccept();
+		this.profile_privacy =	nested.getProfilePrivacy();
+		this.search_privacy = 	nested.getSearchPrivacy();
 	}
 
-	public HHUser(Cursor cursor){
+	public HHUser(Cursor cursor, String idColumnIndex){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMUser.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(idColumnIndex)),
+			Timestamp.valueOf(
+				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(
+				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_UPDATED_AT_NAME)))
 			 );
-		this.first_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FIRST_NAME_NAME));
-		this.last_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
-		this.email = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_EMAIL_NAME));
-		this.fb_user_id = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FB_USER_ID_NAME));
-		this.bio = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_BIO_NAME));
-		this.auto_accept = cursor.getInt(cursor.getColumnIndex(ORMUser.COLUMN_AUTO_ACCEPT_NAME));
-		this.privacy = cursor.getInt(cursor.getColumnIndex(ORMUser.COLUMN_PRIVACY_NAME));
+		this.first_name = 		cursor.getString(
+			cursor.getColumnIndex(ORMUser.COLUMN_FIRST_NAME_NAME));
+		this.last_name = 		cursor.getString(
+			cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
+		this.email = 			cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_EMAIL_NAME));
+		this.fb_user_id = 		cursor.getString(
+			cursor.getColumnIndex(ORMUser.COLUMN_FB_USER_ID_NAME));
+		this.bio = 				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_BIO_NAME));
+		this.url = 				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_URL_NAME));
+		this.auto_accept = 		cursor.getInt(
+			cursor.getColumnIndex(ORMUser.COLUMN_AUTO_ACCEPT_NAME));
+		this.profile_privacy =	cursor.getInt(
+			cursor.getColumnIndex(ORMUser.COLUMN_PROFILE_PRIVACY_NAME));
+		this.search_privacy = 	cursor.getInt(
+			cursor.getColumnIndex(ORMUser.COLUMN_SEARCH_PRIVACY_NAME));
 	}
 
 	public HHUser(Profile profile){
@@ -89,12 +103,20 @@ public class HHUser extends HHBase {
 		return bio;
 	}
 
+	public String getURL() {
+		return url;
+	}
+
 	public int getAutoAccept() {
 		return auto_accept;
 	}
 
-	public int getPrivacy() {
-		return privacy;
+	public int getProfilePrivacy() {
+		return profile_privacy;
+	}
+
+	public int getSearchPrivacy() {
+		return search_privacy;
 	}
 
 	@Override
@@ -147,41 +169,112 @@ public class HHUser extends HHBase {
 		return profilePicture;
 	}
 
-	public static boolean friendIsFollowed(HHUserFull user, HHUser friend){
+
+	public static boolean userIsFriend(long testID){
+		return userIsFriend(getCurrentUser(), testID);
+	}
+
+	public static boolean userIsFollowed(long testID){
+		return userIsFollowed(getCurrentUser(), testID);
+	}
+
+	public static boolean userFollowsMe(long testID){
+		return userFollowsMe(getCurrentUser(), testID);
+	}
+
+	public static boolean userIsRequested(long testID){
+		return userIsRequested(getCurrentUser(), testID);
+	}
+
+	public static boolean userRequestedMe(long testID){
+		return userRequestedMe(getCurrentUser(), testID);
+	}
+
+	public static boolean userIsFriend(HHUser testUser){
+		return userIsFriend(getCurrentUser(), testUser.getID());
+	}
+
+	public static boolean userIsFollowed(HHUser testUser){
+		return userIsFollowed(getCurrentUser(), testUser.getID());
+	}
+
+	public static boolean userFollowsMe(HHUser testUser){
+		return userFollowsMe(getCurrentUser(), testUser.getID());
+	}
+
+	public static boolean userIsRequested(HHUser testUser){
+		return userIsRequested(getCurrentUser(), testUser.getID());
+	}
+
+	public static boolean userRequestedMe(HHUser testUser){
+		return userRequestedMe(getCurrentUser(), testUser.getID());
+	}
+
+	public static boolean userIsFriend(HHUserFull user, HHUser testUser){
+		return userIsFriend(user, testUser.getID());
+	}
+
+	public static boolean userIsFollowed(HHUserFull user, HHUser testUser){
+		return userIsFollowed(user, testUser.getID());
+	}
+
+	public static boolean userFollowsMe(HHUserFull user, HHUser testUser){
+		return userFollowsMe(user, testUser.getID());
+	}
+
+	public static boolean userIsRequested(HHUserFull user, HHUser testUser){
+		return userIsRequested(user, testUser.getID());
+	}
+
+	public static boolean userRequestedMe(HHUserFull user, HHUser testUser){
+		return userRequestedMe(user, testUser.getID());
+	}
+
+	public static boolean userIsFriend(HHUserFull user, long testID){
+		for (HHFriendshipUser follow : user.getFriendships()){
+			if (follow.getUser().getID() == testID){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean userIsFollowed(HHUserFull user, long testID){
 		for (HHFollowUser follow : user.getFollowOuts()){
-			if (follow.getUser().equals(friend)){
+			if (follow.getUser().getID() == testID){
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static boolean friendFollowsMe(HHUserFull user, HHUser friend){
+	public static boolean userFollowsMe(HHUserFull user, long testID){
 		for (HHFollowUser follow : user.getFollowIns()){
-			if (follow.getUser().equals(friend)){
+			if (follow.getUser().getID() == testID){
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static boolean friendIsRequested(HHUserFull user, HHUser friend){
+	public static boolean userIsRequested(HHUserFull user, long testID){
 		for (HHFollowRequestUser follow : user.getFollowOutRequests()){
-			if (follow.getUser().equals(friend)){
+			if (follow.getUser().getID() == testID){
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static boolean friendRequestedMe(HHUserFull user, HHUser friend){
+	public static boolean userRequestedMe(HHUserFull user, long testID){
 		for (HHFollowRequestUser follow : user.getFollowInRequests()){
-			if (follow.getUser().equals(friend)){
+			if (follow.getUser().getID() == testID){
 				return true;
 			}
 		}
 		return false;
 	}
+
 
 	public static class HHUserSpan extends ClickableSpan {
 		private final HHUser user;

@@ -17,9 +17,9 @@ public class HHTagUser {
 		this.user = nested.getUser();
 	}
 
-	public HHTagUser(Cursor cursor){
+	public HHTagUser(Cursor cursor, String userIDColumnIndex){
 		this.tag = new HHTag(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 	}
 
 	public HHTag getTag() {

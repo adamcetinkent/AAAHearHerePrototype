@@ -44,9 +44,9 @@ public class HHPostFull implements Comparable {
 		this.tags = null;
 	}
 
-	public HHPostFull(Cursor cursor){
+	public HHPostFull(Cursor cursor, String userIDColumnIndex){
 		this.post = new HHPost(cursor);
-		this.user = new HHUser(cursor);
+		this.user = new HHUser(cursor, userIDColumnIndex);
 		this.track = new HHCachedSpotifyTrack(cursor);
 	}
 

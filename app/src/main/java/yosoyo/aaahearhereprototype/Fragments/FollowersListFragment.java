@@ -493,15 +493,15 @@ public class FollowersListFragment extends FeedbackFragment {
 							return -1;
 
 						int lhsScore =
-							(HHUser.friendRequestedMe(currentUser, lhs.getUser()) ? 1 : 0)
-								+ (HHUser.friendIsRequested(currentUser, lhs.getUser()) ? 2 : 0)
-								+ (HHUser.friendFollowsMe(currentUser, lhs.getUser()) ? 4 : 0)
-								+ (HHUser.friendIsFollowed(currentUser, lhs.getUser()) ? 8 : 0);
+							(HHUser.userRequestedMe(currentUser, lhs.getUser()) ? 1 : 0)
+								+ (HHUser.userIsRequested(currentUser, lhs.getUser()) ? 2 : 0)
+								+ (HHUser.userFollowsMe(currentUser, lhs.getUser()) ? 4 : 0)
+								+ (HHUser.userIsFollowed(currentUser, lhs.getUser()) ? 8 : 0);
 						int rhsScore =
-							(HHUser.friendRequestedMe(currentUser, rhs.getUser()) ? 1 : 0)
-								+ (HHUser.friendIsRequested(currentUser, rhs.getUser()) ? 2 : 0)
-								+ (HHUser.friendFollowsMe(currentUser, rhs.getUser()) ? 4 : 0)
-								+ (HHUser.friendIsFollowed(currentUser, rhs.getUser()) ? 8 : 0);
+							(HHUser.userRequestedMe(currentUser, rhs.getUser()) ? 1 : 0)
+								+ (HHUser.userIsRequested(currentUser, rhs.getUser()) ? 2 : 0)
+								+ (HHUser.userFollowsMe(currentUser, rhs.getUser()) ? 4 : 0)
+								+ (HHUser.userIsFollowed(currentUser, rhs.getUser()) ? 8 : 0);
 
 						if (lhsScore != rhsScore)
 							return rhsScore - lhsScore;
@@ -548,10 +548,10 @@ public class FollowersListFragment extends FeedbackFragment {
 				holder.btnAcceptClickListener.setUser(follow.getUser());
 				holder.btnDeleteOnClickListener.setUser(follow.getUser());
 
-				boolean friendIsFollowed = HHUser.friendIsFollowed(currentUser, follow.getUser());
-				boolean friendFollowsMe = HHUser.friendFollowsMe(currentUser, follow.getUser());
-				boolean friendIsRequested = HHUser.friendIsRequested(currentUser, follow.getUser());
-				boolean friendRequestedMe = HHUser.friendRequestedMe(currentUser, follow.getUser());
+				boolean friendIsFollowed = HHUser.userIsFollowed(currentUser, follow.getUser());
+				boolean friendFollowsMe = HHUser.userFollowsMe(currentUser, follow.getUser());
+				boolean friendIsRequested = HHUser.userIsRequested(currentUser, follow.getUser());
+				boolean friendRequestedMe = HHUser.userRequestedMe(currentUser, follow.getUser());
 
 				if (friendIsFollowed) {
 					holder.btnFollow.setVisibility(View.GONE);

@@ -11,51 +11,43 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
-import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
-	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/";
+class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "GetUserPrivacyTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/privacy/by/%1$d/for/%2$d/";
 
 	public interface Callback {
-		void returnPosts(List<HHPostFullProcess> postsToProcess);
+		void returnUserPrivacy(boolean userPrivacy);
 	}
 
 	private final long userID;
 	private final Callback callbackTo;
 
-	public GetPostsUserTask(long userID, Callback callbackTo) {
+	public GetUserPrivacyTask(long userID, Callback callbackTo) {
 		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
 
 	@Override
-	protected List<HHPostFullProcess> doInBackground(Void... params) {
+	protected Boolean doInBackground(Void... params) {
 		String urlString = String.format(VM_SERVER_ADDRESS,
 										 userID,
 										 HHUser.getCurrentUserID());
-		Log.d(TAG, "Fetching Posts by " + urlString);
+		Log.d(TAG, "Fetching user privacy by " + urlString);
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				HHPostFullNested[] postsNested = new Gson().fromJson(streamString, HHPostFullNested[].class);
-				List<HHPostFullProcess> posts = new ArrayList<>(postsNested.length);
-				for (HHPostFullNested postNested : postsNested) {
-					posts.add(new HHPostFullProcess(postNested));
-				}
-				return posts;
+				Boolean userPrivacy = new Gson().fromJson(streamString, Boolean.class);
+				return userPrivacy;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -69,8 +61,8 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 
 	@Override
 	// Fires once doInBackground is completed
-	protected void onPostExecute(List<HHPostFullProcess> result) {
-		callbackTo.returnPosts(result);	// sends results back
+	protected void onPostExecute(Boolean userPrivacy) {
+		callbackTo.returnUserPrivacy(userPrivacy);	// sends results back
 	}
 
 }
