@@ -224,11 +224,17 @@ public class AsyncDataManager {
 	}
 
 	public static void getUserPostCount(final long userID, final GetUserPostCountCallback callback) {
-		getUserPostCount(context, userID, callback);
+		getUserPostCount(context, userID, false, callback);
 	}
 
-	public static void getUserPostCount(Context context, final long userID, final GetUserPostCountCallback callback){
-		getUserCachedPostCount(context, userID, callback);
+	public static void getUserPostCount(final long userID, final boolean webOnly, final GetUserPostCountCallback callback) {
+		getUserPostCount(context, userID, webOnly, callback);
+	}
+
+	public static void getUserPostCount(Context context, final long userID, final boolean webOnly, final GetUserPostCountCallback callback){
+		if (!webOnly) {
+			getUserCachedPostCount(context, userID, callback);
+		}
 		getUserWebPostCount(userID, callback);
 	}
 
@@ -251,6 +257,94 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetUserPostCount(int postCount) {
 					callback.returnWebUserPostCount(postCount);
+				}
+			}
+		);
+	}
+
+	public interface GetUserFollowersInCountCallback{
+		void returnCachedUserFollowersInCount(int followersInCount);
+		void returnWebUserFollowersInCount(int followersInCount);
+	}
+
+	public static void getUserFollowersInCount(final long userID, final GetUserFollowersInCountCallback callback) {
+		getUserFollowersInCount(context, userID, false, callback);
+	}
+
+	public static void getUserFollowersInCount(final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback) {
+		getUserFollowersInCount(context, userID, webOnly, callback);
+	}
+
+	public static void getUserFollowersInCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback){
+		if (!webOnly) {
+			getUserCachedFollowersInCount(context, userID, callback);
+		}
+		getUserWebFollowersInCount(userID, callback);
+	}
+
+	private static void getUserCachedFollowersInCount(Context context, final long userID, final  GetUserFollowersInCountCallback callback){
+		DatabaseHelper.getUserCachedFollowersInCount(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCachedFollowersInCallback() {
+				@Override
+				public void returnUserCachedFollowersInCount(int followersInCount) {
+					callback.returnCachedUserFollowersInCount(followersInCount);
+				}
+			}
+		);
+	}
+
+	private static void getUserWebFollowersInCount(final long userID, final GetUserFollowersInCountCallback callback){
+		WebHelper.getUserFollowersInCount(
+			userID, new WebHelper.GetUserFollowersInCountCallback() {
+				@Override
+				public void returnGetUserFollowersInCount(int followersInCount) {
+					callback.returnWebUserFollowersInCount(followersInCount);
+				}
+			}
+		);
+	}
+
+	public interface GetUserFollowersOutCountCallback{
+		void returnCachedUserFollowersOutCount(int followersOutCount);
+		void returnWebUserFollowersOutCount(int followersOutCount);
+	}
+
+	public static void getUserFollowersInCount(final long userID, final GetUserFollowersOutCountCallback callback) {
+		getUserFollowersOutCount(context, userID, false, callback);
+	}
+
+	public static void getUserFollowersOutCount(final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback) {
+		getUserFollowersOutCount(context, userID, webOnly, callback);
+	}
+
+	public static void getUserFollowersOutCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback){
+		if (!webOnly) {
+			getUserCachedFollowersOutCount(context, userID, callback);
+		}
+		getUserWebFollowersOutCount(userID, callback);
+	}
+
+	private static void getUserCachedFollowersOutCount(Context context, final long userID, final  GetUserFollowersOutCountCallback callback){
+		DatabaseHelper.getUserCachedFollowersOutCount(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCachedFollowersOutCallback() {
+				@Override
+				public void returnUserCachedFollowersOutCount(int followersOutCount) {
+					callback.returnCachedUserFollowersOutCount(followersOutCount);
+				}
+			}
+		);
+	}
+
+	private static void getUserWebFollowersOutCount(final long userID, final GetUserFollowersOutCountCallback callback){
+		WebHelper.getUserFollowersOutCount(
+			userID, new WebHelper.GetUserFollowersOutCountCallback() {
+				@Override
+				public void returnGetUserFollowersOutCount(int followersOutCount) {
+					callback.returnWebUserFollowersOutCount(followersOutCount);
 				}
 			}
 		);
@@ -499,8 +593,9 @@ public class AsyncDataManager {
 		void returnGetWebUser(final HHUserFull returnedUser);
 	}
 
-	public static void getUser(final long userID, final GetUserCallback callback){
-		getCachedUser(userID, callback);
+	public static void getUser(final long userID, final boolean webOnly, final GetUserCallback callback){
+		if (!webOnly)
+			getCachedUser(userID, callback);
 		getWebUser(userID, callback);
 	}
 

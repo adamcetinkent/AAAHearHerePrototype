@@ -29,7 +29,8 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
 public class WebHelper {
 
 	public static final String TAG = "Web Helper";
-	public static final String SERVER_IP = "http://10.0.1.79:3000";
+	//public static final String SERVER_IP = "http://10.0.1.79:3000";		// MSHAW
+	public static final String SERVER_IP = "http://192.168.5.59:3000";		// KAS
 	//public static final String SERVER_IP = "http://192.168.1.183:3000";
 	//public static final String SERVER_IP = "http://192.168.0.63:3000";
 	//public static final String SERVER_IP = "http://10.72.100.185:3000";
@@ -83,6 +84,32 @@ public class WebHelper {
 			@Override
 			public void returnUserPostCount(int postCount) {
 				callback.returnGetUserPostCount(postCount);
+			}
+		}).execute();
+	}
+
+	public interface GetUserFollowersInCountCallback {
+		void returnGetUserFollowersInCount(int followersInCount);
+	}
+
+	public static void getUserFollowersInCount(final long user_id, final GetUserFollowersInCountCallback callback){
+		new GetUserFollowersInCountTask(user_id, new GetUserFollowersInCountTask.Callback(){
+			@Override
+			public void returnUserFollowersInCount(int followersInCount) {
+				callback.returnGetUserFollowersInCount(followersInCount);
+			}
+		}).execute();
+	}
+
+	public interface GetUserFollowersOutCountCallback {
+		void returnGetUserFollowersOutCount(int followersOutCount);
+	}
+
+	public static void getUserFollowersOutCount(final long user_id, final GetUserFollowersOutCountCallback callback){
+		new GetUserFollowersOutCountTask(user_id, new GetUserFollowersOutCountTask.Callback(){
+			@Override
+			public void returnUserFollowersOutCount(int followersOutCount) {
+				callback.returnGetUserFollowersOutCount(followersOutCount);
 			}
 		}).execute();
 	}

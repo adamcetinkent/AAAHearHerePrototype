@@ -24,11 +24,20 @@ public abstract class FeedbackFragment extends Fragment {
 		}
 	}
 
-	protected void requestUserFeed(HHUser user){
+	protected void requestUserProfile(HHUser user){
 		Bundle bundle = new Bundle();
 		bundle.putLong(USER_ID, user.getID());
 		fragmentChangeRequestListener.requestFragmentChange(
 			FragmentChangeRequestListener.USER_PROFILE_REQUEST, bundle);
+	}
+
+
+	protected void requestFollowerList(HHUser user, int followerType){
+		Bundle bundle = new Bundle();
+		bundle.putLong(USER_ID, user.getID());
+		bundle.putInt(FollowersListFragment.FOLLOWER_TYPE, followerType);
+		fragmentChangeRequestListener.requestFragmentChange(
+			FragmentChangeRequestListener.FOLLOWERS_LIST_REQUEST, bundle);
 	}
 
 }

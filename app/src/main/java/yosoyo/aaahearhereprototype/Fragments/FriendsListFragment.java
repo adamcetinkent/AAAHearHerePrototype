@@ -115,7 +115,7 @@ public class FriendsListFragment extends FeedbackFragment {
 			@Override
 			public void onUserClick(HHUser user) {
 				if (user != null)
-					requestUserFeed(user);
+					requestUserProfile(user);
 			}
 		};
 

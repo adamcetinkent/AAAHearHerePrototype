@@ -32,8 +32,8 @@ public class HHUser extends HHBase {
 	public HHUser(HHUserFullNested nested){
 		super(
 			nested.getID(),
-			nested.getUpdatedAt(),
-			nested.getCreatedAt()
+			nested.getCreatedAt(),
+			nested.getUpdatedAt()
 			 );
 		this.first_name = nested.getFirstName();
 		this.last_name = nested.getLastName();
@@ -47,8 +47,8 @@ public class HHUser extends HHBase {
 	public HHUser(Cursor cursor){
 		super(
 			cursor.getLong(cursor.getColumnIndex(ORMUser.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_UPDATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_CREATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_UPDATED_AT_NAME)))
 			 );
 		this.first_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_FIRST_NAME_NAME));
 		this.last_name = cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
@@ -124,6 +124,7 @@ public class HHUser extends HHBase {
 	}
 
 	private static HHUserFull currentUser;
+	private static long currentUserUpdated;
 	public static HHUserFull getCurrentUser(){
 		return currentUser;
 	}
@@ -132,6 +133,10 @@ public class HHUser extends HHBase {
 	}
 	public static void setCurrentUser(HHUserFull user){
 		currentUser = user;
+		currentUserUpdated = System.currentTimeMillis();
+	}
+	public static long getCurrentUserUpdated(){
+		return currentUserUpdated;
 	}
 
 	private static Bitmap profilePicture;

@@ -2,6 +2,7 @@ package yosoyo.aaahearhereprototype.HHServerClasses.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -144,7 +145,8 @@ public class ORMFollow {
 
 			int deletedRows = database.delete(
 				TABLE_NAME, COLUMN_USER_ID_NAME + "=? AND " + COLUMN_FOLLOWED_USER_ID_NAME + "=?",
-				new String[]{String.valueOf(follow.getFollow().getUserID()), String.valueOf(follow.getFollow().getFollowedUserID())});
+				new String[]{String.valueOf(follow.getFollow().getUserID()), String
+					.valueOf(follow.getFollow().getFollowedUserID())});
 
 			Log.d(TAG, "Deleted " + deletedRows + " rows with ID:" + follow.getFollow().getID());
 
@@ -209,6 +211,100 @@ public class ORMFollow {
 		@Override
 		protected void onPostExecute(Boolean result){
 			callbackTo.returnInsertedManyFollows(user);
+		}
+	}
+
+	public static void getUserFollowersInCount(Context context, final long userID, DBUserFollowersInCountTask.Callback callbackTo){
+		new DBUserFollowersInCountTask(context, userID, callbackTo).execute();
+	}
+
+	protected static class DBUserFollowersInCountTask extends AsyncTask<Void, Void, Integer> {
+
+		private final Context context;
+		private final long userID;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnFollowersInCount(final int followersInCount);
+		}
+
+		public DBUserFollowersInCountTask(Context context, final long userID, Callback callbackTo){
+			this.context = context;
+			this.userID = userID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery(
+				"SELECT ? FROM " + TABLE_NAME +
+					" WHERE " + COLUMN_FOLLOWED_USER_ID_NAME + "=?"
+				, new String[]{
+					COLUMN_USER_ID_NAME,
+					String.valueOf(userID)
+				});
+
+			int postCount = cursor.getCount();
+
+			cursor.close();
+			database.close();
+
+			return postCount;
+		}
+
+		@Override
+		protected void onPostExecute(Integer postCount){
+			callbackTo.returnFollowersInCount(postCount);
+		}
+	}
+
+	public static void getUserFollowersOutCount(Context context, final long userID, DBUserFollowersOutCountTask.Callback callbackTo){
+		new DBUserFollowersOutCountTask(context, userID, callbackTo).execute();
+	}
+
+	protected static class DBUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
+
+		private final Context context;
+		private final long userID;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnFollowersOutCount(final int followersInCount);
+		}
+
+		public DBUserFollowersOutCountTask(Context context, final long userID, Callback callbackTo){
+			this.context = context;
+			this.userID = userID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursor = database.rawQuery(
+				"SELECT ? FROM " + TABLE_NAME +
+					" WHERE " + COLUMN_USER_ID_NAME + "=?"
+				, new String[]{
+					COLUMN_USER_ID_NAME,
+					String.valueOf(userID)
+				});
+
+			int postCount = cursor.getCount();
+
+			cursor.close();
+			database.close();
+
+			return postCount;
+		}
+
+		@Override
+		protected void onPostExecute(Integer postCount){
+			callbackTo.returnFollowersOutCount(postCount);
 		}
 	}
 

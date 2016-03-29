@@ -136,9 +136,9 @@ public class FeedFragment extends FeedbackFragment {
 			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
 			ProfileFragment profileFragment;
 			if (userID == HHUser.getCurrentUserID()) {
-				 profileFragment = ProfileFragment.newInstance(ProfileFragment.HOME_PROFILE, userID);
+				 profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
 			} else {
-				profileFragment = ProfileFragment.newInstance(ProfileFragment.USER_PROFILE, userID);
+				profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER, userID);
 			}
 
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -161,14 +161,14 @@ public class FeedFragment extends FeedbackFragment {
 				@Override
 				public void onUserClick(HHUser user) {
 					if (user.getID() != userID)
-						requestUserFeed(user);
+						requestUserProfile(user);
 				}
 			},
 			new HHUser.HHUserSpan.HHUserSpanClickCallback() {
 				@Override
 				public void onClickSpan(HHUser user) {
 					if (user.getID() != userID)
-						requestUserFeed(user);
+						requestUserProfile(user);
 				}
 			});
 		lstTimeline.setAdapter(lstTimelineAdapter);

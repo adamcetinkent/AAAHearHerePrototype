@@ -29,8 +29,8 @@ public class HHPost extends HHBase {
 	public HHPost(HHPostFullNested nested){
 		super(
 			nested.getID(),
-			nested.getUpdatedAt(),
-			nested.getCreatedAt()
+			nested.getCreatedAt(),
+			nested.getUpdatedAt()
 			 );
 		this.user_id = nested.getUserID();
 		this.track = nested.getTrack();
@@ -55,8 +55,8 @@ public class HHPost extends HHBase {
 	public HHPost(Cursor cursor){
 		super(
 			cursor.getLong(cursor.getColumnIndex(ORMPost.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_UPDATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_CREATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_UPDATED_AT_NAME)))
 			 );
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMPost.COLUMN_USER_ID_NAME));
 		this.track = cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_TRACK_NAME));

@@ -481,6 +481,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		);
 	}
 
+	public interface GetUserCachedFollowersInCallback{
+		void returnUserCachedFollowersInCount(int followersInCount);
+	}
+
+	public static void getUserCachedFollowersInCount(Context context, final long userID, final GetUserCachedFollowersInCallback callback){
+		ORMFollow.getUserFollowersInCount(
+			context,
+			userID,
+			new ORMFollow.DBUserFollowersInCountTask.Callback() {
+				@Override
+				public void returnFollowersInCount(int followersInCount) {
+					callback.returnUserCachedFollowersInCount(followersInCount);
+				}
+			}
+		);
+	}
+
+	public interface GetUserCachedFollowersOutCallback{
+		void returnUserCachedFollowersOutCount(int followersOutCount);
+	}
+
+	public static void getUserCachedFollowersOutCount(Context context, final long userID, final GetUserCachedFollowersOutCallback callback){
+		ORMFollow.getUserFollowersOutCount(
+			context,
+			userID,
+			new ORMFollow.DBUserFollowersOutCountTask.Callback() {
+				@Override
+				public void returnFollowersOutCount(int followersOutCount) {
+					callback.returnUserCachedFollowersOutCount(followersOutCount);
+				}
+			}
+		);
+	}
+
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		createDatabase(db);

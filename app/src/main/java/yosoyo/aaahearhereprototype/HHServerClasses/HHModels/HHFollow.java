@@ -39,8 +39,8 @@ public class HHFollow extends HHBase {
 	public HHFollow(Cursor cursor){
 		super(
 			cursor.getLong(cursor.getColumnIndex(ORMFollow.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollow.COLUMN_UPDATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollow.COLUMN_CREATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollow.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollow.COLUMN_UPDATED_AT_NAME)))
 		);
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFollow.COLUMN_USER_ID_NAME));
 		this.followed_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFollow.COLUMN_FOLLOWED_USER_ID_NAME));

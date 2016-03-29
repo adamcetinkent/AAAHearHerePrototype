@@ -46,8 +46,8 @@ public class HHFollowRequest extends HHBase {
 	public HHFollowRequest(Cursor cursor){
 		super(
 			cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_UPDATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_CREATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_UPDATED_AT_NAME)))
 		);
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_USER_ID_NAME));
 		this.requested_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_REQUESTED_USER_ID_NAME));

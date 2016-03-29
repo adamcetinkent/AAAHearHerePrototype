@@ -41,6 +41,8 @@ public class LocationListenerService extends Service implements HHLocationListen
 		intent.putExtra(HHBroadcastReceiver.DOUBLE_LONGITUDE, location.getLongitude());
 		sendBroadcast(intent);
 
+		Log.d(TAG, "returnNewLocation:: userID: " + userID);
+
 		AsyncDataManager.getPostsAtLocation(
 			this,
 			location,
@@ -54,9 +56,11 @@ public class LocationListenerService extends Service implements HHLocationListen
 						Collections.sort(returnedPosts, new Comparator<HHPostFull>() {
 							@Override
 							public int compare(HHPostFull lhs, HHPostFull rhs) {
-								double lhsR2 = Math.pow(lhs.getPost().getLat() - location.getLatitude(), 2)
+								double lhsR2 = Math
+									.pow(lhs.getPost().getLat() - location.getLatitude(), 2)
 									+ Math.pow(lhs.getPost().getLon() - location.getLongitude(), 2);
-								double rhsR2 = Math.pow(rhs.getPost().getLat() - location.getLatitude(), 2)
+								double rhsR2 = Math
+									.pow(rhs.getPost().getLat() - location.getLatitude(), 2)
 									+ Math.pow(rhs.getPost().getLon() - location.getLongitude(), 2);
 								double result = lhsR2 - rhsR2;
 
@@ -91,7 +95,8 @@ public class LocationListenerService extends Service implements HHLocationListen
 										.setDefaults(Notification.DEFAULT_VIBRATE)
 										.build();
 
-									NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+									NotificationManager notificationManager = (NotificationManager) getSystemService(
+										Context.NOTIFICATION_SERVICE);
 									notificationManager.notify(NOTIFICATION_ID, notification);
 								}
 							}
@@ -119,25 +124,24 @@ public class LocationListenerService extends Service implements HHLocationListen
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand");
-		if (intent != null)
-			userID = intent.getLongExtra(USER_ID, -1);
+		if (intent != null) {
+			if (intent.hasExtra(USER_ID)) {
+				userID = intent.getLongExtra(USER_ID, -1);
+			}
+		}
+		Log.d(TAG, "userID: "+userID);
 		super.onStartCommand(intent, flags, startId);
-		return START_STICKY;
+		return START_REDELIVER_INTENT;
 	}
 
 	@Override
 	public void onCreate() {
 		Log.d(TAG, "onCreate");
 		initialiseLocationManager();
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-			&& ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+				!= PackageManager.PERMISSION_GRANTED
+			&& ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+				!= PackageManager.PERMISSION_GRANTED) {
 			return;
 		}
 		try {
@@ -149,13 +153,6 @@ public class LocationListenerService extends Service implements HHLocationListen
 		} catch (IllegalArgumentException e){
 			e.printStackTrace();
 		}
-		/*try {
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, locationListeners[0]);
-		} catch (SecurityException e){
-			e.printStackTrace();
-		} catch (IllegalArgumentException e){
-			e.printStackTrace();
-		}*/
 		try {
 			locationManager
 				.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, LOCATION_INTERVAL,
@@ -178,17 +175,10 @@ public class LocationListenerService extends Service implements HHLocationListen
 	public void onDestroy() {
 		Log.d(TAG, "onDestroy");
 		super.onDestroy();
-		if (ActivityCompat.checkSelfPermission(this,
-											   Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat
-			.checkSelfPermission(this,
-								 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+				!= PackageManager.PERMISSION_GRANTED
+			&& ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+				!= PackageManager.PERMISSION_GRANTED) {
 			return;
 		}
 		if (locationManager != null){

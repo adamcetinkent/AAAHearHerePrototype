@@ -39,6 +39,7 @@ import java.util.Map;
 
 import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import yosoyo.aaahearhereprototype.Fragments.FeedbackFragment;
+import yosoyo.aaahearhereprototype.Fragments.FollowersListFragment;
 import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
@@ -431,12 +432,22 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					fragment = selectItem(R.string.navigation_option_profile);
 				} else {
 					long userID = bundle.getLong(FeedbackFragment.USER_ID);
-					selectItem(R.string.navigation_option_user_profile);
 					if (userID == HHUser.getCurrentUserID()){
+						selectItem(R.string.navigation_option_user_profile);
 						fragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, userID);
 					} else {
 						fragment = FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, userID);
 					}
+				}
+				break;
+			}
+			case FragmentChangeRequestListener.FOLLOWERS_LIST_REQUEST:{
+				if (bundle == null){
+
+				} else {
+					long userID = bundle.getLong(FeedbackFragment.USER_ID);
+					int followerType = bundle.getInt(FollowersListFragment.FOLLOWER_TYPE);
+					fragment = FollowersListFragment.newInstance(followerType, userID);
 				}
 				break;
 			}

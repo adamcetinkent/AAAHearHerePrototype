@@ -28,8 +28,8 @@ public class HHFriendship extends HHBase {
 	public HHFriendship(Cursor cursor){
 		super(
 			cursor.getLong(cursor.getColumnIndex(ORMFriendship.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_UPDATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_CREATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_CREATED_AT_NAME))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_UPDATED_AT_NAME)))
 		);
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFriendship.COLUMN_USER_ID_NAME));
 		this.friend_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFriendship.COLUMN_FRIEND_USER_ID_NAME));

@@ -69,8 +69,6 @@ public class UserSearchFragment extends FeedbackFragment {
 		item.setActionView(searchView);
 		searchView.setIconified(false);
 		searchView.requestFocusFromTouch();
-		//MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-		//MenuItemCompat.setActionView(item, searchView);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
@@ -162,7 +160,7 @@ public class UserSearchFragment extends FeedbackFragment {
 			@Override
 			public void onUserClick(HHUser user) {
 				if (user != null)
-					requestUserFeed(user);
+					requestUserProfile(user);
 			}
 		};
 
