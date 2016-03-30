@@ -30,7 +30,7 @@ public class WebHelper {
 
 	public static final String TAG = "Web Helper";
 	//public static final String SERVER_IP = "http://10.0.1.79:3000";		// MSHAW
-	public static final String SERVER_IP = "http://192.168.5.59:3000";		// KAS
+	public static final String SERVER_IP = "http://192.168.5.105:3000";		// KAS
 	//public static final String SERVER_IP = "http://192.168.1.183:3000";
 	//public static final String SERVER_IP = "http://192.168.0.63:3000";
 	//public static final String SERVER_IP = "http://10.72.100.185:3000";

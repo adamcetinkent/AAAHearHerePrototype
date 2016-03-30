@@ -196,36 +196,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/list_row_timeline_llTagFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:background="#fff4f4f4"
-        android:padding="5dp">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/tag"
-            android:cropToPadding="true"
-            android:adjustViewBounds="false"
-            android:layout_marginLeft="5dp"
-            />
-
-        <TextView
-            android:id="@+id/list_row_timeline_txtTags"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/placeholder_tags"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="10dp"/>
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/list_row_timeline_llLikeCommentShare"
         android:layout_width="match_parent"
         android:layout_height="30dp"

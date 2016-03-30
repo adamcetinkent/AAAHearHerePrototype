@@ -343,7 +343,7 @@ public class PostFragment extends Fragment {
 					message.replace(
 						message.getSpanStart(span),
 						message.getSpanEnd(span),
-						"{tag_"+String.format("%1$02d", i)+"}"
+						"{tag_"+String.format("%1$d", span.getUser().getID())+"}"
 					);
 					tags[i] = new HHTag(0, span.getUser().getID());
 				}

@@ -25,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -215,11 +214,12 @@ public class FeedFragment extends FeedbackFragment {
 			true,
 			new AsyncDataManager.GetUserPrivacyCallback() {
 				@Override
-				public void returnCachedUserPrivacy(boolean userPrivacy) {}
+				public void returnCachedUserPrivacy(boolean userPrivacy) {
+				}
 
 				@Override
 				public void returnWebUserPrivacy(boolean userPrivacy) {
-					if (userPrivacy){
+					if (userPrivacy) {
 						AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
 					} else {
 						setPrivateProfile();
@@ -338,8 +338,6 @@ public class FeedFragment extends FeedbackFragment {
 			ToggleButton btnLikeButton;
 			ImageButton btnCommentButton;
 			ImageButton btnShareButton;
-			LinearLayout llTags;
-			TextView txtTags;
 			int groupPosition;
 			boolean addingComment;
 			HHPostFull post;
@@ -383,8 +381,6 @@ public class FeedFragment extends FeedbackFragment {
 				viewHolder.btnLikeButton = (ToggleButton) convertView.findViewById(R.id.list_row_timeline_btnLike);
 				viewHolder.btnCommentButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnComment);
 				viewHolder.btnShareButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnShare);
-				viewHolder.llTags = (LinearLayout) convertView.findViewById(R.id.list_row_timeline_llTagFrame);
-				viewHolder.txtTags = (TextView) convertView.findViewById(R.id.list_row_timeline_txtTags);
 
 				viewHolder.likeCheckListener = new CompoundButton.OnCheckedChangeListener() {
 					@Override
@@ -580,28 +576,32 @@ public class FeedFragment extends FeedbackFragment {
 			viewHolder.txtAlbum.setText(viewHolder.post.getTrack().getAlbum());
 
 			viewHolder.txtMessage.setText(viewHolder.post.getPost().getMessage());
-			Editable message = Editable.Factory.getInstance().newEditable(viewHolder.txtMessage.getText());
-			Pattern pattern = Pattern.compile("\\{tag_\\d\\d\\}");
+			Editable message = Editable.Factory.getInstance().newEditable(
+				viewHolder.txtMessage.getText());
+			Pattern pattern = Pattern.compile("\\{tag_(\\d+)\\}");
 			Matcher matcher = pattern.matcher(message);
-			int inlineTagged = 0;
+
 			while (matcher.find()){
 				int start = matcher.start();
 				int end = matcher.end();
 
-				if (inlineTagged >= viewHolder.post.getTags().size())
-					break;
+				long userID = Long.valueOf(matcher.group(1));
 
-				HHUser tagUser = viewHolder.post.getTags().get(inlineTagged).getUser();
-				String userName = tagUser.getName();
-				message.replace(start, end, userName);
-				message.setSpan(
-					new HHUser.HHUserSpan(tagUser, userSpanClickCallback),
-					start,
-					start + userName.length(),
-					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-				);
+				HHUser tagUser = getTagUser(viewHolder.post.getTags(), userID);
+				if (tagUser != null){
+					String userName = tagUser.getName();
+					message.replace(start, end, userName);
+					message.setSpan(
+						new HHUser.HHUserSpan(tagUser, userSpanClickCallback),
+						start,
+						start + userName.length(),
+						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+					);
+				} else {
+					message.replace(start, end, "");
+				}
+
 				matcher = pattern.matcher(message);
-				inlineTagged++;
 			}
 			viewHolder.txtMessage.setText(message);
 			viewHolder.txtMessage.setMovementMethod(LinkMovementMethod.getInstance());
@@ -616,34 +616,16 @@ public class FeedFragment extends FeedbackFragment {
 			}
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(viewHolder.likeCheckListener);
 
-			if (viewHolder.post.getTags().size() > inlineTagged){
-
-				viewHolder.llTags.setVisibility(View.VISIBLE);
-
-				List<HHTagUser> tags = viewHolder.post.getTags();
-				int youTag = -1;
-				StringBuilder sb;
-				if (tags.get(inlineTagged).getUser().equals(HHUser.getCurrentUser().getUser())) {
-					youTag = inlineTagged;
-					sb = new StringBuilder();
-				} else {
-					sb = new StringBuilder(tags.get(inlineTagged).getUser().getName());
-				}
-				for (int i = inlineTagged + 1; i < tags.size(); i++){
-					if (tags.get(i).getUser().equals(HHUser.getCurrentUser().getUser())){
-						youTag = i;
-					} else {
-						sb.append(", ").append(tags.get(i).getUser().getName());
-					}
-				}
-				viewHolder.txtTags.setText((youTag >= 0 ? "You" + ((youTag > 0) ? ", " : "") : "")
-											   + sb.toString());
-
-			} else {
-				viewHolder.llTags.setVisibility(View.GONE);
-			}
-
 			return convertView;
+		}
+
+		private HHUser getTagUser(List<HHTagUser> tags, long userID){
+			for (HHTagUser tag : tags) {
+				if (tag.getUser().getID() == userID) {
+					return tag.getUser();
+				}
+			}
+			return null;
 		}
 
 		static class ViewHolderChildItem{
