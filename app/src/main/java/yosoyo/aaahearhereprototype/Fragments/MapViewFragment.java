@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +74,7 @@ public class MapViewFragment
 	private static final String LOCATION_ADDRESS_KEY = "location-address";
 	private boolean mAddressRequested;
 	private String mAddressOutput;
-	private ProgressBar mProgressBar;
+	//private ProgressBar mProgressBar;
 
 	private HHCachedSpotifyTrack currentTrack;
 
@@ -166,7 +165,7 @@ public class MapViewFragment
 					updateUIWidgets();
 				}
 			});
-		mProgressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
+		//mProgressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
 		mAddressRequested = false;
 		mAddressOutput = "";
 
@@ -214,10 +213,10 @@ public class MapViewFragment
 
 	private void setUpMap() {
 		if (ActivityCompat.checkSelfPermission(
-			getContext(),
+			getActivity(),
 			Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 			&& ActivityCompat.checkSelfPermission(
-			getContext(),
+			getActivity(),
 			Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 			ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, HolderActivity.LOCATION_PERMISSIONS);
 
@@ -469,10 +468,10 @@ public class MapViewFragment
 	}
 
 	private void updateUIWidgets(){
-		if (mAddressRequested){
+		/*if (mAddressRequested){
 			mProgressBar.setVisibility(ProgressBar.VISIBLE);
 		} else {
 			mProgressBar.setVisibility(ProgressBar.GONE);
-		}
+		}*/
 	}
 }

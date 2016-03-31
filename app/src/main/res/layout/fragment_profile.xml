@@ -7,6 +7,7 @@
                                    android:background="#ffffffff">
 
     <LinearLayout
+        android:id="@+id/fragment_profile_llProfile"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -284,26 +285,32 @@
                 android:layout_marginBottom="5dp"
                 android:text="@string/placeholder_user_name"/>
 
-            <TextView
-                android:id="@+id/fragment_profile_txtBio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="__________________________________________________________________________________________________________________________________________________________"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="10dp"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/fragment_profile_txtURL"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="__________________________________________________________________________________________________________________________________________________________"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="10dp"
-                android:clickable="true"
-                android:autoLink="web"
-                android:linksClickable="true"
-                android:lines="1"/>
+                <TextView
+                    android:id="@+id/fragment_profile_txtBio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="__________________________________________________________________________________________________________________________________________________________"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    />
+
+                <TextView
+                    android:id="@+id/fragment_profile_txtURL"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="__________________________________________________________________________________________________________________________________________________________"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:autoLink="web"
+                    android:linksClickable="true"
+                    android:lines="1"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/fragment_profile_llPrivacy"
@@ -326,6 +333,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/fragment_profile_llProfileMode"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -343,13 +351,33 @@
             android:src="@drawable/comment"
             android:layout_weight="1"/>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
         <ImageView
             android:id="@+id/fragment_profile_btnMap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|center_horizontal"
             android:src="@drawable/map"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            />
+
+        <ToggleButton
+            android:id="@+id/fragment_profile_btnShowHide"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center_vertical|right"
+            android:background="@drawable/ic_updown_toggle"
+            android:scaleType="fitXY"
+            android:textOn=""
+            android:textOff=""
+            android:checked="true"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

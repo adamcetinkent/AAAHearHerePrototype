@@ -45,6 +45,7 @@ import yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
 import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
+import yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
 import yosoyo.aaahearhereprototype.Fragments.RequestFollowFragment;
 import yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
@@ -105,13 +106,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
 			R.string.action_search_users,
+			R.string.navigation_map_test,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
 			R.string.action_friends
 		};
 
-		final int NUM_NAV_STRINGS = 4;
+		final int NUM_NAV_STRINGS = 5;
 		String[] navStrings = new String[NUM_NAV_STRINGS];
 		for (int i = 0; i < NUM_NAV_STRINGS; i++){
 			navStrings[i] = getString(navOptions[i]);
@@ -301,6 +303,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 			case R.string.action_search_users: {
 				fragment = new UserSearchFragment();
+				break;
+			}
+			case R.string.navigation_map_test: {
+				fragment = new ProfileMapFragment();
 				break;
 			}
 			default: {

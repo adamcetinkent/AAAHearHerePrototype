@@ -4,15 +4,21 @@ package yosoyo.aaahearhereprototype.Fragments;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
@@ -36,34 +42,56 @@ public class ProfileFragment extends FeedbackFragment {
 	public static final int PROFILE_TYPE_CURRENT_USER = 0;
 	public static final int PROFILE_TYPE_OTHER_USER = 1;
 
+	private int profileMode;
+	public static final String PROFILE_MODE = "profile_mode";
+	public static final int PROFILE_MODE_FEED = 0;
+	public static final int PROFILE_MODE_MAP = 1;
+
 	private long userID = -1;
 	private HHUserFull user;
 
-	private ImageView btnFollow;
-	private ProgressBar btnFollowProgressBar;
-	private ImageView btnUnfollow;
-	private ProgressBar btnUnfollowProgressBar;
+	private LinearLayout llProfile;
+	private LinearLayout llProfileMode;
 
-	private LinearLayout llRequestedResponse;
+	private ImageView imgProfile;
 
+	private TextView txtUserName;
+	private TextView txtBio;
+	private TextView txtURL;
+	private ImageView imgFollowStatus;
+
+	private LinearLayout llPostsCount;
 	private TextView txtPostsCount;
 	private ProgressBar txtPostsCountProgressBar;
 
+	private LinearLayout llFollowsOutCount;
 	private TextView txtFollowsOutCount;
 	private ProgressBar txtFollowsOutCountProgressBar;
 
+	private LinearLayout llFollowsInCount;
 	private TextView txtFollowsInCount;
 	private ProgressBar txtFollowsInCountProgressBar;
 
-	private ImageView imgFollowStatus;
-
+	private LinearLayout llRequestedResponse;
 	private ImageView btnAccept;
 	private ProgressBar btnAcceptProgressBar;
 	private ImageView btnDelete;
 	private ProgressBar btnDeleteProgressBar;
 
+	private FrameLayout flFollow;
+	private ImageView btnFollow;
+	private ProgressBar btnFollowProgressBar;
+	private ImageView btnUnfollow;
+	private ProgressBar btnUnfollowProgressBar;
+
 	private LinearLayout llPrivacy;
 	private boolean privacy = false;
+
+	private ImageView btnFeed;
+	private ImageView btnMap;
+	private ToggleButton btnShowHide;
+	private boolean readyToHide = false;
+	private boolean alreadyHidden = false;
 
 	private boolean friendIsFollowed;
 	private boolean friendFollowsMe;
@@ -127,6 +155,21 @@ public class ProfileFragment extends FeedbackFragment {
 		// Inflate the layout for this fragment
 		final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+		getViewComponents(view);
+		setBtnShowHideVisibility();
+		txtUserName.setVisibility(View.INVISIBLE);
+		txtBio.setVisibility(View.INVISIBLE);
+		txtURL.setVisibility(View.INVISIBLE);
+
+		view.getViewTreeObserver().addOnGlobalLayoutListener(
+			new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					readyToHide = true;
+					checkBtnShowHide();
+				}
+			});
+
 		switch (profileType){
 			case PROFILE_TYPE_CURRENT_USER:{
 				user = HHUser.getCurrentUser();
@@ -136,6 +179,7 @@ public class ProfileFragment extends FeedbackFragment {
 						@Override
 						public void returnUpdateCurrentUser(boolean success) {
 							user = HHUser.getCurrentUser();
+							readyToHide = true;
 							createView(view);
 						}
 					});
@@ -149,13 +193,16 @@ public class ProfileFragment extends FeedbackFragment {
 						@Override
 						public void returnGetCachedUser(HHUserFull returnedUser) {
 							user = returnedUser;
-							if (user != null)
+							if (user != null) {
+								readyToHide = true;
 								createView(view);
+							}
 						}
 
 						@Override
 						public void returnGetWebUser(HHUserFull returnedUser) {
 							user = returnedUser;
+							readyToHide = true;
 							createView(view);
 						}
 					}
@@ -164,10 +211,49 @@ public class ProfileFragment extends FeedbackFragment {
 			}
 		}
 
-		/*FeedFragment testFragment = FeedFragment.newInstance(FeedFragment.USER_FEED, userID);
-		commitFragmentTransaction(testFragment, false);*/
-
 		return view;
+	}
+
+	private void getViewComponents(View view){
+		llProfile = (LinearLayout) view.findViewById(R.id.fragment_profile_llProfile);
+		llProfileMode = (LinearLayout) view.findViewById(R.id.fragment_profile_llProfileMode);
+
+		imgProfile = (ImageView) view.findViewById(R.id.fragment_profile_imgProfile);
+
+		txtUserName = (TextView) view.findViewById(R.id.fragment_profile_txtUserName);
+		txtBio = (TextView) view.findViewById(R.id.fragment_profile_txtBio);
+		txtURL = (TextView) view.findViewById(R.id.fragment_profile_txtURL);
+		imgFollowStatus = (ImageView) view.findViewById(R.id.fragment_profile_imgFollowStatus);
+
+		llPostsCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llPostsCount);
+		txtPostsCount = (TextView) view.findViewById(R.id.fragment_profile_txtPostsCount);
+		txtPostsCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtPostsCount_progress);
+
+		llFollowsOutCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llFollowsOutCount);
+		txtFollowsOutCount = (TextView)	view.findViewById(R.id.fragment_profile_txtFollowsOutCount);
+		txtFollowsOutCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtFollowsOutCount_progress);
+
+		llFollowsInCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llFollowsInCount);
+		txtFollowsInCount = (TextView) view.findViewById(R.id.fragment_profile_txtFollowsInCount);
+		txtFollowsInCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtFollowsInCount_progress);
+
+		llRequestedResponse = (LinearLayout) view.findViewById(R.id.fragment_profile_llRequestResponse);
+		btnAccept = (ImageView) view.findViewById(R.id.fragment_profile_btnAccept);
+		btnAcceptProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnAccept_progress);
+		btnDelete = (ImageView) view.findViewById(R.id.fragment_profile_btnDelete);
+		btnDeleteProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnDelete_progress);
+
+		flFollow = (FrameLayout) view.findViewById(R.id.fragment_profile_flFollow);
+		btnFollow = (ImageView) view.findViewById(R.id.fragment_profile_btnFollow);
+		btnFollowProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnFollow_progress);
+		btnUnfollow = (ImageView) view.findViewById(R.id.fragment_profile_btnUnfollow);
+		btnUnfollowProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnUnfollow_progress);
+
+		llPrivacy = (LinearLayout) view.findViewById(R.id.fragment_profile_llPrivacy);
+
+		btnFeed = (ImageView) view.findViewById(R.id.fragment_profile_btnFeed);
+		btnMap = (ImageView) view.findViewById(R.id.fragment_profile_btnMap);
+		btnShowHide = (ToggleButton) view.findViewById(R.id.fragment_profile_btnShowHide);
 	}
 
 	private View.OnClickListener onClickAcceptRequestListener = new View.OnClickListener() {
@@ -416,43 +502,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private void createView(View view){
-
-		final ImageView imgProfile = (ImageView) view.findViewById(R.id.fragment_profile_imgProfile);
-
-		final TextView txtUserName = (TextView) view.findViewById(R.id.fragment_profile_txtUserName);
-		final TextView txtBio = (TextView) view.findViewById(R.id.fragment_profile_txtBio);
-		final TextView txtURL = (TextView) view.findViewById(R.id.fragment_profile_txtURL);
-		imgFollowStatus = (ImageView) view.findViewById(R.id.fragment_profile_imgFollowStatus);
-
-		final LinearLayout llPostsCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llPostsCount);
-		txtPostsCount = (TextView) view.findViewById(R.id.fragment_profile_txtPostsCount);
-		txtPostsCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtPostsCount_progress);
-
-		final LinearLayout llFollowsOutCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llFollowsOutCount);
-		txtFollowsOutCount = (TextView)	view.findViewById(R.id.fragment_profile_txtFollowsOutCount);
-		txtFollowsOutCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtFollowsOutCount_progress);
-
-		final LinearLayout llFollowsInCount = (LinearLayout) view.findViewById(R.id.fragment_profile_llFollowsInCount);
-		txtFollowsInCount = (TextView) view.findViewById(R.id.fragment_profile_txtFollowsInCount);
-		txtFollowsInCountProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_txtFollowsInCount_progress);
-
-		llRequestedResponse = (LinearLayout) view.findViewById(R.id.fragment_profile_llRequestResponse);
-		btnAccept = (ImageView) view.findViewById(R.id.fragment_profile_btnAccept);
-		btnAcceptProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnAccept_progress);
-		btnDelete = (ImageView) view.findViewById(R.id.fragment_profile_btnDelete);
-		btnDeleteProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnDelete_progress);
-
-		final FrameLayout flFollow = (FrameLayout) view.findViewById(R.id.fragment_profile_flFollow);
-		btnFollow = (ImageView) view.findViewById(R.id.fragment_profile_btnFollow);
-		btnFollowProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnFollow_progress);
-		btnUnfollow = (ImageView) view.findViewById(R.id.fragment_profile_btnUnfollow);
-		btnUnfollowProgressBar = (ProgressBar) view.findViewById(R.id.fragment_profile_btnUnfollow_progress);
-
-		llPrivacy = (LinearLayout) view.findViewById(R.id.fragment_profile_llPrivacy);
-
-		final ImageView btnFeed = (ImageView) view.findViewById(R.id.fragment_profile_btnFeed);
-		final ImageView btnMap = (ImageView) view.findViewById(R.id.fragment_profile_btnMap);
+	private void createView(final View view){
 
 		WebHelper.getFacebookProfilePicture(
 			user.getUser().getFBUserID(),
@@ -463,19 +513,24 @@ public class ProfileFragment extends FeedbackFragment {
 				}
 			});
 
+		txtUserName.setVisibility(View.VISIBLE);
 		txtUserName.setText(user.getUser().getName());
 
 		if (user.getUser().getBio().isEmpty())
 			txtBio.setVisibility(View.GONE);
-		else
+		else {
 			txtBio.setText(user.getUser().getBio());
+			txtBio.setVisibility(View.VISIBLE);
+		}
 
 		if (user.getUser().getURL().isEmpty())
 			txtURL.setVisibility(View.GONE);
-		else
+		else {
 			txtURL.setText(user.getUser().getURL());
+			txtURL.setVisibility(View.VISIBLE);
+		}
 
-		if (privacy = true)
+		if (privacy == true)
 			llPrivacy.setVisibility(View.VISIBLE);
 
 		llFollowsInCount.setOnClickListener(onClickFollowsInListener);
@@ -507,6 +562,61 @@ public class ProfileFragment extends FeedbackFragment {
 			btnUnfollow.setOnClickListener(onClickUnfollowListener);
 
 		}
+
+		btnShowHide.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+				if (isChecked) {
+					Log.d(TAG, "TRUE");
+					final int translateY = -llProfile.getHeight();
+					llProfile.setVisibility(View.VISIBLE);
+					Animation show = new Animation() {
+
+						@Override
+						protected void applyTransformation(float interpolatedTime, Transformation t) {
+							view.setTranslationY(translateY * (1-interpolatedTime));
+							view.requestLayout();
+							llProfileMode.requestLayout();
+						}
+
+						@Override
+						public boolean willChangeBounds() {
+							return true;
+						}
+					};
+
+					show.setDuration(200);
+					view.startAnimation(show);
+
+				} else {
+					Log.d(TAG, "FALSE");
+					final int translateY = -llProfile.getHeight();
+
+					Animation hide = new Animation() {
+
+						@Override
+						protected void applyTransformation(float interpolatedTime, Transformation t) {
+							view.setTranslationY(translateY * interpolatedTime);
+							view.requestLayout();
+							llProfileMode.requestLayout();
+							if (interpolatedTime == 1){
+								llProfile.setVisibility(View.INVISIBLE);
+							}
+						}
+
+						@Override
+						public boolean willChangeBounds() {
+							return true;
+						}
+					};
+
+					hide.setDuration(200);
+					view.startAnimation(hide);
+				}
+			}
+		});
+
+		checkBtnShowHide();
 
 	}
 
@@ -633,6 +743,24 @@ public class ProfileFragment extends FeedbackFragment {
 		if (llPrivacy != null)
 			llPrivacy.setVisibility(View.VISIBLE);
 		privacy = true;
+	}
+
+	void setProfileMode(int mode){
+		profileMode = mode;
+	}
+
+	void setBtnShowHideVisibility(){
+		if (profileMode != PROFILE_MODE_MAP)
+			btnShowHide.setVisibility(View.INVISIBLE);
+		else
+			btnShowHide.setVisibility(View.VISIBLE);
+	}
+
+	void checkBtnShowHide(){
+		if (profileMode == PROFILE_MODE_MAP && readyToHide && !alreadyHidden && btnShowHide.isChecked()){
+			btnShowHide.setChecked(false);
+			alreadyHidden = true;
+		}
 	}
 
 }
