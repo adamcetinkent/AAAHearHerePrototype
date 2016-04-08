@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.sql.Timestamp;
 
@@ -10,7 +12,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserN
 /**
  * Created by adam on 02/03/16.
  */
-public class HHLike extends HHBase {
+public class HHLike extends HHBase implements Parcelable {
 
 	private final long post_id;
 	private final long user_id;
@@ -58,4 +60,37 @@ public class HHLike extends HHBase {
 	public long getUserID() {
 		return user_id;
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
+		dest.writeLong(post_id);
+		dest.writeLong(user_id);
+	}
+
+	public static final Parcelable.Creator<HHLike> CREATOR = new Parcelable.Creator<HHLike>(){
+
+		@Override
+		public HHLike createFromParcel(Parcel source) {
+			return new HHLike(source);
+		}
+
+		@Override
+		public HHLike[] newArray(int size) {
+			return new HHLike[size];
+		}
+
+	};
+
+	protected HHLike(Parcel in){
+		super(in);
+		post_id = in.readLong();
+		user_id = in.readLong();
+	}
+
 }

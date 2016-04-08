@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -8,7 +10,7 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 /**
  * Created by adam on 23/02/16.
  */
-public class HHCachedSpotifyTrack {
+public class HHCachedSpotifyTrack implements Parcelable {
 
 	private final String trackID;
 	private final String name;
@@ -58,4 +60,43 @@ public class HHCachedSpotifyTrack {
 	public String getPreviewUrl() {
 		return preview_url;
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(trackID);
+		dest.writeString(name);
+		dest.writeString(artist);
+		dest.writeString(album);
+		dest.writeString(image_url);
+		dest.writeString(preview_url);
+	}
+
+	public static final Parcelable.Creator<HHCachedSpotifyTrack> CREATOR = new Parcelable.Creator<HHCachedSpotifyTrack>(){
+
+		@Override
+		public HHCachedSpotifyTrack createFromParcel(Parcel source) {
+			return new HHCachedSpotifyTrack(source);
+		}
+
+		@Override
+		public HHCachedSpotifyTrack[] newArray(int size) {
+			return new HHCachedSpotifyTrack[size];
+		}
+
+	};
+
+	private HHCachedSpotifyTrack(Parcel in){
+		trackID = in.readString();
+		name = in.readString();
+		artist = in.readString();
+		album = in.readString();
+		image_url = in.readString();
+		preview_url = in.readString();
+	}
+
 }

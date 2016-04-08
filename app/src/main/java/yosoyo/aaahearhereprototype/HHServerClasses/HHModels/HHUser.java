@@ -284,6 +284,7 @@ public class HHUser extends HHBase implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
 		dest.writeString(	first_name);
 		dest.writeString(	last_name);
 		dest.writeString(	fb_user_id);
@@ -310,6 +311,7 @@ public class HHUser extends HHBase implements Parcelable {
 	};
 
 	private HHUser(Parcel in){
+		super(in);
 		first_name = 		in.readString();
 		last_name = 		in.readString();
 		fb_user_id = 		in.readString();

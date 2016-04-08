@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -10,7 +12,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
 /**
  * Created by adam on 02/03/16.
  */
-public class HHPostFull implements Comparable {
+public class HHPostFull implements Comparable, Parcelable {
 
 	private final HHPost post;
 	private final HHUser user;
@@ -108,6 +110,44 @@ public class HHPostFull implements Comparable {
 	@Override
 	public int hashCode() {
 		return (int) post.id;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeParcelable(post, flags);
+		dest.writeParcelable(user, flags);
+		dest.writeParcelable(track, flags);
+		dest.writeTypedList(comments);
+		dest.writeTypedList(likes);
+		dest.writeTypedList(tags);
+	}
+
+	private final static Parcelable.Creator<HHPostFull> CREATOR = new Parcelable.Creator<HHPostFull>(){
+
+		@Override
+		public HHPostFull createFromParcel(Parcel source) {
+			return new HHPostFull(source);
+		}
+
+		@Override
+		public HHPostFull[] newArray(int size) {
+			return new HHPostFull[size];
+		}
+
+	};
+
+	private HHPostFull(Parcel in){
+		post = in.readParcelable(HHPost.class.getClassLoader());
+		user = in.readParcelable(HHUser.class.getClassLoader());
+		track = in.readParcelable(HHCachedSpotifyTrack.class.getClassLoader());
+		in.readTypedList(comments, HHCommentUser.CREATOR);
+		in.readTypedList(likes, HHLikeUser.CREATOR);
+		in.readTypedList(tags, HHTagUser.CREATOR);
 	}
 
 }

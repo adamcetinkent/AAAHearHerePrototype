@@ -1,13 +1,16 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshipUserNested;
 
 /**
  * Created by adam on 10/03/16.
  */
-public class HHFriendshipUser {
+public class HHFriendshipUser implements Parcelable {
 
 	private final HHFriendship friendship;
 	private final HHUser user;
@@ -28,6 +31,42 @@ public class HHFriendshipUser {
 
 	public HHUser getUser() {
 		return user;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		friendship.writeToParcel(dest,flags);
+		user.writeToParcel(dest, flags);
+	}
+
+	public static final Parcelable.Creator<HHFriendshipUser> CREATOR = new Parcelable.Creator<HHFriendshipUser>(){
+
+		@Override
+		public HHFriendshipUser createFromParcel(Parcel source) {
+			return new HHFriendshipUser(source);
+		}
+
+		@Override
+		public HHFriendshipUser[] newArray(int size) {
+			return new HHFriendshipUser[size];
+		}
+
+	};
+
+	private HHFriendshipUser(Parcel in){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			friendship = in.readTypedObject(HHFriendship.CREATOR);
+			user = in.readTypedObject(HHUser.CREATOR);
+		} else {
+			// TODO
+			friendship = null;
+			user = null;
+		}
 	}
 
 }

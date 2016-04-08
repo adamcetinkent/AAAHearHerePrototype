@@ -105,13 +105,12 @@ public class HHUserFull implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		//private final HHUser user;
-		/*private List<HHFriendshipUser> friendships;
-		private List<HHFollowUser> followOuts;
-		private List<HHFollowUser> followIns;
-		private List<HHFollowRequestUser> followOutRequests;
-		private List<HHFollowRequestUser> followInRequests;*/
 		dest.writeParcelable(user, flags);
+		dest.writeTypedList(friendships);
+		dest.writeTypedList(followOuts);
+		dest.writeTypedList(followIns);
+		dest.writeTypedList(followOutRequests);
+		dest.writeTypedList(followInRequests);
 	}
 
 	private final static Parcelable.Creator<HHUserFull> CREATOR = new Parcelable.Creator<HHUserFull>(){
@@ -130,6 +129,11 @@ public class HHUserFull implements Parcelable {
 
 	private HHUserFull(Parcel in){
 		user = in.readParcelable(HHUser.class.getClassLoader());
+		in.readTypedList(friendships, HHFriendshipUser.CREATOR);
+		in.readTypedList(followOuts, HHFollowUser.CREATOR);
+		in.readTypedList(followIns, HHFollowUser.CREATOR);
+		in.readTypedList(followOutRequests, HHFollowRequestUser.CREATOR);
+		in.readTypedList(followInRequests, HHFollowRequestUser.CREATOR);
 	}
 
 }

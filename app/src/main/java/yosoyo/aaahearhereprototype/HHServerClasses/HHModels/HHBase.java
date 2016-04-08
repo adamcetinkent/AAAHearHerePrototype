@@ -1,5 +1,7 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
+import android.os.Parcel;
+
 import java.sql.Timestamp;
 
 /**
@@ -17,6 +19,12 @@ public abstract class HHBase {
 		this.id = id;
 		this.created_at = created_at;
 		this.updated_at = updated_at;
+	}
+
+	public HHBase(Parcel in) {
+		this.id = in.readLong();
+		this.created_at = Timestamp.valueOf(in.readString());
+		this.updated_at = Timestamp.valueOf(in.readString());
 	}
 
 	public long getID(){
@@ -45,5 +53,11 @@ public abstract class HHBase {
 	@Override
 	public int hashCode() {
 		return (int) (id ^ (id >>> 32));
+	}
+
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(id);
+		dest.writeString(created_at.toString());
+		dest.writeString(updated_at.toString());
 	}
 }

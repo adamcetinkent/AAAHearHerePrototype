@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.sql.Timestamp;
 
@@ -10,7 +12,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHCommentUs
 /**
  * Created by adam on 02/03/16.
  */
-public class HHComment extends HHLike {
+public class HHComment extends HHLike implements Parcelable {
 
 	private final String message;
 
@@ -43,6 +45,36 @@ public class HHComment extends HHLike {
 
 	public String getMessage() {
 		return message;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
+		dest.writeString(message);
+	}
+
+	public static final Parcelable.Creator<HHComment> CREATOR = new Parcelable.Creator<HHComment>(){
+
+		@Override
+		public HHComment createFromParcel(Parcel source) {
+			return new HHComment(source);
+		}
+
+		@Override
+		public HHComment[] newArray(int size) {
+			return new HHComment[size];
+		}
+
+	};
+
+	private HHComment(Parcel in){
+		super(in);
+		message = in.readString();
 	}
 
 }

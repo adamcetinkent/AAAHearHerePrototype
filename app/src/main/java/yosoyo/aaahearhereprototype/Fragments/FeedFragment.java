@@ -9,6 +9,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -59,21 +60,26 @@ public class FeedFragment extends FeedbackFragment {
 	private static final String TAG = FeedFragment.class.getSimpleName();
 
 	private int feedType;
-	public static final String FEED_TYPE = "feed_type";
+	public static final String KEY_FEED_TYPE = "feed_type";
 	public static final int GENERAL_FEED = 0;
 	public static final int HOME_PROFILE_FEED = 1;
 	public static final int USER_PROFILE_FEED = 2;
 
+	public static final String KEY_USER_ID = "user_id";
 	private long userID = -1;
+
+	public static final String KEY_FETCH_DATA = "fetch_data";
+	private boolean fetchData = true;
 
 	private ProfileFragment profileFragment;
 	private Bundle profileFragmentBundle;
-	private int profileFragmentID;
-	public static final String KEY_PROFILE_FRAGMENT_ID = "profile_fragment_id";
+	/*private int profileFragmentID;
+	public static final String KEY_PROFILE_FRAGMENT_ID = "profile_fragment_id";*/
 
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	private List<HHPostFull> posts = new ArrayList<>();
+	public static final String KEY_POSTS = "posts";
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -83,7 +89,7 @@ public class FeedFragment extends FeedbackFragment {
 		FeedFragment feedFragment = new FeedFragment();
 
 		Bundle arguments = new Bundle();
-		arguments.putInt(FEED_TYPE, feedType);
+		arguments.putInt(KEY_FEED_TYPE, feedType);
 		arguments.putLong(USER_ID, userID);
 		feedFragment.setArguments(arguments);
 
@@ -98,6 +104,7 @@ public class FeedFragment extends FeedbackFragment {
 		this.profileFragmentBundle = bundle;
 	}
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,13 +117,17 @@ public class FeedFragment extends FeedbackFragment {
 		}
 
 		if (savedInstanceState != null){
-			profileFragmentID = savedInstanceState.getInt(KEY_PROFILE_FRAGMENT_ID);
+			feedType = savedInstanceState.getInt(KEY_FEED_TYPE);
+			fetchData = savedInstanceState.getBoolean(KEY_FETCH_DATA);
+			userID = savedInstanceState.getInt(KEY_USER_ID);
+			posts = savedInstanceState.getParcelableArrayList(KEY_POSTS);
+			profileFragmentBundle = savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
 		}
 
 	}
 
 	private void handleArguments(Bundle arguments){
-		feedType = arguments.getInt(FEED_TYPE);
+		feedType = arguments.getInt(KEY_FEED_TYPE);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
 			userID = arguments.getLong(USER_ID);
@@ -140,10 +151,16 @@ public class FeedFragment extends FeedbackFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
+		outState.putInt(KEY_FEED_TYPE, feedType);
+		outState.putBoolean(KEY_FETCH_DATA, fetchData);
+		outState.putLong(KEY_USER_ID, userID);
+		outState.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+
 		if (profileFragmentBundle != null){
 			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
 		} else if (profileFragment != null) {
-			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragment.getBundle());
+			profileFragmentBundle = profileFragment.getBundle();
+			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
 		}
 
 	}
@@ -216,16 +233,20 @@ public class FeedFragment extends FeedbackFragment {
 			});
 		lstTimeline.setAdapter(lstTimelineAdapter);
 
-		switch (feedType){
-			case GENERAL_FEED: {
-				getAllData();
-				break;
+		if (fetchData) {
+			switch (feedType) {
+				case GENERAL_FEED: {
+					getAllData();
+					break;
+				}
+				case HOME_PROFILE_FEED:
+				case USER_PROFILE_FEED: {
+					getUserData();
+					break;
+				}
 			}
-			case HOME_PROFILE_FEED:
-			case USER_PROFILE_FEED:{
-				getUserData();
-				break;
-			}
+		} else {
+			notifyAdapter();
 		}
 
 		return view;
@@ -237,6 +258,7 @@ public class FeedFragment extends FeedbackFragment {
 			Log.d(TAG, "Cached posts returned");
 			posts = ZZZUtility.mergeLists(posts, cachedPosts);
 			notifyAdapter();
+			fetchData = false;	//TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
 		}
 
 		@Override
@@ -244,6 +266,7 @@ public class FeedFragment extends FeedbackFragment {
 			Log.d(TAG, "Web post returned!");
 			posts = ZZZUtility.updateList(posts, webPost);
 			notifyAdapter();
+			fetchData = false; //TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
 		}
 	};
 

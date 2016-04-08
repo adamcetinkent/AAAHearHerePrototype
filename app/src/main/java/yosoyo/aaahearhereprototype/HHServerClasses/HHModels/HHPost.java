@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.sql.Timestamp;
 
@@ -10,7 +12,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
 /**
  * Created by adam on 18/02/16.
  */
-public class HHPost extends HHBase {
+public class HHPost extends HHBase implements Parcelable {
 
 	private long user_id;
 	private String track;
@@ -91,4 +93,45 @@ public class HHPost extends HHBase {
 		return google_place_id;
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeToParcel(dest, flags);
+		dest.writeLong(user_id);
+		dest.writeString(track);
+		dest.writeDouble(lat);
+		dest.writeDouble(lon);
+		dest.writeString(place_name);
+		dest.writeString(google_place_id);
+		dest.writeString(message);
+	}
+
+	public static final Parcelable.Creator<HHPost> CREATOR = new Parcelable.Creator<HHPost>(){
+
+		@Override
+		public HHPost createFromParcel(Parcel source) {
+			return new HHPost(source);
+		}
+
+		@Override
+		public HHPost[] newArray(int size) {
+			return new HHPost[size];
+		}
+
+	};
+
+	private HHPost(Parcel in){
+		super(in);
+		user_id = 			in.readLong();
+		track = 			in.readString();
+		lat = 				in.readDouble();
+		lon = 				in.readDouble();
+		place_name = 		in.readString();
+		google_place_id = 	in.readString();
+		message = 			in.readString();
+	}
 }
