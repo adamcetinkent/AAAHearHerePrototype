@@ -3,6 +3,8 @@ package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -19,7 +21,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 /**
  * Created by adam on 18/02/16.
  */
-public class HHUser extends HHBase {
+public class HHUser extends HHBase implements Parcelable {
 
 	private final String first_name;
 	private final String last_name;
@@ -275,6 +277,49 @@ public class HHUser extends HHBase {
 		return false;
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(	first_name);
+		dest.writeString(	last_name);
+		dest.writeString(	fb_user_id);
+		dest.writeString(	email);
+		dest.writeString(	bio);
+		dest.writeString(	url);
+		dest.writeInt(		auto_accept);
+		dest.writeInt(		profile_privacy);
+		dest.writeInt(		search_privacy);
+	}
+
+	public static final Parcelable.Creator<HHUser> CREATOR = new Parcelable.Creator<HHUser>(){
+
+		@Override
+		public HHUser createFromParcel(Parcel source) {
+			return new HHUser(source);
+		}
+
+		@Override
+		public HHUser[] newArray(int size) {
+			return new HHUser[size];
+		}
+
+	};
+
+	private HHUser(Parcel in){
+		first_name = 		in.readString();
+		last_name = 		in.readString();
+		fb_user_id = 		in.readString();
+		email = 			in.readString();
+		bio = 				in.readString();
+		url = 				in.readString();
+		auto_accept = 		in.readInt();
+		profile_privacy = 	in.readInt();
+		search_privacy = 	in.readInt();
+	}
 
 	public static class HHUserSpan extends ClickableSpan {
 		private final HHUser user;

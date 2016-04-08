@@ -67,6 +67,9 @@ public class FeedFragment extends FeedbackFragment {
 	private long userID = -1;
 
 	private ProfileFragment profileFragment;
+	private Bundle profileFragmentBundle;
+	private int profileFragmentID;
+	public static final String KEY_PROFILE_FRAGMENT_ID = "profile_fragment_id";
 
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
@@ -91,6 +94,10 @@ public class FeedFragment extends FeedbackFragment {
 		// Required empty public constructor
 	}
 
+	public void setProfileFragmentBundle(Bundle bundle){
+		this.profileFragmentBundle = bundle;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,6 +107,10 @@ public class FeedFragment extends FeedbackFragment {
 		Bundle arguments = getArguments();
 		if (arguments != null){
 			handleArguments(arguments);
+		}
+
+		if (savedInstanceState != null){
+			profileFragmentID = savedInstanceState.getInt(KEY_PROFILE_FRAGMENT_ID);
 		}
 
 	}
@@ -126,6 +137,18 @@ public class FeedFragment extends FeedbackFragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		if (profileFragmentBundle != null){
+			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
+		} else if (profileFragment != null) {
+			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragment.getBundle());
+		}
+
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
@@ -135,16 +158,36 @@ public class FeedFragment extends FeedbackFragment {
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
 			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
-			if (userID == HHUser.getCurrentUserID()) {
-				 profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
+
+			if (profileFragmentBundle != null){
+				profileFragment = ProfileFragment.newInstance(profileFragmentBundle);
 			} else {
-				profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER, userID);
+
+				if (savedInstanceState == null && profileFragment == null) {
+					if (userID == HHUser.getCurrentUserID()) {
+						profileFragment = ProfileFragment
+							.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
+					} else {
+						profileFragment = ProfileFragment
+							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER, userID);
+					}
+				} else if (profileFragment != null) {
+					profileFragmentBundle = profileFragment.getBundle();
+					profileFragment = ProfileFragment.newInstance(profileFragmentBundle);
+				} else {
+					if (savedInstanceState.containsKey(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE)) {
+						profileFragment = ProfileFragment.newInstance(savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE));
+					}
+				}
 			}
 
-			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_frame_frame, profileFragment);
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-			ft.commit();
+			if (profileFragment != null) {
+				profileFragment.setProfileMode(ProfileFragment.PROFILE_MODE_FEED);
+				FragmentTransaction ft = getFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_frame_frame, profileFragment);
+				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+				ft.commit();
+			}
 
 			lstTimeline.addHeaderView(headerView);
 		}

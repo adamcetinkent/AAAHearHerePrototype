@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
@@ -28,6 +27,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.R;
+import yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -38,16 +38,22 @@ public class ProfileFragment extends FeedbackFragment {
 	private static final String TAG = ProfileFragment.class.getSimpleName();
 
 	private int profileType;
-	public static final String PROFILE_TYPE = "profile_type";
+	public static final String KEY_PROFILE_TYPE = "profile_type";
 	public static final int PROFILE_TYPE_CURRENT_USER = 0;
 	public static final int PROFILE_TYPE_OTHER_USER = 1;
 
 	private int profileMode;
-	public static final String PROFILE_MODE = "profile_mode";
+	public static final String KEY_PROFILE_MODE = "profile_mode";
 	public static final int PROFILE_MODE_FEED = 0;
 	public static final int PROFILE_MODE_MAP = 1;
 
+	private boolean fetchData = true;
+	public static final String KEY_FETCH_DATA = "fetch_data";
+
+	public static final String KEY_USER_ID = "user_id";
 	private long userID = -1;
+
+	public static final String KEY_USER = "user";
 	private HHUserFull user;
 
 	private LinearLayout llProfile;
@@ -89,22 +95,43 @@ public class ProfileFragment extends FeedbackFragment {
 
 	private ImageView btnFeed;
 	private ImageView btnMap;
-	private ToggleButton btnShowHide;
+	private AutoShowHideButton btnShowHide;
 	private boolean readyToHide = false;
 	private boolean alreadyHidden = false;
+	private boolean btnHideManualOverride = false;
+	private boolean btnHideManualState = false;
+	public static final String KEY_BUTTON_HIDE_MANUAL_OVERRIDE = "button_hide_manual_override";
+	public static final String KEY_BUTTON_HIDE_MANUAL_STATE = "button_hide_manual_state";
 
 	private boolean friendIsFollowed;
 	private boolean friendFollowsMe;
 	private boolean friendIsRequested;
 	private boolean friendRequestedMe;
 
+	public static final String KEY_POST_COUNT = "post_count";
+	private int postCount;
+	public static final String KEY_FOLLOWERS_IN_COUNT = "followers_in_count";
+	private int followersInCount;
+	public static final String KEY_FOLLOWERS_OUT_COUNT = "followers_out_count";
+	private int followersOutCount;
+
+	public static final String KEY_PROFILE_FRAGMENT_BUNDLE = "profile_fragment_bundle";
+
 	public static ProfileFragment newInstance(int profileType, long userID){
 		ProfileFragment profileFragment = new ProfileFragment();
 
 		Bundle arguments = new Bundle();
-		arguments.putInt(PROFILE_TYPE, profileType);
+		arguments.putInt(KEY_PROFILE_TYPE, profileType);
 		arguments.putLong(USER_ID, userID);
 		profileFragment.setArguments(arguments);
+
+		return profileFragment;
+	}
+
+	public static ProfileFragment newInstance(Bundle bundle){
+		ProfileFragment profileFragment = new ProfileFragment();
+
+		profileFragment.restoreInstanceState(bundle);
 
 		return profileFragment;
 	}
@@ -114,19 +141,70 @@ public class ProfileFragment extends FeedbackFragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		addToBundle(outState);
+
+	}
+
+	public Bundle getBundle(){
+		Bundle bundle = new Bundle();
+		addToBundle(bundle);
+		return bundle;
+	}
+
+	private void addToBundle(Bundle bundle){
+		bundle.putLong(			KEY_USER_ID, 					userID);
+		bundle.putInt(			KEY_PROFILE_TYPE, 				profileType);
+		bundle.putInt(			KEY_PROFILE_MODE,				profileMode);
+		bundle.putParcelable(	KEY_USER, 						user);
+		bundle.putBoolean(		KEY_FETCH_DATA, 				fetchData);
+		bundle.putInt(			KEY_POST_COUNT, 				postCount);
+		bundle.putInt(			KEY_FOLLOWERS_IN_COUNT,			followersInCount);
+		bundle.putInt(			KEY_FOLLOWERS_OUT_COUNT,		followersOutCount);
+		bundle.putBoolean(		KEY_BUTTON_HIDE_MANUAL_OVERRIDE,btnHideManualOverride);
+		bundle.putBoolean(		KEY_BUTTON_HIDE_MANUAL_STATE, 	btnHideManualState);
+
+	}
+
+	private void restoreInstanceState(Bundle bundle){
+
+		userID = 				bundle.getLong(			KEY_USER_ID);
+		profileType =			bundle.getInt(			KEY_PROFILE_TYPE);
+		profileMode =			bundle.getInt(			KEY_PROFILE_MODE);
+		user =					bundle.getParcelable(	KEY_USER);
+		fetchData =				bundle.getBoolean(		KEY_FETCH_DATA);
+		postCount =				bundle.getInt(			KEY_POST_COUNT);
+		followersInCount =		bundle.getInt(			KEY_FOLLOWERS_IN_COUNT);
+		followersOutCount =		bundle.getInt(			KEY_FOLLOWERS_OUT_COUNT);
+		btnHideManualOverride =	bundle.getBoolean(		KEY_BUTTON_HIDE_MANUAL_OVERRIDE);
+		btnHideManualState =	bundle.getBoolean(		KEY_BUTTON_HIDE_MANUAL_STATE);
+
+		//Log.d(TAG, "restoredState");
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setHasOptionsMenu(true);
+		if (savedInstanceState == null) {
 
-		Bundle arguments = getArguments();
-		if (arguments != null){
-			handleArguments(arguments);
+			setHasOptionsMenu(true);
+
+			Bundle arguments = getArguments();
+			if (arguments != null) {
+				handleArguments(arguments);
+			}
+		} else {
+
+			restoreInstanceState(savedInstanceState);
+
 		}
 	}
 
 	private void handleArguments(Bundle arguments){
-		profileType = arguments.getInt(PROFILE_TYPE);
+		profileType = arguments.getInt(KEY_PROFILE_TYPE);
 
 		if (profileType == PROFILE_TYPE_OTHER_USER){
 			userID = arguments.getLong(USER_ID);
@@ -160,55 +238,62 @@ public class ProfileFragment extends FeedbackFragment {
 		txtUserName.setVisibility(View.INVISIBLE);
 		txtBio.setVisibility(View.INVISIBLE);
 		txtURL.setVisibility(View.INVISIBLE);
+		btnShowHide.setManualOverride(btnHideManualOverride);
 
 		view.getViewTreeObserver().addOnGlobalLayoutListener(
 			new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
-					readyToHide = true;
-					checkBtnShowHide();
+					//readyToHide = true;
+					if (!btnShowHide.getManualOverride())
+						checkBtnShowHide();
 				}
 			});
 
-		switch (profileType){
-			case PROFILE_TYPE_CURRENT_USER:{
-				user = HHUser.getCurrentUser();
-				createView(view);
-				AsyncDataManager.updateCurrentUser(
-					new AsyncDataManager.UpdateCurrentUserCallback() {
-						@Override
-						public void returnUpdateCurrentUser(boolean success) {
-							user = HHUser.getCurrentUser();
-							readyToHide = true;
-							createView(view);
-						}
-					});
-				break;
-			}
-			case PROFILE_TYPE_OTHER_USER:{
-				AsyncDataManager.getUser(
-					userID,
-					false,
-					new AsyncDataManager.GetUserCallback() {
-						@Override
-						public void returnGetCachedUser(HHUserFull returnedUser) {
-							user = returnedUser;
-							if (user != null) {
-								readyToHide = true;
-								createView(view);
+		if (fetchData){
+
+			switch (profileType){
+				case PROFILE_TYPE_CURRENT_USER:{
+					user = HHUser.getCurrentUser();
+					createView(view, true);
+					AsyncDataManager.updateCurrentUser(
+						new AsyncDataManager.UpdateCurrentUserCallback() {
+							@Override
+							public void returnUpdateCurrentUser(boolean success) {
+								user = HHUser.getCurrentUser();
+								fetchData = false;
+								createView(view, true);
+							}
+						});
+					break;
+				}
+				case PROFILE_TYPE_OTHER_USER:{
+					AsyncDataManager.getUser(
+						userID,
+						false,
+						new AsyncDataManager.GetUserCallback() {
+							@Override
+							public void returnGetCachedUser(HHUserFull returnedUser) {
+								user = returnedUser;
+								if (user != null) {
+									fetchData = false;
+									createView(view, true);
+								}
+							}
+
+							@Override
+							public void returnGetWebUser(HHUserFull returnedUser) {
+								user = returnedUser;
+								fetchData = false;
+								createView(view, true);
 							}
 						}
-
-						@Override
-						public void returnGetWebUser(HHUserFull returnedUser) {
-							user = returnedUser;
-							readyToHide = true;
-							createView(view);
-						}
-					}
-				);
-				break;
+					);
+					break;
+				}
 			}
+		} else {
+			createView(view, false);
 		}
 
 		return view;
@@ -253,7 +338,7 @@ public class ProfileFragment extends FeedbackFragment {
 
 		btnFeed = (ImageView) view.findViewById(R.id.fragment_profile_btnFeed);
 		btnMap = (ImageView) view.findViewById(R.id.fragment_profile_btnMap);
-		btnShowHide = (ToggleButton) view.findViewById(R.id.fragment_profile_btnShowHide);
+		btnShowHide = (AutoShowHideButton) view.findViewById(R.id.fragment_profile_btnShowHide);
 	}
 
 	private View.OnClickListener onClickAcceptRequestListener = new View.OnClickListener() {
@@ -502,7 +587,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private void createView(final View view){
+	private void createView(final View view, boolean fullUpdate){
 
 		WebHelper.getFacebookProfilePicture(
 			user.getUser().getFBUserID(),
@@ -536,9 +621,15 @@ public class ProfileFragment extends FeedbackFragment {
 		llFollowsInCount.setOnClickListener(onClickFollowsInListener);
 		llFollowsOutCount.setOnClickListener(onClickFollowsOutListener);
 
-		updatePostCount(true);
-		updateFollowersInCount(true);
-		updateFollowersOutCount(true);
+		if (fullUpdate) {
+			updatePostCount(true);
+			updateFollowersInCount(true);
+			updateFollowersOutCount(true);
+		} else {
+			updatePostCount(postCount);
+			updateFollowersInCount(followersInCount);
+			updateFollowersOutCount(followersOutCount);
+		}
 
 		if (profileType == PROFILE_TYPE_CURRENT_USER){
 			flFollow.setVisibility(View.GONE);
@@ -566,6 +657,14 @@ public class ProfileFragment extends FeedbackFragment {
 		btnShowHide.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+				if (!btnShowHide.getListening())
+					return;
+
+				if (!btnShowHide.getAutoListening() && !btnShowHide.getManualOverride()) {
+					btnShowHide.setManualOverride(true);
+					btnHideManualOverride = true;
+				}
+
 				if (isChecked) {
 					Log.d(TAG, "TRUE");
 					final int translateY = -llProfile.getHeight();
@@ -613,10 +712,38 @@ public class ProfileFragment extends FeedbackFragment {
 					hide.setDuration(200);
 					view.startAnimation(hide);
 				}
+
+				btnHideManualState = btnShowHide.isChecked();
 			}
 		});
 
 		checkBtnShowHide();
+
+		btnFeed.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (profileMode == PROFILE_MODE_FEED) {
+					Log.d(TAG, "Feed -> Feed: NOTHING");
+				} else {
+					Log.d(TAG, "Feed -> Map: SWITCH");
+					requestProfileModeSwitch(PROFILE_MODE_FEED, userID, getBundle());
+				}
+			}
+		});
+
+		btnMap.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (profileMode == PROFILE_MODE_MAP){
+					Log.d(TAG, "Map -> Map: NOTHING");
+				} else {
+					Log.d(TAG, "Map -> Feed: SWITCH");
+					requestProfileModeSwitch(PROFILE_MODE_MAP, userID, getBundle());
+				}
+			}
+		});
+
+		readyToHide = true;
 
 	}
 
@@ -676,67 +803,76 @@ public class ProfileFragment extends FeedbackFragment {
 		txtFollowsInCountProgressBar.setVisibility(View.VISIBLE);
 	}
 
-	private void updatePostCount(final boolean webOnly){
+	private void updatePostCount(final boolean webOnly) {
 		AsyncDataManager.getUserPostCount(
 			userID,
 			webOnly,
 			new AsyncDataManager.GetUserPostCountCallback() {
 				@Override
 				public void returnCachedUserPostCount(int postCount) {
-					txtPostsCount.setText(String.valueOf(postCount));
-					txtPostsCount.setVisibility(View.VISIBLE);
-					txtPostsCountProgressBar.setVisibility(View.GONE);
+					updatePostCount(postCount);
 				}
 
 				@Override
 				public void returnWebUserPostCount(int postCount) {
-					txtPostsCount.setText(String.valueOf(postCount));
-					txtPostsCount.setVisibility(View.VISIBLE);
-					txtPostsCountProgressBar.setVisibility(View.GONE);
+					updatePostCount(postCount);
 				}
 			});
 	}
 
-	private void updateFollowersInCount(final boolean webOnly){
+	private void updatePostCount(final int postCount){
+		ProfileFragment.this.postCount = postCount;
+		txtPostsCount.setText(String.valueOf(postCount));
+		txtPostsCount.setVisibility(View.VISIBLE);
+		txtPostsCountProgressBar.setVisibility(View.GONE);
+	}
+
+	private void updateFollowersInCount(final boolean webOnly) {
 		AsyncDataManager.getUserFollowersInCount(
 			userID,
 			webOnly,
 			new AsyncDataManager.GetUserFollowersInCountCallback() {
 				@Override
 				public void returnCachedUserFollowersInCount(int followersInCount) {
-					txtFollowsInCount.setText(String.valueOf(followersInCount));
-					txtFollowsInCount.setVisibility(View.VISIBLE);
-					txtFollowsInCountProgressBar.setVisibility(View.GONE);
+					updateFollowersInCount(followersInCount);
 				}
 
 				@Override
 				public void returnWebUserFollowersInCount(int followersInCount) {
-					txtFollowsInCount.setText(String.valueOf(followersInCount));
-					txtFollowsInCount.setVisibility(View.VISIBLE);
-					txtFollowsInCountProgressBar.setVisibility(View.GONE);
+					updateFollowersInCount(followersInCount);
 				}
 			});
 	}
 
-	private void updateFollowersOutCount(final boolean webOnly){
+	private void updateFollowersInCount(final int followersInCount){
+		ProfileFragment.this.followersInCount = followersInCount;
+		txtFollowsInCount.setText(String.valueOf(followersInCount));
+		txtFollowsInCount.setVisibility(View.VISIBLE);
+		txtFollowsInCountProgressBar.setVisibility(View.GONE);
+	}
+
+	private void updateFollowersOutCount(final boolean webOnly) {
 		AsyncDataManager.getUserFollowersOutCount(
 			userID,
 			webOnly,
 			new AsyncDataManager.GetUserFollowersOutCountCallback() {
 				@Override
 				public void returnCachedUserFollowersOutCount(int followersOutCount) {
-					txtFollowsOutCount.setText(String.valueOf(followersOutCount));
-					txtFollowsOutCount.setVisibility(View.VISIBLE);
-					txtFollowsOutCountProgressBar.setVisibility(View.GONE);
+					updateFollowersOutCount(followersOutCount);
 				}
 
 				@Override
 				public void returnWebUserFollowersOutCount(int followersOutCount) {
-					txtFollowsOutCount.setText(String.valueOf(followersOutCount));
-					txtFollowsOutCount.setVisibility(View.VISIBLE);
-					txtFollowsOutCountProgressBar.setVisibility(View.GONE);
+					updateFollowersOutCount(followersOutCount);
 				}
 			});
+	}
+
+	private void updateFollowersOutCount(final int followersOutCount){
+		ProfileFragment.this.followersOutCount = followersOutCount;
+		txtFollowsOutCount.setText(String.valueOf(followersOutCount));
+		txtFollowsOutCount.setVisibility(View.VISIBLE);
+		txtFollowsOutCountProgressBar.setVisibility(View.GONE);
 	}
 
 	void setPrivate(){
@@ -745,7 +881,7 @@ public class ProfileFragment extends FeedbackFragment {
 		privacy = true;
 	}
 
-	void setProfileMode(int mode){
+	public void setProfileMode(int mode){
 		profileMode = mode;
 	}
 
@@ -756,11 +892,32 @@ public class ProfileFragment extends FeedbackFragment {
 			btnShowHide.setVisibility(View.VISIBLE);
 	}
 
-	void checkBtnShowHide(){
+	public void checkBtnShowHide(){
+		if (profileMode == PROFILE_MODE_MAP && btnShowHide.getManualOverride()){
+			alreadyHidden = true;
+			if (btnShowHide.isChecked() && !btnHideManualState){
+				btnShowHide.setAutoListening(true);
+				btnShowHide.setChecked(false);
+				btnShowHide.setAutoListening(false);
+			} else {
+				btnShowHide.setAutoListening(true);
+				btnShowHide.setChecked(true);
+				btnShowHide.setAutoListening(false);
+			}
+			return;
+		}
+
 		if (profileMode == PROFILE_MODE_MAP && readyToHide && !alreadyHidden && btnShowHide.isChecked()){
+			btnShowHide.setAutoListening(true);
 			btnShowHide.setChecked(false);
+			btnShowHide.setAutoListening(false);
 			alreadyHidden = true;
 		}
+	}
+
+	public void resetReadyToHide(){
+		readyToHide = true;
+		alreadyHidden = false;
 	}
 
 }

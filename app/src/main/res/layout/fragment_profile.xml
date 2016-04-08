@@ -365,7 +365,7 @@
             android:layout_weight="1"
             />
 
-        <ToggleButton
+        <yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
             android:id="@+id/fragment_profile_btnShowHide"
             android:layout_width="30dp"
             android:layout_height="30dp"

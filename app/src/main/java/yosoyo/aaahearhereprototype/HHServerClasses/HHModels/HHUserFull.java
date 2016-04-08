@@ -1,6 +1,8 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.facebook.Profile;
 
@@ -12,7 +14,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 /**
  * Created by adam on 10/03/16.
  */
-public class HHUserFull {
+public class HHUserFull implements Parcelable {
 
 	private final HHUser user;
 	private List<HHFriendshipUser> friendships;
@@ -95,4 +97,39 @@ public class HHUserFull {
 	public void setFollowInRequests(List<HHFollowRequestUser> followInRequests) {
 		this.followInRequests = followInRequests;
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		//private final HHUser user;
+		/*private List<HHFriendshipUser> friendships;
+		private List<HHFollowUser> followOuts;
+		private List<HHFollowUser> followIns;
+		private List<HHFollowRequestUser> followOutRequests;
+		private List<HHFollowRequestUser> followInRequests;*/
+		dest.writeParcelable(user, flags);
+	}
+
+	private final static Parcelable.Creator<HHUserFull> CREATOR = new Parcelable.Creator<HHUserFull>(){
+
+		@Override
+		public HHUserFull createFromParcel(Parcel source) {
+			return new HHUserFull(source);
+		}
+
+		@Override
+		public HHUserFull[] newArray(int size) {
+			return new HHUserFull[size];
+		}
+
+	};
+
+	private HHUserFull(Parcel in){
+		user = in.readParcelable(HHUser.class.getClassLoader());
+	}
+
 }

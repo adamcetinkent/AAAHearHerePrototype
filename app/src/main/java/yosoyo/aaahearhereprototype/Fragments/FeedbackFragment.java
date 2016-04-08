@@ -40,4 +40,8 @@ public abstract class FeedbackFragment extends Fragment {
 			FragmentChangeRequestListener.FOLLOWERS_LIST_REQUEST, bundle);
 	}
 
+	protected void requestProfileModeSwitch(int profileType, long userID, Bundle bundle){
+		fragmentChangeRequestListener.requestProfileModeSwitch(profileType, userID, bundle);
+	}
+
 }

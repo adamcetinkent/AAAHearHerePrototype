@@ -398,7 +398,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	}
 
 	@Override
-	public void onConfigurationChanged(Configuration configuration){
+	public void onConfigurationChanged(Configuration configuration) {
 		super.onConfigurationChanged(configuration);
 		drawerToggle.onConfigurationChanged(configuration);
 	}
@@ -460,6 +460,36 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		}
 		if (fragment != null){
 			commitFragmentTransaction(fragment, true);
+		}
+	}
+
+	@Override
+	public void requestProfileModeSwitch(int profileMode, long userID, Bundle bundle) {
+		switch (profileMode){
+			case ProfileFragment.PROFILE_MODE_FEED:{
+				FeedFragment feedFragment;
+				if (userID == HHUser.getCurrentUserID()) {
+					feedFragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, userID);
+				} else {
+					feedFragment = FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, userID);
+				}
+				feedFragment.setProfileFragmentBundle(bundle);
+
+				commitFragmentTransaction(feedFragment, true);
+				break;
+			}
+			case ProfileFragment.PROFILE_MODE_MAP:{
+				ProfileMapFragment profileMapFragment;
+				if (userID == HHUser.getCurrentUserID()) {
+					profileMapFragment = ProfileMapFragment.newInstance(ProfileMapFragment.PROFILE_TYPE_CURRENT_USER, userID);
+				} else {
+					profileMapFragment = ProfileMapFragment.newInstance(ProfileMapFragment.PROFILE_TYPE_OTHER_USER, userID);
+				}
+				profileMapFragment.setProfileFragmentBundle(bundle);
+
+				commitFragmentTransaction(profileMapFragment, true);
+				break;
+			}
 		}
 	}
 
