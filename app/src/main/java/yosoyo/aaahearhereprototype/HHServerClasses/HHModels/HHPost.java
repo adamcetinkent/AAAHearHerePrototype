@@ -56,17 +56,17 @@ public class HHPost extends HHBase implements Parcelable {
 
 	public HHPost(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMPost.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMPost.ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.UPDATED_AT())))
 			 );
-		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMPost.COLUMN_USER_ID_NAME));
-		this.track = cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_TRACK_NAME));
-		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMPost.COLUMN_LAT_NAME));
-		this.lon = cursor.getDouble(cursor.getColumnIndex(ORMPost.COLUMN_LON_NAME));
-		this.message = cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_MESSAGE_NAME));
-		this.place_name = cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_PLACE_NAME_NAME));
-		this.google_place_id = cursor.getString(cursor.getColumnIndex(ORMPost.COLUMN_GOOGLE_PLACE_ID_NAME));
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMPost.USER_ID()));
+		this.track = cursor.getString(cursor.getColumnIndex(ORMPost.TRACK()));
+		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMPost.LAT()));
+		this.lon = cursor.getDouble(cursor.getColumnIndex(ORMPost.LON()));
+		this.message = cursor.getString(cursor.getColumnIndex(ORMPost.MESSAGE()));
+		this.place_name = cursor.getString(cursor.getColumnIndex(ORMPost.PLACE_NAME()));
+		this.google_place_id = cursor.getString(cursor.getColumnIndex(ORMPost.GOOGLE_PLACE_ID()));
 	}
 
 	public double getLat() {

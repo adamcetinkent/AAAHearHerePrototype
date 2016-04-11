@@ -29,15 +29,12 @@ public class HHFriendship extends HHBase implements Parcelable {
 
 	public HHFriendship(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMFriendship.COLUMN_ID_NAME)),
-			Timestamp.valueOf(
-				cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(
-				cursor.getString(cursor.getColumnIndex(ORMFriendship.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMFriendship.ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFriendship.UPDATED_AT())))
 		);
-		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFriendship.COLUMN_USER_ID_NAME));
-		this.friend_user_id =  cursor.getLong(
-			cursor.getColumnIndex(ORMFriendship.COLUMN_FRIEND_USER_ID_NAME));
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFriendship.USER_ID()));
+		this.friend_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFriendship.FRIEND_USER_ID()));
 	}
 
 	public long getUserID() {

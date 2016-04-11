@@ -24,7 +24,9 @@ public class ProfileMapFragment extends FeedbackFragment {
 	private long userID = -1;
 
 	private ProfileFragment profileFragment;
+	private MapViewFragment mapViewFragment;
 	private Bundle profileFragmentBundle;
+	private Bundle mapFragmentBundle;
 
 	public static ProfileMapFragment newInstance(int profileType, long userID){
 		ProfileMapFragment profileMapFragment = new ProfileMapFragment();
@@ -37,12 +39,25 @@ public class ProfileMapFragment extends FeedbackFragment {
 		return profileMapFragment;
 	}
 
+	public static ProfileMapFragment newInstance(Bundle bundle){
+		ProfileMapFragment profileMapFragment = new ProfileMapFragment();
+
+		profileMapFragment.setProfileFragmentBundle(bundle);
+		profileMapFragment.setMapFragmentBundle(bundle);
+
+		return profileMapFragment;
+	}
+
 	public ProfileMapFragment() {
 		// Required empty public constructor
 	}
 
 	public void setProfileFragmentBundle(Bundle bundle){
 		this.profileFragmentBundle = bundle;
+	}
+
+	public void setMapFragmentBundle(Bundle bundle){
+		this.mapFragmentBundle = bundle;
 	}
 
 	@Override
@@ -53,6 +68,10 @@ public class ProfileMapFragment extends FeedbackFragment {
 		if (profileFragment != null){
 			profileFragmentBundle = profileFragment.getBundle();
 			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
+		}
+		if (mapViewFragment != null){
+			mapFragmentBundle = mapViewFragment.getBundle();
+			outState.putBundle(MapViewFragment.KEY_MAP_VIEW_FRAGMENT_BUNDLE, mapFragmentBundle);
 		}
 	}
 
@@ -67,7 +86,17 @@ public class ProfileMapFragment extends FeedbackFragment {
 			if (savedInstanceState.containsKey(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE)){
 				profileFragmentBundle = savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
 			}
+			if (savedInstanceState.containsKey(MapViewFragment.KEY_MAP_VIEW_FRAGMENT_BUNDLE)){
+				mapFragmentBundle = savedInstanceState.getBundle(MapViewFragment.KEY_MAP_VIEW_FRAGMENT_BUNDLE);
+			}
 		}
+
+		mapViewFragment = MapViewFragment.newInstance(mapFragmentBundle);
+
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_profile_map_frameMap, mapViewFragment);
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+		ft.commit();
 
 		if (profileFragmentBundle == null) {
 			profileFragment = ProfileFragment.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
@@ -76,15 +105,10 @@ public class ProfileMapFragment extends FeedbackFragment {
 		}
 
 		profileFragment.setProfileMode(ProfileFragment.PROFILE_MODE_MAP);
+		profileFragment.setMapFragment(mapViewFragment);
 
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_profile_map_frameProfile, profileFragment);
-		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		ft.commit();
-
-		MapViewFragment mapViewFragment = new MapViewFragment();
 		ft = getFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_profile_map_frameMap, mapViewFragment);
+		ft.replace(R.id.fragment_profile_map_frameProfile, profileFragment);
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 		ft.commit();
 

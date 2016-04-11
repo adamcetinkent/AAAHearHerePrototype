@@ -53,26 +53,18 @@ public class HHUser extends HHBase implements Parcelable {
 	public HHUser(Cursor cursor, String idColumnIndex){
 		super(
 			cursor.getLong(cursor.getColumnIndex(idColumnIndex)),
-			Timestamp.valueOf(
-				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(
-				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_UPDATED_AT_NAME)))
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.UPDATED_AT())))
 			 );
-		this.first_name = 		cursor.getString(
-			cursor.getColumnIndex(ORMUser.COLUMN_FIRST_NAME_NAME));
-		this.last_name = 		cursor.getString(
-			cursor.getColumnIndex(ORMUser.COLUMN_LAST_NAME_NAME));
-		this.email = 			cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_EMAIL_NAME));
-		this.fb_user_id = 		cursor.getString(
-			cursor.getColumnIndex(ORMUser.COLUMN_FB_USER_ID_NAME));
-		this.bio = 				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_BIO_NAME));
-		this.url = 				cursor.getString(cursor.getColumnIndex(ORMUser.COLUMN_URL_NAME));
-		this.auto_accept = 		cursor.getInt(
-			cursor.getColumnIndex(ORMUser.COLUMN_AUTO_ACCEPT_NAME));
-		this.profile_privacy =	cursor.getInt(
-			cursor.getColumnIndex(ORMUser.COLUMN_PROFILE_PRIVACY_NAME));
-		this.search_privacy = 	cursor.getInt(
-			cursor.getColumnIndex(ORMUser.COLUMN_SEARCH_PRIVACY_NAME));
+		this.first_name = 		cursor.getString(cursor.getColumnIndex(ORMUser.FIRST_NAME()));
+		this.last_name = 		cursor.getString(cursor.getColumnIndex(ORMUser.LAST_NAME()));
+		this.email = 			cursor.getString(cursor.getColumnIndex(ORMUser.EMAIL()));
+		this.fb_user_id = 		cursor.getString(cursor.getColumnIndex(ORMUser.FB_USER_ID()));
+		this.bio = 				cursor.getString(cursor.getColumnIndex(ORMUser.BIO()));
+		this.url = 				cursor.getString(cursor.getColumnIndex(ORMUser.URL()));
+		this.auto_accept = 		cursor.getInt(cursor.getColumnIndex(ORMUser.AUTO_ACCEPT()));
+		this.profile_privacy =	cursor.getInt(cursor.getColumnIndex(ORMUser.PROFILE_PRIVACY()));
+		this.search_privacy = 	cursor.getInt(cursor.getColumnIndex(ORMUser.SEARCH_PRIVACY()));
 	}
 
 	public HHUser(Profile profile){

@@ -23,6 +23,131 @@ class ORMPostFull {
 
 	private static final String TAG = "ORMPostFull";
 
+	public static void getPost(Context context, long postID, DBPostFullSelectTask.Callback callbackTo){
+		new DBPostFullSelectTask(context, postID, callbackTo).execute();
+	}
+
+	public static class DBPostFullSelectTask extends AsyncTask<Void, Void, HHPostFull> {
+
+		private final Context context;
+		private final long postID;
+		private final Callback callbackTo;
+
+		public interface Callback {
+			void returnPost(HHPostFull post);
+		}
+
+		public DBPostFullSelectTask(Context context, long postID, Callback callbackTo){
+			this.context = context;
+			this.postID = postID;
+			this.callbackTo = callbackTo;
+		}
+
+		@Override
+		protected HHPostFull doInBackground(Void... params) {
+			DatabaseHelper databaseHelper = new DatabaseHelper(context);
+			SQLiteDatabase database = databaseHelper.getReadableDatabase();
+
+			Cursor cursorPost = database.rawQuery(
+				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE()
+					+ " INNER JOIN ("
+					+ ORMPost.TABLE() + " LEFT JOIN " + ORMUser.TABLE()
+					+ " ON " + ORMPost.USER_ID() + " = " + ORMUser.ID()
+					+ ") ON " + ORMCachedSpotifyTrack.TRACK_ID() + " = " + ORMPost.TRACK()
+					+ " WHERE " + ORMPost.ID() + "=?"
+				, new String[]{String.valueOf(postID)});
+
+			int numPosts = cursorPost.getCount();
+			Log.d(TAG, "Loaded " + numPosts + " Posts...");
+
+			HHPostFull post = null;
+			if (numPosts > 0){
+				cursorPost.moveToFirst();
+				post = new HHPostFull(cursorPost, ORMPost.USER_ID());
+
+				{
+					Cursor cursorComment = database.rawQuery(
+						"SELECT * FROM " + ORMComment.TABLE()
+							+ " LEFT JOIN " + ORMUser.TABLE()
+							+ " ON " + ORMComment.USER_ID() + " = " + ORMUser.ID()
+							+ " WHERE " + ORMComment.POST_ID() + " = ?"
+						, new String[]{String.valueOf(postID)});
+
+					int numComments = cursorComment.getCount();
+					Log.d(TAG, "Loaded " + numComments + " Comments...");
+					List<HHCommentUser> comments = new ArrayList<>(numComments);
+					if (numComments > 0) {
+						cursorComment.moveToFirst();
+						while (!cursorComment.isAfterLast()) {
+							HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.USER_ID());
+							comments.add(commentUser);
+							cursorComment.moveToNext();
+						}
+					}
+					cursorComment.close();
+					post.setComments(comments);
+				}
+
+				{
+					Cursor cursorLike = database.rawQuery(
+						"SELECT * FROM " + ORMLike.TABLE()
+							+ " LEFT JOIN " + ORMUser.TABLE()
+							+ " ON " + ORMLike.USER_ID() + " = " + ORMUser.ID()
+							+ " WHERE " + ORMLike.POST_ID() + " = ?"
+						, new String[]{String.valueOf(postID)});
+
+					int numLikes = cursorLike.getCount();
+					Log.d(TAG, "Loaded " + numLikes + " Likes...");
+					List<HHLikeUser> likes = new ArrayList<>(numLikes);
+					if (numLikes > 0) {
+						cursorLike.moveToFirst();
+						while (!cursorLike.isAfterLast()) {
+							HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.USER_ID());
+							likes.add(likeUser);
+							cursorLike.moveToNext();
+						}
+					}
+					cursorLike.close();
+					post.setLikes(likes);
+				}
+
+				{
+					Cursor cursorTag = database.rawQuery(
+						"SELECT * FROM " + ORMTag.TABLE()
+							+ " LEFT JOIN " + ORMUser.TABLE()
+							+ " ON " + ORMTag.USER_ID() + " = " + ORMUser.ID()
+							+ " WHERE " + ORMTag.POST_ID() + " = ?"
+						, new String[]{String.valueOf(postID)});
+
+					int numTags = cursorTag.getCount();
+					Log.d(TAG, "Loaded " + numTags + " Tags...");
+					List<HHTagUser> tags = new ArrayList<>();
+					if (numTags > 0) {
+						cursorTag.moveToFirst();
+						while (!cursorTag.isAfterLast()) {
+							HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.USER_ID());
+							tags.add(tagUser);
+							cursorTag.moveToNext();
+						}
+					}
+					cursorTag.close();
+					post.setTags(tags);
+				}
+				Log.d(TAG, "Post loaded successfully");
+			}
+
+			cursorPost.close();
+			database.close();
+
+			return post;
+		}
+
+		@Override
+		protected void onPostExecute(HHPostFull post){
+			callbackTo.returnPost(post);
+		}
+	}
+
 	public static void getAllPosts(Context context, DBPostFullSelectAllTask.Callback callbackTo){
 		new DBPostFullSelectAllTask(context, callbackTo).execute();
 	}
@@ -47,8 +172,8 @@ class ORMPostFull {
 			SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
 			Cursor cursorFollows = database.rawQuery(
-				"SELECT " + ORMFollow.COLUMN_FOLLOWED_USER_ID_NAME + " FROM " + ORMFollow.TABLE_NAME
-					+ " WHERE " + ORMFollow.COLUMN_USER_ID_NAME + "=?"
+				"SELECT " + ORMFollow.FOLLOWED_USER_ID() + " FROM " + ORMFollow.TABLE()
+					+ " WHERE " + ORMFollow.USER_ID() + "=?"
 				, new String[]{String.valueOf(HHUser.getCurrentUserID())});
 
 			StringBuilder followIDs = new StringBuilder(String.valueOf(HHUser.getCurrentUserID())).append(",");
@@ -56,7 +181,7 @@ class ORMPostFull {
 			if (numFollows > 0){
 				cursorFollows.moveToFirst();
 				while (!cursorFollows.isAfterLast()){
-					long id = cursorFollows.getLong(cursorFollows.getColumnIndex(ORMFollow.COLUMN_FOLLOWED_USER_ID_NAME));
+					long id = cursorFollows.getLong(cursorFollows.getColumnIndex(ORMFollow.FOLLOWED_USER_ID()));
 					followIDs.append(id).append(",");
 					cursorFollows.moveToNext();
 				}
@@ -64,12 +189,12 @@ class ORMPostFull {
 			String followsInArray = "(" + followIDs.substring(0, followIDs.length()-1) + ")";
 
 			Cursor cursorPost = database.rawQuery(
-				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE_NAME
+				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE()
 					+ " INNER JOIN ("
-					+ ORMPost.TABLE_NAME + " LEFT JOIN " + ORMUser.TABLE_NAME
-					+ " ON " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_TRACK_NAME
-					+ " WHERE " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " IN " + followsInArray
+					+ ORMPost.TABLE() + " LEFT JOIN " + ORMUser.TABLE()
+					+ " ON " + ORMPost.USER_ID() + " = " + ORMUser.ID()
+					+ ") ON " + ORMCachedSpotifyTrack.TRACK_ID() + " = " + ORMPost.TRACK()
+					+ " WHERE " + ORMPost.USER_ID() + " IN " + followsInArray
 				, null);
 
 			int numPosts = cursorPost.getCount();
@@ -79,15 +204,15 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursorPost.moveToFirst();
 				while (!cursorPost.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursorPost, ORMPost.COLUMN_USER_ID_NAME);
+					HHPostFull post = new HHPostFull(cursorPost, ORMPost.USER_ID());
 					posts.add(post);
 
 					{
 						Cursor cursorComment = database.rawQuery(
-							"SELECT * FROM " + ORMComment.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMComment.TABLE_NAME + "." + ORMComment.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMComment.TABLE_NAME + "." + ORMComment.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMComment.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMComment.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMComment.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numComments = cursorComment.getCount();
@@ -96,7 +221,7 @@ class ORMPostFull {
 						if (numComments > 0) {
 							cursorComment.moveToFirst();
 							while (!cursorComment.isAfterLast()) {
-								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.COLUMN_USER_ID_NAME);
+								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.USER_ID());
 								comments.add(commentUser);
 								cursorComment.moveToNext();
 							}
@@ -107,10 +232,10 @@ class ORMPostFull {
 
 					{
 						Cursor cursorLike = database.rawQuery(
-							"SELECT * FROM " + ORMLike.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMLike.TABLE_NAME + "." + ORMLike.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMLike.TABLE_NAME + "." + ORMLike.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMLike.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMLike.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMLike.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numLikes = cursorLike.getCount();
@@ -119,7 +244,7 @@ class ORMPostFull {
 						if (numLikes > 0) {
 							cursorLike.moveToFirst();
 							while (!cursorLike.isAfterLast()) {
-								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.COLUMN_USER_ID_NAME);
+								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.USER_ID());
 								likes.add(likeUser);
 								cursorLike.moveToNext();
 							}
@@ -130,10 +255,10 @@ class ORMPostFull {
 
 					{
 						Cursor cursorTag = database.rawQuery(
-							"SELECT * FROM " + ORMTag.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMTag.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMTag.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMTag.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numTags = cursorTag.getCount();
@@ -142,7 +267,7 @@ class ORMPostFull {
 						if (numTags > 0) {
 							cursorTag.moveToFirst();
 							while (!cursorTag.isAfterLast()) {
-								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.COLUMN_USER_ID_NAME);
+								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.USER_ID());
 								tags.add(tagUser);
 								cursorTag.moveToNext();
 							}
@@ -194,12 +319,12 @@ class ORMPostFull {
 			SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
 			Cursor cursorPost = database.rawQuery(
-				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE_NAME
+				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE()
 					+ " INNER JOIN ("
-					+ ORMPost.TABLE_NAME + " LEFT JOIN " + ORMUser.TABLE_NAME
-					+ " ON " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_TRACK_NAME
-					+ " WHERE " + ORMPost.COLUMN_USER_ID_NAME + "=?"
+					+ ORMPost.TABLE() + " LEFT JOIN " + ORMUser.TABLE()
+					+ " ON " + ORMPost.USER_ID() + " = " + ORMUser.ID()
+					+ ") ON " + ORMCachedSpotifyTrack.TRACK_ID() + " = " + ORMPost.TRACK()
+					+ " WHERE " + ORMPost.USER_ID() + "=?"
 				, new String[]{String.valueOf(userID)});
 
 			int numPosts = cursorPost.getCount();
@@ -209,15 +334,15 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursorPost.moveToFirst();
 				while (!cursorPost.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursorPost, ORMPost.COLUMN_USER_ID_NAME);
+					HHPostFull post = new HHPostFull(cursorPost, ORMPost.USER_ID());
 					posts.add(post);
 
 					{
 						Cursor cursorComment = database.rawQuery(
-							"SELECT * FROM " + ORMComment.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMComment.TABLE_NAME + "." + ORMComment.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMComment.TABLE_NAME + "." + ORMComment.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMComment.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMComment.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMComment.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numComments = cursorComment.getCount();
@@ -226,7 +351,7 @@ class ORMPostFull {
 						if (numComments > 0) {
 							cursorComment.moveToFirst();
 							while (!cursorComment.isAfterLast()) {
-								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.COLUMN_USER_ID_NAME);
+								HHCommentUser commentUser = new HHCommentUser(cursorComment, ORMComment.USER_ID());
 								comments.add(commentUser);
 								cursorComment.moveToNext();
 							}
@@ -237,10 +362,10 @@ class ORMPostFull {
 
 					{
 						Cursor cursorLike = database.rawQuery(
-							"SELECT * FROM " + ORMLike.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMLike.TABLE_NAME + "." + ORMLike.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMLike.TABLE_NAME + "." + ORMLike.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMLike.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMLike.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMLike.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numLikes = cursorLike.getCount();
@@ -249,7 +374,7 @@ class ORMPostFull {
 						if (numLikes > 0) {
 							cursorLike.moveToFirst();
 							while (!cursorLike.isAfterLast()) {
-								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.COLUMN_USER_ID_NAME);
+								HHLikeUser likeUser = new HHLikeUser(cursorLike, ORMLike.USER_ID());
 								likes.add(likeUser);
 								cursorLike.moveToNext();
 							}
@@ -260,10 +385,10 @@ class ORMPostFull {
 
 					{
 						Cursor cursorTag = database.rawQuery(
-							"SELECT * FROM " + ORMTag.TABLE_NAME
-								+ " LEFT JOIN " + ORMUser.TABLE_NAME
-								+ " ON " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-								+ " WHERE " + ORMTag.TABLE_NAME + "." + ORMTag.COLUMN_POST_ID_NAME + " = ?"
+							"SELECT * FROM " + ORMTag.TABLE()
+								+ " LEFT JOIN " + ORMUser.TABLE()
+								+ " ON " + ORMTag.USER_ID() + " = " + ORMUser.ID()
+								+ " WHERE " + ORMTag.POST_ID() + " = ?"
 							, new String[]{String.valueOf(post.getPost().getID())});
 
 						int numTags = cursorTag.getCount();
@@ -272,7 +397,7 @@ class ORMPostFull {
 						if (numTags > 0) {
 							cursorTag.moveToFirst();
 							while (!cursorTag.isAfterLast()) {
-								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.COLUMN_USER_ID_NAME);
+								HHTagUser tagUser = new HHTagUser(cursorTag, ORMTag.USER_ID());
 								tags.add(tagUser);
 								cursorTag.moveToNext();
 							}
@@ -329,13 +454,13 @@ class ORMPostFull {
 			SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
 			Cursor cursor = database.rawQuery(
-				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE_NAME
+				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE()
 					+ " INNER JOIN ("
-					+ ORMPost.TABLE_NAME + " LEFT JOIN " + ORMUser.TABLE_NAME
-					+ " ON " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_USER_ID_NAME + " = " + ORMUser.TABLE_NAME + "." + ORMUser.COLUMN_ID_NAME
-					+ ") ON " + ORMCachedSpotifyTrack.TABLE_NAME + "." + ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME + " = " + ORMPost.TABLE_NAME + "." + ORMPost.COLUMN_TRACK_NAME
-					+ " WHERE " + ORMPost.COLUMN_LAT_NAME + ">? AND " + ORMPost.COLUMN_LAT_NAME + "<?"
-					+ " AND " + ORMPost.COLUMN_LON_NAME + ">? AND " + ORMPost.COLUMN_LON_NAME + "<?",
+					+ ORMPost.TABLE() + " LEFT JOIN " + ORMUser.TABLE()
+					+ " ON " + ORMPost.USER_ID() + " = " + ORMUser.ID()
+					+ ") ON " + ORMCachedSpotifyTrack.TRACK_ID() + " = " + ORMPost.TRACK()
+					+ " WHERE " + ORMPost.LAT() + ">? AND " + ORMPost.LON() + "<?"
+					+ " AND " + ORMPost.LAT() + ">? AND " + ORMPost.LON() + "<?",
 				new String[]{
 					String.valueOf(location.getLatitude() - RANGE),
 					String.valueOf(location.getLatitude() + RANGE),
@@ -350,7 +475,7 @@ class ORMPostFull {
 			if (numPosts > 0){
 				cursor.moveToFirst();
 				while (!cursor.isAfterLast()){
-					HHPostFull post = new HHPostFull(cursor, ORMPost.COLUMN_USER_ID_NAME);
+					HHPostFull post = new HHPostFull(cursor, ORMPost.USER_ID());
 					posts.add(post);
 					cursor.moveToNext();
 				}

@@ -47,12 +47,12 @@ public class HHFollowRequest extends HHBase implements Parcelable {
 
 	public HHFollowRequest(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMFollowRequest.UPDATED_AT())))
 		);
-		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_USER_ID_NAME));
-		this.requested_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.COLUMN_REQUESTED_USER_ID_NAME));
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.USER_ID()));
+		this.requested_user_id =  cursor.getLong(cursor.getColumnIndex(ORMFollowRequest.REQUESTED_USER_ID()));
 	}
 
 	public long getUserID() {

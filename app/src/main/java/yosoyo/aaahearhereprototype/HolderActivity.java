@@ -20,6 +20,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +56,7 @@ import yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
 import yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
 
 public class HolderActivity extends Activity implements FragmentChangeRequestListener {
+	private static final String TAG = "HolderActivity";
 
 	public static final int LOCATION_PERMISSIONS = 16442103;
 	public static final String KEY_POSITION = "position";
@@ -106,7 +108,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
 			R.string.action_search_users,
-			R.string.navigation_map_test,
+			R.string.navigation_post_test,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
@@ -305,8 +307,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				fragment = new UserSearchFragment();
 				break;
 			}
-			case R.string.navigation_map_test: {
-				fragment = new ProfileMapFragment();
+			case R.string.navigation_post_test: {
+				fragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED, 1, 1);
 				break;
 			}
 			default: {
@@ -410,6 +412,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	}
 
 	public static Location getLastLocation(Activity activity){
+		if (activity == null){
+			Log.e(TAG, "activity is null?!");
+			return null;
+		}
 		if (ActivityCompat.checkSelfPermission(
 			activity,
 			Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -468,11 +474,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		switch (profileMode){
 			case ProfileFragment.PROFILE_MODE_FEED:{
 				FeedFragment feedFragment;
-				if (userID == HHUser.getCurrentUserID()) {
-					feedFragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, userID);
-				} else {
-					feedFragment = FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, userID);
-				}
+				feedFragment = FeedFragment.newInstance(bundle);
 				feedFragment.setProfileFragmentBundle(bundle);
 
 				commitFragmentTransaction(feedFragment, true);
@@ -480,12 +482,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 			case ProfileFragment.PROFILE_MODE_MAP:{
 				ProfileMapFragment profileMapFragment;
-				if (userID == HHUser.getCurrentUserID()) {
-					profileMapFragment = ProfileMapFragment.newInstance(ProfileMapFragment.PROFILE_TYPE_CURRENT_USER, userID);
-				} else {
-					profileMapFragment = ProfileMapFragment.newInstance(ProfileMapFragment.PROFILE_TYPE_OTHER_USER, userID);
-				}
-				profileMapFragment.setProfileFragmentBundle(bundle);
+				profileMapFragment = ProfileMapFragment.newInstance(bundle);
 
 				commitFragmentTransaction(profileMapFragment, true);
 				break;

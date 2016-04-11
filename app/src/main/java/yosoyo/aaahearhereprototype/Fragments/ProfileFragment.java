@@ -38,23 +38,26 @@ public class ProfileFragment extends FeedbackFragment {
 	private static final String TAG = ProfileFragment.class.getSimpleName();
 
 	private int profileType;
-	public static final String KEY_PROFILE_TYPE = "profile_type";
+	public static final String KEY_PROFILE_TYPE = TAG + "profile_type";
 	public static final int PROFILE_TYPE_CURRENT_USER = 0;
 	public static final int PROFILE_TYPE_OTHER_USER = 1;
 
 	private int profileMode;
-	public static final String KEY_PROFILE_MODE = "profile_mode";
+	public static final String KEY_PROFILE_MODE = TAG + "profile_mode";
 	public static final int PROFILE_MODE_FEED = 0;
 	public static final int PROFILE_MODE_MAP = 1;
 
 	private boolean fetchData = true;
-	public static final String KEY_FETCH_DATA = "fetch_data";
+	public static final String KEY_FETCH_DATA = TAG + "fetch_data";
 
-	public static final String KEY_USER_ID = "user_id";
+	public static final String KEY_USER_ID = TAG + "user_id";
 	private long userID = -1;
 
-	public static final String KEY_USER = "user";
+	public static final String KEY_USER = TAG + "user";
 	private HHUserFull user;
+
+	private FeedFragment feedFragment;
+	private MapViewFragment mapFragment;
 
 	private LinearLayout llProfile;
 	private LinearLayout llProfileMode;
@@ -100,22 +103,22 @@ public class ProfileFragment extends FeedbackFragment {
 	private boolean alreadyHidden = false;
 	private boolean btnHideManualOverride = false;
 	private boolean btnHideManualState = false;
-	public static final String KEY_BUTTON_HIDE_MANUAL_OVERRIDE = "button_hide_manual_override";
-	public static final String KEY_BUTTON_HIDE_MANUAL_STATE = "button_hide_manual_state";
+	public static final String KEY_BUTTON_HIDE_MANUAL_OVERRIDE = TAG + "button_hide_manual_override";
+	public static final String KEY_BUTTON_HIDE_MANUAL_STATE = TAG + "button_hide_manual_state";
 
 	private boolean friendIsFollowed;
 	private boolean friendFollowsMe;
 	private boolean friendIsRequested;
 	private boolean friendRequestedMe;
 
-	public static final String KEY_POST_COUNT = "post_count";
+	public static final String KEY_POST_COUNT = TAG + "post_count";
 	private int postCount;
-	public static final String KEY_FOLLOWERS_IN_COUNT = "followers_in_count";
+	public static final String KEY_FOLLOWERS_IN_COUNT = TAG + "followers_in_count";
 	private int followersInCount;
-	public static final String KEY_FOLLOWERS_OUT_COUNT = "followers_out_count";
+	public static final String KEY_FOLLOWERS_OUT_COUNT = TAG + "followers_out_count";
 	private int followersOutCount;
 
-	public static final String KEY_PROFILE_FRAGMENT_BUNDLE = "profile_fragment_bundle";
+	public static final String KEY_PROFILE_FRAGMENT_BUNDLE = TAG + "profile_fragment_bundle";
 
 	public static ProfileFragment newInstance(int profileType, long userID){
 		ProfileFragment profileFragment = new ProfileFragment();
@@ -170,14 +173,14 @@ public class ProfileFragment extends FeedbackFragment {
 
 	private void restoreInstanceState(Bundle bundle){
 
-		userID = 				bundle.getLong(			KEY_USER_ID);
+		userID = 				bundle.getLong(KEY_USER_ID);
 		profileType =			bundle.getInt(			KEY_PROFILE_TYPE);
-		profileMode =			bundle.getInt(			KEY_PROFILE_MODE);
-		user =					bundle.getParcelable(	KEY_USER);
-		fetchData =				bundle.getBoolean(		KEY_FETCH_DATA);
+		profileMode =			bundle.getInt(KEY_PROFILE_MODE);
+		user =					bundle.getParcelable(KEY_USER);
+		fetchData =				bundle.getBoolean(KEY_FETCH_DATA);
 		postCount =				bundle.getInt(			KEY_POST_COUNT);
 		followersInCount =		bundle.getInt(			KEY_FOLLOWERS_IN_COUNT);
-		followersOutCount =		bundle.getInt(			KEY_FOLLOWERS_OUT_COUNT);
+		followersOutCount =		bundle.getInt(KEY_FOLLOWERS_OUT_COUNT);
 		btnHideManualOverride =	bundle.getBoolean(		KEY_BUTTON_HIDE_MANUAL_OVERRIDE);
 		btnHideManualState =	bundle.getBoolean(		KEY_BUTTON_HIDE_MANUAL_STATE);
 
@@ -726,7 +729,9 @@ public class ProfileFragment extends FeedbackFragment {
 					Log.d(TAG, "Feed -> Feed: NOTHING");
 				} else {
 					Log.d(TAG, "Feed -> Map: SWITCH");
-					requestProfileModeSwitch(PROFILE_MODE_FEED, userID, getBundle());
+					Bundle bundle = getBundle();
+					mapFragment.addToBundleForSwitch(bundle);
+					requestProfileModeSwitch(PROFILE_MODE_FEED, userID, bundle);
 				}
 			}
 		});
@@ -738,7 +743,9 @@ public class ProfileFragment extends FeedbackFragment {
 					Log.d(TAG, "Map -> Map: NOTHING");
 				} else {
 					Log.d(TAG, "Map -> Feed: SWITCH");
-					requestProfileModeSwitch(PROFILE_MODE_MAP, userID, getBundle());
+					Bundle bundle = getBundle();
+					feedFragment.addToBundleForSwitch(bundle);
+					requestProfileModeSwitch(PROFILE_MODE_MAP, userID, bundle);
 				}
 			}
 		});
@@ -883,6 +890,15 @@ public class ProfileFragment extends FeedbackFragment {
 
 	public void setProfileMode(int mode){
 		profileMode = mode;
+	}
+
+	public void setFeedFragment(final FeedFragment feedFragment){
+		this.feedFragment = feedFragment;
+	}
+
+
+	public void setMapFragment(final MapViewFragment mapFragment){
+		this.mapFragment = mapFragment;
 	}
 
 	void setBtnShowHideVisibility(){

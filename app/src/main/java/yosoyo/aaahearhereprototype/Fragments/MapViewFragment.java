@@ -12,6 +12,7 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
@@ -60,7 +61,20 @@ public class MapViewFragment
 
 	private static final String TAG = "MapViewFragment";
 
+	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
+
+	private int mapType;
+	public static final String KEY_MAP_TYPE = TAG + "map_type";
+	public static final int GENERAL_MAP = 0;
+	public static final int HOME_MAP = 1;
+	public static final int USER_MAP = 2;
+
+	public static final String KEY_USER_ID = TAG + "user_id";
+	private long userID = -1;
+
+	public static final String KEY_FETCH_DATA = TAG + "fetch_data";
+	private boolean fetchData = true;
 
 	private MapView mMapView;
 	private GoogleMap googleMap;
@@ -70,16 +84,54 @@ public class MapViewFragment
 	private Marker currentMarker;
 
 	private AddressResultReceiver mResultReceiver;
-	private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
-	private static final String LOCATION_ADDRESS_KEY = "location-address";
+	private static final String ADDRESS_REQUESTED_KEY = TAG + "address-request-pending";
+	private static final String LOCATION_ADDRESS_KEY = TAG + "location-address";
 	private boolean mAddressRequested;
 	private String mAddressOutput;
 	//private ProgressBar mProgressBar;
+
+	public static final String KEY_MAP_VIEW_FRAGMENT_BUNDLE = TAG + "map_view_fragment_bundle";
 
 	private HHCachedSpotifyTrack currentTrack;
 
 	public MapViewFragment() {
 		//required empty public constructor
+	}
+
+	public static MapViewFragment newInstance(Bundle bundle){
+		MapViewFragment mapViewFragment = new MapViewFragment();
+
+		mapViewFragment.restoreInstanceState(bundle);
+
+		return mapViewFragment;
+	}
+
+
+	public Bundle getBundle(){
+		Bundle bundle = new Bundle();
+		addToBundle(bundle);
+		return bundle;
+	}
+
+	public void addToBundle(Bundle bundle){
+		bundle.putLong(KEY_USER_ID, userID);
+		bundle.putBoolean(KEY_FETCH_DATA, fetchData);
+		bundle.putInt(KEY_MAP_TYPE, mapType);
+		bundle.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+	}
+
+	public void addToBundleForSwitch(Bundle bundle){
+		bundle.putLong(FeedFragment.KEY_USER_ID, userID);
+		bundle.putBoolean(FeedFragment.KEY_FETCH_DATA, fetchData);
+		bundle.putInt(FeedFragment.KEY_FEED_TYPE, mapType);
+		bundle.putParcelableArrayList(FeedFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+	}
+
+	private void restoreInstanceState(Bundle bundle){
+		userID = bundle.getLong(KEY_USER_ID);
+		fetchData = bundle.getBoolean(KEY_FETCH_DATA);
+		mapType = bundle.getInt(KEY_MAP_TYPE);
+		posts = bundle.getParcelableArrayList(KEY_POSTS);
 	}
 
 	@Nullable
@@ -249,20 +301,28 @@ public class MapViewFragment
 
 		googleMap.setOnInfoWindowClickListener(this);
 
-		AsyncDataManager.getAllPosts(
-			new AsyncDataManager.GetAllPostsCallback() {
-				@Override
-				public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
-					posts = ZZZUtility.mergeLists(posts, cachedPosts);
-					addMapMarkers();
-				}
+		if (fetchData) {
+			AsyncDataManager.getAllPosts(
+				new AsyncDataManager.GetAllPostsCallback() {
+					@Override
+					public void returnPostList(List<HHPostFull> posts) {
+						MapViewFragment.this.posts = ZZZUtility.mergeLists(
+							MapViewFragment.this.posts, posts);
+						addMapMarkers();
+						fetchData = false;
+					}
 
-				@Override
-				public void returnGetWebPost(HHPostFull webPost) {
-					if (ZZZUtility.addItemToList(posts, webPost))
-						addMapMarker(webPost, true);
-				}
-			});
+					@Override
+					public void returnGetPost(HHPostFull post) {
+						if (ZZZUtility.addItemToList(posts, post)) {
+							addMapMarker(post, true);
+							fetchData = false;
+						}
+					}
+				});
+		} else {
+			addMapMarkers();
+		}
 	}
 
 	private void onMapReadyForLocation(){

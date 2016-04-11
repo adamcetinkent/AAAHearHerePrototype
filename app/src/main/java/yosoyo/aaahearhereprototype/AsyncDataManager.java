@@ -108,12 +108,12 @@ public class AsyncDataManager {
 		).execute();
 	}
 
-	public interface GetWebPostCallback {
-		void returnGetWebPost(HHPostFull webPost);
+	public interface GetPostCallback {
+		void returnGetPost(HHPostFull post);
 	}
 
-	public interface GetAllPostsCallback extends GetWebPostCallback {
-		void returnGetAllCachedPosts(List<HHPostFull> cachedPosts);
+	public interface GetAllPostsCallback extends GetPostCallback {
+		void returnPostList(List<HHPostFull> posts);
 	}
 
 	public static void getAllPosts(GetAllPostsCallback callback){
@@ -125,7 +125,7 @@ public class AsyncDataManager {
 		DatabaseHelper.getAllCachedPosts(context, new DatabaseHelper.GetAllCachedPostsCallback() {
 			@Override
 			public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
-				callback.returnGetAllCachedPosts(cachedPosts);
+				callback.returnPostList(cachedPosts);
 			}
 		});
 	}
@@ -152,7 +152,7 @@ public class AsyncDataManager {
 			new DatabaseHelper.GetAllCachedPostsCallback() {
 				@Override
 				public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
-					callback.returnGetAllCachedPosts(cachedPosts);
+					callback.returnPostList(cachedPosts);
 				}
 			});
 	}
@@ -169,7 +169,24 @@ public class AsyncDataManager {
 			});
 	}
 
-	public static void getWebPost(long post_id, final GetWebPostCallback callback){
+	public static void getPost(long postID, GetPostCallback callback){
+		getCachedPost(postID, callback);
+		getWebPost(postID, callback);
+	}
+
+	private static void getCachedPost(long postID, final GetPostCallback callback){
+		DatabaseHelper.getCachedPost(
+			context,
+			postID,
+			new DatabaseHelper.GetCachedPostCallback() {
+				@Override
+				public void returnGetCachedPost(HHPostFull cachedPost) {
+					callback.returnGetPost(cachedPost);
+				}
+			});
+	}
+
+	public static void getWebPost(long post_id, final GetPostCallback callback){
 		WebHelper.getPost(post_id, new WebHelper.GetPostCallback() {
 			@Override
 			public void returnGetPost(HHPostFullProcess webPostToProcess) {
@@ -193,7 +210,7 @@ public class AsyncDataManager {
 	}
 
 	public static void getPostsAtLocation(Context context, Location location, final long userID, final GetPostsAtLocationCallback callback){
-		DatabaseHelper.getPostsAtLocation(
+		/*DatabaseHelper.getPostsAtLocation(
 			context,
 			location,
 			new DatabaseHelper.GetPostsAtLocationCallback() {
@@ -214,6 +231,15 @@ public class AsyncDataManager {
 							}
 						});
 
+				}
+			});*/
+		WebHelper.getPostsAtLocation(
+			location,
+			userID,
+			new WebHelper.GetPostsAtLocationCallback() {
+				@Override
+				public void returnGetPostsAtLocation(List<HHPostFull> webPosts) {
+					callback.returnPostsAtLocation(webPosts);
 				}
 			});
 	}

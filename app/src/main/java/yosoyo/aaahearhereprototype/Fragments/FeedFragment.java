@@ -60,26 +60,28 @@ public class FeedFragment extends FeedbackFragment {
 	private static final String TAG = FeedFragment.class.getSimpleName();
 
 	private int feedType;
-	public static final String KEY_FEED_TYPE = "feed_type";
+	public static final String KEY_FEED_TYPE = TAG + "feed_type";
 	public static final int GENERAL_FEED = 0;
 	public static final int HOME_PROFILE_FEED = 1;
 	public static final int USER_PROFILE_FEED = 2;
+	public static final int SINGLE_POST_FEED = 3;
 
-	public static final String KEY_USER_ID = "user_id";
+	public static final String KEY_USER_ID = TAG + "user_id";
 	private long userID = -1;
 
-	public static final String KEY_FETCH_DATA = "fetch_data";
+	public static final String KEY_POST_ID = TAG + "post_id";
+	private long postID = -1;
+
+	public static final String KEY_FETCH_DATA = TAG + "fetch_data";
 	private boolean fetchData = true;
 
 	private ProfileFragment profileFragment;
 	private Bundle profileFragmentBundle;
-	/*private int profileFragmentID;
-	public static final String KEY_PROFILE_FRAGMENT_ID = "profile_fragment_id";*/
 
 	private ExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
+	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
-	public static final String KEY_POSTS = "posts";
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -90,20 +92,60 @@ public class FeedFragment extends FeedbackFragment {
 
 		Bundle arguments = new Bundle();
 		arguments.putInt(KEY_FEED_TYPE, feedType);
-		arguments.putLong(USER_ID, userID);
+		arguments.putLong(KEY_USER_ID, userID);
 		feedFragment.setArguments(arguments);
 
 		return feedFragment;
+	}
+
+	public static FeedFragment newInstance(int feedType, long userID, long postID){
+		FeedFragment feedFragment = new FeedFragment();
+
+		Bundle arguments = new Bundle();
+		arguments.putInt(KEY_FEED_TYPE, feedType);
+		arguments.putLong(KEY_USER_ID, userID);
+		arguments.putLong(KEY_POST_ID, postID);
+		feedFragment.setArguments(arguments);
+
+		return feedFragment;
+	}
+
+	public static FeedFragment newInstance(Bundle bundle){
+		FeedFragment feedFragment = new FeedFragment();
+
+		feedFragment.restoreInstanceState(bundle);
+
+		return feedFragment;
+	}
+
+	public void addToBundle(Bundle bundle){
+		bundle.putLong(KEY_USER_ID, userID);
+		bundle.putBoolean(KEY_FETCH_DATA, fetchData);
+		bundle.putInt(KEY_FEED_TYPE, feedType);
+		bundle.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+	}
+
+	public void addToBundleForSwitch(Bundle bundle){
+		bundle.putLong(MapViewFragment.KEY_USER_ID, userID);
+		bundle.putBoolean(MapViewFragment.KEY_FETCH_DATA, fetchData);
+		bundle.putInt(MapViewFragment.KEY_MAP_TYPE, feedType);
+		bundle.putParcelableArrayList(MapViewFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
 	}
 
 	public FeedFragment() {
 		// Required empty public constructor
 	}
 
+	private void restoreInstanceState(Bundle bundle){
+		userID = bundle.getLong(KEY_USER_ID);
+		fetchData = bundle.getBoolean(KEY_FETCH_DATA);
+		feedType = bundle.getInt(KEY_FEED_TYPE);
+		posts = bundle.getParcelableArrayList(KEY_POSTS);
+	}
+
 	public void setProfileFragmentBundle(Bundle bundle){
 		this.profileFragmentBundle = bundle;
 	}
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -120,6 +162,7 @@ public class FeedFragment extends FeedbackFragment {
 			feedType = savedInstanceState.getInt(KEY_FEED_TYPE);
 			fetchData = savedInstanceState.getBoolean(KEY_FETCH_DATA);
 			userID = savedInstanceState.getInt(KEY_USER_ID);
+			postID = savedInstanceState.getInt(KEY_POST_ID);
 			posts = savedInstanceState.getParcelableArrayList(KEY_POSTS);
 			profileFragmentBundle = savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
 		}
@@ -130,8 +173,11 @@ public class FeedFragment extends FeedbackFragment {
 		feedType = arguments.getInt(KEY_FEED_TYPE);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
-			userID = arguments.getLong(USER_ID);
+			userID = arguments.getLong(KEY_USER_ID);
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+		} else if (feedType == SINGLE_POST_FEED){
+			userID = arguments.getLong(KEY_USER_ID);
+			postID = arguments.getLong(KEY_POST_ID);
 		}
 
 	}
@@ -154,6 +200,7 @@ public class FeedFragment extends FeedbackFragment {
 		outState.putInt(KEY_FEED_TYPE, feedType);
 		outState.putBoolean(KEY_FETCH_DATA, fetchData);
 		outState.putLong(KEY_USER_ID, userID);
+		outState.putLong(KEY_POST_ID, postID);
 		outState.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
 
 		if (profileFragmentBundle != null){
@@ -200,6 +247,7 @@ public class FeedFragment extends FeedbackFragment {
 
 			if (profileFragment != null) {
 				profileFragment.setProfileMode(ProfileFragment.PROFILE_MODE_FEED);
+				profileFragment.setFeedFragment(this);
 				FragmentTransaction ft = getFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_frame_frame, profileFragment);
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -244,6 +292,10 @@ public class FeedFragment extends FeedbackFragment {
 					getUserData();
 					break;
 				}
+				case SINGLE_POST_FEED:{
+					getSinglePostData();
+					break;
+				}
 			}
 		} else {
 			notifyAdapter();
@@ -254,17 +306,17 @@ public class FeedFragment extends FeedbackFragment {
 
 	private AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
 		@Override
-		public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
+		public void returnPostList(List<HHPostFull> posts) {
 			Log.d(TAG, "Cached posts returned");
-			posts = ZZZUtility.mergeLists(posts, cachedPosts);
+			FeedFragment.this.posts = ZZZUtility.mergeLists(FeedFragment.this.posts, posts);
 			notifyAdapter();
 			fetchData = false;	//TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
 		}
 
 		@Override
-		public void returnGetWebPost(HHPostFull webPost) {
+		public void returnGetPost(HHPostFull post) {
 			Log.d(TAG, "Web post returned!");
-			posts = ZZZUtility.updateList(posts, webPost);
+			posts = ZZZUtility.updateList(posts, post);
 			notifyAdapter();
 			fetchData = false; //TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
 		}
@@ -287,6 +339,26 @@ public class FeedFragment extends FeedbackFragment {
 				public void returnWebUserPrivacy(boolean userPrivacy) {
 					if (userPrivacy) {
 						AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
+					} else {
+						setPrivateProfile();
+					}
+				}
+			});
+	}
+
+	private void getSinglePostData(){
+		AsyncDataManager.getUserPrivacy(
+			userID,
+			true,
+			new AsyncDataManager.GetUserPrivacyCallback() {
+				@Override
+				public void returnCachedUserPrivacy(boolean userPrivacy) {
+				}
+
+				@Override
+				public void returnWebUserPrivacy(boolean userPrivacy) {
+					if (userPrivacy) {
+						AsyncDataManager.getPost(postID, getAllPostsCallback);
 					} else {
 						setPrivateProfile();
 					}
@@ -462,10 +534,10 @@ public class FeedFragment extends FeedbackFragment {
 										Log.d(TAG, "Posted new comment!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),
-											new AsyncDataManager.GetWebPostCallback() {
+											new AsyncDataManager.GetPostCallback() {
 												@Override
-												public void returnGetWebPost(HHPostFull webPost) {
-													posts = ZZZUtility.updateList(posts, webPost);
+												public void returnGetPost(HHPostFull post) {
+													posts = ZZZUtility.updateList(posts, post);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
 												}
@@ -486,10 +558,10 @@ public class FeedFragment extends FeedbackFragment {
 										Log.d(TAG, "Deleted like!");
 										AsyncDataManager.getWebPost(
 											viewHolder.post.getPost().getID(),
-											new AsyncDataManager.GetWebPostCallback() {
+											new AsyncDataManager.GetPostCallback() {
 												@Override
-												public void returnGetWebPost(HHPostFull webPost) {
-													posts = ZZZUtility.updateList(posts, webPost);
+												public void returnGetPost(HHPostFull post) {
+													posts = ZZZUtility.updateList(posts, post);
 													callback.onDataChange();
 													viewHolder.btnLikeButton.setEnabled(true);
 												}
@@ -868,10 +940,10 @@ public class FeedFragment extends FeedbackFragment {
 								Log.d(TAG, "Posted new comment!");
 								AsyncDataManager.getWebPost(
 									post_id,
-									new AsyncDataManager.GetWebPostCallback() {
+									new AsyncDataManager.GetPostCallback() {
 										@Override
-										public void returnGetWebPost(HHPostFull webPost) {
-											posts = ZZZUtility.updateList(posts, webPost);
+										public void returnGetPost(HHPostFull post) {
+											posts = ZZZUtility.updateList(posts, post);
 											callback.onDataChange();
 										}
 									});

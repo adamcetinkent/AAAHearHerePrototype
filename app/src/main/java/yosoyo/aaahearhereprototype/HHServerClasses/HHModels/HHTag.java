@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import java.sql.Timestamp;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMTag;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNested;
 
 /**
@@ -30,11 +30,11 @@ public class HHTag extends HHLike implements Parcelable {
 
 	public HHTag(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_ID_NAME)),
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_POST_ID_NAME)),
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_USER_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMTag.ID())),
+			cursor.getLong(cursor.getColumnIndex(ORMTag.POST_ID())),
+			cursor.getLong(cursor.getColumnIndex(ORMTag.USER_ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTag.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTag.UPDATED_AT())))
 			 );
 	}
 

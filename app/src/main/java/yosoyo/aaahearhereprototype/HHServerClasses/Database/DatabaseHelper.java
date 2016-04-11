@@ -157,6 +157,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		void returnGetAllCachedPosts(List<HHPostFull> cachedPosts);
 	}
 
+	public interface GetCachedPostCallback {
+		void returnGetCachedPost(HHPostFull cachedPost);
+	}
+
 	public static void getAllCachedPosts(Context context, final GetAllCachedPostsCallback callback){
 		// GET CACHED POSTS FROM DATABASE
 		ORMPostFull.getAllPosts(
@@ -165,6 +169,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				@Override
 				public void returnPosts(List<HHPostFull> posts) {
 					callback.returnGetAllCachedPosts(posts);
+				}
+			});
+	}
+
+	public static void getCachedPost(Context context, long postID, final GetCachedPostCallback callback){
+		// GET CACHED POST FROM DATABASE
+		ORMPostFull.getPost(
+			context,
+			postID,
+			new ORMPostFull.DBPostFullSelectTask.Callback() {
+				@Override
+				public void returnPost(HHPostFull post) {
+					callback.returnGetCachedPost(post);
 				}
 			});
 	}
@@ -182,7 +199,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			});
 	}
 
-	public static void processWebPosts(final Context context, final AsyncDataManager.GetWebPostCallback callback, final List<HHPostFullProcess> webPostsToProcess){
+	public static void processWebPosts(final Context context, final AsyncDataManager.GetPostCallback callback, final List<HHPostFullProcess> webPostsToProcess){
 		// INSERT POSTS INTO DATABASE
 		ORMPost.insertPosts(
 			context,
@@ -289,17 +306,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	}
 
-	private static void returnProcessedPosts(final AsyncDataManager.GetWebPostCallback callback, List<HHPostFullProcess> postsToProcess){
+	private static void returnProcessedPosts(final AsyncDataManager.GetPostCallback callback, List<HHPostFullProcess> postsToProcess){
 		for (HHPostFullProcess postToProcess : postsToProcess){
 			testProcessPost(callback, postToProcess, postsToProcess);
 		}
 	}
 
-	private static void testProcessPost(final AsyncDataManager.GetWebPostCallback callback, HHPostFullProcess postToProcess, List<HHPostFullProcess> postsToProcess){
+	private static void testProcessPost(final AsyncDataManager.GetPostCallback callback, HHPostFullProcess postToProcess, List<HHPostFullProcess> postsToProcess){
 		if (postToProcess.isProcessed()){
 
 			//postsToProcess.remove(postToProcess);
-			callback.returnGetWebPost(new HHPostFull(postToProcess));
+			callback.returnGetPost(new HHPostFull(postToProcess));
 		}
 	}
 

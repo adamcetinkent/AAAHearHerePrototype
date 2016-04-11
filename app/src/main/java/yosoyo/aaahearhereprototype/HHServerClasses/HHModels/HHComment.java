@@ -34,13 +34,13 @@ public class HHComment extends HHLike implements Parcelable {
 
 	public HHComment(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_ID_NAME)),
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_POST_ID_NAME)),
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_USER_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMComment.ID())),
+			cursor.getLong(cursor.getColumnIndex(ORMComment.POST_ID())),
+			cursor.getLong(cursor.getColumnIndex(ORMComment.USER_ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.UPDATED_AT())))
 		);
-		this.message = cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_MESSAGE_NAME));
+		this.message = cursor.getString(cursor.getColumnIndex(ORMComment.MESSAGE()));
 	}
 
 	public String getMessage() {

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import java.sql.Timestamp;
 
-import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMComment;
+import yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMLike;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserNested;
 
 /**
@@ -45,12 +45,12 @@ public class HHLike extends HHBase implements Parcelable {
 
 	public HHLike(Cursor cursor){
 		super(
-			cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_ID_NAME)),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_CREATED_AT_NAME))),
-			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMComment.COLUMN_UPDATED_AT_NAME)))
+			cursor.getLong(cursor.getColumnIndex(ORMLike.ID())),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMLike.CREATED_AT()))),
+			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMLike.UPDATED_AT())))
 			 );
-		this.post_id = cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_POST_ID_NAME));
-		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMComment.COLUMN_USER_ID_NAME));
+		this.post_id = cursor.getLong(cursor.getColumnIndex(ORMLike.POST_ID()));
+		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMLike.USER_ID()));
 	}
 
 	public long getPostID() {

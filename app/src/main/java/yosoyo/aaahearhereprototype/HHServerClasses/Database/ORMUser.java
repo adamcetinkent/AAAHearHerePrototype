@@ -27,49 +27,63 @@ public class ORMUser {
 
 	private static final String TAG = "ORMUser";
 
-	public static final String	TABLE_NAME = 					"users";
+	private static final String	TABLE_NAME = 					"users";
+	public static String TABLE() {return TABLE_NAME;}
 
 	private static final String	COMMA_SEP = 					", ";
 
-	public static final String	COLUMN_ID_NAME = 				"_id";
+	private static final String	COLUMN_ID_NAME = 				"_id";
 	private static final String	COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
+	public static String ID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
 
-	public static final String	COLUMN_FIRST_NAME_NAME =		"first_name";
+	private static final String	COLUMN_FIRST_NAME_NAME =		"first_name";
 	private static final String	COLUMN_FIRST_NAME_TYPE =		"TEXT";
+	public static String FIRST_NAME() { return TABLE_NAME + "." + COLUMN_FIRST_NAME_NAME; }
 
-	public static final String	COLUMN_LAST_NAME_NAME =			"last_name";
+	private static final String	COLUMN_LAST_NAME_NAME =			"last_name";
 	private static final String	COLUMN_LAST_NAME_TYPE =			"TEXT";
+	public static String LAST_NAME() { return TABLE_NAME + "." + COLUMN_LAST_NAME_NAME; }
 
-	public static final String	COLUMN_EMAIL_NAME = 			"email";
+	private static final String	COLUMN_EMAIL_NAME = 			"email";
 	private static final String	COLUMN_EMAIL_TYPE = 			"TEXT";
+	public static String EMAIL() { return TABLE_NAME + "." + COLUMN_EMAIL_NAME; }
 
-	public static final String	COLUMN_FB_USER_ID_NAME = 		"fb_user_id";
+	private static final String	COLUMN_FB_USER_ID_NAME = 		"fb_user_id";
 	private static final String	COLUMN_FB_USER_ID_TYPE = 		"TEXT";
+	public static String FB_USER_ID() { return TABLE_NAME + "." + COLUMN_FB_USER_ID_NAME; }
 
-	public static final String	COLUMN_PROFILE_PRIVACY_NAME =	"profile_privacy";
+	private static final String	COLUMN_PROFILE_PRIVACY_NAME =	"profile_privacy";
 	private static final String	COLUMN_PROFILE_PRIVACY_TYPE =	"INTEGER";
+	public static String PROFILE_PRIVACY() { return TABLE_NAME + "." + COLUMN_PROFILE_PRIVACY_NAME; }
 
-	public static final String	COLUMN_SEARCH_PRIVACY_NAME = 	"search_privacy";
+	private static final String	COLUMN_SEARCH_PRIVACY_NAME = 	"search_privacy";
 	private static final String	COLUMN_SEARCH_PRIVACY_TYPE = 	"INTEGER";
+	public static String SEARCH_PRIVACY() { return TABLE_NAME + "." + COLUMN_SEARCH_PRIVACY_NAME; }
 
-	public static final String	COLUMN_AUTO_ACCEPT_NAME = 		"auto_accept";
+	private static final String	COLUMN_AUTO_ACCEPT_NAME = 		"auto_accept";
 	private static final String	COLUMN_AUTO_ACCEPT_TYPE = 		"INTEGER";
+	public static String AUTO_ACCEPT() { return TABLE_NAME + "." + COLUMN_AUTO_ACCEPT_NAME; }
 
-	public static final String	COLUMN_BIO_NAME = 				"bio";
+	private static final String	COLUMN_BIO_NAME = 				"bio";
 	private static final String	COLUMN_BIO_TYPE = 				"TEXT";
+	public static String BIO() { return TABLE_NAME + "." + COLUMN_BIO_NAME; }
 
-	public static final String	COLUMN_URL_NAME = 				"url";
+	private static final String	COLUMN_URL_NAME = 				"url";
 	private static final String	COLUMN_URL_TYPE = 				"TEXT";
+	public static String URL() { return TABLE_NAME + "." + COLUMN_URL_NAME; }
 
-	public static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
+	private static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
+	public static String CREATED_AT() { return TABLE_NAME + "." + COLUMN_CREATED_AT_NAME; }
 
-	public static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
+	private static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
+	public static String UPDATED_AT() { return TABLE_NAME + "." + COLUMN_UPDATED_AT_NAME; }
 
 	private static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 		"TIMESTAMP";
 	private static final String	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
+	public static String CACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
 
 
 	public static final String SQL_CREATE_TABLE =

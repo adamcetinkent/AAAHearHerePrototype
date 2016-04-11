@@ -29,12 +29,12 @@ public class HHCachedSpotifyTrack implements Parcelable {
 	}
 
 	public HHCachedSpotifyTrack(Cursor cursor){
-		this.trackID = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_TRACK_ID_NAME));
-		this.name = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_NAME_NAME));
-		this.artist = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_ARTIST_NAME));
-		this.album = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_ALBUM_NAME));
-		this.image_url = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_IMAGE_URL_NAME));
-		this.preview_url = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.COLUMN_PREVIEW_URL_NAME));
+		this.trackID = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.TRACK_ID()));
+		this.name = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.NAME()));
+		this.artist = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.ARTIST_NAME()));
+		this.album = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.ALBUM_NAME()));
+		this.image_url = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.IMAGE_URL()));
+		this.preview_url = cursor.getString(cursor.getColumnIndex(ORMCachedSpotifyTrack.PREVIEW_URL()));
 	}
 
 	public String getTrackID() {
