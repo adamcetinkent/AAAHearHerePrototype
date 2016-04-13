@@ -46,7 +46,7 @@ class ORMUserFull {
 			SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
 			Cursor cursorUser = database.rawQuery("SELECT * FROM " + ORMUser.TABLE() +
-													  " WHERE " + ORMUser.ID() + "=?",
+													  " WHERE " + ORMUser.dotID() + "=?",
 												  new String[]{String.valueOf(userID)});
 
 			int numUsers = cursorUser.getCount();
@@ -55,15 +55,15 @@ class ORMUserFull {
 			HHUserFull user = null;
 			if (numUsers > 0){
 				cursorUser.moveToFirst();
-				user = new HHUserFull(cursorUser, ORMUser.ID());
+				user = new HHUserFull(cursorUser, ORMUser.dotID());
 				Log.d(TAG, "User loaded successfully");
 
 				{
 					Cursor cursorFriends = database.rawQuery(
 						"SELECT * FROM " + ORMFriendship.TABLE()
 							+ " LEFT JOIN " + ORMUser.TABLE()
-							+ " ON " + ORMFriendship.USER_ID() + " = " + ORMUser.ID()
-							+ " WHERE " + ORMFriendship.USER_ID() + " = ?"
+							+ " ON " + ORMFriendship.dotUSER_ID() + " = " + ORMUser.dotID()
+							+ " WHERE " + ORMFriendship.dotUSER_ID() + " = ?"
 						, new String[]{String.valueOf(userID)});
 
 					int numFriends = cursorFriends.getCount();
@@ -72,7 +72,7 @@ class ORMUserFull {
 					if (numFriends > 0) {
 						cursorFriends.moveToFirst();
 						while (!cursorFriends.isAfterLast()) {
-							HHFriendshipUser friendshipUser = new HHFriendshipUser(cursorFriends, ORMFriendship.USER_ID());
+							HHFriendshipUser friendshipUser = new HHFriendshipUser(cursorFriends, ORMFriendship.dotUSER_ID());
 							friendships.add(friendshipUser);
 							cursorFriends.moveToNext();
 						}
@@ -85,8 +85,8 @@ class ORMUserFull {
 					Cursor cursorFollows = database.rawQuery(
 						"SELECT * FROM " + ORMFollow.TABLE()
 							+ " LEFT JOIN " + ORMUser.TABLE()
-							+ " ON " + ORMFollow.USER_ID() + " = " + ORMUser.ID()
-							+ " WHERE " + ORMFollow.USER_ID() + " = ?"
+							+ " ON " + ORMFollow.dotUSER_ID() + " = " + ORMUser.dotID()
+							+ " WHERE " + ORMFollow.dotUSER_ID() + " = ?"
 						, new String[]{String.valueOf(userID)});
 
 					int numFollows = cursorFollows.getCount();
@@ -95,7 +95,7 @@ class ORMUserFull {
 					if (numFollows > 0) {
 						cursorFollows.moveToFirst();
 						while (!cursorFollows.isAfterLast()) {
-							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.USER_ID());
+							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.dotUSER_ID());
 							follows.add(followUser);
 							cursorFollows.moveToNext();
 						}
@@ -108,8 +108,8 @@ class ORMUserFull {
 					Cursor cursorFollows = database.rawQuery(
 						"SELECT * FROM " + ORMFollow.TABLE()
 							+ " LEFT JOIN " + ORMUser.TABLE()
-							+ " ON " + ORMFollow.FOLLOWED_USER_ID() + " = " + ORMUser.ID()
-							+ " WHERE " + ORMFollow.FOLLOWED_USER_ID() + " = ?"
+							+ " ON " + ORMFollow.dotFOLLOWED_USER_ID() + " = " + ORMUser.dotID()
+							+ " WHERE " + ORMFollow.dotFOLLOWED_USER_ID() + " = ?"
 						, new String[]{String.valueOf(userID)});
 
 					int numFollows = cursorFollows.getCount();
@@ -118,7 +118,7 @@ class ORMUserFull {
 					if (numFollows > 0) {
 						cursorFollows.moveToFirst();
 						while (!cursorFollows.isAfterLast()) {
-							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.FOLLOWED_USER_ID());
+							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.dotFOLLOWED_USER_ID());
 							follows.add(followUser);
 							cursorFollows.moveToNext();
 						}
@@ -131,8 +131,8 @@ class ORMUserFull {
 					Cursor cursorFollowRequests = database.rawQuery(
 						"SELECT * FROM " + ORMFollowRequest.TABLE()
 							+ " LEFT JOIN " + ORMUser.TABLE()
-							+ " ON " + ORMFollowRequest.USER_ID() + " = " + ORMUser.ID()
-							+ " WHERE " + ORMFollowRequest.USER_ID() + " = ?"
+							+ " ON " + ORMFollowRequest.dotUSER_ID() + " = " + ORMUser.dotID()
+							+ " WHERE " + ORMFollowRequest.dotUSER_ID() + " = ?"
 						, new String[]{String.valueOf(userID)});
 
 					int numFollowRequests = cursorFollowRequests.getCount();
@@ -141,7 +141,7 @@ class ORMUserFull {
 					if (numFollowRequests > 0) {
 						cursorFollowRequests.moveToFirst();
 						while (!cursorFollowRequests.isAfterLast()) {
-							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.USER_ID());
+							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.dotUSER_ID());
 							followRequests.add(followRequestUser);
 							cursorFollowRequests.moveToNext();
 						}
@@ -154,8 +154,8 @@ class ORMUserFull {
 					Cursor cursorFollowRequests = database.rawQuery(
 						"SELECT * FROM " + ORMFollowRequest.TABLE()
 							+ " LEFT JOIN " + ORMUser.TABLE()
-							+ " ON " + ORMFollowRequest.REQUESTED_USER_ID() + " = " + ORMUser.ID()
-							+ " WHERE " + ORMFollowRequest.REQUESTED_USER_ID() + " = ?"
+							+ " ON " + ORMFollowRequest.dotREQUESTED_USER_ID() + " = " + ORMUser.dotID()
+							+ " WHERE " + ORMFollowRequest.dotREQUESTED_USER_ID() + " = ?"
 						, new String[]{String.valueOf(userID)});
 
 					int numFollowRequests = cursorFollowRequests.getCount();
@@ -164,7 +164,7 @@ class ORMUserFull {
 					if (numFollowRequests > 0) {
 						cursorFollowRequests.moveToFirst();
 						while (!cursorFollowRequests.isAfterLast()) {
-							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.REQUESTED_USER_ID());
+							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.dotREQUESTED_USER_ID());
 							followRequests.add(followRequestUser);
 							cursorFollowRequests.moveToNext();
 						}

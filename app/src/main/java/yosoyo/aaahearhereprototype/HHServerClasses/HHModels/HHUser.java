@@ -55,7 +55,7 @@ public class HHUser extends HHBase implements Parcelable {
 			cursor.getLong(cursor.getColumnIndex(idColumnIndex)),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.CREATED_AT()))),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMUser.UPDATED_AT())))
-			 );
+		);
 		this.first_name = 		cursor.getString(cursor.getColumnIndex(ORMUser.FIRST_NAME()));
 		this.last_name = 		cursor.getString(cursor.getColumnIndex(ORMUser.LAST_NAME()));
 		this.email = 			cursor.getString(cursor.getColumnIndex(ORMUser.EMAIL()));

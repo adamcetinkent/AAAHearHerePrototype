@@ -93,6 +93,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		setContentView(R.layout.activity_holder);
 
 		AsyncDataManager.setContext(this);
+		WebHelper.setActivity(this);
 
 		WebHelper.getFacebookProfilePicture(
 			Profile.getCurrentProfile().getId(),

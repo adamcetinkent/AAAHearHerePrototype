@@ -28,36 +28,44 @@ public class ORMCachedSpotifyTrack {
 
 	private static final String COLUMN_ID_NAME = 			"_id";
 	private static final String COLUMN_ID_TYPE = 			"INTEGER PRIMARY KEY AUTOINCREMENT";
-	public static String ID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
+	public static String ID() { return COLUMN_ID_NAME; }
+	public static String dotID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
 
 	private static final String	COLUMN_TRACK_ID_NAME = 		"track_id";
 	private static final String COLUMN_TRACK_ID_TYPE = 		"TEXT";
-	public static String TRACK_ID() { return TABLE_NAME + "." + COLUMN_TRACK_ID_NAME; }
+	public static String TRACK_ID() { return COLUMN_TRACK_ID_NAME; }
+	public static String dotTRACK_ID() { return TABLE_NAME + "." + COLUMN_TRACK_ID_NAME; }
 
 	private static final String	COLUMN_NAME_NAME = 			"name";
 	private static final String COLUMN_NAME_TYPE = 			"TEXT";
-	public static String NAME() { return TABLE_NAME + "." + COLUMN_NAME_NAME;}
+	public static String NAME() { return COLUMN_NAME_NAME;}
+	public static String dotNAME() { return TABLE_NAME + "." + COLUMN_NAME_NAME;}
 
 	private static final String	COLUMN_ARTIST_NAME = 		"artist";
 	private static final String COLUMN_ARTIST_TYPE = 		"TEXT";
-	public static String ARTIST_NAME() { return TABLE_NAME + "." + COLUMN_ARTIST_NAME; }
+	public static String ARTIST_NAME() { return COLUMN_ARTIST_NAME; }
+	public static String dotARTIST_NAME() { return TABLE_NAME + "." + COLUMN_ARTIST_NAME; }
 
 	private static final String	COLUMN_ALBUM_NAME =			"album";
 	private static final String COLUMN_ALBUM_TYPE =			"TEXT";
-	public static String ALBUM_NAME() { return TABLE_NAME + "." + COLUMN_ALBUM_NAME; }
+	public static String ALBUM_NAME() { return COLUMN_ALBUM_NAME; }
+	public static String dotALBUM_NAME() { return TABLE_NAME + "." + COLUMN_ALBUM_NAME; }
 
 	private static final String	COLUMN_IMAGE_URL_NAME =		"image_url";
 	private static final String COLUMN_IMAGE_URL_TYPE =		"TEXT";
-	public static String IMAGE_URL() { return TABLE_NAME + "." + COLUMN_IMAGE_URL_NAME; }
+	public static String IMAGE_URL() { return COLUMN_IMAGE_URL_NAME; }
+	public static String dotIMAGE_URL() { return TABLE_NAME + "." + COLUMN_IMAGE_URL_NAME; }
 
 	private static final String	COLUMN_PREVIEW_URL_NAME =	"preview_url";
 	private static final String COLUMN_PREVIEW_URL_TYPE =	"TEXT";
-	public static String PREVIEW_URL() { return TABLE_NAME + "." + COLUMN_PREVIEW_URL_NAME; }
+	public static String PREVIEW_URL() { return COLUMN_PREVIEW_URL_NAME; }
+	public static String dotPREVIEW_URL() { return TABLE_NAME + "." + COLUMN_PREVIEW_URL_NAME; }
 
 	private static final String COLUMN_CACHED_AT_NAME =		"cached_at";
 	private static final String COLUMN_CACHED_AT_TYPE =		"TIMESTAMP";
 	private static final String COLUMN_CACHED_AT_DEFAULT =	"DEFAULT CURRENT_TIMESTAMP NOT NULL";
-	public static String CACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
+	public static String CACHED_AT() { return COLUMN_CACHED_AT_NAME; }
+	public static String dotCACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +

@@ -161,8 +161,8 @@ public class FeedFragment extends FeedbackFragment {
 		if (savedInstanceState != null){
 			feedType = savedInstanceState.getInt(KEY_FEED_TYPE);
 			fetchData = savedInstanceState.getBoolean(KEY_FETCH_DATA);
-			userID = savedInstanceState.getInt(KEY_USER_ID);
-			postID = savedInstanceState.getInt(KEY_POST_ID);
+			userID = savedInstanceState.getLong(KEY_USER_ID);
+			postID = savedInstanceState.getLong(KEY_POST_ID);
 			posts = savedInstanceState.getParcelableArrayList(KEY_POSTS);
 			profileFragmentBundle = savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
 		}
@@ -705,10 +705,8 @@ public class FeedFragment extends FeedbackFragment {
 				});
 
 			viewHolder.txtUserName.setText(viewHolder.post.getUser().getName());
-			viewHolder.txtLocation.setText(ZZZUtility.truncatedAddress(
-				viewHolder.post.getPost().getPlaceName(), 35));
-			viewHolder.txtDateTime.setText(ZZZUtility.formatDynamicDate(
-				viewHolder.post.getPost().getCreatedAt()));
+			viewHolder.txtLocation.setText(ZZZUtility.truncatedAddress(viewHolder.post.getPost().getPlaceName(), 35));
+			viewHolder.txtDateTime.setText(ZZZUtility.formatDynamicDate(viewHolder.post.getPost().getCreatedAt()));
 			viewHolder.txtTrackName.setText(viewHolder.post.getTrack().getName());
 			viewHolder.txtArtist.setText(viewHolder.post.getTrack().getArtist());
 			viewHolder.txtAlbum.setText(viewHolder.post.getTrack().getAlbum());

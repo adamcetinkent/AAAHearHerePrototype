@@ -27,48 +27,59 @@ public class ORMPost {
 
 	private static final String COLUMN_ID_NAME = 				"_id";
 	private static final String COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
-	public static String ID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
+	public static String ID() { return COLUMN_ID_NAME; }
+	public static String dotID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
 
 	private static final String COLUMN_USER_ID_NAME = 			"user_id";
 	private static final String COLUMN_USER_ID_TYPE = 			"INTEGER";
-	public static String USER_ID() { return TABLE_NAME + "." + COLUMN_USER_ID_NAME; }
+	public static String USER_ID() { return COLUMN_USER_ID_NAME; }
+	public static String dotUSER_ID() { return TABLE_NAME + "." + COLUMN_USER_ID_NAME; }
 
 	private static final String COLUMN_TRACK_NAME =		 		"track";
 	private static final String COLUMN_TRACK_TYPE = 			"TEXT";
-	public static String TRACK() { return TABLE_NAME + "." + COLUMN_TRACK_NAME; }
+	public static String TRACK() { return COLUMN_TRACK_NAME; }
+	public static String dotTRACK() { return TABLE_NAME + "." + COLUMN_TRACK_NAME; }
 
 	private static final String COLUMN_LAT_NAME = 				"lat";
 	private static final String COLUMN_LAT_TYPE = 				"REAL";
-	public static String LAT() { return TABLE_NAME + "." + COLUMN_LAT_NAME; }
+	public static String LAT() { return COLUMN_LAT_NAME; }
+	public static String dotLAT() { return TABLE_NAME + "." + COLUMN_LAT_NAME; }
 
 	private static final String COLUMN_LON_NAME = 				"lon";
 	private static final String COLUMN_LON_TYPE = 				"REAL";
-	public static String LON() { return TABLE_NAME + "." + COLUMN_LON_NAME; }
+	public static String LON() { return COLUMN_LON_NAME; }
+	public static String dotLON() { return TABLE_NAME + "." + COLUMN_LON_NAME; }
 
 	private static final String COLUMN_MESSAGE_NAME = 			"message";
 	private static final String COLUMN_MESSAGE_TYPE = 			"TEXT";
-	public static String MESSAGE() { return TABLE_NAME + "." + COLUMN_MESSAGE_NAME; }
+	public static String MESSAGE() { return COLUMN_MESSAGE_NAME; }
+	public static String dotMESSAGE() { return TABLE_NAME + "." + COLUMN_MESSAGE_NAME; }
 
 	private static final String COLUMN_PLACE_NAME_NAME = 		"place_name";
 	private static final String COLUMN_PLACE_NAME_TYPE = 		"TEXT";
-	public static String PLACE_NAME() { return TABLE_NAME + "." + COLUMN_PLACE_NAME_NAME; }
+	public static String PLACE_NAME() { return COLUMN_PLACE_NAME_NAME; }
+	public static String dotPLACE_NAME() { return TABLE_NAME + "." + COLUMN_PLACE_NAME_NAME; }
 
 	private static final String COLUMN_GOOGLE_PLACE_ID_NAME =	"google_place_id";
 	private static final String COLUMN_GOOGLE_PLACE_ID_TYPE =	"TEXT";
-	public static String GOOGLE_PLACE_ID() { return TABLE_NAME + "." + COLUMN_GOOGLE_PLACE_ID_NAME; }
+	public static String GOOGLE_PLACE_ID() { return COLUMN_GOOGLE_PLACE_ID_NAME; }
+	public static String dotGOOGLE_PLACE_ID() { return TABLE_NAME + "." + COLUMN_GOOGLE_PLACE_ID_NAME; }
 
 	private static final String COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
-	public static String CREATED_AT() { return TABLE_NAME + "." + COLUMN_CREATED_AT_NAME; }
+	public static String CREATED_AT() { return COLUMN_CREATED_AT_NAME; }
+	public static String dotCREATED_AT() { return TABLE_NAME + "." + COLUMN_CREATED_AT_NAME; }
 
 	private static final String COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
-	public static String UPDATED_AT() { return TABLE_NAME + "." + COLUMN_UPDATED_AT_NAME; }
+	public static String UPDATED_AT() { return COLUMN_UPDATED_AT_NAME; }
+	public static String dotUPDATED_AT() { return TABLE_NAME + "." + COLUMN_UPDATED_AT_NAME; }
 
 	private static final String COLUMN_CACHED_AT_NAME =			"cached_at";
 	private static final String COLUMN_CACHED_AT_TYPE =			"TIMESTAMP";
 	private static final String COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
-	public static String CACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
+	public static String CACHED_AT() { return COLUMN_CACHED_AT_NAME; }
+	public static String dotCACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
 
 	public static final String SQL_CREATE_TABLE =
 		"CREATE TABLE " + TABLE_NAME + " (" +

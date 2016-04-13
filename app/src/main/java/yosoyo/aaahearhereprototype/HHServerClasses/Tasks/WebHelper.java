@@ -1,7 +1,12 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +44,7 @@ public class WebHelper {
 
 	private static final Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
 	private static final Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
+	private static Activity activity;
 
 	public interface GetAllPostsCallback {
 		void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess);
@@ -49,6 +55,7 @@ public class WebHelper {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 				callback.returnGetAllPosts(postsToProcess);
+				preLoadPostProcessBitmaps(postsToProcess);
 			}
 		}).execute();
 	}
@@ -60,6 +67,7 @@ public class WebHelper {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 					callback.returnGetAllPosts(postsToProcess);
+					preLoadPostProcessBitmaps(postsToProcess);
 				}
 			}).execute();
 	}
@@ -73,6 +81,7 @@ public class WebHelper {
 			@Override
 			public void returnPost(HHPostFullProcess post) {
 				callback.returnGetPost(post);
+				preLoadPostProcessBitmaps(post);
 			}
 		}).execute();
 	}
@@ -166,6 +175,7 @@ public class WebHelper {
 			@Override
 			public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
 				callback.returnSpotifyTrack(spotifyTrack);
+				preLoadTrackBitmaps(spotifyTrack);
 			}
 		}).execute();
 	}
@@ -174,47 +184,68 @@ public class WebHelper {
 		void returnSpotifyAlbumArt(Bitmap bitmap);
 	}
 
-	public static void getSpotifyAlbumArt(final String trackID, final String imageURL, final GetSpotifyAlbumArtCallback callback){
-		if (spotifyAlbumArt.containsKey(trackID))
-			callback.returnSpotifyAlbumArt(spotifyAlbumArt.get(trackID));
-		else
+	public static Bitmap getSpotifyAlbumArt(final String trackID, final String imageURL, final GetSpotifyAlbumArtCallback callback){
+		if (spotifyAlbumArt.containsKey(trackID)) {
+			Bitmap bitmap = spotifyAlbumArt.get(trackID);
+			if (callback != null)
+				callback.returnSpotifyAlbumArt(bitmap);
+			return bitmap;
+		} else {
 			new DownloadImageTask(new DownloadImageTask.DownloadImageTaskCallback() {
 				@Override
 				public void returnDownloadedImage(Bitmap result) {
 					spotifyAlbumArt.put(trackID, result);
-					callback.returnSpotifyAlbumArt(result);
+					if (callback != null)
+						callback.returnSpotifyAlbumArt(result);
 				}
 			}).execute(imageURL);
+		}
+		return null;
 	}
 
-	public static void getSpotifyAlbumArt(final HHCachedSpotifyTrack track, final GetSpotifyAlbumArtCallback callback){
-		if (spotifyAlbumArt.containsKey(track.getTrackID()))
-			callback.returnSpotifyAlbumArt(spotifyAlbumArt.get(track.getTrackID()));
-		else
+	public static Bitmap getSpotifyAlbumArt(final HHCachedSpotifyTrack track, final GetSpotifyAlbumArtCallback callback){
+		if (track == null)
+			return null;
+		if (spotifyAlbumArt.containsKey(track.getTrackID())) {
+			Bitmap bitmap = spotifyAlbumArt.get(track.getTrackID());
+			if (callback != null)
+				callback.returnSpotifyAlbumArt(bitmap);
+			return bitmap;
+		} else {
 			new DownloadImageTask(new DownloadImageTask.DownloadImageTaskCallback() {
 				@Override
 				public void returnDownloadedImage(Bitmap result) {
 					spotifyAlbumArt.put(track.getTrackID(), result);
-					callback.returnSpotifyAlbumArt(result);
+					if (callback != null)
+						callback.returnSpotifyAlbumArt(result);
 				}
 			}).execute(track.getImageUrl());
+		}
+		return null;
 	}
 
 	public interface GetFacebookProfilePictureCallback {
 		void returnFacebookProfilePicture(Bitmap bitmap);
 	}
 
-	public static void getFacebookProfilePicture(final String fb_user_id, final GetFacebookProfilePictureCallback callback){
-		if (facebookProfilePictures.containsKey(fb_user_id))
-			callback.returnFacebookProfilePicture(facebookProfilePictures.get(fb_user_id));
-		else
+	public static Bitmap getFacebookProfilePicture(final String fb_user_id, final GetFacebookProfilePictureCallback callback){
+		if (facebookProfilePictures.containsKey(fb_user_id)) {
+			Bitmap bitmap = facebookProfilePictures.get(fb_user_id);
+			if (callback != null)
+				callback.returnFacebookProfilePicture(bitmap);
+			return bitmap;
+		} else {
 			new DownloadImageTask(new DownloadImageTask.DownloadImageTaskCallback() {
 				@Override
 				public void returnDownloadedImage(Bitmap result) {
 					facebookProfilePictures.put(fb_user_id, result);
-					callback.returnFacebookProfilePicture(result);
+					if (callback != null)
+						callback.returnFacebookProfilePicture(result);
 				}
-			}).execute(DownloadImageTask.FACEBOOK_PROFILE_PHOTO + fb_user_id + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_NORMAL);
+			}).execute(
+				DownloadImageTask.FACEBOOK_PROFILE_PHOTO + fb_user_id + DownloadImageTask.FACEBOOK_PROFILE_PHOTO_NORMAL);
+		}
+		return null;
 	}
 
 	public interface PostCommentCallback{
@@ -339,6 +370,7 @@ public class WebHelper {
 				@Override
 				public void returnGetUser(boolean success, HHUserFullProcess user) {
 					callback.returnGetUser(new HHUserFull(user));
+					preLoadUserBitmaps(user);
 				}
 			}).execute();
 	}
@@ -354,8 +386,100 @@ public class WebHelper {
 				@Override
 				public void returnSearchUsers(List<HHUser> foundUsers) {
 					callback.returnSearchUsers(foundUsers);
+					preLoadUserBitmaps(foundUsers);
 				}
 			}).execute();
+	}
+
+	private static void preLoadPostProcessBitmaps(List<HHPostFullProcess> posts){
+		if (checkWifi()){
+			for (HHPostFullProcess post : posts) {
+				preLoadPostProcessBitmaps(post, true);
+			}
+		}
+	}
+
+	private static void preLoadPostProcessBitmaps(HHPostFullProcess post){
+		preLoadPostProcessBitmaps(post, false);
+	}
+
+	private static void preLoadPostProcessBitmaps(HHPostFullProcess post, boolean shortcut){
+		if (shortcut || checkWifi()){
+			getFacebookProfilePicture(post.getUser().getFBUserID(), null);
+			getSpotifyAlbumArt(post.getTrack(), null);
+		}
+	}
+
+	public static void preLoadPostBitmaps(List<HHPostFull> posts){
+		if (checkWifi()){
+			for (HHPostFull post : posts) {
+				preLoadPostBitmaps(post, true);
+			}
+		}
+	}
+
+	public static void preLoadPostBitmaps(HHPostFull post){
+		preLoadPostBitmaps(post, false);
+	}
+
+	private static void preLoadPostBitmaps(HHPostFull post, boolean shortcut){
+		if (shortcut || checkWifi()){
+			getFacebookProfilePicture(post.getUser().getFBUserID(), null);
+			getSpotifyAlbumArt(post.getTrack(), null);
+		}
+	}
+
+	private static void preLoadUserBitmaps(List<HHUser> users){
+		if (checkWifi()){
+			for (HHUser user : users) {
+				preLoadUserBitmaps(user, true);
+			}
+		}
+	}
+
+	public static void preLoadUserBitmaps(HHUserFull user){
+		preLoadUserBitmaps(user.getUser(), false);
+	}
+
+	private static void preLoadUserBitmaps(HHUser user){
+		preLoadUserBitmaps(user, false);
+	}
+
+	private static void preLoadUserBitmaps(HHUser user, boolean shortcut){
+		if (shortcut || checkWifi()){
+			getFacebookProfilePicture(user.getFBUserID(), null);
+		}
+	}
+
+	public static void preLoadTrackBitmaps(SpotifyTrack spotifyTrack){
+		if (checkWifi()){
+			getSpotifyAlbumArt(spotifyTrack.getID(), spotifyTrack.getImages(0).getUrl(), null);
+		}
+	}
+
+	public static void preLoadTrackBitmaps(HHCachedSpotifyTrack spotifyTrack){
+		if (checkWifi()){
+			getSpotifyAlbumArt(spotifyTrack, null);
+		}
+	}
+
+	public static void setActivity(Activity activity){
+		WebHelper.activity = activity;
+	}
+
+	private static boolean checkWifi(){
+		if (activity == null)
+			return false;
+
+		WifiManager wifiManager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
+		if (wifiManager.isWifiEnabled()){
+			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+			if (wifiInfo.getNetworkId() == -1 && wifiInfo.getSupplicantState() != SupplicantState.COMPLETED){
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -15,20 +16,21 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.text.Editable;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -36,20 +38,26 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
 import yosoyo.aaahearhereprototype.AsyncDataManager;
 import yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
+import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import yosoyo.aaahearhereprototype.HolderActivity;
 import yosoyo.aaahearhereprototype.R;
+import yosoyo.aaahearhereprototype.ZZZInterface.FreezeableMapView;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
@@ -63,6 +71,7 @@ public class MapViewFragment
 
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
+	private List<Marker> markers = new ArrayList<>();
 
 	private int mapType;
 	public static final String KEY_MAP_TYPE = TAG + "map_type";
@@ -76,12 +85,21 @@ public class MapViewFragment
 	public static final String KEY_FETCH_DATA = TAG + "fetch_data";
 	private boolean fetchData = true;
 
-	private MapView mMapView;
+	private FreezeableMapView mMapView;
 	private GoogleMap googleMap;
 	private Boolean mapExists = false;
 	private Location lastLocation;
 	private Location middleLocation;
+
 	private Marker currentMarker;
+
+	private HHPostFull currentPost;
+	private static final String KEY_CURRENT_POST = TAG + "current_post";
+
+	private ImageView btnLeft;
+	private ImageView btnCentre;
+	private ImageView btnRight;
+	private ProgressBar btnCentreProgressBar;
 
 	private AddressResultReceiver mResultReceiver;
 	private static final String ADDRESS_REQUESTED_KEY = TAG + "address-request-pending";
@@ -90,9 +108,23 @@ public class MapViewFragment
 	private String mAddressOutput;
 	//private ProgressBar mProgressBar;
 
+	public static final String KEY_CAMERA_POSITION = TAG + "camera_position";
+	private CameraPosition cameraPosition = null;
+
+	public static final String KEY_LAST_LOCATION = TAG + "last_location";
+
 	public static final String KEY_MAP_VIEW_FRAGMENT_BUNDLE = TAG + "map_view_fragment_bundle";
+	public static final String KEY_WORKAROUND_BUNDLE = TAG + "workaround_bundle";
 
 	private HHCachedSpotifyTrack currentTrack;
+
+	//public static final String KEY_ALREADY_SHIFTED = TAG + "already_shifted";
+	private boolean alreadyShifted = false;
+	//public static final String KEY_SHIFTED_CAMERA_POSITION = TAG + "shifted_camera_position";
+	private CameraPosition shiftedCameraPosition = null;
+
+	public static final String KEY_INFO_WINDOW_OPEN = TAG + "info_window_open";
+	private boolean needToOpenInfoWindow = false;
 
 	public MapViewFragment() {
 		//required empty public constructor
@@ -118,6 +150,19 @@ public class MapViewFragment
 		bundle.putBoolean(KEY_FETCH_DATA, fetchData);
 		bundle.putInt(KEY_MAP_TYPE, mapType);
 		bundle.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+		if (googleMap != null) {
+			cameraPosition = googleMap.getCameraPosition();
+		}
+		bundle.putParcelable(KEY_CAMERA_POSITION, cameraPosition);
+		bundle.putParcelable(KEY_LAST_LOCATION, HolderActivity.getLastLocation(getActivity()));
+		bundle.putParcelable(KEY_CURRENT_POST, currentPost);
+		//bundle.putBoolean(KEY_ALREADY_SHIFTED, alreadyShifted);
+		//bundle.putParcelable(KEY_SHIFTED_CAMERA_POSITION, shiftedCameraPosition);
+		if (currentMarker != null && currentMarker.isInfoWindowShown()) {
+			bundle.putBoolean(KEY_INFO_WINDOW_OPEN, true);
+		} else {
+			bundle.putBoolean(KEY_INFO_WINDOW_OPEN, false);
+		}
 	}
 
 	public void addToBundleForSwitch(Bundle bundle){
@@ -125,13 +170,36 @@ public class MapViewFragment
 		bundle.putBoolean(FeedFragment.KEY_FETCH_DATA, fetchData);
 		bundle.putInt(FeedFragment.KEY_FEED_TYPE, mapType);
 		bundle.putParcelableArrayList(FeedFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+		/*if (googleMap != null) {
+			cameraPosition = googleMap.getCameraPosition();
+		}
+		bundle.putParcelable(KEY_CAMERA_POSITION, cameraPosition);*/
 	}
 
 	private void restoreInstanceState(Bundle bundle){
+		if (bundle.containsKey(KEY_WORKAROUND_BUNDLE)){
+			bundle = bundle.getBundle(KEY_WORKAROUND_BUNDLE);
+		}
 		userID = bundle.getLong(KEY_USER_ID);
 		fetchData = bundle.getBoolean(KEY_FETCH_DATA);
 		mapType = bundle.getInt(KEY_MAP_TYPE);
 		posts = bundle.getParcelableArrayList(KEY_POSTS);
+		cameraPosition = bundle.getParcelable(KEY_CAMERA_POSITION);
+		lastLocation = bundle.getParcelable(KEY_LAST_LOCATION);
+		currentPost = bundle.getParcelable(KEY_CURRENT_POST);
+		//alreadyShifted = bundle.getBoolean(KEY_ALREADY_SHIFTED);
+		//shiftedCameraPosition = bundle.getParcelable(KEY_SHIFTED_CAMERA_POSITION);
+		needToOpenInfoWindow = bundle.getBoolean(KEY_INFO_WINDOW_OPEN);
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		mMapView.onSaveInstanceState(outState);
+		Bundle workaroundBundle = new Bundle();
+		addToBundle(workaroundBundle);
+		outState.putBundle(KEY_WORKAROUND_BUNDLE, workaroundBundle);
 	}
 
 	@Nullable
@@ -140,9 +208,13 @@ public class MapViewFragment
 
 		View v = inflater.inflate(R.layout.fragment_map, container, false);
 
-		mMapView = (MapView) v.findViewById(R.id.mapView);
+		mMapView = (FreezeableMapView) v.findViewById(R.id.mapView);
 
 		mMapView.onCreate(savedInstanceState);
+
+		if (savedInstanceState != null){
+			restoreInstanceState(savedInstanceState);
+		}
 
 		mMapView.onResume();
 
@@ -189,6 +261,65 @@ public class MapViewFragment
 			}
 		});
 
+		btnLeft = (ImageView) v.findViewById(R.id.fragment_map_btnLeft);
+		btnCentre = (ImageView) v.findViewById(R.id.fragment_map_btnCentre);
+		btnRight = (ImageView) v.findViewById(R.id.fragment_map_btnRight);
+		btnCentreProgressBar = (ProgressBar) v.findViewById(R.id.fragment_map_btnCentre_progress);
+		updateUIWidgets();
+
+		btnLeft.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (googleMap == null)
+					return;
+				if (currentPost == null && posts.size() > 0){
+					currentPost = posts.get(posts.size()-1);
+				}
+				if (currentPost != null && currentPost.getPost() != null) {
+					int position = posts.indexOf(currentPost);
+					if (--position < 0){
+						position = posts.size() - 1;
+					}
+					currentPost = posts.get(position);
+					currentMarker = markers.get(position);
+					alreadyShifted = false;
+					shiftedCameraPosition = null;
+					activateMarker(currentMarker);
+				}
+			}
+		});
+		btnRight.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (googleMap == null)
+					return;
+				if (currentPost == null && posts.size() > 0){
+					currentPost = posts.get(0);
+				}
+				if (currentPost != null && currentPost.getPost() != null) {
+					int position = posts.indexOf(currentPost);
+					if (++position >= posts.size()){
+						position = 0;
+					}
+					currentPost = posts.get(position);
+					currentMarker = markers.get(position);
+					alreadyShifted = false;
+					shiftedCameraPosition = null;
+					activateMarker(currentMarker);
+				}
+			}
+		});
+		btnCentre.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (googleMap == null)
+					return;
+				if (currentMarker != null && currentPost.getPost() != null){
+					activateMarker(currentMarker);
+				}
+			}
+		});
+
 		return v;
 	}
 
@@ -214,14 +345,14 @@ public class MapViewFragment
 					displayAddressOutput();
 
 					mAddressRequested = false;
-					updateUIWidgets();
+					//updateUIWidgets();
 				}
 			});
 		//mProgressBar = (ProgressBar) getView().findViewById(R.id.progress_bar);
 		mAddressRequested = false;
 		mAddressOutput = "";
 
-		updateUIWidgets();
+		//updateUIWidgets();
 
 		super.onStart();
 	}
@@ -263,6 +394,82 @@ public class MapViewFragment
 		}
 	}
 
+	private GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
+		@Override
+		public boolean onMarkerClick(final Marker marker) {
+			if (!marker.isInfoWindowShown()) {
+				return activateMarker(marker);
+			}
+			return true;
+		}
+	};
+
+	private boolean activateMarker(final Marker marker){
+
+		if (currentMarker == null || !marker.getPosition().equals(currentMarker.getPosition())){
+			alreadyShifted = false;
+			shiftedCameraPosition = null;
+		}
+
+		marker.showInfoWindow();
+
+		cameraPosition = googleMap.getCameraPosition();
+
+		if (!alreadyShifted) {
+
+			mMapView.setFrozen(true);
+			googleMap.moveCamera(
+				CameraUpdateFactory.newCameraPosition(
+					new CameraPosition.Builder()
+						.target(marker.getPosition())
+						.zoom(cameraPosition.zoom)
+						.tilt(cameraPosition.tilt)
+						.bearing(cameraPosition.bearing)
+						.build()));
+
+			Point markerPoint = googleMap.getProjection().toScreenLocation(marker.getPosition());
+			VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
+			Point farLeft = googleMap.getProjection().toScreenLocation(visibleRegion.farLeft);
+			int newY = (int) ((markerPoint.y + farLeft.y) * 0.3);
+			Point halfUp = new Point(markerPoint.x, newY);
+			LatLng shiftedLatLng = googleMap.getProjection().fromScreenLocation(halfUp);
+
+			googleMap.moveCamera(
+				CameraUpdateFactory.newCameraPosition(
+					new CameraPosition.Builder()
+						.target(cameraPosition.target)
+						.zoom(cameraPosition.zoom)
+						.tilt(cameraPosition.tilt)
+						.bearing(cameraPosition.bearing)
+						.build()));
+			mMapView.setFrozen(false);
+
+			shiftedCameraPosition = new CameraPosition.Builder()
+				.target(shiftedLatLng)
+				.zoom(cameraPosition.zoom)
+				.tilt(cameraPosition.tilt)
+				.bearing(cameraPosition.bearing)
+				.build();
+
+			googleMap.animateCamera(
+				CameraUpdateFactory.newCameraPosition(shiftedCameraPosition), 1000, null);
+
+			alreadyShifted = true;
+
+		} else if (shiftedCameraPosition != null){
+			googleMap.animateCamera(
+				CameraUpdateFactory.newCameraPosition(
+					new CameraPosition.Builder()
+						.target(shiftedCameraPosition.target)
+						.zoom(cameraPosition.zoom)
+						.tilt(cameraPosition.tilt)
+						.bearing(cameraPosition.bearing)
+						.build()), 500, null);
+		}
+
+		return true;
+	}
+
 	private void setUpMap() {
 		if (ActivityCompat.checkSelfPermission(
 			getActivity(),
@@ -275,6 +482,8 @@ public class MapViewFragment
 			return;
 		}
 		googleMap.setMyLocationEnabled(true);
+
+		googleMap.setOnMarkerClickListener(markerClickListener);
 
 		googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 			@Override
@@ -292,7 +501,7 @@ public class MapViewFragment
 					startIntentService();
 				}
 				mAddressRequested = true;
-				updateUIWidgets();
+				//updateUIWidgets();
 
 			}
 		});
@@ -300,6 +509,26 @@ public class MapViewFragment
 		googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
 		googleMap.setOnInfoWindowClickListener(this);
+
+		googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+			@Override
+			public void onCameraChange(CameraPosition cameraPosition) {
+				if (currentMarker != null && needToOpenInfoWindow && !currentMarker.isInfoWindowShown()){
+					activateMarker(currentMarker);
+					needToOpenInfoWindow = false;
+					updateUIWidgets();
+				}
+
+				if (MapViewFragment.this.shiftedCameraPosition == null)
+					return;
+				if (MapViewFragment.this.shiftedCameraPosition.bearing != cameraPosition.bearing
+					|| MapViewFragment.this.shiftedCameraPosition.tilt != cameraPosition.tilt){
+					MapViewFragment.this.cameraPosition = cameraPosition;
+					MapViewFragment.this.alreadyShifted = false;
+					MapViewFragment.this.shiftedCameraPosition = null;
+				}
+			}
+		});
 
 		if (fetchData) {
 			AsyncDataManager.getAllPosts(
@@ -310,6 +539,7 @@ public class MapViewFragment
 							MapViewFragment.this.posts, posts);
 						addMapMarkers();
 						fetchData = false;
+						updateUIWidgets();
 					}
 
 					@Override
@@ -317,11 +547,17 @@ public class MapViewFragment
 						if (ZZZUtility.addItemToList(posts, post)) {
 							addMapMarker(post, true);
 							fetchData = false;
+							updateUIWidgets();
 						}
 					}
 				});
 		} else {
 			addMapMarkers();
+			if (needToOpenInfoWindow && currentMarker != null){
+				activateMarker(currentMarker);
+				//needToOpenInfoWindow = false;
+			}
+			updateUIWidgets();
 		}
 	}
 
@@ -340,27 +576,38 @@ public class MapViewFragment
 
 		addMapMarkers();
 
-		googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
-																		  .target(myLatLng).zoom(15)
-																		  .build()), 1000, null);
+		if (cameraPosition == null) {
+			googleMap
+				.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
+																		 .target(myLatLng).zoom(15)
+																		 .build()), 1000, null);
+		} else {
+			googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+		}
 	}
 
 	private void addMapMarkers(){
 		googleMap.clear();
+		markers.clear();
 		for (HHPostFull post : posts) {
 			addMapMarker(post, false);
+		}
+		if (currentPost != null && posts != null) {
+			int postsPosition = posts.indexOf(currentPost);
+			if (postsPosition >= 0) {
+				currentMarker = markers.get(postsPosition);
+			}
 		}
 	}
 
 	private void addMapMarker(HHPostFull post, boolean newColour){
 		LatLng latLng = new LatLng(post.getPost().getLat(), post.getPost().getLon());
-		googleMap.addMarker(
+		Marker marker = googleMap.addMarker(
 			new MarkerOptions().position(latLng)
 							   .title(new Gson().toJson(post))
-							   .icon(BitmapDescriptorFactory
-										 .fromResource(
-											 newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small))
-		);
+							   .icon(BitmapDescriptorFactory.fromResource(
+								   newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small)));
+		markers.add(marker);
 	}
 
 	private void startIntentService() {
@@ -440,6 +687,22 @@ public class MapViewFragment
 		private final View mContents;
 		private HHCachedSpotifyTrack spotifyTrack;
 
+		ImageView imgProfile;
+		TextView txtUserName;
+		TextView txtLocation;
+		TextView txtDateTime;
+		TextView txtTrackName;
+		TextView txtArtist;
+		TextView txtAlbum;
+		TextView txtMessage;
+		ImageView imgAlbumArt;
+		ImageView btnPlayButton;
+		//ToggleButton btnLikeButton;
+		//ImageButton btnCommentButton;
+		//ImageButton btnShareButton;
+		HHPostFull post;
+		//HHLike myLike;
+
 		CustomInfoWindowAdapter(){
 			mWindow = getActivity().getLayoutInflater().inflate(R.layout.custom_info_window, null);
 			mContents = getActivity().getLayoutInflater().inflate(R.layout.custom_info_contents, null);
@@ -457,65 +720,132 @@ public class MapViewFragment
 			return mContents;
 		}
 
-		private void render(Marker marker, View view) {
+		private void render(final Marker marker, View view) {
 
 			currentMarker = marker;
 
-			HHPostFull post = new Gson().fromJson(marker.getTitle(), HHPostFull.class);
+			post = new Gson().fromJson(marker.getTitle(), HHPostFull.class);
+			currentPost = post;
 			spotifyTrack = post.getTrack();
 			currentTrack = spotifyTrack;
 
-			final ImageView imgAlbumArt = (ImageView) view.findViewById(R.id.imgAlbumArt);
-			final ImageView imgUserArt = (ImageView) view.findViewById(R.id.imgUserArt);
+			imgAlbumArt = (ImageView) view.findViewById(R.id.list_row_timeline_imgAlbumArt);
+			imgProfile = (ImageView) view.findViewById(R.id.list_row_timeline_imgProfile);
 
 			if (!marker.isInfoWindowShown()) {
-				imgAlbumArt.setImageBitmap(null);
-				imgUserArt.setImageBitmap(null);
-
-				WebHelper.getSpotifyAlbumArt(
+				Bitmap albumArt = WebHelper.getSpotifyAlbumArt(
 					spotifyTrack,
 					new WebHelper.GetSpotifyAlbumArtCallback() {
 						@Override
 						public void returnSpotifyAlbumArt(Bitmap bitmap) {
 							imgAlbumArt.setImageBitmap(bitmap);
+							if (marker != null && marker.isInfoWindowShown()) {
+								marker.showInfoWindow();
+							}
 						}
 					});
+				imgAlbumArt.setImageBitmap(albumArt);
 
-				WebHelper.getFacebookProfilePicture(
+				Bitmap userArt = WebHelper.getFacebookProfilePicture(
 					post.getUser().getFBUserID(),
 					new WebHelper.GetFacebookProfilePictureCallback() {
 						@Override
 						public void returnFacebookProfilePicture(Bitmap bitmap) {
-							imgUserArt.setImageBitmap(bitmap);
+							imgProfile.setImageBitmap(bitmap);
+							if (marker != null && marker.isInfoWindowShown()) {
+								marker.showInfoWindow();
+							}
 						}
 					});
+				imgProfile.setImageBitmap(userArt);
 			}
 
-			TextView titleUI = (TextView) view.findViewById(R.id.title);
-			TextView artistUI = (TextView) view.findViewById(R.id.artist);
-			TextView albumUI = (TextView) view.findViewById(R.id.album);
-			TextView snippetUI = (TextView) view.findViewById(R.id.snippet);
-			TextView dateUI = (TextView) view.findViewById(R.id.date_time);
-			TextView userUI = (TextView) view.findViewById(R.id.txtUserID);
+			txtUserName = (TextView) view.findViewById(R.id.list_row_timeline_txtUserName);
+			txtLocation = (TextView) view.findViewById(R.id.list_row_timeline_txtLocation);
+			txtDateTime = (TextView) view.findViewById(R.id.list_row_timeline_txtDateTime);
+			txtTrackName = (TextView) view.findViewById(R.id.list_row_timeline_txtTrackName);
+			txtArtist = (TextView) view.findViewById(R.id.list_row_timeline_txtArtist);
+			txtAlbum = (TextView) view.findViewById(R.id.list_row_timeline_txtAlbum);
+			txtMessage = (TextView) view.findViewById(R.id.list_row_timeline_txtMessage);
+			btnPlayButton = (ImageView) view.findViewById(R.id.list_row_timeline_btnPlayButton);
+			//btnLikeButton = (ToggleButton) view.findViewById(R.id.list_row_timeline_btnLike);
+			//btnCommentButton = (ImageButton) view.findViewById(R.id.list_row_timeline_btnComment);
+			//btnShareButton = (ImageButton) view.findViewById(R.id.list_row_timeline_btnShare);
 
-			titleUI.setText(spotifyTrack.getName());
-			artistUI.setText(spotifyTrack.getArtist());
-			albumUI.setText(spotifyTrack.getAlbum());
-			snippetUI.setText(getString(R.string.placeholder_message_map,
-										post.getPost().getMessage()));
-			dateUI.setText(
-				getString(
-					R.string.placeholder_date_map,
-					ZZZUtility.formatDynamicDate(post.getPost().getCreatedAt())));
-			userUI.setText(post.getUser().getName());
+			txtUserName.setText(post.getUser().getName());
+			txtLocation.setText(ZZZUtility.truncatedAddress(post.getPost().getPlaceName(), 35));
+			txtDateTime.setText(ZZZUtility.formatDynamicDate(post.getPost().getCreatedAt()));
+			txtTrackName.setText(post.getTrack().getName());
+			txtArtist.setText(post.getTrack().getArtist());
+			txtAlbum.setText(post.getTrack().getAlbum());
 
-			final ImageButton playButton = (ImageButton) view.findViewById(R.id.play_button);
-			if (HolderActivity.mediaPlayer.isPlaying()) {
-				playButton.setImageResource(R.drawable.ic_media_pause);
+			txtMessage.setText(post.getPost().getMessage());
+			Editable message = Editable.Factory.getInstance().newEditable(txtMessage.getText());
+			Pattern pattern = Pattern.compile("\\{tag_(\\d+)\\}");
+			Matcher matcher = pattern.matcher(message);
+
+			while (matcher.find()){
+				int start = matcher.start();
+				int end = matcher.end();
+
+				long userID = Long.valueOf(matcher.group(1));
+
+				HHUser tagUser = getTagUser(post.getTags(), userID);
+				if (tagUser != null){
+					String userName = tagUser.getName();
+					message.replace(start, end, userName);
+					message.setSpan(
+						new HHUser.HHUserSpan(tagUser, null),
+						start,
+						start + userName.length(),
+						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+					);
+				} else {
+					message.replace(start, end, "");
+				}
+
+				matcher = pattern.matcher(message);
+			}
+			txtMessage.setText(message);
+
+			updatePlayButton(btnPlayButton, spotifyTrack.getPreviewUrl());
+
+			/*for (HHLikeUser like : post.getLikes() ){
+				if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
+					myLike = like.getLike();
+					break;
+				}
+			}
+
+			if (myLike != null) {
+				btnLikeButton.setChecked(true);
 			} else {
-				playButton.setImageResource(R.drawable.ic_media_play);
-			}
+				btnLikeButton.setChecked(false);
+			}*/
 
+		}
+	}
+
+	private HHUser getTagUser(List<HHTagUser> tags, long userID){
+		for (HHTagUser tag : tags) {
+			if (tag.getUser().getID() == userID) {
+				return tag.getUser();
+			}
+		}
+		return null;
+	}
+
+	private void updatePlayButton(ImageView btnPlayButton, String previewURL){
+		if (previewURL == null) {
+			btnPlayButton.setVisibility(View.GONE);
+		} else {
+			btnPlayButton.setVisibility(View.VISIBLE);
+		}
+
+		if (HolderActivity.mediaPlayer.isPlaying()) {
+			btnPlayButton.setImageResource(R.drawable.pause_overlay);
+		} else {
+			btnPlayButton.setImageResource(R.drawable.play_overlay);
 		}
 	}
 
@@ -528,10 +858,17 @@ public class MapViewFragment
 	}
 
 	private void updateUIWidgets(){
-		/*if (mAddressRequested){
-			mProgressBar.setVisibility(ProgressBar.VISIBLE);
+		if (!needToOpenInfoWindow && !fetchData && mapExists){
+			btnLeft.setVisibility(View.VISIBLE);
+			btnCentre.setVisibility(View.VISIBLE);
+			btnRight.setVisibility(View.VISIBLE);
+			btnCentreProgressBar.setVisibility(View.GONE);
 		} else {
-			mProgressBar.setVisibility(ProgressBar.GONE);
-		}*/
+			btnLeft.setVisibility(View.INVISIBLE);
+			btnCentre.setVisibility(View.INVISIBLE);
+			btnRight.setVisibility(View.INVISIBLE);
+			btnCentreProgressBar.setVisibility(View.VISIBLE);
+		}
 	}
+
 }

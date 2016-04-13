@@ -126,6 +126,7 @@ public class AsyncDataManager {
 			@Override
 			public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
 				callback.returnPostList(cachedPosts);
+				WebHelper.preLoadPostBitmaps(cachedPosts);
 			}
 		});
 	}
@@ -153,6 +154,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
 					callback.returnPostList(cachedPosts);
+					WebHelper.preLoadPostBitmaps(cachedPosts);
 				}
 			});
 	}
@@ -182,6 +184,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetCachedPost(HHPostFull cachedPost) {
 					callback.returnGetPost(cachedPost);
+					WebHelper.preLoadPostBitmaps(cachedPost);
 				}
 			});
 	}
@@ -636,6 +639,7 @@ public class AsyncDataManager {
 				public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
 					if (track != null) {
 						callback.returnSpotifyTrack(track);
+						WebHelper.preLoadTrackBitmaps(track);
 						return;
 					}
 
@@ -677,6 +681,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetUser(HHUserFull user) {
 					callback.returnGetCachedUser(user);
+					WebHelper.preLoadUserBitmaps(user);
 				}
 			}
 		);

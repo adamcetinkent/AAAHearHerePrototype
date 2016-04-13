@@ -25,28 +25,34 @@ public class ORMFollow {
 
 	private static final String	COLUMN_ID_NAME = 				"_id";
 	private static final String	COLUMN_ID_TYPE = 				"INTEGER PRIMARY KEY";
-	public static String ID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
+	public static String ID() { return COLUMN_ID_NAME; }
+	public static String dotID() { return TABLE_NAME + "." + COLUMN_ID_NAME; }
 
 	private static final String	COLUMN_USER_ID_NAME = 			"user_id";
 	private static final String	COLUMN_USER_ID_TYPE = 			"INTEGER";
-	public static String USER_ID() { return TABLE_NAME + "." + COLUMN_USER_ID_NAME; }
+	public static String USER_ID() { return COLUMN_USER_ID_NAME; }
+	public static String dotUSER_ID() { return TABLE_NAME + "." + COLUMN_USER_ID_NAME; }
 
 	private static final String	COLUMN_FOLLOWED_USER_ID_NAME = 	"followed_user_id";
 	private static final String	COLUMN_FOLLOWED_USER_ID_TYPE =	"INTEGER";
-	public static String FOLLOWED_USER_ID() { return TABLE_NAME + "." + COLUMN_FOLLOWED_USER_ID_NAME; }
+	public static String FOLLOWED_USER_ID() { return COLUMN_FOLLOWED_USER_ID_NAME; }
+	public static String dotFOLLOWED_USER_ID() { return TABLE_NAME + "." + COLUMN_FOLLOWED_USER_ID_NAME; }
 
 	private static final String	COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String	COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
-	public static String CREATED_AT() { return TABLE_NAME + "." + COLUMN_CREATED_AT_NAME; }
+	public static String CREATED_AT() { return COLUMN_CREATED_AT_NAME; }
+	public static String dotCREATED_AT() { return TABLE_NAME + "." + COLUMN_CREATED_AT_NAME; }
 
 	private static final String	COLUMN_UPDATED_AT_NAME = 		"updated_at";
 	private static final String	COLUMN_UPDATED_AT_TYPE = 		"TIMESTAMP";
-	public static String UPDATED_AT() { return TABLE_NAME + "." + COLUMN_UPDATED_AT_NAME; }
+	public static String UPDATED_AT() { return COLUMN_UPDATED_AT_NAME; }
+	public static String dotUPDATED_AT() { return TABLE_NAME + "." + COLUMN_UPDATED_AT_NAME; }
 
 	private static final String	COLUMN_CACHED_AT_NAME = 		"cached_at";
 	private static final String	COLUMN_CACHED_AT_TYPE = 		"TIMESTAMP";
 	private static final String	COLUMN_CACHED_AT_DEFAULT =		"DEFAULT CURRENT_TIMESTAMP NOT NULL";
-	public static String CACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
+	public static String CACHED_AT() { return COLUMN_CACHED_AT_NAME; }
+	public static String dotCACHED_AT() { return TABLE_NAME + "." + COLUMN_CACHED_AT_NAME; }
 
 
 	public static final String SQL_CREATE_TABLE =
