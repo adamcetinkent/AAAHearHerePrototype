@@ -55,7 +55,7 @@ class ORMUserFull {
 			HHUserFull user = null;
 			if (numUsers > 0){
 				cursorUser.moveToFirst();
-				user = new HHUserFull(cursorUser, ORMUser.dotID());
+				user = new HHUserFull(cursorUser, ORMUser.ID());
 				Log.d(TAG, "User loaded successfully");
 
 				{
@@ -72,7 +72,7 @@ class ORMUserFull {
 					if (numFriends > 0) {
 						cursorFriends.moveToFirst();
 						while (!cursorFriends.isAfterLast()) {
-							HHFriendshipUser friendshipUser = new HHFriendshipUser(cursorFriends, ORMFriendship.dotUSER_ID());
+							HHFriendshipUser friendshipUser = new HHFriendshipUser(cursorFriends, ORMFriendship.USER_ID());
 							friendships.add(friendshipUser);
 							cursorFriends.moveToNext();
 						}
@@ -95,7 +95,7 @@ class ORMUserFull {
 					if (numFollows > 0) {
 						cursorFollows.moveToFirst();
 						while (!cursorFollows.isAfterLast()) {
-							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.dotUSER_ID());
+							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.USER_ID());
 							follows.add(followUser);
 							cursorFollows.moveToNext();
 						}
@@ -118,7 +118,7 @@ class ORMUserFull {
 					if (numFollows > 0) {
 						cursorFollows.moveToFirst();
 						while (!cursorFollows.isAfterLast()) {
-							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.dotFOLLOWED_USER_ID());
+							HHFollowUser followUser = new HHFollowUser(cursorFollows, ORMFollow.FOLLOWED_USER_ID());
 							follows.add(followUser);
 							cursorFollows.moveToNext();
 						}
@@ -141,7 +141,7 @@ class ORMUserFull {
 					if (numFollowRequests > 0) {
 						cursorFollowRequests.moveToFirst();
 						while (!cursorFollowRequests.isAfterLast()) {
-							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.dotUSER_ID());
+							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.USER_ID());
 							followRequests.add(followRequestUser);
 							cursorFollowRequests.moveToNext();
 						}
@@ -164,7 +164,7 @@ class ORMUserFull {
 					if (numFollowRequests > 0) {
 						cursorFollowRequests.moveToFirst();
 						while (!cursorFollowRequests.isAfterLast()) {
-							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.dotREQUESTED_USER_ID());
+							HHFollowRequestUser followRequestUser = new HHFollowRequestUser(cursorFollowRequests, ORMFollowRequest.REQUESTED_USER_ID());
 							followRequests.add(followRequestUser);
 							cursorFollowRequests.moveToNext();
 						}

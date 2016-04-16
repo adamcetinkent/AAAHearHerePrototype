@@ -16,48 +16,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
-import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
  */
-class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
-	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/";
-	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s";
+class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
+	private static final String TAG = "GetPostsSinceTask";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/since/%2$s";
+
+	private final long userID;
+	private final Timestamp since;
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
-	private final long userID;
-	private final Timestamp beforeTime;
 	private final Callback callbackTo;
 
-	public GetPostsUserTask(final long userID,
-							final Timestamp beforeTime,
-							final Callback callbackTo) {
+	public GetPostsSinceTask(long userID, Timestamp since, Callback callbackTo) {
 		this.userID = userID;
+		this.since = since;
 		this.callbackTo = callbackTo;
-		this.beforeTime = beforeTime;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		String urlString;
-		if (beforeTime != null) {
-			urlString = String.format(VM_SERVER_ADDRESS_BEFORE,
-									  userID,
-									  HHUser.getCurrentUserID(),
-									  beforeTime.toString());
-			urlString = urlString.replace(" ", "%20");
-		} else {
-			urlString = String.format(VM_SERVER_ADDRESS,
-									  userID,
-									  HHUser.getCurrentUserID());
-		}
+		String urlString = String.format(VM_SERVER_ADDRESS,
+										 userID,
+										 since.toString());
 		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {
 			URL url = new URL(urlString);

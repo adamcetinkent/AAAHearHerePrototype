@@ -33,6 +33,7 @@ import android.widget.ToggleButton;
 import com.facebook.Profile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +83,13 @@ public class FeedFragment extends FeedbackFragment {
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
+
+	//private ProgressBar progressBarFooter = new ProgressBar(getActivity());
+	private ProgressBar footerView;
+
+	private Timestamp earliestWebPost;
+	private Timestamp requestedWebPost;
+	boolean haveEarliestPost = false;
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -216,9 +224,10 @@ public class FeedFragment extends FeedbackFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_home, container, false);
+		View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
-		lstTimeline = (ExpandableListView) view.findViewById(R.id.lstTimeline);
+		lstTimeline = (ExpandableListView) view.findViewById(R.id.fragment_feed_lstTimeline);
+		//progressBarFooter = inflater.inflate(R.layout.list_row_timeline_footer, null, false);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
 			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
@@ -271,6 +280,11 @@ public class FeedFragment extends FeedbackFragment {
 					if (user.getID() != userID)
 						requestUserProfile(user);
 				}
+
+				@Override
+				public void onLastItemReached(){
+					getData();
+				}
 			},
 			new HHUser.HHUserSpan.HHUserSpanClickCallback() {
 				@Override
@@ -282,26 +296,41 @@ public class FeedFragment extends FeedbackFragment {
 		lstTimeline.setAdapter(lstTimelineAdapter);
 
 		if (fetchData) {
-			switch (feedType) {
-				case GENERAL_FEED: {
-					getAllData();
-					break;
-				}
-				case HOME_PROFILE_FEED:
-				case USER_PROFILE_FEED: {
-					getUserData();
-					break;
-				}
-				case SINGLE_POST_FEED:{
-					getSinglePostData();
-					break;
-				}
-			}
+			getData();
 		} else {
 			notifyAdapter();
 		}
 
 		return view;
+	}
+
+	private void setListProgressBar(boolean active){
+		int footersCount = lstTimeline.getFooterViewsCount();
+		if (active && footersCount <= 0){
+			footerView = new ProgressBar(getActivity());
+			lstTimeline.addFooterView(footerView);
+		} else if (footersCount > 0) {
+			lstTimeline.removeFooterView(footerView);
+		}
+	}
+
+	private void getData(){
+		setListProgressBar(true);
+		switch (feedType) {
+			case GENERAL_FEED: {
+				getAllData();
+				break;
+			}
+			case HOME_PROFILE_FEED:
+			case USER_PROFILE_FEED: {
+				getUserData();
+				break;
+			}
+			case SINGLE_POST_FEED:{
+				getSinglePostData();
+				break;
+			}
+		}
 	}
 
 	private AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
@@ -319,11 +348,31 @@ public class FeedFragment extends FeedbackFragment {
 			posts = ZZZUtility.updateList(posts, post);
 			notifyAdapter();
 			fetchData = false; //TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
+			if (earliestWebPost == null || post.getPost().getCreatedAt().before(earliestWebPost)){
+				earliestWebPost = post.getPost().getCreatedAt();
+				lstTimelineAdapter.setEarliestWebPost(earliestWebPost);
+				setListProgressBar(false);
+			}
+		}
+
+		@Override
+		public void warnNoEarlierPosts() {
+			haveEarliestPost = true;
+			lstTimelineAdapter.setHaveEarliestPost(true);
+			setListProgressBar(false);
 		}
 	};
 
 	private void getAllData(){
-		AsyncDataManager.getAllPosts(getAllPostsCallback);
+		AsyncDataManager.getAllPosts(earliestWebPost, getAllPostsCallback);
+		if (requestedWebPost == null){
+			requestedWebPost = new Timestamp(System.currentTimeMillis());
+			if (earliestWebPost == null)
+				earliestWebPost = requestedWebPost;
+		} else {
+			requestedWebPost = earliestWebPost;
+		}
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
 	}
 
 	private void getUserData(){
@@ -337,16 +386,24 @@ public class FeedFragment extends FeedbackFragment {
 
 				@Override
 				public void returnWebUserPrivacy(boolean userPrivacy) {
-					if (userPrivacy) {
-						AsyncDataManager.getUserPosts(userID, getAllPostsCallback);
-					} else {
+					AsyncDataManager.getUserPosts(userID, earliestWebPost, getAllPostsCallback);
+					if (!userPrivacy) {
 						setPrivateProfile();
 					}
 				}
 			});
+		if (requestedWebPost == null){
+			requestedWebPost = new Timestamp(System.currentTimeMillis());
+			if (earliestWebPost == null)
+				earliestWebPost = requestedWebPost;
+		} else {
+			requestedWebPost = earliestWebPost;
+		}
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
 	}
 
 	private void getSinglePostData(){
+		//TODO SHOULD ACTUALLY CHECK FOR POST PRIVACY
 		AsyncDataManager.getUserPrivacy(
 			userID,
 			true,
@@ -364,6 +421,14 @@ public class FeedFragment extends FeedbackFragment {
 					}
 				}
 			});
+		if (requestedWebPost == null){
+			requestedWebPost = new Timestamp(System.currentTimeMillis());
+			if (earliestWebPost == null)
+				earliestWebPost = requestedWebPost;
+		} else {
+			requestedWebPost = earliestWebPost;
+		}
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
 	}
 
 	private void setPrivateProfile(){
@@ -405,6 +470,7 @@ public class FeedFragment extends FeedbackFragment {
 		public interface AdapterCallback {
 			void onDataChange();
 			void onUserClick(HHUser user);
+			void onLastItemReached();
 		}
 
 		private final Activity context;
@@ -412,7 +478,10 @@ public class FeedFragment extends FeedbackFragment {
 		private final HHUser.HHUserSpan.HHUserSpanClickCallback userSpanClickCallback;
 
 		private List<HHPostFull> posts;
-		int addingComment = -1;
+		private Timestamp earliestWebPost;
+		private Timestamp requestedWebPost;
+		private int addingComment = -1;
+		private boolean haveEarliestPost = false;
 
 		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback, HHUser.HHUserSpan.HHUserSpanClickCallback userSpanClickCallback){
 			super();
@@ -420,6 +489,18 @@ public class FeedFragment extends FeedbackFragment {
 			this.posts = posts;
 			this.callback = callback;
 			this.userSpanClickCallback = userSpanClickCallback;
+		}
+
+		public void setEarliestWebPost(Timestamp earliestWebPost){
+			this.earliestWebPost = earliestWebPost;
+		}
+
+		public void setRequestedWebPost(Timestamp requestedWebPost){
+			this.requestedWebPost = requestedWebPost;
+		}
+
+		public void setHaveEarliestPost(boolean haveEarliestPost){
+			this.haveEarliestPost = haveEarliestPost;
 		}
 
 		@Override
@@ -751,6 +832,15 @@ public class FeedFragment extends FeedbackFragment {
 				viewHolder.btnLikeButton.setChecked(false);
 			}
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(viewHolder.likeCheckListener);
+
+			if (!haveEarliestPost
+				&& (requestedWebPost == null || !requestedWebPost.equals(earliestWebPost))
+				&& (viewHolder.post.getPost().getCreatedAt().equals(earliestWebPost)
+					|| groupPosition == getGroupCount() - 1)
+				){
+				Log.d(TAG, "LOADING NEW POSTS!");
+				callback.onLastItemReached();
+			}
 
 			return convertView;
 		}

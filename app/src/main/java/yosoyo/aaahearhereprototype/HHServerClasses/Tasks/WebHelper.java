@@ -8,6 +8,7 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +35,8 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
 public class WebHelper {
 
 	public static final String TAG = "Web Helper";
+	public static final String SERVER_IP = "http://94.174.159.110";			// WEB
 	//public static final String SERVER_IP = "http://10.0.1.79:3000";		// MSHAW
-	public static final String SERVER_IP = "http://94.174.159.110";		// WEB
-	//public static final String SERVER_IP = "http://192.168.5.105:3000";	// KAS TTNET
-	//public static final String SERVER_IP = "http://192.168.5.61:3000";		// KAS EXTENDED
-	//public static final String SERVER_IP = "http://192.168.1.183:3000";
-	//public static final String SERVER_IP = "http://192.168.0.63:3000";
-	//public static final String SERVER_IP = "http://10.72.100.185:3000";
 
 	private static final Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();
 	private static final Map<String, Bitmap> facebookProfilePictures = new HashMap<>();
@@ -48,26 +44,37 @@ public class WebHelper {
 
 	public interface GetAllPostsCallback {
 		void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess);
+		void warnNoEarlierPosts();
 	}
 
-	public static void getAllPosts(final GetAllPostsCallback callback){
-		new GetPostsTask(new GetPostsTask.Callback() {
+	public static void getAllPosts(final Timestamp beforeTime,
+								   final GetAllPostsCallback callback){
+		new GetPostsTask(
+			beforeTime,
+			new GetPostsTask.Callback() {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 				callback.returnGetAllPosts(postsToProcess);
 				preLoadPostProcessBitmaps(postsToProcess);
+				if (postsToProcess.size() <= 0)
+					callback.warnNoEarlierPosts();
 			}
 		}).execute();
 	}
 
-	public static void getUserPosts(long userID, final GetAllPostsCallback callback){
+	public static void getUserPosts(final long userID,
+									final Timestamp beforeTime,
+									final GetAllPostsCallback callback){
 		new GetPostsUserTask(
 			userID,
+			beforeTime,
 			new GetPostsUserTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 					callback.returnGetAllPosts(postsToProcess);
 					preLoadPostProcessBitmaps(postsToProcess);
+					if (postsToProcess.size() <= 0)
+						callback.warnNoEarlierPosts();
 				}
 			}).execute();
 	}
@@ -392,7 +399,7 @@ public class WebHelper {
 	}
 
 	private static void preLoadPostProcessBitmaps(List<HHPostFullProcess> posts){
-		if (checkWifi()){
+		if (posts != null && checkWifi()){
 			for (HHPostFullProcess post : posts) {
 				preLoadPostProcessBitmaps(post, true);
 			}

@@ -532,6 +532,7 @@ public class MapViewFragment
 
 		if (fetchData) {
 			AsyncDataManager.getAllPosts(
+				null,
 				new AsyncDataManager.GetAllPostsCallback() {
 					@Override
 					public void returnPostList(List<HHPostFull> posts) {
@@ -549,6 +550,11 @@ public class MapViewFragment
 							fetchData = false;
 							updateUIWidgets();
 						}
+					}
+
+					@Override
+					public void warnNoEarlierPosts() {
+						//TODO
 					}
 				});
 		} else {

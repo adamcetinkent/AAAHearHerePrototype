@@ -286,6 +286,7 @@
                 android:text="@string/placeholder_user_name"/>
 
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

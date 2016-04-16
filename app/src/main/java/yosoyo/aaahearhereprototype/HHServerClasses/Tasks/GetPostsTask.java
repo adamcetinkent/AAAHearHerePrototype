@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,22 +26,34 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
+	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/for/%1$d/before/%2$s";
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
 	private final Callback callbackTo;
+	private final Timestamp beforeTime;
 
-	public GetPostsTask(Callback callbackTo) {
+	public GetPostsTask(Timestamp beforeTime, Callback callbackTo) {
 		this.callbackTo = callbackTo;
+		this.beforeTime = beforeTime;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		Log.d(TAG, "Fetching Posts from " + VM_SERVER_ADDRESS + HHUser.getCurrentUserID());
+		String urlString;
+		if (beforeTime != null) {
+			urlString = String.format(VM_SERVER_ADDRESS_BEFORE,
+									  HHUser.getCurrentUserID(),
+								 	  beforeTime.toString());
+			urlString = urlString.replace(" ", "%20");
+		} else {
+			urlString = VM_SERVER_ADDRESS + HHUser.getCurrentUserID();
+		}
+		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {
-			URL url = new URL(VM_SERVER_ADDRESS + HHUser.getCurrentUserID());
+			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

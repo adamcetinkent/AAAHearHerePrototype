@@ -150,7 +150,7 @@ public class FollowersListFragment extends FeedbackFragment {
 			}
 
 			@Override
-			public void acceptRequest(HHFollowRequestUser acceptedFollowRequest, int position) {
+			public void acceptRequest(final HHFollowRequestUser acceptedFollowRequest, final int position) {
 				currentUser.getFollowInRequests().remove(acceptedFollowRequest);
 				adapter.notifyItemChanged(position);
 
@@ -160,6 +160,14 @@ public class FollowersListFragment extends FeedbackFragment {
 						public void returnUpdateCurrentUser(boolean success) {
 							if (success) {
 								getActivity().invalidateOptionsMenu();
+
+								for (HHFollowUser follow : HHUser.getCurrentUser().getFollowIns()){
+									if (follow.getUser().equals(acceptedFollowRequest.getUser())){
+										currentUser.getFollowIns().add(follow);
+										adapter.notifyItemChanged(position);
+										break;
+									}
+								}
 							}
 						}
 					}
@@ -167,7 +175,7 @@ public class FollowersListFragment extends FeedbackFragment {
 			}
 
 			@Override
-			public void deleteRequest(HHFollowRequestUser deletedFollowRequest, int position) {
+			public void deleteRequest(HHFollowRequestUser deletedFollowRequest, final int position) {
 				currentUser.getFollowInRequests().remove(deletedFollowRequest);
 				adapter.notifyItemChanged(position);
 

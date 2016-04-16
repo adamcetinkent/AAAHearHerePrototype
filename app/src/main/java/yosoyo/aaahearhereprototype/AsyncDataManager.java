@@ -7,6 +7,7 @@ import com.facebook.AccessToken;
 import com.facebook.Profile;
 
 import java.net.HttpURLConnection;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,14 +115,20 @@ public class AsyncDataManager {
 
 	public interface GetAllPostsCallback extends GetPostCallback {
 		void returnPostList(List<HHPostFull> posts);
+		void warnNoEarlierPosts();
 	}
 
-	public static void getAllPosts(GetAllPostsCallback callback){
-		getAllCachedPosts(callback);
-		getAllWebPosts(callback);
+	public static void getAllPosts(final Timestamp beforeTime,
+								   final GetAllPostsCallback callback){
+		//getAllCachedPosts(beforeTime, callback);
+		getAllWebPosts(beforeTime, callback);
 	}
 
-	private static void getAllCachedPosts(final GetAllPostsCallback callback){
+	private static void getAllCachedPosts(final Timestamp beforeTime,
+										  final GetAllPostsCallback callback){
+		if (beforeTime == null)
+			return;
+		//TODO INCLUDE BEFORETIME
 		DatabaseHelper.getAllCachedPosts(context, new DatabaseHelper.GetAllCachedPostsCallback() {
 			@Override
 			public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
@@ -131,22 +138,37 @@ public class AsyncDataManager {
 		});
 	}
 
-	private static void getAllWebPosts(final GetAllPostsCallback callback){
-		WebHelper.getAllPosts(new WebHelper.GetAllPostsCallback() {
-			@Override
-			public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
-				if (webPostsToProcess != null)
-					DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
-			}
-		});
+	private static void getAllWebPosts(final Timestamp beforeTime,
+									   final GetAllPostsCallback callback){
+		WebHelper.getAllPosts(
+			beforeTime,
+			new WebHelper.GetAllPostsCallback() {
+				@Override
+				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
+					if (webPostsToProcess != null)
+						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+				}
+
+				@Override
+				public void warnNoEarlierPosts(){
+					callback.warnNoEarlierPosts();
+				}
+			});
 	}
 
-	public static void getUserPosts(long userID, GetAllPostsCallback callback){
-		getUserCachedPosts(userID, callback);
-		getUserWebPosts(userID, callback);
+	public static void getUserPosts(final long userID,
+									final Timestamp beforeTime,
+									final GetAllPostsCallback callback){
+		//getUserCachedPosts(userID, beforeTime, callback);
+		getUserWebPosts(userID, beforeTime, callback);
 	}
 
-	private static void getUserCachedPosts(long userID, final GetAllPostsCallback callback){
+	private static void getUserCachedPosts(final long userID,
+										   final Timestamp beforeTime,
+										   final GetAllPostsCallback callback){
+		if (beforeTime == null)
+			return;
+		//TODO INCLUDE BEFORETIME
 		DatabaseHelper.getUserCachedPosts(
 			context,
 			userID,
@@ -159,14 +181,22 @@ public class AsyncDataManager {
 			});
 	}
 
-	private static void getUserWebPosts(long userID, final GetAllPostsCallback callback){
+	private static void getUserWebPosts(final long userID,
+										final Timestamp beforeTime,
+										final GetAllPostsCallback callback){
 		WebHelper.getUserPosts(
 			userID,
+			beforeTime,
 			new WebHelper.GetAllPostsCallback() {
 				@Override
 				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
 					if (webPostsToProcess != null)
 						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+				}
+
+				@Override
+				public void warnNoEarlierPosts(){
+					callback.warnNoEarlierPosts();
 				}
 			});
 	}
@@ -681,7 +711,8 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetUser(HHUserFull user) {
 					callback.returnGetCachedUser(user);
-					WebHelper.preLoadUserBitmaps(user);
+					if (user != null && user.getUser() != null)
+						WebHelper.preLoadUserBitmaps(user);
 				}
 			}
 		);
