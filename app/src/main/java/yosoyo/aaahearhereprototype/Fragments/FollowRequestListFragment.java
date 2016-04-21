@@ -1,7 +1,6 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
 
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,9 +24,11 @@ import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 18/03/2016.
+ *
+ * FollowRequestListFragment displays the incoming follow requests of the current user.
  */
-public class RequestFollowFragment extends FeedbackFragment {
+public class FollowRequestListFragment extends FeedbackFragment {
 
 	private HHUserFull currentUser;
 
@@ -35,7 +36,7 @@ public class RequestFollowFragment extends FeedbackFragment {
 	private RecyclerView.Adapter adapter;
 	private RecyclerView.LayoutManager layoutManager;
 
-	public RequestFollowFragment() {
+	public FollowRequestListFragment() {
 		// Required empty public constructor
 	}
 

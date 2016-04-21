@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for a simplified Artist.
  */
+@SuppressWarnings("unused")
 public class SpotifyArtistSimple {
 
 	private SpotifyExternalURL external_urls;

@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
@@ -42,6 +43,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,6 +64,9 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 27/02/16.
+ *
+ * MapViewFragment displays posts on a Google Maps Instance through a {@link FreezeableMapView}.
+ * It is highly dependent on the Google Maps lifecycle.
  */
 public class MapViewFragment
 	extends Fragment
@@ -126,6 +131,13 @@ public class MapViewFragment
 	public static final String KEY_INFO_WINDOW_OPEN = TAG + "info_window_open";
 	private boolean needToOpenInfoWindow = false;
 
+	//TODO incorporate pagination here too - think of how!
+	public static final String KEY_EARLIEST_WEB_POST = TAG + "earliest_web_post";
+	private Timestamp earliestWebPost;
+	private Timestamp requestedWebPost;
+	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
+	private boolean haveEarliestPost = false;
+
 	public MapViewFragment() {
 		//required empty public constructor
 	}
@@ -177,9 +189,12 @@ public class MapViewFragment
 	}
 
 	private void restoreInstanceState(Bundle bundle){
+		if (bundle == null)
+			return;
 		if (bundle.containsKey(KEY_WORKAROUND_BUNDLE)){
 			bundle = bundle.getBundle(KEY_WORKAROUND_BUNDLE);
 		}
+		assert bundle != null;
 		userID = bundle.getLong(KEY_USER_ID);
 		fetchData = bundle.getBoolean(KEY_FETCH_DATA);
 		mapType = bundle.getInt(KEY_MAP_TYPE);
@@ -190,6 +205,8 @@ public class MapViewFragment
 		//alreadyShifted = bundle.getBoolean(KEY_ALREADY_SHIFTED);
 		//shiftedCameraPosition = bundle.getParcelable(KEY_SHIFTED_CAMERA_POSITION);
 		needToOpenInfoWindow = bundle.getBoolean(KEY_INFO_WINDOW_OPEN);
+		earliestWebPost = new Timestamp(bundle.getLong(KEY_EARLIEST_WEB_POST));
+		haveEarliestPost = bundle.getBoolean(KEY_HAVE_EARLIEST_POST);
 	}
 
 
@@ -382,7 +399,7 @@ public class MapViewFragment
 	}
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		switch (requestCode){
 			case HolderActivity.LOCATION_PERMISSIONS:{
 				if (grantResults.length > 0
@@ -397,10 +414,7 @@ public class MapViewFragment
 	private final GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
 		@Override
 		public boolean onMarkerClick(final Marker marker) {
-			if (!marker.isInfoWindowShown()) {
-				return activateMarker(marker);
-			}
-			return true;
+			return marker.isInfoWindowShown() || activateMarker(marker);
 		}
 	};
 
@@ -745,6 +759,7 @@ public class MapViewFragment
 						@Override
 						public void returnSpotifyAlbumArt(Bitmap bitmap) {
 							imgAlbumArt.setImageBitmap(bitmap);
+							//noinspection ConstantConditions
 							if (marker != null && marker.isInfoWindowShown()) {
 								marker.showInfoWindow();
 							}
@@ -758,6 +773,7 @@ public class MapViewFragment
 						@Override
 						public void returnFacebookProfilePicture(Bitmap bitmap) {
 							imgProfile.setImageBitmap(bitmap);
+							//noinspection ConstantConditions
 							if (marker != null && marker.isInfoWindowShown()) {
 								marker.showInfoWindow();
 							}

@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an ExternalID
  */
+@SuppressWarnings("unused")
 class SpotifyExternalID {
 
 	private String key;

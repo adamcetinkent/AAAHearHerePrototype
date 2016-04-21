@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 /**
  * Created by adam on 16/03/16.
+ *
+ * Listener for {@link FeedbackFragment}s to communicate with their parent activity
  */
 public interface FragmentChangeRequestListener {
 	int MAP_VIEW_REQUEST = 1;

@@ -20,6 +20,7 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
  * Asynchronously performs API request from Spotify.
  * Response is returned to processFinish function of specified SpotifyAPIRequestCallback.
  */
+@SuppressWarnings("unused")
 public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIResponse> {
 	private static final String TAG = "SpotifyAPIRequest";
 
@@ -54,6 +55,8 @@ public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIRespons
 	protected SpotifyAPIResponse doInBackground(String... strings) {
 		try {
 			URL url = makeSpotifyQuery(strings[0], this.searchType);
+			if (url == null)
+				return null;
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

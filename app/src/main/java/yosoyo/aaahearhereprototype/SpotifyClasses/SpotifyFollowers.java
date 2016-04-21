@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for Followers.
  */
+@SuppressWarnings("unused")
 class SpotifyFollowers {
 
 	private String href;

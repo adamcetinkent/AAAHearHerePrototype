@@ -1,7 +1,6 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
 
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,7 +27,9 @@ import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 18/03/2016.
+ *
+ * FriendsListFragment displays a list of a user's friends
  */
 public class FriendsListFragment extends FeedbackFragment {
 

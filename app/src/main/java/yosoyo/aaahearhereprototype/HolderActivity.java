@@ -40,6 +40,7 @@ import java.util.Map;
 
 import yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import yosoyo.aaahearhereprototype.Fragments.FeedbackFragment;
+import yosoyo.aaahearhereprototype.Fragments.FollowRequestListFragment;
 import yosoyo.aaahearhereprototype.Fragments.FollowersListFragment;
 import yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
@@ -47,7 +48,6 @@ import yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
-import yosoyo.aaahearhereprototype.Fragments.RequestFollowFragment;
 import yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -81,9 +81,15 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-			Fragment fragment = selectItem(ZZZUtility.getKeyByValue(navigationOptions, position));
-			if (fragment != null)
-				commitFragmentTransaction(fragment, true);
+			try {
+				//noinspection ConstantConditions
+				Fragment fragment = selectItem(ZZZUtility.getKeyByValue(navigationOptions, position));
+				if (fragment != null)
+					commitFragmentTransaction(fragment, true);
+			} catch (NullPointerException e){
+				Log.e(TAG, e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -158,8 +164,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		};
 
 		drawerLayout.addDrawerListener(drawerToggle);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		try {
+			//noinspection ConstantConditions
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setHomeButtonEnabled(true);
+		} catch (NullPointerException e){
+			Log.e(TAG, e.getMessage());
+			e.printStackTrace();
+		}
 
 		getFragmentManager().addOnBackStackChangedListener(
 			new FragmentManager.OnBackStackChangedListener() {
@@ -297,7 +309,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				break;
 			}
 			case R.string.action_user_requests: {
-				fragment = new RequestFollowFragment();
+				fragment = new FollowRequestListFragment();
 				break;
 			}
 			case R.string.action_friends: {
@@ -324,13 +336,26 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	}
 
 	private void setActionBarTitle(int position){
-		String title;
-		title = getString(ZZZUtility.getKeyByValue(navigationOptions, position));
-		getActionBar().setTitle(title);
+		try {
+			String title;
+			//noinspection ConstantConditions
+			title = getString(ZZZUtility.getKeyByValue(navigationOptions, position));
+			//noinspection ConstantConditions
+			getActionBar().setTitle(title);
+		} catch (NullPointerException e){
+			Log.e(TAG, e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private void setActionBarTitle(String string){
-		getActionBar().setTitle(string);
+		try {
+			//noinspection ConstantConditions
+			getActionBar().setTitle(string);
+		} catch (NullPointerException e){
+			Log.e(TAG, e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private void commitFragmentTransaction(Fragment fragment, boolean backStack){
@@ -455,9 +480,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				break;
 			}
 			case FragmentChangeRequestListener.FOLLOWERS_LIST_REQUEST:{
-				if (bundle == null){
-
-				} else {
+				if (bundle != null){
 					long userID = bundle.getLong(FeedbackFragment.USER_ID);
 					int followerType = bundle.getInt(FollowersListFragment.FOLLOWER_TYPE);
 					fragment = FollowersListFragment.newInstance(followerType, userID);

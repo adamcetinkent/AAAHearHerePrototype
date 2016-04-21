@@ -6,6 +6,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  * The Spotify specification for a "Paging", which is what is contained in a SpotifyAPIResponse,
  * and contains an array of items of type T
  */
+@SuppressWarnings("unused")
 public class SpotifyPaging<T> {
 
 	private String href;

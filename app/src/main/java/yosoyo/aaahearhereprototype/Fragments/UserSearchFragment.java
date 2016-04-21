@@ -1,6 +1,5 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,7 +30,9 @@ import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 18/03/2016.
+ *
+ * UserSearchFragment provides a search bar and recycler view to display results.
  */
 public class UserSearchFragment extends FeedbackFragment {
 	public static final String TAG = "UserSearchFragment";
@@ -64,6 +65,7 @@ public class UserSearchFragment extends FeedbackFragment {
 
 		inflater.inflate(R.menu.menu_search, menu);
 		item = menu.findItem(R.id.action_search);
+		//noinspection ConstantConditions
 		SearchView searchView = new SearchView(getActivity().getActionBar().getThemedContext());
 		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		item.setActionView(searchView);

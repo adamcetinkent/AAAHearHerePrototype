@@ -6,6 +6,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  * This is returned by a SpotifyAPIRequest. The type of search request sent to Spotify determines
  * which fields will be filled.
  */
+@SuppressWarnings("unused")
 public class SpotifyAPIResponse {
 
 	private SpotifyPaging<SpotifyArtist> artists;

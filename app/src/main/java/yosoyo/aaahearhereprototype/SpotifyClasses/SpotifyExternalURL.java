@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an ExternalURL
  */
+@SuppressWarnings("unused")
 class SpotifyExternalURL {
 
 	private String key;

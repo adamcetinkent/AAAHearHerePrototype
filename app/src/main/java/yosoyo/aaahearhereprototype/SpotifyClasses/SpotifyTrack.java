@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for a Track.
  */
+@SuppressWarnings("unused")
 public class SpotifyTrack {
 
 	private SpotifyAlbumSimple album;

@@ -21,7 +21,7 @@ public abstract class HHBase {
 		this.updated_at = updated_at;
 	}
 
-	public HHBase(Parcel in) {
+	HHBase(Parcel in) {
 		this.id = in.readLong();
 		this.created_at = Timestamp.valueOf(in.readString());
 		this.updated_at = Timestamp.valueOf(in.readString());
@@ -55,7 +55,7 @@ public abstract class HHBase {
 		return (int) (id ^ (id >>> 32));
 	}
 
-	public void writeToParcel(Parcel dest, int flags) {
+	void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(id);
 		dest.writeString(created_at.toString());
 		dest.writeString(updated_at.toString());

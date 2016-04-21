@@ -53,6 +53,8 @@ class SearchUsersTask extends AsyncTask<Void, Void, List<HHUser>> {
 		Log.d(TAG, "Fetching Users from " + VM_SERVER_ADDRESS + HHUser.getCurrentUserID() + VM_SERVER_SUFFIX + query);
 		try {
 			URL url = makeUserQuery(query);
+			if (url == null)
+				return null;
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

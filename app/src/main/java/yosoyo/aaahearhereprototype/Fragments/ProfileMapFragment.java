@@ -1,7 +1,6 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
 
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +10,9 @@ import android.view.ViewGroup;
 import yosoyo.aaahearhereprototype.R;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 31/03/2016.
+ *
+ * A dumb fragment that holds both a {@link ProfileFragment} and a {@link MapViewFragment} as children.
  */
 public class ProfileMapFragment extends FeedbackFragment {
 
@@ -52,11 +53,11 @@ public class ProfileMapFragment extends FeedbackFragment {
 		// Required empty public constructor
 	}
 
-	public void setProfileFragmentBundle(Bundle bundle){
+	private void setProfileFragmentBundle(Bundle bundle){
 		this.profileFragmentBundle = bundle;
 	}
 
-	public void setMapFragmentBundle(Bundle bundle){
+	private void setMapFragmentBundle(Bundle bundle){
 		this.mapFragmentBundle = bundle;
 	}
 

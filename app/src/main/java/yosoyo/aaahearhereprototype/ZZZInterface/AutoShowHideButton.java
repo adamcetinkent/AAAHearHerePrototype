@@ -8,6 +8,8 @@ import android.widget.ToggleButton;
 
 /**
  * Created by adam on 07/04/16.
+ *
+ * A simple, extended toggle button with a switch to circumvent the toggle listener
  */
 public class AutoShowHideButton extends ToggleButton {
 

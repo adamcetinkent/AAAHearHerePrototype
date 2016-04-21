@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an Image
  */
+@SuppressWarnings("unused")
 public class SpotifyImage {
 
 	private int height;

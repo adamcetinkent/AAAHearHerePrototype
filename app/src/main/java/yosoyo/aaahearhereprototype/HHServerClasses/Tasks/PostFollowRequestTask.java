@@ -73,6 +73,7 @@ class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 					followRequestReturned = new HHFollowRequestUser(new Gson().fromJson(inString, HHFollowRequestUserNested.class));
 					if (followRequestReturned.getFollowRequest().getRequestedUserID() <= 0){
 						followReturned = new HHFollowUser(new Gson().fromJson(inString,HHFollowUserNested.class));
+						//noinspection ConstantConditions
 						return followReturned != null;
 					}
 

@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an Album
  */
+@SuppressWarnings({"MismatchedReadAndWriteOfArray", "unused"})
 public class SpotifyAlbum {
 
 	private String album_type;

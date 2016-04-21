@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an Track Link
  */
+@SuppressWarnings("unused")
 class SpotifyTrackLink {
 
 	private SpotifyExternalURL external_urls;

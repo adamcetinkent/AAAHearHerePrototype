@@ -137,7 +137,7 @@ public class ORMPost {
 		new DBPostSelectTask(context, callbackTo).execute();
 	}
 
-	protected static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
+	static class DBPostSelectTask extends AsyncTask<Void, Void, List<HHPost> > {
 
 		private final Context context;
 		private final Callback callbackTo;
@@ -184,7 +184,7 @@ public class ORMPost {
 		}
 	}
 
-	protected static class DBPostInsertTask extends AsyncTask<Void, Void, Long> {
+	static class DBPostInsertTask extends AsyncTask<Void, Void, Long> {
 
 		private final Context context;
 		private final HHPost post;
@@ -220,7 +220,7 @@ public class ORMPost {
 		}
 	}
 
-	protected static class DBPostInsertManyTask extends AsyncTask<Void, Void, Boolean> {
+	static class DBPostInsertManyTask extends AsyncTask<Void, Void, Boolean> {
 
 		private final Context context;
 		private final List<HHPostFullProcess> posts;
@@ -268,7 +268,7 @@ public class ORMPost {
 		new DBUserPostCountTask(context, userID, callbackTo).execute();
 	}
 
-	protected static class DBUserPostCountTask extends AsyncTask<Void, Void, Integer> {
+	static class DBUserPostCountTask extends AsyncTask<Void, Void, Integer> {
 
 		private final Context context;
 		private final long userID;

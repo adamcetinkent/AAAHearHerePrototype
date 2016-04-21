@@ -69,7 +69,9 @@ import yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 26/02/2016.
+ *
+ * PostFragment is used to create new posts. It provides a platform to search the Spotify database.
  */
 public class PostFragment extends Fragment {
 

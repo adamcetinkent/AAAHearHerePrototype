@@ -85,7 +85,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 										+ " posted " + cachedSpotifyTrack.getName()
 										+ " at " + post.getPost().getPlaceName();
 
-									Notification notification = null;
+									Notification notification;
 									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
 										notification = new Notification.Builder(
 											getApplicationContext())
@@ -120,7 +120,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 
 	}
 
-	final HHLocationListener[] locationListeners = new HHLocationListener[]{
+	private final HHLocationListener[] locationListeners = new HHLocationListener[]{
 		new HHLocationListener(LocationManager.GPS_PROVIDER, this),
 		new HHLocationListener(LocationManager.NETWORK_PROVIDER, this),
 		new HHLocationListener(LocationManager.PASSIVE_PROVIDER, this)
@@ -195,10 +195,10 @@ public class LocationListenerService extends Service implements HHLocationListen
 			return;
 		}
 		if (locationManager != null){
-			for (int i = 0; i < locationListeners.length; i++){
+			for (HHLocationListener locationListener : locationListeners) {
 				try {
-					locationManager.removeUpdates(locationListeners[i]);
-				} catch (Exception e){
+					locationManager.removeUpdates(locationListener);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

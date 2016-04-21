@@ -283,7 +283,7 @@ public class ORMUser {
 		new DBUserPrivacyTask(context, userID, callbackTo).execute();
 	}
 
-	protected static class DBUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
+	static class DBUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 
 		private final Context context;
 		private final long userID;

@@ -14,6 +14,7 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 /**
  * Created by adam on 02/03/16.
  */
+@SuppressWarnings({"MismatchedReadAndWriteOfArray", "unused"})
 @SuppressLint("ParcelCreator")
 public class HHPostFullNested extends HHPost {
 

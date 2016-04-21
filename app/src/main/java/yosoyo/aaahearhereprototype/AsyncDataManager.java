@@ -202,7 +202,7 @@ public class AsyncDataManager {
 			public void returnGetPost(HHPostFullProcess webPostToProcess) {
 				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
 				webPostsToProcess.add(webPostToProcess);
-				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+				DatabaseHelper.processWebPosts(context, webPostsToProcess, callback);
 			}
 		});
 	}
@@ -243,7 +243,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
 					if (webPostsToProcess != null)
-						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+						DatabaseHelper.processWebPosts(context, webPostsToProcess, callback);
 				}
 
 				@Override
@@ -297,7 +297,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
 					if (webPostsToProcess != null)
-						DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+						DatabaseHelper.processWebPosts(context, webPostsToProcess, callback);
 				}
 
 				@Override

@@ -450,6 +450,7 @@ class ORMPostFull {
 		protected List<HHPostFull> doInBackground(Void... params) {
 			DatabaseHelper databaseHelper = new DatabaseHelper(context);
 
+			//noinspection ConstantConditions
 			if (databaseHelper == null || context == null)
 				return null;
 

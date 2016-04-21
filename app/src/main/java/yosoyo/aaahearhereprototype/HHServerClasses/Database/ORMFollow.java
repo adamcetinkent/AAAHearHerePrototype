@@ -231,7 +231,7 @@ public class ORMFollow {
 		new DBUserFollowersInCountTask(context, userID, callbackTo).execute();
 	}
 
-	protected static class DBUserFollowersInCountTask extends AsyncTask<Void, Void, Integer> {
+	static class DBUserFollowersInCountTask extends AsyncTask<Void, Void, Integer> {
 
 		private final Context context;
 		private final long userID;
@@ -278,7 +278,7 @@ public class ORMFollow {
 		new DBUserFollowersOutCountTask(context, userID, callbackTo).execute();
 	}
 
-	protected static class DBUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
+	static class DBUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
 
 		private final Context context;
 		private final long userID;

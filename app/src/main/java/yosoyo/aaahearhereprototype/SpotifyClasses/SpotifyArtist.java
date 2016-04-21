@@ -5,6 +5,7 @@ package yosoyo.aaahearhereprototype.SpotifyClasses;
  *
  * The Spotify specification for an Artist.
  */
+@SuppressWarnings({"MismatchedReadAndWriteOfArray", "unused"})
 public class SpotifyArtist {
 
 	private SpotifyExternalURL external_urls;

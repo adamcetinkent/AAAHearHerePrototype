@@ -1,7 +1,6 @@
 package yosoyo.aaahearhereprototype.Fragments;
 
 
-import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +30,9 @@ import yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 26/02/2016.
+ *
+ * ProfileFragment displays user information.
  */
 public class ProfileFragment extends FeedbackFragment {
 
@@ -211,6 +212,7 @@ public class ProfileFragment extends FeedbackFragment {
 
 		if (profileType == PROFILE_TYPE_OTHER_USER){
 			userID = arguments.getLong(USER_ID);
+			//noinspection ConstantConditions
 			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 		} else {
 			userID = HHUser.getCurrentUserID();
@@ -484,7 +486,6 @@ public class ProfileFragment extends FeedbackFragment {
 							);
 							btnFollow.setColorFilter(ZZZUtility.greyOut);
 							btnFollow.setEnabled(false);
-						} else {
 						}
 						btnFollow.setVisibility(View.VISIBLE);
 						btnFollowProgressBar.setVisibility(View.GONE);
@@ -901,14 +902,14 @@ public class ProfileFragment extends FeedbackFragment {
 		this.mapFragment = mapFragment;
 	}
 
-	void setBtnShowHideVisibility(){
+	private void setBtnShowHideVisibility(){
 		if (profileMode != PROFILE_MODE_MAP)
 			btnShowHide.setVisibility(View.INVISIBLE);
 		else
 			btnShowHide.setVisibility(View.VISIBLE);
 	}
 
-	public void checkBtnShowHide(){
+	private void checkBtnShowHide(){
 		if (profileMode == PROFILE_MODE_MAP && btnShowHide.getManualOverride()){
 			alreadyHidden = true;
 			if (btnShowHide.isChecked() && !btnHideManualState){

@@ -2,7 +2,6 @@ package yosoyo.aaahearhereprototype.Fragments;
 
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -54,7 +53,9 @@ import yosoyo.aaahearhereprototype.R;
 import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by adam on 26/02/2016
+ *
+ * FeedFragment displays a timeline of posts.
  */
 public class FeedFragment extends FeedbackFragment {
 
@@ -84,12 +85,13 @@ public class FeedFragment extends FeedbackFragment {
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
 
-	//private ProgressBar progressBarFooter = new ProgressBar(getActivity());
 	private ProgressBar footerView;
 
+	public static final String KEY_EARLIEST_WEB_POST = TAG + "earliest_web_post";
 	private Timestamp earliestWebPost;
 	private Timestamp requestedWebPost;
-	boolean haveEarliestPost = false;
+	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
+	private boolean haveEarliestPost = false;
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -138,6 +140,8 @@ public class FeedFragment extends FeedbackFragment {
 		bundle.putBoolean(MapViewFragment.KEY_FETCH_DATA, fetchData);
 		bundle.putInt(MapViewFragment.KEY_MAP_TYPE, feedType);
 		bundle.putParcelableArrayList(MapViewFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+		bundle.putLong(MapViewFragment.KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
+		bundle.putBoolean(MapViewFragment.KEY_HAVE_EARLIEST_POST, haveEarliestPost);
 	}
 
 	public FeedFragment() {
@@ -149,6 +153,11 @@ public class FeedFragment extends FeedbackFragment {
 		fetchData = bundle.getBoolean(KEY_FETCH_DATA);
 		feedType = bundle.getInt(KEY_FEED_TYPE);
 		posts = bundle.getParcelableArrayList(KEY_POSTS);
+		earliestWebPost = new Timestamp(bundle.getLong(KEY_EARLIEST_WEB_POST));
+		haveEarliestPost = bundle.getBoolean(KEY_HAVE_EARLIEST_POST);
+		if (bundle.containsKey(KEY_POST_ID)) postID = bundle.getLong(KEY_POST_ID);
+		if (bundle.containsKey(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE))
+			profileFragmentBundle = bundle.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
 	}
 
 	public void setProfileFragmentBundle(Bundle bundle){
@@ -167,12 +176,7 @@ public class FeedFragment extends FeedbackFragment {
 		}
 
 		if (savedInstanceState != null){
-			feedType = savedInstanceState.getInt(KEY_FEED_TYPE);
-			fetchData = savedInstanceState.getBoolean(KEY_FETCH_DATA);
-			userID = savedInstanceState.getLong(KEY_USER_ID);
-			postID = savedInstanceState.getLong(KEY_POST_ID);
-			posts = savedInstanceState.getParcelableArrayList(KEY_POSTS);
-			profileFragmentBundle = savedInstanceState.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
+			restoreInstanceState(savedInstanceState);
 		}
 
 	}
@@ -182,7 +186,13 @@ public class FeedFragment extends FeedbackFragment {
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
 			userID = arguments.getLong(KEY_USER_ID);
-			getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+			try {
+				//noinspection ConstantConditions
+				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+			} catch (NullPointerException e){
+				Log.e(TAG, e.getMessage());
+				e.printStackTrace();
+			}
 		} else if (feedType == SINGLE_POST_FEED){
 			userID = arguments.getLong(KEY_USER_ID);
 			postID = arguments.getLong(KEY_POST_ID);
@@ -210,6 +220,8 @@ public class FeedFragment extends FeedbackFragment {
 		outState.putLong(KEY_USER_ID, userID);
 		outState.putLong(KEY_POST_ID, postID);
 		outState.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+		outState.putBoolean(KEY_HAVE_EARLIEST_POST, haveEarliestPost);
+		outState.putLong(KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
 
 		if (profileFragmentBundle != null){
 			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
@@ -294,6 +306,13 @@ public class FeedFragment extends FeedbackFragment {
 				}
 			});
 		lstTimeline.setAdapter(lstTimelineAdapter);
+
+		if (savedInstanceState != null){
+			if (savedInstanceState.containsKey(KEY_HAVE_EARLIEST_POST))
+				lstTimelineAdapter.setHaveEarliestPost(haveEarliestPost);
+			if (savedInstanceState.containsKey(KEY_EARLIEST_WEB_POST))
+				lstTimelineAdapter.setEarliestWebPost(earliestWebPost);
+		}
 
 		if (fetchData) {
 			getData();
@@ -665,7 +684,13 @@ public class FeedFragment extends FeedbackFragment {
 							addingComment = -1;
 							InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
 								Context.INPUT_METHOD_SERVICE);
-							inputMethodManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
+							try {
+								//noinspection ConstantConditions
+								inputMethodManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
+							} catch (NullPointerException e){
+								Log.e(TAG, e.getMessage());
+								e.printStackTrace();
+							}
 						} else {
 							viewHolder.addingComment = true;
 							addingComment = viewHolder.groupPosition;
@@ -1039,7 +1064,14 @@ public class FeedFragment extends FeedbackFragment {
 								addingComment = -1;
 								InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(
 									Context.INPUT_METHOD_SERVICE);
-								inputMethodManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
+								try {
+									//noinspection ConstantConditions
+									inputMethodManager.hideSoftInputFromWindow(
+										context.getCurrentFocus().getWindowToken(), 0);
+								} catch (NullPointerException e){
+									Log.e(TAG, e.getMessage());
+									e.printStackTrace();
+								}
 							}
 						});
 					btnAddComment.setVisibility(View.INVISIBLE);
