@@ -10,8 +10,8 @@ import android.util.Log;
 class HHLocationListener implements android.location.LocationListener {
 	public static final String TAG = "HHLocationListener";
 
-	Location lastLocation;
-	HHLocationListenerCallback callback;
+	final Location lastLocation;
+	final HHLocationListenerCallback callback;
 
 	public interface HHLocationListenerCallback {
 		void returnNewLocation(Location location);

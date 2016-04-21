@@ -7,6 +7,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.Build;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +16,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,8 +33,8 @@ public class ZZZUtility {
 		return s.hasNext() ? s.next() : "";
 	}
 
-	private static SimpleDateFormat fullDate = new SimpleDateFormat("dd MMMM yyyy");
-	private static SimpleDateFormat halfDate = new SimpleDateFormat("dd MMMM");
+	private static final SimpleDateFormat fullDate = new SimpleDateFormat("dd MMMM yyyy", Locale.UK);
+	private static final SimpleDateFormat halfDate = new SimpleDateFormat("dd MMMM", Locale.UK);
 	private static final int SECOND_MILLIS = 1000;
 	private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 	private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -143,8 +145,14 @@ public class ZZZUtility {
 
 	public static <T, E> T getKeyByValue(Map<T, E> map, E value){
 		for (Map.Entry<T,E> entry: map.entrySet()){
-			if (Objects.equals(value, entry.getValue())){
-				return entry.getKey();
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				if (Objects.equals(value, entry.getValue())){
+					return entry.getKey();
+				}
+			} else {
+				if (value.equals(entry.getValue())){
+					return entry.getKey();
+				}
 			}
 		}
 		return null;
@@ -154,6 +162,6 @@ public class ZZZUtility {
 		return new LightingColorFilter(0xFFFFFFFF -c, c);
 	}
 
-	public static ColorFilter greyOut = screen(Color.LTGRAY);
+	public static final ColorFilter greyOut = screen(Color.LTGRAY);
 
 }

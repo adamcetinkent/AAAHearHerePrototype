@@ -25,12 +25,14 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                android:contentDescription="@string/contentDescription_user_profile_picture"
                 />
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/frame"
+                android:contentDescription="@string/contentDescription_user_profile_picture_frame"
                 />
 
         </FrameLayout>
@@ -63,7 +65,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textColor="#ffaaaaaa"
             android:layout_gravity="center_vertical|right"
             android:textAlignment="gravity"
@@ -171,6 +173,7 @@
                     android:layout_width="104dp"
                     android:layout_height="104dp"
                     android:background="@color/cardview_dark_background"
+                    android:contentDescription="@string/contentDescription_user_profile_picture_frame"
                     />
 
                 <ImageView
@@ -180,6 +183,7 @@
                     android:layout_marginLeft="1dp"
                     android:layout_marginTop="1dp"
                     android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    android:contentDescription="@string/contentDescription_album_artwork"
                     />
 
                 <ImageView
@@ -188,7 +192,9 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginLeft="1dp"
-                    android:layout_marginTop="1dp"/>
+                    android:layout_marginTop="1dp"
+                    android:contentDescription="@string/contentDescription_play_button"
+                    />
 
             </FrameLayout>
 
@@ -220,6 +226,7 @@
             android:scaleType="fitXY"
             android:src="@drawable/comment"
             android:background="@android:color/transparent"
+            android:contentDescription="@string/contentDescription_add_comment_button"
             />
 
         <ImageButton
@@ -229,7 +236,8 @@
             android:layout_marginLeft="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/share"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/contentDescription_share_button"/>
 
     </LinearLayout>
 

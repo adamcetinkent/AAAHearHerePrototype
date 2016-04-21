@@ -14,6 +14,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
@@ -43,7 +44,8 @@ class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		String urlString = String.format(VM_SERVER_ADDRESS,
+		String urlString = String.format(Locale.ENGLISH,
+										 VM_SERVER_ADDRESS,
 										 userID,
 										 since.toString());
 		Log.d(TAG, "Fetching Posts from " + urlString);

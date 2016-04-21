@@ -22,12 +22,14 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:contentDescription="@string/contentDescription_user_profile_picture"
             />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/frame"
+            android:contentDescription="@string/contentDescription_user_profile_picture_frame"
             />
 
     </FrameLayout>
@@ -46,7 +48,8 @@
         android:id="@+id/rv_row_follower_imgFollowStatus"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/follow_none"/>
+        android:src="@drawable/follow_none"
+        android:contentDescription="@string/contentDescription_user_follow_status"/>
 
     <LinearLayout
         android:id="@+id/rv_row_follower_llRequestResponse"
@@ -68,7 +71,8 @@
                 android:id="@+id/rv_row_follower_btnDelete"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/cross_button"/>
+                android:src="@drawable/cross_button"
+                android:contentDescription="@string/contentDescription_delete_follow_request_button"/>
 
             <ProgressBar
                 android:id="@+id/rv_row_follower_btnDelete_progress"
@@ -87,7 +91,8 @@
                 android:id="@+id/rv_row_follower_btnAccept"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:src="@drawable/tick_button"/>
+                android:src="@drawable/tick_button"
+                android:contentDescription="@string/contentDescription_accept_follow_request_button"/>
 
             <ProgressBar
                 android:id="@+id/rv_row_follower_btnAccept_progress"
@@ -110,6 +115,7 @@
             android:layout_width="30dp"
             android:layout_gravity="center"
             android:src="@drawable/minus_button"
+            android:contentDescription="@string/contentDescription_unfollow_user_button"
             />
 
         <ProgressBar
@@ -126,6 +132,7 @@
             android:layout_width="match_parent"
             android:src="@drawable/add_user_full"
             android:visibility="gone"
+            android:contentDescription="@string/contentDescription_send_follow_request_button"
             />
 
         <ProgressBar

@@ -47,7 +47,8 @@
         android:id="@+id/imgUserImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/contentDescription_user_profile_picture"/>
 
     <Button
         style="?android:attr/buttonStyleSmall"

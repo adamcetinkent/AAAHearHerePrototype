@@ -29,7 +29,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 	private static final int LOCATION_INTERVAL = 1000;
 	private static final float LOCATION_DISTANCE = 10f;
 	public static final String LOCATION_UPDATE = "locationUpdate";
-	private static int NOTIFICATION_ID = 17441503;
+	private static final int NOTIFICATION_ID = 17441503;
 	private static long userID;
 	public static final String USER_ID = "userID";
 
@@ -85,15 +85,28 @@ public class LocationListenerService extends Service implements HHLocationListen
 										+ " posted " + cachedSpotifyTrack.getName()
 										+ " at " + post.getPost().getPlaceName();
 
-									Notification notification = new Notification.Builder(
-										getApplicationContext())
-										.setSmallIcon(R.mipmap.ic_launcher)
-										.setContentTitle(getString(R.string.app_name))
-										.setContentText(notificationText)
-										.setAutoCancel(true)
-										.setPriority(Notification.PRIORITY_DEFAULT)
-										.setDefaults(Notification.DEFAULT_VIBRATE)
-										.build();
+									Notification notification = null;
+									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+										notification = new Notification.Builder(
+											getApplicationContext())
+											.setSmallIcon(R.mipmap.ic_launcher)
+											.setContentTitle(getString(R.string.app_name))
+											.setContentText(notificationText)
+											.setAutoCancel(true)
+											.setPriority(Notification.PRIORITY_DEFAULT)
+											.setDefaults(Notification.DEFAULT_VIBRATE)
+											.build();
+									} else {
+										//noinspection deprecation
+										notification = new Notification.Builder(
+											getApplicationContext())
+											.setSmallIcon(R.mipmap.ic_launcher)
+											.setContentTitle(getString(R.string.app_name))
+											.setContentText(notificationText)
+											.setAutoCancel(true)
+											.setDefaults(Notification.DEFAULT_VIBRATE)
+											.getNotification();
+									}
 
 									NotificationManager notificationManager = (NotificationManager) getSystemService(
 										Context.NOTIFICATION_SERVICE);
@@ -107,7 +120,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 
 	}
 
-	HHLocationListener[] locationListeners = new HHLocationListener[]{
+	final HHLocationListener[] locationListeners = new HHLocationListener[]{
 		new HHLocationListener(LocationManager.GPS_PROVIDER, this),
 		new HHLocationListener(LocationManager.NETWORK_PROVIDER, this),
 		new HHLocationListener(LocationManager.PASSIVE_PROVIDER, this)

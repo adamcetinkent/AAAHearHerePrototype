@@ -71,7 +71,7 @@ public class MapViewFragment
 
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
-	private List<Marker> markers = new ArrayList<>();
+	private final List<Marker> markers = new ArrayList<>();
 
 	private int mapType;
 	public static final String KEY_MAP_TYPE = TAG + "map_type";
@@ -394,7 +394,7 @@ public class MapViewFragment
 		}
 	}
 
-	private GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
+	private final GoogleMap.OnMarkerClickListener markerClickListener = new GoogleMap.OnMarkerClickListener() {
 		@Override
 		public boolean onMarkerClick(final Marker marker) {
 			if (!marker.isInfoWindowShown()) {

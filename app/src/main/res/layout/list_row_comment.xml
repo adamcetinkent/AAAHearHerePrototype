@@ -22,12 +22,14 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:contentDescription="@string/contentDescription_user_profile_picture"
             />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/frame"
+            android:contentDescription="@string/contentDescription_user_profile_picture_frame"
             />
 
     </FrameLayout>
@@ -53,7 +55,7 @@
             android:layout_marginRight="10dp"
             android:text="@string/placeholder_message"
             android:textColor="#ff7f7f7f"
-            android:textSize="10sp"
+            android:textSize="12sp"
             />
 
     </LinearLayout>

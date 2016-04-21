@@ -188,6 +188,8 @@ class ORMPostFull {
 			}
 			String followsInArray = "(" + followIDs.substring(0, followIDs.length()-1) + ")";
 
+			cursorFollows.close();
+
 			Cursor cursorPost = database.rawQuery(
 				"SELECT * FROM " + ORMCachedSpotifyTrack.TABLE()
 					+ " INNER JOIN ("

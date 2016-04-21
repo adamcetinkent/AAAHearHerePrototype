@@ -333,7 +333,7 @@ public class FeedFragment extends FeedbackFragment {
 		}
 	}
 
-	private AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
+	private final AsyncDataManager.GetAllPostsCallback getAllPostsCallback = new AsyncDataManager.GetAllPostsCallback() {
 		@Override
 		public void returnPostList(List<HHPostFull> posts) {
 			Log.d(TAG, "Cached posts returned");
@@ -436,6 +436,7 @@ public class FeedFragment extends FeedbackFragment {
 	}
 
 	private void notifyAdapter(){
+		//noinspection unchecked
 		Collections.sort(posts);
 		lstTimelineAdapter.notifyDataSetChanged();
 		for(int i=0; i < lstTimelineAdapter.getGroupCount(); i++) {

@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 
 /**
  * Created by adam on 07/03/16.
+ *
+ * Receives a result from Google Places for address awareness
  */
 @SuppressLint("ParcelCreator")
 public class AddressResultReceiver extends ResultReceiver {

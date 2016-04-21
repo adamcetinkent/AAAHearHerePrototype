@@ -11,7 +11,7 @@ public class HHBroadcastReceiver extends BroadcastReceiver {
 
 	public static final String DOUBLE_LATITUDE = "latitude";
 	public static final String DOUBLE_LONGITUDE = "longitude";
-	HHBroadCastReceiverCallback callback;
+	final HHBroadCastReceiverCallback callback;
 
 	public interface HHBroadCastReceiverCallback{
 		void returnNewLocation(double lat, double lng);

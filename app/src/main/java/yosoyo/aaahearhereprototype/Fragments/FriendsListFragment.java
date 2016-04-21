@@ -171,16 +171,16 @@ public class FriendsListFragment extends FeedbackFragment {
 
 			}
 
-			public TextView txtUserName;
-			public ImageView imgProfile;
-			public ImageView imgFollowStatus;
-			public ImageView btnFollow;
-			public ImageView btnUnfollow;
-			public ProgressBar btnFollowProgressBar;
-			public ProgressBar btnUnfollowProgressBar;
-			public OnClickFollowRequestListener btnFollowOnClickListener;
-			public OnClickFollowRequestListener btnUnfollowOnClickListener;
-			public OnClickUserListener onClickUserListener;
+			public final TextView txtUserName;
+			public final ImageView imgProfile;
+			public final ImageView imgFollowStatus;
+			public final ImageView btnFollow;
+			public final ImageView btnUnfollow;
+			public final ProgressBar btnFollowProgressBar;
+			public final ProgressBar btnUnfollowProgressBar;
+			public final OnClickFollowRequestListener btnFollowOnClickListener;
+			public final OnClickFollowRequestListener btnUnfollowOnClickListener;
+			public final OnClickUserListener onClickUserListener;
 			public int position;
 			//private final AdapterCallback adapterCallback;
 
@@ -271,10 +271,10 @@ public class FriendsListFragment extends FeedbackFragment {
 		}
 
 		public FriendsListAdapter(final HHUserFull user, AdapterCallback adapterCallback){
-			this.user = user;
+			FriendsListAdapter.user = user;
 			this.adapterCallback = adapterCallback;
 
-			Collections.sort(this.user.getFriendships(), new Comparator<HHFriendshipUser>() {
+			Collections.sort(FriendsListAdapter.user.getFriendships(), new Comparator<HHFriendshipUser>() {
 				@Override
 				public int compare(HHFriendshipUser lhs, HHFriendshipUser rhs) {
 					int lhsScore =

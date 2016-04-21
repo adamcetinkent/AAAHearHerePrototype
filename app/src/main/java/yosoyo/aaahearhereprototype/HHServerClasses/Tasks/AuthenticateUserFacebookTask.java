@@ -20,12 +20,13 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Sends an access token to the Facebook API. The response is sent back via the {@link Callback} interface.
  */
 public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer> {
 	private static final String TAG = "FBAuthenticateUser";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
-	// Interface for classes wanting to incorporate this class to download user info asynchronously
 	public interface Callback {
 		void returnAuthenticationResult(Integer result, HHUserFullProcess user);
 	}

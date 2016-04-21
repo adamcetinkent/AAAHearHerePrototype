@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import yosoyo.aaahearhereprototype.AddressPicker;
 import yosoyo.aaahearhereprototype.AddressResultReceiver;
@@ -343,7 +344,7 @@ public class PostFragment extends Fragment {
 					message.replace(
 						message.getSpanStart(span),
 						message.getSpanEnd(span),
-						"{tag_"+String.format("%1$d", span.getUser().getID())+"}"
+						"{tag_"+String.format(Locale.ENGLISH, "%1$d", span.getUser().getID())+"}"
 					);
 					tags[i] = new HHTag(0, span.getUser().getID());
 				}

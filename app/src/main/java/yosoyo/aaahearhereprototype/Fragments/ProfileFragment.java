@@ -344,7 +344,7 @@ public class ProfileFragment extends FeedbackFragment {
 		btnShowHide = (AutoShowHideButton) view.findViewById(R.id.fragment_profile_btnShowHide);
 	}
 
-	private View.OnClickListener onClickAcceptRequestListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickAcceptRequestListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			btnAccept.setVisibility(View.GONE);
@@ -403,7 +403,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private View.OnClickListener onClickDeleteRequestListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickDeleteRequestListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			btnDelete.setVisibility(View.GONE);
@@ -458,7 +458,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private View.OnClickListener onClickFollowListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickFollowListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			btnFollow.setVisibility(View.GONE);
@@ -522,7 +522,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private View.OnClickListener onClickUnfollowListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickUnfollowListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			btnUnfollow.setVisibility(View.GONE);
@@ -576,14 +576,14 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 	};
 
-	private View.OnClickListener onClickFollowsInListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickFollowsInListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			requestFollowerList(user.getUser(), FollowersListFragment.FOLLOWER_TYPE_IN);
 		}
 	};
 
-	private View.OnClickListener onClickFollowsOutListener = new View.OnClickListener() {
+	private final View.OnClickListener onClickFollowsOutListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			requestFollowerList(user.getUser(), FollowersListFragment.FOLLOWER_TYPE_OUT);
@@ -618,7 +618,7 @@ public class ProfileFragment extends FeedbackFragment {
 			txtURL.setVisibility(View.VISIBLE);
 		}
 
-		if (privacy == true)
+		if (privacy)
 			llPrivacy.setVisibility(View.VISIBLE);
 
 		llFollowsInCount.setOnClickListener(onClickFollowsInListener);

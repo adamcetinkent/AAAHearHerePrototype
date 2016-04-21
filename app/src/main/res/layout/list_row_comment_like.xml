@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/like_full"
+            android:contentDescription="@string/contentDescription_number_of_likes"
             />
 
         <TextView

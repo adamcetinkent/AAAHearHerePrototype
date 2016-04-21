@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
@@ -42,7 +43,8 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 
 	@Override
 	protected List<HHPostFull> doInBackground(Void... params) {
-		String urlString = String.format(VM_SERVER_ADDRESS,
+		String urlString = String.format(Locale.ENGLISH,
+										 VM_SERVER_ADDRESS,
 										 userID,
 										 location.getLatitude(),
 										 location.getLongitude());

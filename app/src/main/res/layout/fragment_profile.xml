@@ -13,7 +13,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
         android:paddingTop="25dp"
-        android:paddingRight="25dp">
+        android:paddingRight="25dp"
+        android:paddingLeft="25dp"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:orientation="vertical"
@@ -26,7 +28,6 @@
                 android:layout_height="80dp"
                 android:layout_gravity="right"
                 android:layout_marginRight="25dp"
-                android:layout_marginLeft="25dp"
                 >
 
                 <ImageView
@@ -34,12 +35,14 @@
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
                     android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                    android:contentDescription="@string/contentDescription_user_profile_picture"
                     />
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/frame_white"
+                    android:contentDescription="@string/contentDescription_user_profile_picture_frame"
                     />
             </FrameLayout>
 
@@ -61,6 +64,7 @@
                     android:layout_gravity="center"
                     android:src="@drawable/minus_button"
                     android:visibility="gone"
+                    android:contentDescription="@string/contentDescription_unfollow_user_button"
                     />
 
                 <ProgressBar
@@ -77,6 +81,7 @@
                     android:layout_width="match_parent"
                     android:src="@drawable/add_user_full"
                     android:visibility="gone"
+                    android:contentDescription="@string/contentDescription_send_follow_request_button"
                     />
 
                 <ProgressBar
@@ -107,7 +112,8 @@
                         android:id="@+id/fragment_profile_btnDelete"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/cross_button"/>
+                        android:src="@drawable/cross_button"
+                        android:contentDescription="@string/contentDescription_delete_follow_request_button"/>
 
                     <ProgressBar
                         android:id="@+id/fragment_profile_btnDelete_progress"
@@ -126,7 +132,8 @@
                         android:id="@+id/fragment_profile_btnAccept"
                         android:layout_height="match_parent"
                         android:layout_width="match_parent"
-                        android:src="@drawable/tick_button"/>
+                        android:src="@drawable/tick_button"
+                        android:contentDescription="@string/contentDescription_accept_follow_request_button"/>
 
                     <ProgressBar
                         android:id="@+id/fragment_profile_btnAccept_progress"
@@ -149,7 +156,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="top"
                 android:layout_gravity="top">
@@ -159,7 +166,8 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/follow_none"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/contentDescription_user_follow_status"/>
 
                 <LinearLayout
                     android:id="@+id/fragment_profile_llPostsCount"
@@ -178,7 +186,7 @@
                             android:id="@+id/fragment_profile_txtPostsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="@string/placeholder_100"
                             android:textSize="25sp"
                             android:visibility="invisible"/>
 
@@ -195,7 +203,7 @@
                         android:id="@+id/fragment_profile_txtPostsCountDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Posts"
+                        android:text="@string/title_posts"
                         android:textSize="12sp"/>
                 </LinearLayout>
 
@@ -216,7 +224,7 @@
                             android:id="@+id/fragment_profile_txtFollowsInCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="@string/placeholder_100"
                             android:textSize="25sp"
                             android:visibility="invisible"/>
 
@@ -233,7 +241,7 @@
                         android:id="@+id/fragment_profile_txtFollowsInCountDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Followers"
+                        android:text="@string/title_followers"
                         android:textSize="12sp"/>
                 </LinearLayout>
 
@@ -254,7 +262,7 @@
                             android:id="@+id/fragment_profile_txtFollowsOutCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="100"
+                            android:text="@string/placeholder_100"
                             android:textSize="25sp"
                             android:visibility="invisible"/>
 
@@ -271,7 +279,7 @@
                         android:id="@+id/fragment_profile_txtFollowsOutCountDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Following"
+                        android:text="@string/title_following"
                         android:textSize="12sp"/>
                 </LinearLayout>
 
@@ -294,7 +302,7 @@
                     android:id="@+id/fragment_profile_txtBio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="__________________________________________________________________________________________________________________________________________________________"
+                    android:text="@string/placeholder_140_chars"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"
                     />
@@ -303,7 +311,7 @@
                     android:id="@+id/fragment_profile_txtURL"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="__________________________________________________________________________________________________________________________________________________________"
+                    android:text="@string/placeholder_140_chars"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"
                     android:clickable="true"
@@ -322,11 +330,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/lock"/>
+                    android:src="@drawable/lock"
+                    android:contentDescription="@string/contentDescription_private_profile"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="This user's privacy settings prevent you from seeing all their posts. Send them a follow request!"/>
+                    android:text="@string/private_profile_warning"/>
 
             </LinearLayout>
 
@@ -350,7 +359,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:src="@drawable/comment"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_feed_button"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -359,11 +369,12 @@
 
         <ImageView
             android:id="@+id/fragment_profile_btnMap"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:src="@drawable/map"
             android:layout_weight="1"
+            android:contentDescription="@string/contentDescription_map_button"
             />
 
         <yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton

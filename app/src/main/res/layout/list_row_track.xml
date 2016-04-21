@@ -8,7 +8,8 @@
         android:id="@+id/list_row_track_artwork"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:padding="5dp" />
+        android:padding="5dp"
+        android:contentDescription="@string/contentDescription_album_artwork"/>
 
     <LinearLayout android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

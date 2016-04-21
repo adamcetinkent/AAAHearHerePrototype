@@ -71,5 +71,35 @@
     <string name="action_friends">Facebook Friends</string>
     <string name="action_search_users">Search Users</string>
     <string name="navigation_post_test">navigation_map_test</string>
+    <string name="contentDescription_album_artwork">Album Artwork</string>
+    <string name="contentDescription_user_profile_picture">User Profile Picture</string>
+    <string name="contentDescription_number_of_likes">Number of Likes</string>
+    <string name="contentDescription_previous_post_button">Previous Post Button</string>
+    <string name="contentDescription_user_profile_picture_frame">User Profile Picture Frame</string>
+    <string name="contentDescription_recenter_map_button">Recentre Map Button</string>
+    <string name="contentDescription_user_follow_status">User Follow Status</string>
+    <string name="contentDescription_delete_follow_request_button">Delete Follow Request Button</string>
+    <string name="contentDescription_add_comment_button">Add Comment Button</string>
+    <string name="contentDescription_post_comment_button">Post Comment Button</string>
+    <string name="contentDescription_unfollow_user_button">Unfollow User Button</string>
+    <string name="contentDescription_post_location_button">Post Location Button</string>
+    <string name="contentDescription_accept_follow_request_button">Accept Follow Request Button</string>
+    <string name="contentDescription_send_follow_request_button">Send Follow Request Button</string>
+    <string name="contentDescription_next_post_button">Next Post Button</string>
+    <string name="contentDescription_set_location_button">Set Location Button</string>
+    <string name="contentDescription_album_artwork_frame">Album Artwork Frame</string>
+    <string name="contentDescription_play_button">Play Button</string>
+    <string name="contentDescription_share_button">Share Button</string>
+    <string name="contentDescription_post_button">Post Button</string>
+    <string name="contentDescription_private_profile">Private Profile Icon</string>
+    <string name="contentDescription_feed_button">Feed Button</string>
+    <string name="contentDescription_map_button">Map Button</string>
+    <string name="placeholder_140_chars">__________________________________________________________________________________________________________________________________________________________</string>
+    <string name="private_profile_warning">This user\'s privacy settings prevent you from seeing all their posts. Send them a follow request!</string>
+    <string name="search_title">Search</string>
+    <string name="placeholder_100">100</string>
+    <string name="title_posts">Posts</string>
+    <string name="title_followers">Followers</string>
+    <string name="title_following">Following</string>
 
 </resources>

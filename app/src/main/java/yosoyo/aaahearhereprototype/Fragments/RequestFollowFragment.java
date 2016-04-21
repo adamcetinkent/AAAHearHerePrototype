@@ -154,15 +154,15 @@ public class RequestFollowFragment extends FeedbackFragment {
 
 			}
 
-			public TextView txtUserName;
-			public ImageView imgProfile;
-			public ImageView btnAccept;
-			public ImageView btnDelete;
-			public ProgressBar btnAcceptProgressBar;
-			public ProgressBar btnDeleteProgressBar;
-			public OnClickFollowRequestListener btnAcceptOnClickListener;
-			public OnClickFollowRequestListener btnDeleteOnClickListener;
-			public OnClickUserListener onClickUserListener;
+			public final TextView txtUserName;
+			public final ImageView imgProfile;
+			public final ImageView btnAccept;
+			public final ImageView btnDelete;
+			public final ProgressBar btnAcceptProgressBar;
+			public final ProgressBar btnDeleteProgressBar;
+			public final OnClickFollowRequestListener btnAcceptOnClickListener;
+			public final OnClickFollowRequestListener btnDeleteOnClickListener;
+			public final OnClickUserListener onClickUserListener;
 			public int position;
 			//private final AdapterCallback adapterCallback;
 

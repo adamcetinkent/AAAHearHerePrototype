@@ -223,16 +223,16 @@ public class UserSearchFragment extends FeedbackFragment {
 
 			}
 
-			public TextView txtUserName;
-			public ImageView imgProfile;
-			public ImageView imgFollowStatus;
-			public ImageView btnFollow;
-			public ImageView btnUnfollow;
-			public ProgressBar btnFollowProgressBar;
-			public ProgressBar btnUnfollowProgressBar;
-			public OnClickFollowRequestListener btnFollowOnClickListener;
-			public OnClickFollowRequestListener btnUnfollowOnClickListener;
-			public OnClickUserListener onClickUserListener;
+			public final TextView txtUserName;
+			public final ImageView imgProfile;
+			public final ImageView imgFollowStatus;
+			public final ImageView btnFollow;
+			public final ImageView btnUnfollow;
+			public final ProgressBar btnFollowProgressBar;
+			public final ProgressBar btnUnfollowProgressBar;
+			public final OnClickFollowRequestListener btnFollowOnClickListener;
+			public final OnClickFollowRequestListener btnUnfollowOnClickListener;
+			public final OnClickUserListener onClickUserListener;
 			public int position;
 			//private final AdapterCallback adapterCallback;
 
@@ -327,8 +327,8 @@ public class UserSearchFragment extends FeedbackFragment {
 		}
 
 		public UserSearchListAdapter(HHUserFull currentUser, List<HHUser> foundUsers, AdapterCallback adapterCallback){
-			this.currentUser = currentUser;
-			this.foundUsers = foundUsers;
+			UserSearchListAdapter.currentUser = currentUser;
+			UserSearchListAdapter.foundUsers = foundUsers;
 			this.adapterCallback = adapterCallback;
 
 			/*Collections.sort(this.currentUser.getFriendships(), new Comparator<HHFriendshipUser>() {

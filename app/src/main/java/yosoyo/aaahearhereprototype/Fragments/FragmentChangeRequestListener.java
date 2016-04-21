@@ -6,9 +6,9 @@ import android.os.Bundle;
  * Created by adam on 16/03/16.
  */
 public interface FragmentChangeRequestListener {
-	public static final int MAP_VIEW_REQUEST = 1;
-	public static final int USER_PROFILE_REQUEST = 2;
-	public static final int FOLLOWERS_LIST_REQUEST = 3;
+	int MAP_VIEW_REQUEST = 1;
+	int USER_PROFILE_REQUEST = 2;
+	int FOLLOWERS_LIST_REQUEST = 3;
 
 	void requestFragmentChange(int fragmentChange, Bundle bundle);
 	void requestProfileModeSwitch(int profileMode, long userID, Bundle bundle);

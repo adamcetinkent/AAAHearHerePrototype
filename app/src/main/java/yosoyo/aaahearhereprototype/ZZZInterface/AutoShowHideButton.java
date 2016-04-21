@@ -32,6 +32,7 @@ public class AutoShowHideButton extends ToggleButton {
 	public void setListening(boolean listening){
 		this.isListening = listening;
 	}
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean getListening(){
 		return isListening;
 	}
@@ -40,6 +41,7 @@ public class AutoShowHideButton extends ToggleButton {
 	public void setAutoListening(boolean autoListening){
 		this.autoListening = autoListening;
 	}
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean getAutoListening(){
 		return autoListening;
 	}

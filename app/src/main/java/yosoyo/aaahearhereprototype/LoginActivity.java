@@ -155,16 +155,13 @@ public class LoginActivity extends Activity implements View.OnClickListener
 		super.onResume();
 
 		// Logs 'install' and 'app activate' App Events.
-		AppEventsLogger.activateApp(this);
+		AppEventsLogger.activateApp(getApplication());
 	}
 
-	@Override
+	/*@Override
 	protected void onPause() {
 		super.onPause();
-
-		// Logs 'app deactivate' App Event.
-		AppEventsLogger.deactivateApp(this);
-	}
+	}*/
 
 	private void startHearHereAuthentication(){
 		AccessToken accessToken = AccessToken.getCurrentAccessToken();

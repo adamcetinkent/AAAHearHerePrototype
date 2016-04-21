@@ -1,10 +1,13 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
+import android.annotation.SuppressLint;
+
 import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
 
 /**
  * Created by adam on 10/03/16.
  */
+@SuppressLint("ParcelCreator")
 public class HHUserFullProcess extends HHUserFull {
 
 	private boolean userProcessed = false;

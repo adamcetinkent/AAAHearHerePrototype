@@ -1,10 +1,13 @@
 package yosoyo.aaahearhereprototype;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -30,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddressPicker extends Activity {
+
 	public static final String TAG = "AddressPicker";
 
 	public static final int REQUEST_CODE = 14070703;
@@ -141,7 +145,7 @@ public class AddressPicker extends Activity {
 		btnLocality.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (btnLocality.isChecked()){
+				if (btnLocality.isChecked()) {
 					addressOutput[2] = address.getLocality();
 				} else {
 					addressOutput[2] = "";
@@ -177,6 +181,17 @@ public class AddressPicker extends Activity {
 			}
 		});
 
+		if (ActivityCompat.checkSelfPermission(this,
+											   Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return;
+		}
 		PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(
 			HolderActivity.mGoogleApiClient, null);
 		result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {

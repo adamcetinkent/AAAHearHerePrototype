@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import yosoyo.aaahearhereprototype.ZZZUtility;
@@ -36,7 +37,8 @@ class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		String urlString = String.format(VM_SERVER_ADDRESS,
+		String urlString = String.format(Locale.ENGLISH,
+										 VM_SERVER_ADDRESS,
 										 userID,
 										 HHUser.getCurrentUserID());
 		Log.d(TAG, "Fetching user privacy by " + urlString);

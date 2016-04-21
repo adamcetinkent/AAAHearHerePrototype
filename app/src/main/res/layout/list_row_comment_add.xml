@@ -22,12 +22,14 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:contentDescription="@string/contentDescription_user_profile_picture"
             />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/frame"
+            android:contentDescription="@string/contentDescription_user_profile_picture_frame"
             />
 
     </FrameLayout>
@@ -60,7 +62,8 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/send"
                 android:background="@android:color/transparent"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:contentDescription="@string/contentDescription_post_comment_button"/>
 
             <ProgressBar
                 android:id="@+id/list_row_comment_add_progressBar"

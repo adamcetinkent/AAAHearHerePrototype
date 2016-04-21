@@ -1,11 +1,14 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns;
 
+import android.annotation.SuppressLint;
+
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollow;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 10/03/16.
  */
+@SuppressLint("ParcelCreator")
 public class HHFollowUserNested extends HHFollow {
 
 	private HHUser followed_user;

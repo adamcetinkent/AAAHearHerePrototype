@@ -273,25 +273,25 @@ public class FollowersListFragment extends FeedbackFragment {
 
 		}
 
-		public TextView txtUserName;
-		public ImageView imgProfile;
-		public ImageView imgFollowStatus;
-		public ImageView btnFollow;
-		public ImageView btnUnfollow;
-		public ProgressBar btnFollowProgressBar;
-		public ProgressBar btnUnfollowProgressBar;
-		public OnClickFollowUserListener btnFollowOnClickListener;
-		public OnClickFollowUserListener btnUnfollowOnClickListener;
+		public final TextView txtUserName;
+		public final ImageView imgProfile;
+		public final ImageView imgFollowStatus;
+		public final ImageView btnFollow;
+		public final ImageView btnUnfollow;
+		public final ProgressBar btnFollowProgressBar;
+		public final ProgressBar btnUnfollowProgressBar;
+		public final OnClickFollowUserListener btnFollowOnClickListener;
+		public final OnClickFollowUserListener btnUnfollowOnClickListener;
 
-		public LinearLayout llRequestResponse;
-		public ImageView btnAccept;
-		public ImageView btnDelete;
-		public ProgressBar btnAcceptProgressBar;
-		public ProgressBar btnDeleteProgressBar;
-		public OnClickFollowUserListener btnAcceptClickListener;
-		public OnClickFollowUserListener btnDeleteOnClickListener;
+		public final LinearLayout llRequestResponse;
+		public final ImageView btnAccept;
+		public final ImageView btnDelete;
+		public final ProgressBar btnAcceptProgressBar;
+		public final ProgressBar btnDeleteProgressBar;
+		public final OnClickFollowUserListener btnAcceptClickListener;
+		public final OnClickFollowUserListener btnDeleteOnClickListener;
 
-		public OnClickUserListener onClickUserListener;
+		public final OnClickUserListener onClickUserListener;
 		public int position;
 
 		public ViewHolder(View view, final FollowersListAdapterCallback adapterCallback){
@@ -474,8 +474,8 @@ public class FollowersListFragment extends FeedbackFragment {
 	}
 
 	private class FollowersListAdapter extends RecyclerView.Adapter<ViewHolder> {
-		private HHUserFull user;
-		private HHUserFull currentUser;
+		private final HHUserFull user;
+		private final HHUserFull currentUser;
 		private final int FOLLOWER_TYPE;
 		private final FollowersListAdapterCallback adapterCallback;
 

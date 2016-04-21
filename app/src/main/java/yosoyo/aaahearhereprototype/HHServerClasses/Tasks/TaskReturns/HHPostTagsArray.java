@@ -1,11 +1,14 @@
 package yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns;
 
+import android.annotation.SuppressLint;
+
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTag;
 
 /**
  * Created by adam on 10/03/16.
  */
+@SuppressLint("ParcelCreator")
 public class HHPostTagsArray extends HHPost {
 
 	private final HHTag[] tags_attributes;

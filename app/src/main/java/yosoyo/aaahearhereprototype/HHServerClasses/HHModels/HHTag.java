@@ -43,10 +43,10 @@ public class HHTag extends HHLike implements Parcelable {
 		return 0;
 	}
 
-	@Override
+	/*@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-	}
+	}*/
 
 	public static final Parcelable.Creator<HHTag> CREATOR = new Parcelable.Creator<HHTag>(){
 

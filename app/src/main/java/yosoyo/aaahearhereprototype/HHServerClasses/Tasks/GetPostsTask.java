@@ -14,6 +14,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -44,9 +45,10 @@ class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		String urlString;
 		if (beforeTime != null) {
-			urlString = String.format(VM_SERVER_ADDRESS_BEFORE,
+			urlString = String.format(Locale.ENGLISH,
+									  VM_SERVER_ADDRESS_BEFORE,
 									  HHUser.getCurrentUserID(),
-								 	  beforeTime.toString());
+									  beforeTime.toString());
 			urlString = urlString.replace(" ", "%20");
 		} else {
 			urlString = VM_SERVER_ADDRESS + HHUser.getCurrentUserID();

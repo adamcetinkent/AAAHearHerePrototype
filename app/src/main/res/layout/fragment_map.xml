@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        >
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -29,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|left"
                 android:src="@drawable/left_arrow"
-                android:alpha="0.9"/>
+                android:alpha="0.9"
+                android:contentDescription="@string/contentDescription_previous_post_button"/>
 
         </LinearLayout>
 
@@ -47,7 +48,8 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:gravity="center"
                 android:src="@drawable/centre_circle"
-                android:alpha="0.9"/>
+                android:alpha="0.9"
+                android:contentDescription="@string/contentDescription_recenter_map_button"/>
 
             <ProgressBar
                 android:id="@+id/fragment_map_btnCentre_progress"
@@ -86,7 +88,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|bottom|right"
                 android:src="@drawable/right_arrow"
-                android:alpha="0.9"/>
+                android:alpha="0.9"
+                android:contentDescription="@string/contentDescription_next_post_button"/>
 
         </LinearLayout>
 

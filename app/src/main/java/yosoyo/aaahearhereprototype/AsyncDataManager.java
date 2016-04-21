@@ -32,20 +32,34 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Responsible for abstracting the provenance of data requested by the app.
+ * Data can be requested from two sources: the SQLite Database and/or the Web API. Database requests
+ * are handed over to the {@link DatabaseHelper} whereas the web calls are sent to the {@link WebHelper}.
  */
 public class AsyncDataManager {
-
 	public static final String TAG = "AsyncDataManager";
-	private static Context context;
+
+	private static Context context; // required for database calls
 
 	public static void setContext(Context newContext){
 		context = newContext;
 	}
 
+	//**********************************************************************************************
+	// FACEBOOK AUTHENTICATION
+	//**********************************************************************************************
+
 	public interface AuthenticateUserCallback {
 		void returnAuthenticationResult(boolean success);
 	}
 
+	/**
+	 * Check the access token against Facebook's API. Success updates the current user.
+	 *
+	 * @param accessToken	: the access token to be tested by Facebook
+	 * @param callback		: return results via callback
+	 */
 	public static void authenticateUser(AccessToken accessToken, final AuthenticateUserCallback callback){
 		new AuthenticateUserFacebookTask(
 			accessToken,
@@ -53,6 +67,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnAuthenticationResult(Integer result, HHUserFullProcess returnedUser) {
 					if (result == HttpURLConnection.HTTP_OK) {
+						// USER ALREADY REGISTERED :: SIGN IN
 						HHUser.setCurrentUser(returnedUser);
 						DatabaseHelper.processCurrentUser(
 							context,
@@ -64,6 +79,7 @@ public class AsyncDataManager {
 								}
 							});
 					} else if (result == HttpURLConnection.HTTP_ACCEPTED) {
+						// USER NOT PREVIOUSLY REGISTERED :: REGISTER
 						HHUser user = new HHUser(Profile.getCurrentProfile());
 						new PostUserTask(
 							user,
@@ -74,16 +90,26 @@ public class AsyncDataManager {
 								}
 							}).execute();
 					} else {
+						// FAILURE
 						callback.returnAuthenticationResult(false);
 					}
 				}
 			}).execute();
 	}
 
+	//**********************************************************************************************
+	// CURRENT USER
+	//**********************************************************************************************
+
 	public interface UpdateCurrentUserCallback{
 		void returnUpdateCurrentUser(boolean success);
 	}
 
+	/**
+	 * Update the current user
+	 *
+	 * @param callback	: return result via callback
+	 */
 	public static void updateCurrentUser(final UpdateCurrentUserCallback callback){
 		new GetUserTask(
 			HHUser.getCurrentUserID(),
@@ -109,6 +135,33 @@ public class AsyncDataManager {
 		).execute();
 	}
 
+	//**********************************************************************************************
+	// POSTS
+	//**********************************************************************************************
+
+	// POST POST ----------------------
+
+	public interface PostPostCallback{
+		void returnPostPost(boolean success, HHPostFullProcess returnedPost);
+	}
+
+	/**
+	 * Attempt to post a post to Hear Here
+	 *
+	 * @param post		: post to post
+	 * @param callback	: results returned via callback
+	 */
+	public static void postPost(final HHPostTagsArray post, final PostPostCallback callback){
+		WebHelper.postPost(post, new WebHelper.PostPostCallback() {
+			@Override
+			public void returnPostPost(boolean success, HHPostFullProcess webPostToProcess) {
+				callback.returnPostPost(success, webPostToProcess);
+			}
+		});
+	}
+
+	// GET POST -----------------------
+
 	public interface GetPostCallback {
 		void returnGetPost(HHPostFull post);
 	}
@@ -118,6 +171,50 @@ public class AsyncDataManager {
 		void warnNoEarlierPosts();
 	}
 
+	/**
+	 * Fetch specified post - if current user is allowed to see
+	 *
+	 * @param postID	: ID of requested post
+	 * @param callback	: results returned via callback
+	 */
+
+	public static void getPost(long postID, GetPostCallback callback){
+		getCachedPost(postID, callback);
+		getWebPost(postID, callback);
+	}
+
+	private static void getCachedPost(long postID, final GetPostCallback callback){
+		DatabaseHelper.getCachedPost(
+			context,
+			postID,
+			new DatabaseHelper.GetCachedPostCallback() {
+				@Override
+				public void returnGetCachedPost(HHPostFull cachedPost) {
+					callback.returnGetPost(cachedPost);
+					WebHelper.preLoadPostBitmaps(cachedPost);
+				}
+			});
+	}
+
+	public static void getWebPost(long post_id, final GetPostCallback callback){
+		WebHelper.getPost(post_id, new WebHelper.GetPostCallback() {
+			@Override
+			public void returnGetPost(HHPostFullProcess webPostToProcess) {
+				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
+				webPostsToProcess.add(webPostToProcess);
+				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
+			}
+		});
+	}
+
+	// GET ALL POSTS
+
+	/**
+	 * Fetch the next batch of posts that the current user is allowed to see
+	 *
+	 * @param beforeTime 	: fetch batch before this date
+	 * @param callback		: return results via callback
+	 */
 	public static void getAllPosts(final Timestamp beforeTime,
 								   final GetAllPostsCallback callback){
 		//getAllCachedPosts(beforeTime, callback);
@@ -156,6 +253,15 @@ public class AsyncDataManager {
 			});
 	}
 
+	// GET USER POSTS
+
+	/**
+	 * Fetch the next batch of posts by a specific user that the current user is allowed to see
+	 *
+	 * @param userID		: ID of user whose posts are fetched
+	 * @param beforeTime	: fetch batch before this date
+	 * @param callback		: return results via callback
+	 */
 	public static void getUserPosts(final long userID,
 									final Timestamp beforeTime,
 									final GetAllPostsCallback callback){
@@ -201,71 +307,42 @@ public class AsyncDataManager {
 			});
 	}
 
-	public static void getPost(long postID, GetPostCallback callback){
-		getCachedPost(postID, callback);
-		getWebPost(postID, callback);
-	}
-
-	private static void getCachedPost(long postID, final GetPostCallback callback){
-		DatabaseHelper.getCachedPost(
-			context,
-			postID,
-			new DatabaseHelper.GetCachedPostCallback() {
-				@Override
-				public void returnGetCachedPost(HHPostFull cachedPost) {
-					callback.returnGetPost(cachedPost);
-					WebHelper.preLoadPostBitmaps(cachedPost);
-				}
-			});
-	}
-
-	public static void getWebPost(long post_id, final GetPostCallback callback){
-		WebHelper.getPost(post_id, new WebHelper.GetPostCallback() {
-			@Override
-			public void returnGetPost(HHPostFullProcess webPostToProcess) {
-				ArrayList<HHPostFullProcess> webPostsToProcess = new ArrayList<>();
-				webPostsToProcess.add(webPostToProcess);
-				DatabaseHelper.processWebPosts(context, callback, webPostsToProcess);
-			}
-		});
-	}
+	// GET POSTS AT LOCATION
 
 	public interface GetPostsAtLocationCallback{
 		void returnPostsAtLocation(List<HHPostFull> returnedPosts);
 	}
 
+	/**
+	 * Fetch posts visible to current user at given location
+	 *
+	 * @param location	: location to look for posts
+	 * @param callback	: results returned via callback
+	 */
 	public static void getPostsAtLocation(Location location, final GetPostsAtLocationCallback callback){
 		getPostsAtLocation(context, location, HHUser.getCurrentUserID(), callback);
 	}
 
+	/**
+	 * Fetch posts visible to user at given location
+	 *
+	 * @param location	: location to look for posts
+	 * @param userID	: ID of user requesting posts
+	 * @param callback	: results returned via callback
+	 */
 	public static void getPostsAtLocation(Location location, final long userID, final GetPostsAtLocationCallback callback) {
 		getPostsAtLocation(context, location, userID, callback);
 	}
 
+	/**
+	 * Fetch posts visible to user at given location
+	 *
+	 * @param context	: context for database request
+	 * @param location	: location to look for posts
+	 * @param userID	: ID of user requesting posts
+	 * @param callback	: results returned via callback
+	 */
 	public static void getPostsAtLocation(Context context, Location location, final long userID, final GetPostsAtLocationCallback callback){
-		/*DatabaseHelper.getPostsAtLocation(
-			context,
-			location,
-			new DatabaseHelper.GetPostsAtLocationCallback() {
-				@Override
-				public void returnGetCachedPostsAtLocation(Location location, List<HHPostFull> posts) {
-					if (posts != null && posts.size() > 0) {
-						callback.returnPostsAtLocation(posts);
-						return;
-					}
-
-					WebHelper.getPostsAtLocation(
-						location,
-						userID,
-						new WebHelper.GetPostsAtLocationCallback() {
-							@Override
-							public void returnGetPostsAtLocation(List<HHPostFull> webPosts) {
-								callback.returnPostsAtLocation(webPosts);
-							}
-						});
-
-				}
-			});*/
 		WebHelper.getPostsAtLocation(
 			location,
 			userID,
@@ -277,19 +354,86 @@ public class AsyncDataManager {
 			});
 	}
 
+	//**********************************************************************************************
+	// USER
+	//**********************************************************************************************
+
+	// GET USER -----------------------
+
+	public interface GetUserCallback {
+		void returnGetCachedUser(final HHUserFull returnedUser);
+		void returnGetWebUser(final HHUserFull returnedUser);
+	}
+
+	public static void getUser(final long userID, final boolean webOnly, final GetUserCallback callback){
+		if (!webOnly)
+			getCachedUser(userID, callback);
+		getWebUser(userID, callback);
+	}
+
+	private static void getCachedUser(final long userID, final GetUserCallback callback){
+		DatabaseHelper.getUser(
+			context,
+			userID,
+			new DatabaseHelper.GetUserCallback() {
+				@Override
+				public void returnGetUser(HHUserFull user) {
+					callback.returnGetCachedUser(user);
+					if (user != null && user.getUser() != null)
+						WebHelper.preLoadUserBitmaps(user);
+				}
+			}
+		);
+	}
+
+	private static void getWebUser(final long userID, final GetUserCallback callback){
+		WebHelper.getUser(
+			userID,
+			new WebHelper.GetUserCallback() {
+				@Override
+				public void returnGetUser(HHUserFull user) {
+					callback.returnGetWebUser(user);
+				}
+			}
+		);
+	}
+
+	// GET USER PRIVACY ---------------
+
 	public interface GetUserPrivacyCallback{
 		void returnCachedUserPrivacy(boolean userPrivacy);
 		void returnWebUserPrivacy(boolean userPrivacy);
 	}
 
+	/**
+	 * Determines whether user is private to current user
+	 *
+	 * @param userID	: ID of user being viewed
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPrivacy(final long userID, final GetUserPrivacyCallback callback) {
 		getUserPrivacy(context, userID, false, callback);
 	}
 
+	/**
+	 * Determines whether user is private to current user
+	 *
+	 * @param userID	: ID of user being viewed
+	 * @param webOnly	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPrivacy(final long userID, final boolean webOnly, final GetUserPrivacyCallback callback) {
 		getUserPrivacy(context, userID, webOnly, callback);
 	}
 
+	/**
+	 * Determines whether user is private to current user
+	 *
+	 * @param context 	: context required for database requests
+	 * @param userID	: ID of user being viewed
+	 * @param webOnly	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPrivacy(Context context, final long userID, final boolean webOnly, final GetUserPrivacyCallback callback){
 		if (!webOnly) {
 			getUserCachedPrivacy(context, userID, callback);
@@ -312,7 +456,8 @@ public class AsyncDataManager {
 
 	private static void getUserWebPrivacy(final long userID, final GetUserPrivacyCallback callback){
 		WebHelper.getUserPrivacy(
-			userID, new WebHelper.GetUserPrivacyCallback() {
+			userID,
+			new WebHelper.GetUserPrivacyCallback() {
 				@Override
 				public void returnGetUserPrivacy(boolean userPrivacy) {
 					callback.returnWebUserPrivacy(userPrivacy);
@@ -321,19 +466,42 @@ public class AsyncDataManager {
 		);
 	}
 
+	// GET USER POST COUNT ------------
+
 	public interface GetUserPostCountCallback{
 		void returnCachedUserPostCount(int postCount);
 		void returnWebUserPostCount(int postCount);
 	}
 
+	/**
+	 * Fetch number of posts by user
+	 *
+	 * @param userID	: ID of user
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPostCount(final long userID, final GetUserPostCountCallback callback) {
 		getUserPostCount(context, userID, false, callback);
 	}
 
+	/**
+	 * Fetch number of posts by user
+	 *
+	 * @param userID	: ID of user
+	 * @param webOnly 	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPostCount(final long userID, final boolean webOnly, final GetUserPostCountCallback callback) {
 		getUserPostCount(context, userID, webOnly, callback);
 	}
 
+	/**
+	 * Fetch number of posts by user
+	 *
+	 * @param context 	: context required for datbase queries
+	 * @param userID	: ID of user
+	 * @param webOnly 	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserPostCount(Context context, final long userID, final boolean webOnly, final GetUserPostCountCallback callback){
 		if (!webOnly) {
 			getUserCachedPostCount(context, userID, callback);
@@ -364,6 +532,8 @@ public class AsyncDataManager {
 			}
 		);
 	}
+
+	// GET USER FOLLOWERS IN COUNT ----
 
 	public interface GetUserFollowersInCountCallback{
 		void returnCachedUserFollowersInCount(int followersInCount);
@@ -409,6 +579,8 @@ public class AsyncDataManager {
 		);
 	}
 
+	// GET USER FOLLOWERS OUT COUNT ---
+
 	public interface GetUserFollowersOutCountCallback{
 		void returnCachedUserFollowersOutCount(int followersOutCount);
 		void returnWebUserFollowersOutCount(int followersOutCount);
@@ -453,18 +625,26 @@ public class AsyncDataManager {
 		);
 	}
 
-	public interface PostPostCallback{
-		void returnPostPost(boolean success, HHPostFullProcess returnedPost);
+	// SEARCH USERS -------------------
+
+	public interface SearchUsersCallback {
+		void returnSearchUsers(final String query, final List<HHUser> foundUsers);
 	}
 
-	public static void postPost(final HHPostTagsArray post, final PostPostCallback callback){
-		WebHelper.postPost(post, new WebHelper.PostPostCallback() {
+	public static void searchUsers(final String query, final SearchUsersCallback callback){
+		WebHelper.searchUsers(query, new WebHelper.SearchUsersCallback() {
 			@Override
-			public void returnPostPost(boolean success, HHPostFullProcess webPostToProcess) {
-				callback.returnPostPost(success, webPostToProcess);
+			public void returnSearchUsers(List<HHUser> foundUsers) {
+				callback.returnSearchUsers(query, foundUsers);
 			}
 		});
 	}
+
+	//**********************************************************************************************
+	// COMMENTS
+	//**********************************************************************************************
+
+	// POST COMMENT -------------------
 
 	public interface PostCommentCallback{
 		void returnPostComment(HHComment returnedComment);
@@ -487,6 +667,12 @@ public class AsyncDataManager {
 		});
 	}
 
+	//**********************************************************************************************
+	// LIKES
+	//**********************************************************************************************
+
+	// POST LIKE ----------------------
+
 	public interface PostLikeCallback{
 		void returnPostLike(HHLike returnedLike);
 	}
@@ -507,6 +693,8 @@ public class AsyncDataManager {
 			}
 		});
 	}
+
+	// DELETE LIKE --------------------
 
 	public interface DeleteLikeCallback{
 		void returnDeleteLike(boolean success);
@@ -533,6 +721,12 @@ public class AsyncDataManager {
 		});
 	}
 
+	//**********************************************************************************************
+	// FOLLOWS
+	//**********************************************************************************************
+
+	// DELETE FOLLOW ------------------
+
 	public interface DeleteFollowCallback {
 		void returnDeleteFollow(boolean success, HHFollowUser deletedFollow);
 	}
@@ -557,6 +751,12 @@ public class AsyncDataManager {
 			}
 		});
 	}
+
+	//**********************************************************************************************
+	// FOLLOW REQUESTS
+	//**********************************************************************************************
+
+	// POST FOLLOW REQUEST ------------
 
 	public interface PostFollowRequestCallback{
 		void returnPostFollowRequest(boolean success, HHFollowRequestUser returnedFollowRequest);
@@ -599,6 +799,8 @@ public class AsyncDataManager {
 		});
 	}
 
+	// ACCEPT FOLLOW REQUEST ----------
+
 	public interface AcceptFollowRequestCallback{
 		void returnAcceptFollowRequest(boolean success, HHFollowRequestUser followRequest);
 	}
@@ -625,6 +827,8 @@ public class AsyncDataManager {
 		});
 	}
 
+	// DELETE FOLLOW REQUEST ----------
+
 	public interface DeleteFollowRequestCallback{
 		void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest);
 	}
@@ -650,6 +854,12 @@ public class AsyncDataManager {
 			}
 		});
 	}
+
+	//**********************************************************************************************
+	// SPOTIFY TRACKS
+	//**********************************************************************************************
+
+	// GET SPOTIFY TRACK --------------
 
 	public interface  GetSpotifyTrackCallback{
 		void returnSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
@@ -690,57 +900,6 @@ public class AsyncDataManager {
 
 				}
 			});
-	}
-
-	public interface GetUserCallback {
-		void returnGetCachedUser(final HHUserFull returnedUser);
-		void returnGetWebUser(final HHUserFull returnedUser);
-	}
-
-	public static void getUser(final long userID, final boolean webOnly, final GetUserCallback callback){
-		if (!webOnly)
-			getCachedUser(userID, callback);
-		getWebUser(userID, callback);
-	}
-
-	private static void getCachedUser(final long userID, final GetUserCallback callback){
-		DatabaseHelper.getUser(
-			context,
-			userID,
-			new DatabaseHelper.GetUserCallback() {
-				@Override
-				public void returnGetUser(HHUserFull user) {
-					callback.returnGetCachedUser(user);
-					if (user != null && user.getUser() != null)
-						WebHelper.preLoadUserBitmaps(user);
-				}
-			}
-		);
-	}
-
-	private static void getWebUser(final long userID, final GetUserCallback callback){
-		WebHelper.getUser(
-			userID,
-			new WebHelper.GetUserCallback() {
-				@Override
-				public void returnGetUser(HHUserFull user) {
-					callback.returnGetWebUser(user);
-				}
-			}
-		);
-	}
-
-	public interface SearchUsersCallback {
-		void returnSearchUsers(final String query, final List<HHUser> foundUsers);
-	}
-
-	public static void searchUsers(final String query, final SearchUsersCallback callback){
-		WebHelper.searchUsers(query, new WebHelper.SearchUsersCallback() {
-			@Override
-			public void returnSearchUsers(List<HHUser> foundUsers) {
-				callback.returnSearchUsers(query, foundUsers);
-			}
-		});
 	}
 
 }
