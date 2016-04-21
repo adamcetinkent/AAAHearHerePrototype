@@ -55,9 +55,9 @@ public class AsyncDataManager {
 	}
 
 	/**
-	 * Check the access token against Facebook's API. Success updates the current user.
+	 * Check the {@link AccessToken} against Facebook's API. Success updates the current user.
 	 *
-	 * @param accessToken	: the access token to be tested by Facebook
+	 * @param accessToken	: the {@link AccessToken} to be tested by Facebook
 	 * @param callback		: return results via callback
 	 */
 	public static void authenticateUser(AccessToken accessToken, final AuthenticateUserCallback callback){
@@ -146,9 +146,9 @@ public class AsyncDataManager {
 	}
 
 	/**
-	 * Attempt to post a post to Hear Here
+	 * Attempt to post a {@link HHPostFull} to Hear Here
 	 *
-	 * @param post		: post to post
+	 * @param post		: {@link HHPostTagsArray} to post
 	 * @param callback	: results returned via callback
 	 */
 	public static void postPost(final HHPostTagsArray post, final PostPostCallback callback){
@@ -172,7 +172,7 @@ public class AsyncDataManager {
 	}
 
 	/**
-	 * Fetch specified post - if current user is allowed to see
+	 * Fetch specified {@link HHPostFull} - if current user is allowed to see
 	 *
 	 * @param postID	: ID of requested post
 	 * @param callback	: results returned via callback
@@ -316,7 +316,7 @@ public class AsyncDataManager {
 	/**
 	 * Fetch posts visible to current user at given location
 	 *
-	 * @param location	: location to look for posts
+	 * @param location	: {@link Location} to look for posts
 	 * @param callback	: results returned via callback
 	 */
 	public static void getPostsAtLocation(Location location, final GetPostsAtLocationCallback callback){
@@ -326,7 +326,7 @@ public class AsyncDataManager {
 	/**
 	 * Fetch posts visible to user at given location
 	 *
-	 * @param location	: location to look for posts
+	 * @param location	: {@link Location} to look for posts
 	 * @param userID	: ID of user requesting posts
 	 * @param callback	: results returned via callback
 	 */
@@ -337,8 +337,8 @@ public class AsyncDataManager {
 	/**
 	 * Fetch posts visible to user at given location
 	 *
-	 * @param context	: context for database request
-	 * @param location	: location to look for posts
+	 * @param context	: {@link Context} for database request
+	 * @param location	: {@link Location} to look for posts
 	 * @param userID	: ID of user requesting posts
 	 * @param callback	: results returned via callback
 	 */
@@ -364,6 +364,14 @@ public class AsyncDataManager {
 		void returnGetCachedUser(final HHUserFull returnedUser);
 		void returnGetWebUser(final HHUserFull returnedUser);
 	}
+
+	/**
+	 * Fetch a {@link HHUserFull}
+	 *
+	 * @param userID	: ID of user
+	 * @param webOnly	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 
 	public static void getUser(final long userID, final boolean webOnly, final GetUserCallback callback){
 		if (!webOnly)
@@ -429,7 +437,7 @@ public class AsyncDataManager {
 	/**
 	 * Determines whether user is private to current user
 	 *
-	 * @param context 	: context required for database requests
+	 * @param context 	: {@link Context} required for database requests
 	 * @param userID	: ID of user being viewed
 	 * @param webOnly	: if true, does not query database
 	 * @param callback	: results returned via callback
@@ -497,7 +505,7 @@ public class AsyncDataManager {
 	/**
 	 * Fetch number of posts by user
 	 *
-	 * @param context 	: context required for datbase queries
+	 * @param context 	: {@link Context} required for datbase queries
 	 * @param userID	: ID of user
 	 * @param webOnly 	: if true, does not query database
 	 * @param callback	: results returned via callback
@@ -540,14 +548,35 @@ public class AsyncDataManager {
 		void returnWebUserFollowersInCount(int followersInCount);
 	}
 
+	/**
+	 * Fetch number of users that follow user
+	 *
+	 * @param userID	: ID of user
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersInCount(final long userID, final GetUserFollowersInCountCallback callback) {
 		getUserFollowersInCount(context, userID, false, callback);
 	}
 
+	/**
+	 * Fetch number of users that follow user
+	 *
+	 * @param userID	: ID of user
+	 * @param webOnly	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersInCount(final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback) {
 		getUserFollowersInCount(context, userID, webOnly, callback);
 	}
 
+	/**
+	 * Fetch number of users that follow user
+	 *
+	 * @param context	: {@link Context} required for database queries
+	 * @param userID	: ID of user
+	 * @param webOnly	: if true, does not query databse
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersInCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback){
 		if (!webOnly) {
 			getUserCachedFollowersInCount(context, userID, callback);
@@ -586,14 +615,35 @@ public class AsyncDataManager {
 		void returnWebUserFollowersOutCount(int followersOutCount);
 	}
 
+	/**
+	 * Fetch number of users that user follows
+	 *
+	 * @param userID	: ID of user
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersInCount(final long userID, final GetUserFollowersOutCountCallback callback) {
 		getUserFollowersOutCount(context, userID, false, callback);
 	}
 
+	/**
+	 * Fetch number of users that user follows
+	 *
+	 * @param userID	: ID of user
+	 * @param webOnly 	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersOutCount(final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback) {
 		getUserFollowersOutCount(context, userID, webOnly, callback);
 	}
 
+	/**
+	 * Fetch number of users that user follows
+	 *
+	 * @param context 	: {@link Context} required for database queries
+	 * @param userID	: ID of user
+	 * @param webOnly 	: if true, does not query database
+	 * @param callback	: results returned via callback
+	 */
 	public static void getUserFollowersOutCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback){
 		if (!webOnly) {
 			getUserCachedFollowersOutCount(context, userID, callback);
@@ -631,6 +681,12 @@ public class AsyncDataManager {
 		void returnSearchUsers(final String query, final List<HHUser> foundUsers);
 	}
 
+	/**
+	 * Search for users
+	 *
+	 * @param query		: query string to perform search
+	 * @param callback	: results returned via callback
+	 */
 	public static void searchUsers(final String query, final SearchUsersCallback callback){
 		WebHelper.searchUsers(query, new WebHelper.SearchUsersCallback() {
 			@Override
@@ -650,6 +706,12 @@ public class AsyncDataManager {
 		void returnPostComment(HHComment returnedComment);
 	}
 
+	/**
+	 * Attempt to post a {@link HHComment} to Hear Here
+	 *
+	 * @param comment	: {@link HHComment} to be created
+	 * @param callback	: results returned via callback
+	 */
 	public static void postComment(final HHComment comment, final PostCommentCallback callback){
 		WebHelper.postComment(comment, new WebHelper.PostCommentCallback() {
 			@Override
@@ -677,6 +739,12 @@ public class AsyncDataManager {
 		void returnPostLike(HHLike returnedLike);
 	}
 
+	/**
+	 * Attempt to post a {@link HHLike} to Hear Here
+	 *
+	 * @param like		: {@link HHLike} to be created
+	 * @param callback	: results returned via callback
+	 */
 	public static void postLike(final HHLike like, final PostLikeCallback callback){
 		WebHelper.postLike(like, new WebHelper.PostLikeCallback() {
 			@Override
@@ -700,6 +768,12 @@ public class AsyncDataManager {
 		void returnDeleteLike(boolean success);
 	}
 
+	/**
+	 * Attempt to delete a {@link HHLike} from Hear Here
+	 *
+	 * @param like		: {@link HHLike} to be deleted
+	 * @param callback	: results returned via callback
+	 */
 	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
 		WebHelper.deleteLike(like, new WebHelper.DeleteLikeCallback() {
 			@Override
@@ -731,6 +805,12 @@ public class AsyncDataManager {
 		void returnDeleteFollow(boolean success, HHFollowUser deletedFollow);
 	}
 
+	/**
+	 * Attempt to delete a {@link HHFollowUser} from Hear Here
+	 *
+	 * @param follow	: {@link HHFollowUser} to be deleted
+	 * @param callback	: results returned via callback
+	 */
 	public static void deleteFollow(final HHFollowUser follow, final DeleteFollowCallback callback){
 		WebHelper.deleteFollow(follow, new WebHelper.DeleteFollowCallback() {
 			@Override
@@ -763,10 +843,17 @@ public class AsyncDataManager {
 		void returnPostFollowRequestAccepted(boolean success, HHFollowUser returnedFollowUser);
 	}
 
+	/**
+	 * Attempt to post a {@link HHFollowRequest} to Hear Here
+	 *
+	 * @param followRequest	: {@link HHFollowRequest} to be created
+	 * @param callback		: results returned by callback
+	 */
 	public static void postFollowRequest(final HHFollowRequest followRequest, final PostFollowRequestCallback callback){
 		WebHelper.postFollowRequest(followRequest, new WebHelper.PostFollowRequestCallback() {
 			@Override
 			public void returnPostFollowRequest(boolean success, HHFollowRequestUser returnedFollowRequest) {
+				// follow request has been created, and awaits approval
 				if (success) {
 					DatabaseHelper.insertFollowRequest(
 						context,
@@ -783,6 +870,7 @@ public class AsyncDataManager {
 
 			@Override
 			public void returnPostFollowRequestAccepted(boolean success, final HHFollowUser returnedFollow) {
+				// follow request has been automatically approved, so follow returned instead
 				if (success) {
 					DatabaseHelper.insertFollow(
 						context,
@@ -805,6 +893,12 @@ public class AsyncDataManager {
 		void returnAcceptFollowRequest(boolean success, HHFollowRequestUser followRequest);
 	}
 
+	/**
+	 * Attempt to accept a {@link HHFollowRequest}
+	 *
+	 * @param followRequest	: {@link HHFollowRequestUser} to be accepted
+	 * @param callback		: results returned via callback
+	 */
 	public static void acceptFollowRequest(final HHFollowRequestUser followRequest, final AcceptFollowRequestCallback callback){
 		WebHelper.acceptFollowRequest(followRequest, new WebHelper.AcceptFollowRequestCallback() {
 			@Override
@@ -833,6 +927,12 @@ public class AsyncDataManager {
 		void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest);
 	}
 
+	/**
+	 * Attempt to delete a {@link HHFollowRequestUser}
+	 *
+	 * @param followRequest	: {@link HHFollowRequestUser} to be deleted
+	 * @param callback		: results returned via callback
+	 */
 	public static void deleteFollowRequest(final HHFollowRequestUser followRequest, final DeleteFollowRequestCallback callback){
 		WebHelper.deleteFollowRequest(followRequest, new WebHelper.DeleteFollowRequestCallback() {
 			@Override
@@ -865,10 +965,23 @@ public class AsyncDataManager {
 		void returnSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
 	}
 
+	/**
+	 * Fetch {@link HHCachedSpotifyTrack}
+	 *
+	 * @param trackID	: ID of {@link SpotifyTrack}
+	 * @param callback	: results returned via callback
+	 */
 	public static void getSpotifyTrack(final String trackID, final GetSpotifyTrackCallback callback){
 		getSpotifyTrack(context, trackID, callback);
 	}
 
+	/**
+	 * Fetch {@link HHCachedSpotifyTrack}
+	 *
+	 * @param context	: {@link Context} required for database queries
+	 * @param trackID	: ID of {@link SpotifyTrack}
+	 * @param callback	: results returned via callback
+	 */
 	public static void getSpotifyTrack(final Context context, final String trackID, final GetSpotifyTrackCallback callback){
 
 		DatabaseHelper.getCachedSpotifyTrack(
