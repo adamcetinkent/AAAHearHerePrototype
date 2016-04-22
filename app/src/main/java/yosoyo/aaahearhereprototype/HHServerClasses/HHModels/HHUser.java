@@ -20,6 +20,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * A User is one of the two most fundamental classes of Hear Here, along with {@link HHPost}.
+ * It describes a user of the app, along with their privacy settings.
  */
 public class HHUser extends HHBase implements Parcelable {
 
@@ -38,7 +41,7 @@ public class HHUser extends HHBase implements Parcelable {
 			nested.getID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
-			 );
+		);
 		this.first_name = 		nested.getFirstName();
 		this.last_name = 		nested.getLastName();
 		this.fb_user_id = 		nested.getFBUserID();

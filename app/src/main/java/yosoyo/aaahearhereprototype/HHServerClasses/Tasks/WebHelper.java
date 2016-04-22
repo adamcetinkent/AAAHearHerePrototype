@@ -31,6 +31,8 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Handles web operations
  */
 public class WebHelper {
 

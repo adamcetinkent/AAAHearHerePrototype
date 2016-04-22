@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Sends a {@link yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollow} to the server to be deleted
  */
 class DeleteFollowTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "DeleteFollowTask";

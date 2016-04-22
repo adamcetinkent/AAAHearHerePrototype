@@ -6,6 +6,8 @@ import java.sql.Timestamp;
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * The basic format of all Hear Here active record classes includes their ID and their timestamps.
  */
 public abstract class HHBase {
 

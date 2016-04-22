@@ -15,6 +15,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 
 /**
  * Created by adam on 22/02/16.
+ *
+ * Object-Relational Mapping for {@link HHPost}
  */
 public class ORMPost {
 

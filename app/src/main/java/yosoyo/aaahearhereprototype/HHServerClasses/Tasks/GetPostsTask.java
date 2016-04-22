@@ -23,6 +23,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests posts from the server for the current user before the given time
  */
 class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";

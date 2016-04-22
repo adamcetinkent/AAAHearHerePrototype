@@ -9,6 +9,8 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 /**
  * Created by adam on 23/02/16.
+ *
+ * A streamlined form of the {@link SpotifyTrack} for caching
  */
 public class HHCachedSpotifyTrack implements Parcelable {
 

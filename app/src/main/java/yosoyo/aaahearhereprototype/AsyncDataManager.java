@@ -124,11 +124,11 @@ public class AsyncDataManager {
 							new DatabaseHelper.ProcessCurrentUserCallback() {
 								@Override
 								public void returnProcessCurrentUser(HHUserFull hhUserFull) {
-									callback.returnUpdateCurrentUser(success);
+									callback.returnUpdateCurrentUser(true);
 								}
 							});
 					} else {
-						callback.returnUpdateCurrentUser(success);
+						callback.returnUpdateCurrentUser(false);
 					}
 				}
 			}
@@ -789,7 +789,7 @@ public class AsyncDataManager {
 							}
 						});
 				} else {
-					callback.returnDeleteLike(success);
+					callback.returnDeleteLike(false);
 				}
 			}
 		});
@@ -826,7 +826,7 @@ public class AsyncDataManager {
 							}
 						});
 				} else {
-					callback.returnDeleteFollow(success, follow);
+					callback.returnDeleteFollow(false, follow);
 				}
 			}
 		});
@@ -915,7 +915,7 @@ public class AsyncDataManager {
 						}
 					);
 				} else {
-					callback.returnAcceptFollowRequest(success, followRequest);
+					callback.returnAcceptFollowRequest(false, followRequest);
 				}
 			}
 		});
@@ -949,7 +949,7 @@ public class AsyncDataManager {
 						}
 					);
 				} else {
-					callback.returnDeleteFollowRequest(success, followRequest);
+					callback.returnDeleteFollowRequest(false, followRequest);
 				}
 			}
 		});

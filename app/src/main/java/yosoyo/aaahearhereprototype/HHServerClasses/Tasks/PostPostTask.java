@@ -20,6 +20,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts a new {@link yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost} to the server
  */
 class PostPostTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "PostPostTask";

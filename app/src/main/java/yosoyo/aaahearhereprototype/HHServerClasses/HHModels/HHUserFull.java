@@ -13,6 +13,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Contains a {@link HHUser}, and lists of its associated {@link HHFriendshipUser}s,
+ * inward and outward {@link HHFollowUser}s, and inward and outward {@link HHFollowRequestUser}s.
  */
 public class HHUserFull implements Parcelable {
 

@@ -16,6 +16,8 @@ import yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 /**
  * Created by adam on 23/02/16.
+ *
+ * Object-Relational Mapping for {@link SpotifyTrack} &.{@link HHCachedSpotifyTrack}
  */
 public class ORMCachedSpotifyTrack {
 

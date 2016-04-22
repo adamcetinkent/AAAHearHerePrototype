@@ -16,6 +16,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests from the server the number of posts by the given user
  */
 class GetUserPostCountTask extends AsyncTask<Void, Void, Integer> {
 	private static final String TAG = "GetUserPostCountTask";

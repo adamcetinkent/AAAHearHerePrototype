@@ -9,6 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNe
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Contains a {@link HHTag} and its associated {@link HHUser}.
  */
 public class HHTagUser implements Parcelable {
 

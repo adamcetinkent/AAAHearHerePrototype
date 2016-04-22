@@ -16,6 +16,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests from the server the number of users that the given user follows
  */
 class GetUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
 	private static final String TAG = "GetUserFollowersOutCoun";

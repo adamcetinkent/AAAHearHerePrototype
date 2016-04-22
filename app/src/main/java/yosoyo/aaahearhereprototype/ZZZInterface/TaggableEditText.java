@@ -8,6 +8,9 @@ import android.util.Log;
 
 /**
  * Created by adam on 11/03/16.
+ *
+ * An extension of {@link InstantAutoCompleteTextView} that provides a dropdown of potential users
+ * to be tagged, which only allows atomic manipulation of tags.
  */
 public class TaggableEditText extends InstantAutoCompleteTextView {
 	private static final String TAG = "TaggableEditText";

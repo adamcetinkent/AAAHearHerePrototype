@@ -5,6 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by adam on 08/03/16.
+ *
+ * A streamlined {@link Place} for use within Hear Here
  */
 class SimpleGooglePlace {
 

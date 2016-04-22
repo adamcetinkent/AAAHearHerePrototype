@@ -10,6 +10,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowedU
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Contains a {@link HHFollow} and its associated {@link HHUser}.
+ * When "inwards", the user is the follower; when "outwards", the user is the followed.
  */
 public class HHFollowUser implements Parcelable {
 

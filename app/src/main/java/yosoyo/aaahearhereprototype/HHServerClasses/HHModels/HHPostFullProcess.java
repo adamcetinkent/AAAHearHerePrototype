@@ -6,6 +6,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Used to "process" a newly downloaded post as its constituents are inserted into the databse.
+ * Each boolean is set to true as the database insertions are completed.
+ * Once the processing is complete, the underlying {@link HHPostFull} is passed on.
  */
 @SuppressLint("ParcelCreator")
 public class HHPostFullProcess extends HHPostFull {

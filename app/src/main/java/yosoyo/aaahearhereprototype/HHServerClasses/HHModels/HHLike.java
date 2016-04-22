@@ -11,6 +11,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserN
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * A Like belongs to a {@link HHPost} and a {@link HHUser}.
  */
 public class HHLike extends HHBase implements Parcelable {
 
@@ -28,7 +30,7 @@ public class HHLike extends HHBase implements Parcelable {
 			id,
 			created_at,
 			updated_at
-			 );
+		);
 		this.post_id = post_id;
 		this.user_id = user_id;
 	}
@@ -38,7 +40,7 @@ public class HHLike extends HHBase implements Parcelable {
 			nested.getID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
-			 );
+		);
 		this.post_id = nested.getPostID();
 		this.user_id = nested.getUserID();
 	}
@@ -48,7 +50,7 @@ public class HHLike extends HHBase implements Parcelable {
 			cursor.getLong(cursor.getColumnIndex(ORMLike.ID())),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMLike.CREATED_AT()))),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMLike.UPDATED_AT())))
-			 );
+		);
 		this.post_id = cursor.getLong(cursor.getColumnIndex(ORMLike.POST_ID()));
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMLike.USER_ID()));
 	}

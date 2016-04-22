@@ -7,6 +7,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A {@link HHFriendship} with a nested {@link HHUser} of its friend user.
+ *
+ * Only used when parsed from JSON.
  */
 @SuppressWarnings("unused")
 @SuppressLint("ParcelCreator")

@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts a new {@link HHUser} to the server
  */
 public class PostUserTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "PostPostTask";

@@ -17,6 +17,8 @@ import java.util.Locale;
 
 /**
  * Created by adam on 23/02/16.
+ *
+ * Gets the address of a location
  */
 public class FetchAddressIntentService extends IntentService {
 

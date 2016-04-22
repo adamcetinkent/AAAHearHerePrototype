@@ -14,6 +14,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Object-Relational Mapping for {@link HHTag}
  */
 public class ORMTag {
 

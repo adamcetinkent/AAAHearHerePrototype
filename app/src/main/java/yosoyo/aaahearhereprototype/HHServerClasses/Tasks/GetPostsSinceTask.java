@@ -22,6 +22,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests the posts from the server since the given time
  */
 class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsSinceTask";

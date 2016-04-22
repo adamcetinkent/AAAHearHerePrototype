@@ -6,6 +6,8 @@ import android.util.Log;
 
 /**
  * Created by adam on 15/03/16.
+ *
+ * TODO: REMEMBER WHAT THIS DOES?!
  */
 class HHLocationListener implements android.location.LocationListener {
 	public static final String TAG = "HHLocationListener";

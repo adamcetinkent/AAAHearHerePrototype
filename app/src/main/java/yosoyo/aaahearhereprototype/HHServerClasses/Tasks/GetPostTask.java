@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests the post from the server with the given postID.
  */
 class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 	private static final String TAG = "GetPostsTask";

@@ -16,6 +16,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Used to perform queries resulting in fully populated {@link HHUserFull} objects.
  */
 class ORMUserFull {
 

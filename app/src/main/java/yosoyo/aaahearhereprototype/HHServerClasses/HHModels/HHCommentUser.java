@@ -9,6 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHCommentUs
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Contains a {@link HHComment} and its associated {@link HHUser}
  */
 public class HHCommentUser implements Parcelable {
 

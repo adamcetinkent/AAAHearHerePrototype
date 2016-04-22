@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests from the server the privacy state of the given user with respect to the current user
  */
 class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "GetUserPrivacyTask";

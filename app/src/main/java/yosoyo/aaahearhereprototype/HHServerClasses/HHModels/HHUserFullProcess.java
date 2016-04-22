@@ -6,6 +6,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullN
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Used to "process" a newly downloaded user as its constituents are inserted into the databse.
+ * Each boolean is set to true as the database insertions are completed.
+ * Once the processing is complete, the underlying {@link HHUserFull} is passed on.
  */
 @SuppressLint("ParcelCreator")
 public class HHUserFullProcess extends HHUserFull {

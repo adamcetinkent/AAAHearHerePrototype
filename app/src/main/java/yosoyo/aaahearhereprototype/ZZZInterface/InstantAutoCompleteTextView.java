@@ -9,6 +9,8 @@ import android.widget.AutoCompleteTextView;
 
 /**
  * Created by adam on 08/03/16.
+ *
+ * An extension of {@link AutoCompleteTextView} with no filtering limit.
  */
 public class InstantAutoCompleteTextView extends AutoCompleteTextView {
 

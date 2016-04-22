@@ -13,6 +13,11 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * A {@link HHPost} with nested arrays of {@link HHCommentUserNested}s, {@link HHLikeUserNested}s
+ * and {@link HHTagUserNested}s.
+ *
+ * Only used when parsed from JSON.
  */
 @SuppressWarnings({"MismatchedReadAndWriteOfArray", "unused"})
 @SuppressLint("ParcelCreator")

@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Sends a {@link yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest} to the server to be deleted
  */
 class DeleteFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "DeleteFollowRequestTask";
@@ -42,13 +44,6 @@ class DeleteFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestMethod("DELETE");
-
-				/*String json = new Gson().toJson(followRequest, HHLike.class);
-				String jsonplus = "{\"followRequest\": "+json+"}";
-
-				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
-				out.write(jsonplus);
-				out.close();*/
 
 				int httpResult = urlConnection.getResponseCode();
 				if (httpResult == HttpURLConnection.HTTP_OK){

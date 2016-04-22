@@ -9,6 +9,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHLikeUserN
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Contains a {@link HHLike} and its associated {@link HHUser}.
  */
 public class HHLikeUser implements Parcelable {
 

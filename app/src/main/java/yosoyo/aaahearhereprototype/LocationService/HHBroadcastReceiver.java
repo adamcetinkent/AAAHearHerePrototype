@@ -6,6 +6,8 @@ import android.content.Intent;
 
 /**
  * Created by adam on 15/03/16.
+ *
+ * A receiver for new location results from the {@link LocationListenerService}
  */
 public class HHBroadcastReceiver extends BroadcastReceiver {
 

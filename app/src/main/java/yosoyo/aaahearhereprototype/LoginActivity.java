@@ -82,6 +82,7 @@ public class LoginActivity extends Activity implements View.OnClickListener
 			}
 		});
 
+		@SuppressWarnings("UnusedAssignment")
 		AccessTokenTracker accessTokenTracker = new AccessTokenTracker(){
 			@Override
 			protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken){

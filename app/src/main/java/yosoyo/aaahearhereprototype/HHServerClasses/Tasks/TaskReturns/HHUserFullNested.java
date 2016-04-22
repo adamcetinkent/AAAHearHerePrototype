@@ -13,6 +13,11 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A {@link HHUser} with nested arrays of {@link HHFriendshipUserNested}s, {@link HHFollowUserNested}s,
+ * {@link HHFollowedUserNested}s, {@link HHFollowRequestUserNested}s and {@link HHFollowedRequestUserNested}s.
+ *
+ * Only used when parsed from JSON.
  */
 @SuppressWarnings({"MismatchedReadAndWriteOfArray", "unused"})
 @SuppressLint("ParcelCreator")

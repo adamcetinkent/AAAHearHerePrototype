@@ -22,6 +22,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts a new {@link HHFollowRequest} to the server
  */
 class PostFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "PostFollowRequestTask";

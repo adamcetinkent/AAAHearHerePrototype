@@ -22,6 +22,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests the posts from the server that fall near the given location
  */
 class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 	private static final String TAG = "GetPostsTask";

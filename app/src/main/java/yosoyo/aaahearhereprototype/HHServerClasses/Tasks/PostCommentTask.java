@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts a new {@link HHComment} to the server
  */
 class PostCommentTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "PostCommentTask";

@@ -11,6 +11,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshi
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A Friendship belongs to two {@link HHUser}s - the user and his friend.
  */
 public class HHFriendship extends HHBase implements Parcelable {
 
@@ -22,7 +24,7 @@ public class HHFriendship extends HHBase implements Parcelable {
 			nested.getID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
-			 );
+		);
 		this.user_id = nested.getUserID();
 		this.friend_user_id = nested.getFriendUserID();
 	}

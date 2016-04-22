@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Requests from the server the user with the given ID.
  */
 public class GetUserTask extends AsyncTask<Integer, Void, Boolean> {
 	private static final String TAG = "GetUserTask";

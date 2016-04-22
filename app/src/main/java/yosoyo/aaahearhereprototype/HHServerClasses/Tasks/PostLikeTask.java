@@ -19,6 +19,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts a new {@link HHLike} to the server
  */
 class PostLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "PostLikeTask";

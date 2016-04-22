@@ -11,6 +11,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHTagUserNe
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A Tag belongs to a {@link HHPost} and points to a {@link HHUser}.
  */
 public class HHTag extends HHLike implements Parcelable {
 
@@ -25,7 +27,7 @@ public class HHTag extends HHLike implements Parcelable {
 			nested.getUserID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
-			 );
+		);
 	}
 
 	public HHTag(Cursor cursor){
@@ -35,7 +37,7 @@ public class HHTag extends HHLike implements Parcelable {
 			cursor.getLong(cursor.getColumnIndex(ORMTag.USER_ID())),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTag.CREATED_AT()))),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMTag.UPDATED_AT())))
-			 );
+		);
 	}
 
 	@Override

@@ -9,6 +9,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFriendshi
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * Contains a {@link HHFriendship} and its associated {@link HHUser}.
+ * When "inwards", the user is the friend; when "outwards", the user is the user.
  */
 public class HHFriendshipUser implements Parcelable {
 

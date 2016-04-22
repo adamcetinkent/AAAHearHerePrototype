@@ -11,6 +11,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * A Post is one of the two most fundamental classes of Hear Here, along with {@link HHUser}.
+ * It associates a {@link HHUser} with a track, a location and a message.
  */
 public class HHPost extends HHBase implements Parcelable {
 
@@ -33,7 +36,7 @@ public class HHPost extends HHBase implements Parcelable {
 			nested.getID(),
 			nested.getCreatedAt(),
 			nested.getUpdatedAt()
-			 );
+		);
 		this.user_id = nested.getUserID();
 		this.track = nested.getTrack();
 		this.lat = nested.getLat();
@@ -59,7 +62,7 @@ public class HHPost extends HHBase implements Parcelable {
 			cursor.getLong(cursor.getColumnIndex(ORMPost.ID())),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.CREATED_AT()))),
 			Timestamp.valueOf(cursor.getString(cursor.getColumnIndex(ORMPost.UPDATED_AT())))
-			 );
+		);
 		this.user_id = cursor.getLong(cursor.getColumnIndex(ORMPost.USER_ID()));
 		this.track = cursor.getString(cursor.getColumnIndex(ORMPost.TRACK()));
 		this.lat = cursor.getDouble(cursor.getColumnIndex(ORMPost.LAT()));

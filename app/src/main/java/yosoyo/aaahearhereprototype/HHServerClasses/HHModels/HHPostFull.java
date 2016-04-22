@@ -11,6 +11,9 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullN
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Contains a {@link HHPost}, its associated {@link HHUser}, {@link HHCachedSpotifyTrack} and lists
+ * of its {@link HHCommentUser}s, {@link HHLikeUser}s and {@link HHTagUser}s.
  */
 public class HHPostFull implements Comparable, Parcelable {
 
@@ -101,6 +104,7 @@ public class HHPostFull implements Comparable, Parcelable {
 			this.getPost().getCreatedAt());
 	}
 
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o){
 		HHPostFull that = (HHPostFull) o;

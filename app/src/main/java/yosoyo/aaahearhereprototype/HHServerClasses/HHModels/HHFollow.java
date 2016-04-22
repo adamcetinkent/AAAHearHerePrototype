@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowedU
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A Follow belongs to two {@link HHUser}s - the follower and the followed.
  */
 public class HHFollow extends HHBase implements Parcelable {
 

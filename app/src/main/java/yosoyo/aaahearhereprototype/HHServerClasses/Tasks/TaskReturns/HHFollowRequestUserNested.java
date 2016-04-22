@@ -7,6 +7,10 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A {@link HHFollowRequest} with a nested {@link HHUser} of its associated requested user.
+ *
+ * Only used when parsed from JSON.
  */
 @SuppressLint("ParcelCreator")
 public class HHFollowRequestUserNested extends HHFollowRequest {

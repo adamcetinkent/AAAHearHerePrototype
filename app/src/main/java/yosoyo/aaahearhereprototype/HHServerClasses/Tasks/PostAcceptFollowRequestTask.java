@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Posts the acceptance of a {@link HHFollowRequestUser} to the server
  */
 class PostAcceptFollowRequestTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "AcceptFollowRequestTask";

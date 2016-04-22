@@ -18,6 +18,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Used to perform queries resulting in fully populated {@link HHPostFull} objects.
  */
 class ORMPostFull {
 

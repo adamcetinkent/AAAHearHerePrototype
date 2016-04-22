@@ -9,6 +9,8 @@ import com.google.android.gms.maps.MapView;
 
 /**
  * Created by adam on 12/04/16.
+ *
+ * A perhaps fruitless attempt to create a {@link MapView} that won't redraw while "frozen"
  */
 public class FreezeableMapView extends MapView {
 	private boolean frozen;

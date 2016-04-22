@@ -11,6 +11,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHCommentUs
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * A Comment belongs to a {@link HHPost} and a {@link HHUser}, and contains a message.
  */
 public class HHComment extends HHLike implements Parcelable {
 

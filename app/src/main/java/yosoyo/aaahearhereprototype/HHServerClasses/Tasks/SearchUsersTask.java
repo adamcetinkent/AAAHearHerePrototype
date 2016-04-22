@@ -20,6 +20,8 @@ import yosoyo.aaahearhereprototype.ZZZUtility;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Sends a search query of {@link HHUser}s to the server
  */
 class SearchUsersTask extends AsyncTask<Void, Void, List<HHUser>> {
 	private static final String TAG = "SearchUsersTask";

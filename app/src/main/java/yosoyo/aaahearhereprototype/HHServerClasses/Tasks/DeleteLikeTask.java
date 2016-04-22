@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
 
 /**
  * Created by adam on 18/02/16.
+ *
+ * Sends a {@link HHLike} to the server to be deleted
  */
 class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "DeleteLikeTask";

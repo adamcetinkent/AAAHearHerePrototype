@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 
 /**
  * Created by adam on 02/03/16.
+ *
+ * Object-Relational Mapping for {@link HHFollowRequest}
  */
 public class ORMFollowRequest {
 

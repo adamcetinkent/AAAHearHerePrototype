@@ -12,6 +12,8 @@ import yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHFollowedR
 
 /**
  * Created by adam on 10/03/16.
+ *
+ * A FollowRequest belongs to two {@link HHUser}s - the requester and the requested.
  */
 public class HHFollowRequest extends HHBase implements Parcelable {
 
