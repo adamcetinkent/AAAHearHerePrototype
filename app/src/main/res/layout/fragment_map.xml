@@ -4,7 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <yosoyo.aaahearhereprototype.ZZZInterface.FreezeableMapView
+    <com.yosoyo.aaahearhereprototype.ZZZInterface.FreezeableMapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -61,7 +61,7 @@
 
         </FrameLayout>
 
-        <!--<yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
+        <!--<com.yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
             android:id="@+id/fragment_profile_btnShowHide"
             android:layout_width="30dp"
             android:layout_height="30dp"

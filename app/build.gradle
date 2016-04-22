@@ -5,7 +5,7 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        applicationId "yosoyo.aaahearhereprototype"
+        applicationId "com.yosoyo.aaahearhereprototype"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1

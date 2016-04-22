@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                    xmlns:tools="http://schemas.android.com/tools"
-                                   tools:context="yosoyo.aaahearhereprototype.Fragments.ProfileFragment"
+                                   tools:context="com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment"
                                    android:layout_width="match_parent"
                                    android:layout_height="match_parent"
                                    android:orientation="vertical"
@@ -377,7 +377,7 @@
             android:contentDescription="@string/contentDescription_map_button"
             />
 
-        <yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
+        <com.yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
             android:id="@+id/fragment_profile_btnShowHide"
             android:layout_width="30dp"
             android:layout_height="30dp"

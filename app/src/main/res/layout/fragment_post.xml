@@ -219,7 +219,7 @@
 
             </LinearLayout>
 
-            <yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText
+            <com.yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText
                 android:id="@+id/post_fragment_txtMessage"
                 android:hint="@string/fragment_post_txtMessage_hint"
                 android:layout_width="match_parent"
