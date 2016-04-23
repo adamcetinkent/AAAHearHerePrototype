@@ -29,16 +29,23 @@
 
         <activity
             android:name=".HolderActivity"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:launchMode="singleInstance">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".SearchResultsActivity"
@@ -72,13 +79,6 @@
             android:exported="false">
         </service>
 
-        <activity android:name=".NotificationReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

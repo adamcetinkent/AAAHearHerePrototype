@@ -84,6 +84,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	private static MenuItem menuRequests;
 
+	private FeedbackFragment pendingFragment;
+
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
@@ -102,6 +104,23 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Intent intent = getIntent();
+		switch (intent.getAction()){
+			case Intent.ACTION_SEND:{
+
+				Log.d(TAG, "NEW INTENT: "+intent.toString());
+				String sharedTrackResult = intent.getStringExtra(Intent.EXTRA_TEXT);
+				String PREFIX = "https://open.spotify.com/track/";
+				String trackID = sharedTrackResult.substring(PREFIX.length());
+				Log.d(TAG, "SHARED TRACK: "+trackID);
+				Toast.makeText(this, "SHARED TRACK: "+trackID, Toast.LENGTH_LONG).show();
+
+				pendingFragment = PostFragment.newInstance(trackID);
+
+				break;
+			}
+		}
 
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
 		HolderActivity.callbackManager = CallbackManager.Factory.create();
@@ -220,9 +239,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 		if (HHUser.getCurrentUser() != null) {
 			if (!isServiceRunning(LocationListenerService.class)) {
-				Intent intent = new Intent(this, LocationListenerService.class);
-				intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
-				startService(intent);
+				Intent serviceIntent = new Intent(this, LocationListenerService.class);
+				serviceIntent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
+				startService(serviceIntent);
 			}
 		}
 
@@ -467,6 +486,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 			return null;
 		}
+		if (!mGoogleApiClient.isConnected())
+			mGoogleApiClient.connect();
 		return LocationServices.FusedLocationApi.getLastLocation(HolderActivity.mGoogleApiClient);
 	}
 
@@ -555,12 +576,35 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.LEFT);
 
-		commitFragmentTransaction(new FeedFragment(), false);
+		if (pendingFragment != null)
+			commitFragmentTransaction(pendingFragment, false);
+		else
+			commitFragmentTransaction(new FeedFragment(), false);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		HolderActivity.callbackManager.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		switch (intent.getAction()){
+			case Intent.ACTION_SEND:{
+
+				Log.d(TAG, "NEW INTENT: "+intent.toString());
+				String sharedTrackResult = intent.getStringExtra(Intent.EXTRA_TEXT);
+				String PREFIX = "https://open.spotify.com/track/";
+				String trackID = sharedTrackResult.substring(PREFIX.length());
+				Log.d(TAG, "SHARED TRACK: "+trackID);
+				Toast.makeText(this, "SHARED TRACK: "+trackID, Toast.LENGTH_LONG).show();
+
+				commitFragmentTransaction(PostFragment.newInstance(trackID), true);
+
+				break;
+			}
+		}
 	}
 }

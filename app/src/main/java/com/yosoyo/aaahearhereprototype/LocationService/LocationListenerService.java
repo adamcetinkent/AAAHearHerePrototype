@@ -17,6 +17,7 @@ import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.R;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -80,7 +81,10 @@ public class LocationListenerService extends Service implements HHLocationListen
 							post.getPost().getTrack(),
 							new AsyncDataManager.GetSpotifyTrackCallback() {
 								@Override
-								public void returnSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {
+								public void returnSpotifyTrack(SpotifyTrack spotifyTrack){}
+
+								@Override
+								public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {
 									String notificationText = post.getUser().getName()
 										+ " posted " + cachedSpotifyTrack.getName()
 										+ " at " + post.getPost().getPlaceName();

@@ -2,7 +2,6 @@ package com.yosoyo.aaahearhereprototype.Fragments;
 
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -42,6 +41,7 @@ import com.yosoyo.aaahearhereprototype.AddressPicker;
 import com.yosoyo.aaahearhereprototype.AddressResultReceiver;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.FetchAddressIntentService;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTag;
@@ -72,7 +72,7 @@ import java.util.Locale;
  *
  * PostFragment is used to create new posts. It provides a platform to search the Spotify database.
  */
-public class PostFragment extends Fragment {
+public class PostFragment extends FeedbackFragment {
 
 	private static final String TAG = "PostFragment";
 
@@ -104,6 +104,19 @@ public class PostFragment extends Fragment {
 	private String placeName = "";
 	private String googlePlaceID = "";
 
+	private static final String KEY_TRACK_ID = TAG + "track_id";
+	private String trackID;
+
+	public static PostFragment newInstance(String trackID){
+		PostFragment postFragment = new PostFragment();
+
+		Bundle bundle = new Bundle();
+		bundle.putString(KEY_TRACK_ID, trackID);
+		postFragment.setArguments(bundle);
+
+		return postFragment;
+	}
+
 	public PostFragment() {
 		// Required empty public constructor
 	}
@@ -112,6 +125,14 @@ public class PostFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+
+		Bundle arguments = getArguments();
+		if (arguments != null){
+			if (arguments.containsKey(KEY_TRACK_ID)){
+				trackID = arguments.getString(KEY_TRACK_ID);
+			}
+		}
+
 	}
 
 	@Override
@@ -149,27 +170,8 @@ public class PostFragment extends Fragment {
 			}
 		});
 
-		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null){
-			lastLocation = HolderActivity.getLastLocation(getActivity());
-			txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
-			placeName = ZZZUtility.getLatLng(lastLocation);
-			txtLocation.setText(placeName);
-			mResultReceiver = new AddressResultReceiver(
-				new Handler(),
-				new AddressResultReceiver.AddressResultReceiverCallback() {
-					@Override
-					public void returnAddress(Address returnedAddress) {
-						address = returnedAddress;
-						txtLocation.setText(address.getThoroughfare());
-						placeName = address.getThoroughfare();
-						btnLocationButton.setVisibility(View.VISIBLE);
-						mAddressRequested = false;
-					}
-				});
-			if (HolderActivity.mGoogleApiClient.isConnected() && lastLocation != null) {
-				startIntentService();
-			}
-		}
+		txtLocation = (TextView) view.findViewById(R.id.post_fragment_txtLocation);
+		getLocation();
 
 		searchViewTrack = (SearchView) view.findViewById(R.id.post_fragment_searchTrackName);
 		searchViewArtist = (SearchView) view.findViewById(R.id.post_fragment_searchArtist);
@@ -306,8 +308,7 @@ public class PostFragment extends Fragment {
 							}
 						});
 
-					HolderActivity.mediaPlayer
-						.setDataSource(spotifyTrack.getPreviewUrl());
+					HolderActivity.mediaPlayer.setDataSource(spotifyTrack.getPreviewUrl());
 					HolderActivity.mediaPlayer.prepareAsync();
 
 				} catch (IllegalArgumentException e) {
@@ -334,6 +335,11 @@ public class PostFragment extends Fragment {
 			public void onClick(View v) {
 				if (spotifyTrack == null) {
 					Toast.makeText(getActivity(), "No track selected!", Toast.LENGTH_SHORT).show();
+					return;
+				}
+				if (lastLocation == null){
+					Toast.makeText(getActivity(), "No location found!", Toast.LENGTH_SHORT).show();
+					getLocation();
 					return;
 				}
 
@@ -466,6 +472,40 @@ public class PostFragment extends Fragment {
 			}
 		});
 
+		if (trackID != null && !trackID.isEmpty()){
+			searchViewTrack.setEnabled(false);
+			searchViewArtist.setEnabled(false);
+			searchViewAlbum.setEnabled(false);
+			AsyncDataManager.getSpotifyTrack(
+				trackID,
+				new AsyncDataManager.GetSpotifyTrackCallback() {
+					@Override
+					public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+						PostFragment.this.spotifyTrack = spotifyTrack;
+						txtTrack.setText(spotifyTrack.getName());
+						txtArtist.setText(spotifyTrack.getArtistName());
+						txtAlbum.setText(spotifyTrack.getAlbumName());
+						llSearch.setVisibility(View.GONE);
+						llText.setVisibility(View.VISIBLE);
+
+						WebHelper.getSpotifyAlbumArt(
+							spotifyTrack.getID(),
+							spotifyTrack.getImages(0).getUrl(),
+							new WebHelper.GetSpotifyAlbumArtCallback() {
+								@Override
+								public void returnSpotifyAlbumArt(Bitmap bitmap) {
+									imgAlbumArt.setImageBitmap(bitmap);
+								}
+							});
+
+						updatePlayButton(btnPlayButton);
+						getLocation();
+					}
+					@Override
+					public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {}
+				});
+		}
+
 		return view;
 	}
 
@@ -486,6 +526,29 @@ public class PostFragment extends Fragment {
 		}
 		text.setText(ssb);
 		return selectionEnd;
+	}
+
+	private void getLocation(){
+		if (HolderActivity.apiExists && HolderActivity.mGoogleApiClient != null){
+			lastLocation = HolderActivity.getLastLocation(getActivity());
+			placeName = ZZZUtility.getLatLng(lastLocation);
+			txtLocation.setText(placeName);
+			mResultReceiver = new AddressResultReceiver(
+				new Handler(),
+				new AddressResultReceiver.AddressResultReceiverCallback() {
+					@Override
+					public void returnAddress(Address returnedAddress) {
+						address = returnedAddress;
+						txtLocation.setText(address.getThoroughfare());
+						placeName = address.getThoroughfare();
+						btnLocationButton.setVisibility(View.VISIBLE);
+						mAddressRequested = false;
+					}
+				});
+			if (HolderActivity.mGoogleApiClient.isConnected() && lastLocation != null) {
+				startIntentService();
+			}
+		}
 	}
 
 	private void startIntentService() {

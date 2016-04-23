@@ -961,7 +961,8 @@ public class AsyncDataManager {
 	// GET SPOTIFY TRACK --------------
 
 	public interface  GetSpotifyTrackCallback{
-		void returnSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
+		void returnSpotifyTrack(SpotifyTrack spotifyTrack);
+		void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack);
 	}
 
 	/**
@@ -990,7 +991,7 @@ public class AsyncDataManager {
 				@Override
 				public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
 					if (track != null) {
-						callback.returnSpotifyTrack(track);
+						callback.returnCachedSpotifyTrack(track);
 						WebHelper.preLoadTrackBitmaps(track);
 						return;
 					}
@@ -998,13 +999,14 @@ public class AsyncDataManager {
 					WebHelper.getSpotifyTrack(trackID, new WebHelper.GetSpotifyTrackCallback() {
 						@Override
 						public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+							callback.returnSpotifyTrack(spotifyTrack);
 							DatabaseHelper.insertSpotifyTrack(
 								context,
 								spotifyTrack,
 								new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
 									@Override
 									public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
-										callback.returnSpotifyTrack(track);
+										callback.returnCachedSpotifyTrack(track);
 									}
 								});
 						}
