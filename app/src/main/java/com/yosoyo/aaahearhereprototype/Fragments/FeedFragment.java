@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -583,6 +585,7 @@ public class FeedFragment extends FeedbackFragment {
 			CompoundButton.OnCheckedChangeListener likeCheckListener;
 			View.OnClickListener commentClickListener;
 			OnClickUserListener onClickUserListener;
+			ImageView btnSpotifyButton;
 		}
 
 		@Override
@@ -619,6 +622,7 @@ public class FeedFragment extends FeedbackFragment {
 				viewHolder.btnLikeButton = (ToggleButton) convertView.findViewById(R.id.list_row_timeline_btnLike);
 				viewHolder.btnCommentButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnComment);
 				viewHolder.btnShareButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnShare);
+				viewHolder.btnSpotifyButton = (ImageView) convertView.findViewById(R.id.list_row_timeline_btnSpotify);
 
 				viewHolder.likeCheckListener = new CompoundButton.OnCheckedChangeListener() {
 					@Override
@@ -767,6 +771,14 @@ public class FeedFragment extends FeedbackFragment {
 							progressDialog.dismiss();
 							e.printStackTrace();
 						}
+					}
+				});
+
+				viewHolder.btnSpotifyButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("spotify:track:"+viewHolder.post.getTrack().getTrackID()));
+						context.startActivity(intent);
 					}
 				});
 

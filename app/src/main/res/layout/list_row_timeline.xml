@@ -196,6 +196,16 @@
                     android:contentDescription="@string/contentDescription_play_button"
                     />
 
+                <ImageView
+                    android:id="@+id/list_row_timeline_btnSpotify"
+                    android:src="@drawable/spotify"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="74dp"
+                    android:layout_marginTop="74dp"
+                    android:contentDescription="@string/contentDescription_spotify_button"
+                    android:padding="5dp"/>
+
             </FrameLayout>
 
         </LinearLayout>

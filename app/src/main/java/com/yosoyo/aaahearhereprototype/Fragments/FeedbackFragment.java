@@ -63,4 +63,9 @@ public abstract class FeedbackFragment extends Fragment {
 		fragmentChangeRequestListener.requestProfileModeSwitch(profileType, userID, bundle);
 	}
 
+	// TODO: DOCUMENTATION
+	void onLoginSuccess(){
+		fragmentChangeRequestListener.onLoginSuccess();
+	}
+
 }

@@ -29,7 +29,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 import com.facebook.Profile;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -40,6 +43,7 @@ import com.yosoyo.aaahearhereprototype.Fragments.FollowRequestListFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.FollowersListFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import com.yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
+import com.yosoyo.aaahearhereprototype.Fragments.LoginFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
@@ -61,6 +65,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	public static final String KEY_POSITION = "position";
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
+
+	public static CallbackManager callbackManager;
 
 	private Map<Integer, Integer> navigationOptions;
 	private ListView drawerList;
@@ -95,19 +101,23 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Intent testIntent = getIntent();
+		if (testIntent != null && testIntent.getAction() != null && testIntent.getAction().equals(Intent.ACTION_SEND)){
+			Log.d(TAG, "NEW INTENT: "+testIntent.toString());
+			String sharedTrackResult = testIntent.getStringExtra(Intent.EXTRA_TEXT);
+			String PREFIX = "https://open.spotify.com/track/";
+			String trackID = sharedTrackResult.substring(PREFIX.length());
+			Log.d(TAG, "SHARED TRACK: "+trackID);
+			Toast.makeText(this, "SHARED TRACK: "+trackID, Toast.LENGTH_LONG).show();
+		}
+
+		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
+		HolderActivity.callbackManager = CallbackManager.Factory.create();
 		setContentView(R.layout.activity_holder);
 
 		AsyncDataManager.setContext(this);
 		WebHelper.setActivity(this);
-
-		WebHelper.getFacebookProfilePicture(
-			Profile.getCurrentProfile().getId(),
-			new WebHelper.GetFacebookProfilePictureCallback() {
-				@Override
-				public void returnFacebookProfilePicture(Bitmap bitmap) {
-					HHUser.setProfilePicture(bitmap);
-				}
-			});
 
 		int[] navOptions = new int[]{
 			R.string.navigation_option_home,
@@ -141,7 +151,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		if (savedInstanceState == null){
-			Fragment fragment = selectItem(R.string.navigation_option_home);
+			Fragment fragment = new LoginFragment();
 			commitFragmentTransaction(fragment, false);
 		} else {
 			currentPosition = savedInstanceState.getInt(KEY_POSITION);
@@ -171,6 +181,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			Log.e(TAG, e.getMessage());
 			e.printStackTrace();
 		}
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		getFragmentManager().addOnBackStackChangedListener(
 			new FragmentManager.OnBackStackChangedListener() {
@@ -216,10 +227,12 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			.addApi(Places.GEO_DATA_API)
 			.build();
 
-		if (!isServiceRunning(LocationListenerService.class)) {
-			Intent intent = new Intent(this, LocationListenerService.class);
-			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
-			startService(intent);
+		if (HHUser.getCurrentUser() != null) {
+			if (!isServiceRunning(LocationListenerService.class)) {
+				Intent intent = new Intent(this, LocationListenerService.class);
+				intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
+				startService(intent);
+			}
 		}
 
 	}
@@ -236,21 +249,27 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		getMenuInflater().inflate(R.menu.menu_main, menu);
+		if (HHUser.getCurrentUser() != null) {
+			getMenuInflater().inflate(R.menu.menu_main, menu);
 
-		MenuItem menuPost = menu.findItem(R.id.action_post);
-		menuPost.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			MenuItem menuPost = menu.findItem(R.id.action_post);
+			menuPost.setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-		MenuItem menuRequests = menu.findItem(R.id.action_user_requests);
-		menuRequests.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		HolderActivity.menuRequests = menuRequests;
-		if (HHUser.getCurrentUser().getFollowInRequests().size() > 0){
-			menuRequests.setIcon(R.drawable.add_user_full);
+			MenuItem menuRequests = menu.findItem(R.id.action_user_requests);
+			menuRequests.setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			HolderActivity.menuRequests = menuRequests;
+			if (HHUser.getCurrentUser() != null) {
+				if (HHUser.getCurrentUser().getFollowInRequests().size() > 0) {
+					menuRequests.setIcon(R.drawable.add_user_full);
+				}
+			}
+
+			MenuItem menuFriensd = menu.findItem(R.id.action_friends);
+			menuFriensd.setShowAsAction(
+				MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
-
-		MenuItem menuFriensd = menu.findItem(R.id.action_friends);
-		menuFriensd.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -279,6 +298,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			intentFilter.addAction(LocationListenerService.LOCATION_UPDATE);
 			registerReceiver(broadcastReceiver, intentFilter);
 		}
+		AppEventsLogger.activateApp(getApplication());
 	}
 
 	@Override
@@ -323,8 +343,12 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				fragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED, 1, 1);
 				break;
 			}
-			default: {
+			case R.string.navigation_option_home: {
 				fragment = FeedFragment.newInstance();
+				break;
+			}
+			default: {
+				fragment = new LoginFragment();
 			}
 		}
 
@@ -407,14 +431,15 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu){
-		boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
+		if (HHUser.getCurrentUser() != null) {
+			boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
 
-		if (currentPosition != navigationOptions.get(R.string.action_search_users)) {
-			menu.findItem(R.id.action_post).setVisible(!drawerOpen);
-			menu.findItem(R.id.action_friends).setVisible(!drawerOpen);
-			menu.findItem(R.id.action_user_requests).setVisible(!drawerOpen);
+			if (currentPosition != navigationOptions.get(R.string.action_search_users)) {
+				menu.findItem(R.id.action_post).setVisible(!drawerOpen);
+				menu.findItem(R.id.action_friends).setVisible(!drawerOpen);
+				menu.findItem(R.id.action_user_requests).setVisible(!drawerOpen);
+			}
 		}
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -517,5 +542,34 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	public void onBackPressed() {
 		super.onBackPressed();
 		drawerToggle.setDrawerIndicatorEnabled(true);
+	}
+
+	@Override
+	public void onLoginSuccess(){
+
+		if (!isServiceRunning(LocationListenerService.class)) {
+			Intent intent = new Intent(this, LocationListenerService.class);
+			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
+			startService(intent);
+		}
+
+		WebHelper.getFacebookProfilePicture(
+			Profile.getCurrentProfile().getId(),
+			new WebHelper.GetFacebookProfilePictureCallback() {
+				@Override
+				public void returnFacebookProfilePicture(Bitmap bitmap) {
+					HHUser.setProfilePicture(bitmap);
+				}
+			});
+
+		while (HHUser.getCurrentUser() == null){}
+
+		commitFragmentTransaction(new FeedFragment(), false);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		HolderActivity.callbackManager.onActivityResult(requestCode, resultCode, data);
 	}
 }

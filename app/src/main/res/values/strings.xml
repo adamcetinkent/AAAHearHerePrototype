@@ -101,5 +101,6 @@
     <string name="title_posts">Posts</string>
     <string name="title_followers">Followers</string>
     <string name="title_following">Following</string>
+    <string name="contentDescription_spotify_button">Listen on Spotify</string>
 
 </resources>

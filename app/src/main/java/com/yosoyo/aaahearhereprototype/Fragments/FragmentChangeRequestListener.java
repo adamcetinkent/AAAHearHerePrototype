@@ -12,6 +12,7 @@ public interface FragmentChangeRequestListener {
 	int USER_PROFILE_REQUEST = 2;
 	int FOLLOWERS_LIST_REQUEST = 3;
 
+	void onLoginSuccess();
 	void requestFragmentChange(int fragmentChange, Bundle bundle);
 	void requestProfileModeSwitch(int profileMode, long userID, Bundle bundle);
 }
