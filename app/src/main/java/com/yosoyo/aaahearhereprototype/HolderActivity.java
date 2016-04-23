@@ -103,16 +103,6 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Intent testIntent = getIntent();
-		if (testIntent != null && testIntent.getAction() != null && testIntent.getAction().equals(Intent.ACTION_SEND)){
-			Log.d(TAG, "NEW INTENT: "+testIntent.toString());
-			String sharedTrackResult = testIntent.getStringExtra(Intent.EXTRA_TEXT);
-			String PREFIX = "https://open.spotify.com/track/";
-			String trackID = sharedTrackResult.substring(PREFIX.length());
-			Log.d(TAG, "SHARED TRACK: "+trackID);
-			Toast.makeText(this, "SHARED TRACK: "+trackID, Toast.LENGTH_LONG).show();
-		}
-
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
 		HolderActivity.callbackManager = CallbackManager.Factory.create();
 		setContentView(R.layout.activity_holder);
