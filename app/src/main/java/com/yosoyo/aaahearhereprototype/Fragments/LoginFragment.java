@@ -20,6 +20,8 @@ import com.yosoyo.aaahearhereprototype.R;
 
 /**
  * Created by adam on 22/04/16.
+ *
+ * Handles the Facebook login to the app and authorisation with Hear Here server
  */
 public class LoginFragment extends FeedbackFragment {
 

@@ -624,8 +624,7 @@ public class MapViewFragment
 		Marker marker = googleMap.addMarker(
 			new MarkerOptions().position(latLng)
 							   .title(new Gson().toJson(post))
-							   .icon(BitmapDescriptorFactory.fromResource(
-								   newColour ? R.drawable.music_marker_new_small : R.drawable.music_marker_small)));
+							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker)));
 		markers.add(marker);
 	}
 
