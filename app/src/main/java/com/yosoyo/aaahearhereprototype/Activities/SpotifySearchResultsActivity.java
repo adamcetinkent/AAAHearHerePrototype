@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -61,6 +62,8 @@ public class SpotifySearchResultsActivity extends Activity{
 	private RecyclerView.Adapter adapter;
 	private RecyclerView.LayoutManager layoutManager;
 
+	private ProgressBar progressBar;
+
 	private int totalItems;
 	private boolean alreadySearching = false;
 
@@ -69,6 +72,7 @@ public class SpotifySearchResultsActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_spotify_search_results);
 		lstResults = (RecyclerView) findViewById(R.id.activity_search_results_lstResults);
+		progressBar = (ProgressBar) findViewById(R.id.activity_search_results_progressBar);
 		handleIntent(getIntent());
 	}
 
@@ -185,12 +189,14 @@ public class SpotifySearchResultsActivity extends Activity{
 									public void nextPage() {
 										if (!alreadySearching){
 											alreadySearching = true;
+											progressBar.setVisibility(View.VISIBLE);
 											AsyncDataManager.searchSpotifyTracks(
 												query,
 												trackResults.size(),
 												new AsyncDataManager.SearchSpotifyTracksCallback() {
 													@Override
 													public void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks) {
+														progressBar.setVisibility(View.GONE);
 														int oldSize = trackResults.size();
 														trackResults.addAll(spotifyTracks);
 														adapter.notifyItemRangeInserted(oldSize, spotifyTracks.size());
@@ -204,6 +210,7 @@ public class SpotifySearchResultsActivity extends Activity{
 								});
 
 							lstResults.setAdapter(adapter);
+							progressBar.setVisibility(View.GONE);
 						}
 					}
 				);
@@ -249,12 +256,14 @@ public class SpotifySearchResultsActivity extends Activity{
 									public void nextPage() {
 										if (!alreadySearching){
 											alreadySearching = true;
+											progressBar.setVisibility(View.VISIBLE);
 											AsyncDataManager.searchSpotifyArtists(
 												query,
 												artistResults.size(),
 												new AsyncDataManager.SearchSpotifyArtistsCallback() {
 													@Override
 													public void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists) {
+														progressBar.setVisibility(View.GONE);
 														int oldSize = artistResults.size();
 														artistResults.addAll(spotifyArtists);
 														adapter.notifyItemRangeInserted(oldSize, spotifyArtists.size());
@@ -268,6 +277,7 @@ public class SpotifySearchResultsActivity extends Activity{
 								});
 
 							lstResults.setAdapter(adapter);
+							progressBar.setVisibility(View.GONE);
 						}
 					}
 				);
@@ -316,12 +326,14 @@ public class SpotifySearchResultsActivity extends Activity{
 									public void nextPage() {
 										if (!alreadySearching){
 											alreadySearching = true;
+											progressBar.setVisibility(View.VISIBLE);
 											AsyncDataManager.searchSpotifyAlbums(
 												query,
 												albumResults.size(),
 												new AsyncDataManager.SearchSpotifyAlbumsCallback() {
 													@Override
 													public void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums) {
+														progressBar.setVisibility(View.GONE);
 														int oldSize = albumResults.size();
 														albumResults.addAll(spotifyAlbums);
 														adapter.notifyItemRangeInserted(oldSize, spotifyAlbums.size());
@@ -335,6 +347,7 @@ public class SpotifySearchResultsActivity extends Activity{
 								});
 
 							lstResults.setAdapter(adapter);
+							progressBar.setVisibility(View.GONE);
 						}
 					}
 				);
@@ -342,43 +355,6 @@ public class SpotifySearchResultsActivity extends Activity{
 			}
 		}
 	}
-
-	/*private void processAlbums(SpotifyAPIResponse result){
-		albumResults = result.getAlbums().getItems();
-		//Log.d(TAG, "JSON search results:\n" + albumResults);
-		if (albumResults == null){
-			return;
-		}
-		String albumIDList[] = new String[albumResults.length];
-		String albumNameList[] = new String[albumResults.length];
-		String albumImageList[] = new String[albumResults.length];
-		String albumDescList[] = new String[albumResults.length];
-		for (int i = 0; i < albumResults.length; i++){
-			albumIDList[i] = albumResults[i].getID();
-			albumNameList[i] = albumResults[i].getName();
-			SpotifyImage image = albumResults[i].getImages(0);
-			if (image != null)
-				albumImageList[i] = image.getUrl();
-			albumDescList[i] = albumResults[i].getArtistName();
-		}
-
-		SearchResultsCustomListAdapter adapter = new SearchResultsCustomListAdapter(this, albumIDList, albumNameList, albumImageList, albumDescList);
-		ListView listView = (ListView) findViewById(R.id.listView);
-		listView.setAdapter(adapter);
-
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				SpotifyAlbum album = albumResults[position];
-
-				Intent resultIntent = new Intent();
-				resultIntent.putExtra(ALBUM_JSON, new Gson().toJson(album, SpotifyAlbum.class));
-
-				setResult(Activity.RESULT_OK, resultIntent);
-				finish();
-			}
-		});
-	}*/
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -452,6 +428,7 @@ public class SpotifySearchResultsActivity extends Activity{
 			holder.txtTrackName.setText(spotifyTrack.getName());
 			holder.txtTrackDesc.setText(spotifyTrack.getArtistNameAlbumName());
 
+			holder.imgAlbumArt.setImageResource(R.drawable.spotify_blank);
 			// get User Image
 			WebHelper.getSpotifyAlbumArt(
 				spotifyTrack.getID(),
@@ -459,11 +436,13 @@ public class SpotifySearchResultsActivity extends Activity{
 				new WebHelper.GetSpotifyAlbumArtCallback() {
 					@Override
 					public void returnSpotifyAlbumArt(Bitmap bitmap) {
-						holder.imgAlbumArt.setImageBitmap(bitmap);
+						if (bitmap != null)
+							holder.imgAlbumArt.setImageBitmap(bitmap);
 					}
 				});
 
-			if ((position == spotifyTracks.size()-1) && (spotifyTracks.size() < totalTracks)){
+			if ((position == spotifyTracks.size() - 1) && (spotifyTracks
+				.size() < totalTracks)) {
 				callback.nextPage();
 			}
 		}
@@ -559,6 +538,7 @@ public class SpotifySearchResultsActivity extends Activity{
 			holder.txtArtistName.setText(spotifyArtist.getName());
 			holder.txtArtistDesc.setText(spotifyArtist.getGenres());
 
+			holder.imgAlbumArt.setImageResource(R.drawable.spotify_blank);
 			// get User Image
 			WebHelper.getSpotifyAlbumArt(
 				spotifyArtist.getID(),
@@ -566,7 +546,8 @@ public class SpotifySearchResultsActivity extends Activity{
 				new WebHelper.GetSpotifyAlbumArtCallback() {
 					@Override
 					public void returnSpotifyAlbumArt(Bitmap bitmap) {
-						holder.imgAlbumArt.setImageBitmap(bitmap);
+						if (bitmap != null)
+							holder.imgAlbumArt.setImageBitmap(bitmap);
 					}
 				});
 
@@ -682,6 +663,7 @@ public class SpotifySearchResultsActivity extends Activity{
 				);
 			}
 
+			holder.imgAlbumArt.setImageResource(R.drawable.spotify_blank);
 			// get User Image
 			WebHelper.getSpotifyAlbumArt(
 				spotifyAlbum.getID(),
@@ -689,7 +671,8 @@ public class SpotifySearchResultsActivity extends Activity{
 				new WebHelper.GetSpotifyAlbumArtCallback() {
 					@Override
 					public void returnSpotifyAlbumArt(Bitmap bitmap) {
-						holder.imgAlbumArt.setImageBitmap(bitmap);
+						if (bitmap != null)
+							holder.imgAlbumArt.setImageBitmap(bitmap);
 					}
 				});
 

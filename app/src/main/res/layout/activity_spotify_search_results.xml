@@ -1,4 +1,4 @@
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -13,9 +13,18 @@
     android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>-->
 
-<android.support.v7.widget.RecyclerView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/activity_search_results_lstResults"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_search_results_lstResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/activity_search_results_progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="10dp"
+        android:indeterminate="false"/>
+
+</FrameLayout>
