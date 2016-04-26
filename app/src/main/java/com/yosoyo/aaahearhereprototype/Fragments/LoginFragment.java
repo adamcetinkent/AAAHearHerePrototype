@@ -14,8 +14,8 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
-import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
 
 /**

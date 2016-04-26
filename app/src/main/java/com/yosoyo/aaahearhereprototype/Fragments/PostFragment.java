@@ -37,10 +37,10 @@ import android.widget.Toast;
 
 import com.facebook.Profile;
 import com.google.gson.Gson;
-import com.yosoyo.aaahearhereprototype.AddressPicker;
-import com.yosoyo.aaahearhereprototype.AddressResultReceiver;
+import com.yosoyo.aaahearhereprototype.Activities.AddressPicker;
+import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
+import com.yosoyo.aaahearhereprototype.Activities.SpotifySearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
-import com.yosoyo.aaahearhereprototype.FetchAddressIntentService;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
@@ -49,12 +49,12 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
-import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
+import com.yosoyo.aaahearhereprototype.Services.AddressResultReceiver;
+import com.yosoyo.aaahearhereprototype.Services.FetchAddressIntentService;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
-import com.yosoyo.aaahearhereprototype.SpotifySearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 

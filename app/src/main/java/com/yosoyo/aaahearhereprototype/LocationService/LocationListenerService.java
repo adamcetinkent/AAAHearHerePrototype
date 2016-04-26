@@ -14,10 +14,10 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
-import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 

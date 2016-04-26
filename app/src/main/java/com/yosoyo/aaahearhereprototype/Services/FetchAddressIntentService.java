@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype;
+package com.yosoyo.aaahearhereprototype.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.yosoyo.aaahearhereprototype.R;
 
 import java.io.IOException;
 import java.util.List;

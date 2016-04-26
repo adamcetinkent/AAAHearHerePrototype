@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype;
+package com.yosoyo.aaahearhereprototype.Activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -38,6 +38,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.Fragments.FeedFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.FeedbackFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.FollowRequestListFragment;
@@ -56,6 +57,8 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
 import com.yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
+import com.yosoyo.aaahearhereprototype.R;
+import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.util.HashMap;
 import java.util.Map;

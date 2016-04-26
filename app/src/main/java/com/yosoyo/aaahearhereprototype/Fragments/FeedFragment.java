@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.facebook.Profile;
+import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
@@ -41,7 +42,6 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
-import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 

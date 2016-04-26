@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
  *
  * A streamlined {@link Place} for use within Hear Here
  */
-class SimpleGooglePlace {
+public class SimpleGooglePlace {
 
 	private final String id;
 	private final String name;

@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype;
+package com.yosoyo.aaahearhereprototype.Activities;
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -15,10 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.util.List;
 

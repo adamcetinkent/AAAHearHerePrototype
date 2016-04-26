@@ -8,7 +8,6 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import com.yosoyo.aaahearhereprototype.DownloadImageTask;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
@@ -21,6 +20,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
+import com.yosoyo.aaahearhereprototype.Services.DownloadImageTask;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
