@@ -249,15 +249,12 @@ public class FollowRequestListFragment extends FeedbackFragment {
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View view = LayoutInflater.from(parent.getContext())
 									  .inflate(R.layout.rv_row_follow_request, parent, false);
-			ViewHolder viewHolder = new ViewHolder(view, adapterCallback);
-
-			return viewHolder;
+			return new ViewHolder(view, adapterCallback);
 		}
 
 		@Override
 		public void onBindViewHolder(final ViewHolder holder, int position) {
 			HHFollowRequestUser followRequest = this.user.getFollowInRequests().get(position);
-			holder.position = position;
 			holder.btnAcceptOnClickListener.setFollowRequest(followRequest);
 			holder.btnDeleteOnClickListener.setFollowRequest(followRequest);
 			holder.txtUserName.setText(followRequest.getUser().getName());

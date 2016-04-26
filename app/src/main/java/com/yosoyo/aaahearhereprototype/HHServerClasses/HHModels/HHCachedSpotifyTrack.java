@@ -26,8 +26,8 @@ public class HHCachedSpotifyTrack implements Parcelable {
 		this.name = spotifyTrack.getName();
 		this.artist = spotifyTrack.getArtistName();
 		this.album = spotifyTrack.getAlbumName();
-		this.image_url = spotifyTrack.getImages(0).getUrl();
-		this.preview_url = spotifyTrack.getPreviewUrl();
+		this.image_url = spotifyTrack.getImageURL();
+		this.preview_url = spotifyTrack.getPreviewURL();
 	}
 
 	public HHCachedSpotifyTrack(Cursor cursor){

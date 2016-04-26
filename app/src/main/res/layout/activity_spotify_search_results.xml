@@ -2,10 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true">
+    android:layout_height="match_parent">
 
 <!--<android.support.v7.widget.Toolbar
     android:id="@+id/my_toolbar"
@@ -16,9 +13,9 @@
     android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>-->
 
-<ListView
+<android.support.v7.widget.RecyclerView
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/listView"/>
+    android:layout_height="match_parent"
+    android:id="@+id/activity_search_results_lstResults"/>
 
 </LinearLayout>

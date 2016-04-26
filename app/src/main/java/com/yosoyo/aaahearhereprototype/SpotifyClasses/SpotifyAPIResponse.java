@@ -3,7 +3,7 @@ package com.yosoyo.aaahearhereprototype.SpotifyClasses;
 /**
  * Created by Adam Kent on 10/02/2016.
  *
- * This is returned by a SpotifyAPIRequest. The type of search request sent to Spotify determines
+ * This is returned by a SpotifyAPIRequestSearch. The type of search request sent to Spotify determines
  * which fields will be filled.
  */
 @SuppressWarnings("unused")

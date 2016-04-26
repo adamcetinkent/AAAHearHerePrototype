@@ -368,7 +368,7 @@ public class FeedFragment extends FeedbackFragment {
 			posts = ZZZUtility.updateList(posts, post);
 			notifyAdapter();
 			fetchData = false; //TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
-			if (earliestWebPost == null || post.getPost().getCreatedAt().before(earliestWebPost)){
+			if (earliestWebPost == null || feedType == SINGLE_POST_FEED || post.getPost().getCreatedAt().before(earliestWebPost)){
 				earliestWebPost = post.getPost().getCreatedAt();
 				lstTimelineAdapter.setEarliestWebPost(earliestWebPost);
 				setListProgressBar(false);

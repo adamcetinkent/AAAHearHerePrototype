@@ -51,10 +51,10 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostT
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
-import com.yosoyo.aaahearhereprototype.SearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import com.yosoyo.aaahearhereprototype.SpotifySearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.ZZZInterface.TaggableEditText;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -189,30 +189,30 @@ public class PostFragment extends FeedbackFragment {
 		searchViewTrack.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				Log.d(TAG, "OnQueryTextSubmit");
-				Intent intent = new Intent(getActivity(), SearchResultsActivity.class);
+				//Log.d(TAG, "OnQueryTextSubmit");
+				Intent intent = new Intent(getActivity(), SpotifySearchResultsActivity.class);
 				intent.setAction(Intent.ACTION_SEARCH);
 				intent.putExtra(SearchManager.QUERY, query);
 				if (spotifyArtist == null && spotifyAlbum == null) {
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_TRACK);
+					startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_TRACK);
 				} else if (spotifyAlbum != null && spotifyArtist == null) {
-					intent.putExtra(SearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_TRACK_ALBUM);
+					intent.putExtra(SpotifySearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
+					startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_TRACK_ALBUM);
 				} else if (spotifyAlbum == null) {
-					intent.putExtra(SearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_TRACK_ARTIST);
+					intent.putExtra(SpotifySearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
+					startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_TRACK_ARTIST);
 				} else {
-					intent.putExtra(SearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
-					intent.putExtra(SearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
+					intent.putExtra(SpotifySearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
+					intent.putExtra(SpotifySearchResultsActivity.QUERY_ALBUM, spotifyAlbum.getName());
 					startActivityForResult(intent,
-										   SearchResultsActivity.REQUEST_CODE_TRACK_ARTIST_ALBUM);
+										   SpotifySearchResultsActivity.REQUEST_CODE_TRACK_ARTIST_ALBUM);
 				}
 				return false;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				Log.d(TAG, "OnQueryTextChange");
+				//Log.d(TAG, "OnQueryTextChange");
 				return false;
 			}
 		});
@@ -220,17 +220,17 @@ public class PostFragment extends FeedbackFragment {
 		searchViewArtist.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				Log.d(TAG, "OnQueryTextSubmit");
-				Intent intent = new Intent(getActivity(), SearchResultsActivity.class);
+				//Log.d(TAG, "OnQueryTextSubmit");
+				Intent intent = new Intent(getActivity(), SpotifySearchResultsActivity.class);
 				intent.setAction(Intent.ACTION_SEARCH);
 				intent.putExtra(SearchManager.QUERY, query);
-				startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ARTIST);
+				startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_ARTIST);
 				return false;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				Log.d(TAG, "OnQueryTextChange");
+				//Log.d(TAG, "OnQueryTextChange");
 				return false;
 			}
 		});
@@ -238,22 +238,22 @@ public class PostFragment extends FeedbackFragment {
 		searchViewAlbum.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				Log.d(TAG, "OnQueryTextSubmit");
-				Intent intent = new Intent(getActivity(), SearchResultsActivity.class);
+				//Log.d(TAG, "OnQueryTextSubmit");
+				Intent intent = new Intent(getActivity(), SpotifySearchResultsActivity.class);
 				intent.setAction(Intent.ACTION_SEARCH);
 				intent.putExtra(SearchManager.QUERY, query);
 				if (spotifyArtist != null) {
-					intent.putExtra(SearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ALBUM_ARTIST);
+					intent.putExtra(SpotifySearchResultsActivity.QUERY_ARTIST, spotifyArtist.getName());
+					startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_ALBUM_ARTIST);
 				} else {
-					startActivityForResult(intent, SearchResultsActivity.REQUEST_CODE_ALBUM);
+					startActivityForResult(intent, SpotifySearchResultsActivity.REQUEST_CODE_ALBUM);
 				}
 				return false;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				Log.d(TAG, "OnQueryTextChange");
+				//Log.d(TAG, "OnQueryTextChange");
 				return false;
 			}
 		});
@@ -308,7 +308,7 @@ public class PostFragment extends FeedbackFragment {
 							}
 						});
 
-					HolderActivity.mediaPlayer.setDataSource(spotifyTrack.getPreviewUrl());
+					HolderActivity.mediaPlayer.setDataSource(spotifyTrack.getPreviewURL());
 					HolderActivity.mediaPlayer.prepareAsync();
 
 				} catch (IllegalArgumentException e) {
@@ -481,25 +481,116 @@ public class PostFragment extends FeedbackFragment {
 				new AsyncDataManager.GetSpotifyTrackCallback() {
 					@Override
 					public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
-						PostFragment.this.spotifyTrack = spotifyTrack;
-						txtTrack.setText(spotifyTrack.getName());
-						txtArtist.setText(spotifyTrack.getArtistName());
-						txtAlbum.setText(spotifyTrack.getAlbumName());
-						llSearch.setVisibility(View.GONE);
-						llText.setVisibility(View.VISIBLE);
 
-						WebHelper.getSpotifyAlbumArt(
-							spotifyTrack.getID(),
-							spotifyTrack.getImages(0).getUrl(),
-							new WebHelper.GetSpotifyAlbumArtCallback() {
-								@Override
-								public void returnSpotifyAlbumArt(Bitmap bitmap) {
-									imgAlbumArt.setImageBitmap(bitmap);
+						if (spotifyTrack == null) {
+							Toast.makeText(getActivity(), "NOT A TRACK!", Toast.LENGTH_LONG).show();
+
+							AsyncDataManager.getSpotifyAlbum(
+								trackID,
+								new AsyncDataManager.GetSpotifyAlbumCallback(){
+									@Override
+									public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
+
+										if (spotifyAlbum == null) {
+
+											Toast.makeText(getActivity(),
+														   "NOT AN ALBUM!",
+														   Toast.LENGTH_LONG).show();
+
+											AsyncDataManager.getSpotifyArtist(
+												trackID,
+												new AsyncDataManager.GetSpotifyArtistCallback() {
+													@Override
+													public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
+														if (spotifyArtist == null){
+															Toast.makeText(getActivity(),
+																		   "NOT AN ARTIST!",
+																		   Toast.LENGTH_LONG).show();
+														} else {
+															Toast.makeText(getActivity(),
+																		   "ARTIST FOUND: " + spotifyArtist.getName(),
+																		   Toast.LENGTH_LONG).show();
+															PostFragment.this.spotifyArtist = spotifyArtist;
+															searchViewArtist.setQueryHint(spotifyArtist.getName());
+															searchViewArtist.setQuery("", false);
+															searchViewArtist.clearFocus();
+
+															WebHelper.getSpotifyAlbumArt(
+																spotifyArtist.getID(),
+																spotifyArtist.getImageURL(),
+																new WebHelper.GetSpotifyAlbumArtCallback() {
+																	@Override
+																	public void returnSpotifyAlbumArt(Bitmap bitmap) {
+																		imgAlbumArt.setImageBitmap(bitmap);
+																	}
+																});
+
+															searchViewTrack.setEnabled(true);
+															searchViewArtist.setEnabled(true);
+															searchViewAlbum.setEnabled(true);
+														}
+													}
+												}
+											);
+
+
+										} else {
+											Toast.makeText(getActivity(),
+														   "ALBUM FOUND: " + spotifyAlbum.getName(),
+														   Toast.LENGTH_LONG).show();
+											PostFragment.this.spotifyAlbum = spotifyAlbum;
+											searchViewAlbum.setQueryHint(spotifyAlbum.getName());
+											searchViewAlbum.setQuery("", false);
+											searchViewAlbum.clearFocus();
+
+											if (spotifyArtist == null) {
+												searchViewArtist
+													.setQueryHint(spotifyAlbum.getArtistName());
+											}
+
+											WebHelper.getSpotifyAlbumArt(
+												spotifyAlbum.getID(),
+												spotifyAlbum.getImages(0).getUrl(),
+												new WebHelper.GetSpotifyAlbumArtCallback() {
+													@Override
+													public void returnSpotifyAlbumArt(Bitmap bitmap) {
+														imgAlbumArt.setImageBitmap(bitmap);
+													}
+												});
+
+											searchViewTrack.setEnabled(true);
+											searchViewArtist.setEnabled(true);
+											searchViewAlbum.setEnabled(true);
+										}
+									}
 								}
-							});
+							);
 
-						updatePlayButton(btnPlayButton);
+						} else {
+
+							PostFragment.this.spotifyTrack = spotifyTrack;
+							txtTrack.setText(spotifyTrack.getName());
+							txtArtist.setText(spotifyTrack.getArtistName());
+							txtAlbum.setText(spotifyTrack.getAlbumName());
+							llSearch.setVisibility(View.GONE);
+							llText.setVisibility(View.VISIBLE);
+
+							WebHelper.getSpotifyAlbumArt(
+								spotifyTrack.getID(),
+								spotifyTrack.getImageURL(),
+								new WebHelper.GetSpotifyAlbumArtCallback() {
+									@Override
+									public void returnSpotifyAlbumArt(Bitmap bitmap) {
+										imgAlbumArt.setImageBitmap(bitmap);
+									}
+								});
+
+							updatePlayButton(btnPlayButton);
+
+						}
+
 						getLocation();
+
 					}
 					@Override
 					public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {}
@@ -597,87 +688,89 @@ public class PostFragment extends FeedbackFragment {
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 
-		switch (requestCode){
-			case (SearchResultsActivity.REQUEST_CODE_TRACK_ARTIST_ALBUM):
-			case (SearchResultsActivity.REQUEST_CODE_TRACK_ALBUM):
-			case (SearchResultsActivity.REQUEST_CODE_TRACK_ARTIST):
-			case (SearchResultsActivity.REQUEST_CODE_TRACK): {
-				if (resultCode == Activity.RESULT_OK) {
-					spotifyTrack = new Gson().fromJson(data.getStringExtra(SearchResultsActivity.TRACK_JSON), SpotifyTrack.class);
-					txtTrack.setText(spotifyTrack.getName());
-					txtArtist.setText(spotifyTrack.getArtistName());
-					txtAlbum.setText(spotifyTrack.getAlbumName());
-					llSearch.setVisibility(View.GONE);
-					llText.setVisibility(View.VISIBLE);
+		switch (resultCode){
+			case (SpotifySearchResultsActivity.REQUEST_CODE_TRACK): {
+				spotifyTrack = new Gson().fromJson(data.getStringExtra(
+					SpotifySearchResultsActivity.TRACK_JSON), SpotifyTrack.class);
+				txtTrack.setText(spotifyTrack.getName());
+				txtArtist.setText(spotifyTrack.getArtistName());
+				txtAlbum.setText(spotifyTrack.getAlbumName());
+				llSearch.setVisibility(View.GONE);
+				llText.setVisibility(View.VISIBLE);
 
-					WebHelper.getSpotifyAlbumArt(
-						spotifyTrack.getID(),
-						spotifyTrack.getImages(0).getUrl(),
-						new WebHelper.GetSpotifyAlbumArtCallback() {
-							@Override
-							public void returnSpotifyAlbumArt(Bitmap bitmap) {
-								imgAlbumArt.setImageBitmap(bitmap);
-							}
-						});
-				}
+				WebHelper.getSpotifyAlbumArt(
+					spotifyTrack.getID(),
+					spotifyTrack.getImageURL(),
+					new WebHelper.GetSpotifyAlbumArtCallback() {
+						@Override
+						public void returnSpotifyAlbumArt(Bitmap bitmap) {
+							imgAlbumArt.setImageBitmap(bitmap);
+						}
+					});
 				break;
 			}
-			//case (SearchResultsActivity.REQUEST_CODE_ARTIST_ALBUM):
-			case (SearchResultsActivity.REQUEST_CODE_ARTIST): {
-				if (resultCode == Activity.RESULT_OK){
-					spotifyArtist = new Gson().fromJson(data.getStringExtra(SearchResultsActivity.ARTIST_JSON), SpotifyArtist.class);
+			case (SpotifySearchResultsActivity.REQUEST_CODE_ARTIST): {
+				spotifyArtist = new Gson().fromJson(data.getStringExtra(
+					SpotifySearchResultsActivity.ARTIST_JSON), SpotifyArtist.class);
+				searchViewArtist.setQueryHint(spotifyArtist.getName());
+				searchViewArtist.setQuery("", false);
+				searchViewArtist.clearFocus();
+
+				if (spotifyAlbum == null || spotifyAlbum.getArtistID().equals(spotifyArtist.getID())) {
 					searchViewArtist.setQueryHint(spotifyArtist.getName());
 					searchViewArtist.setQuery("", false);
 					searchViewArtist.clearFocus();
-
-					if (spotifyAlbum == null || spotifyAlbum.getArtistID().equals(spotifyArtist.getID())) {
-						searchViewArtist.setQueryHint(spotifyArtist.getName());
-						searchViewArtist.setQuery("", false);
-						searchViewArtist.clearFocus();
-					}
-
-					WebHelper.getSpotifyAlbumArt(
-						spotifyArtist.getID(),
-						spotifyArtist.getImages(0).getUrl(),
-						new WebHelper.GetSpotifyAlbumArtCallback() {
-							@Override
-							public void returnSpotifyAlbumArt(Bitmap bitmap) {
-								imgAlbumArt.setImageBitmap(bitmap);
-							}
-						});
 				}
+
+				WebHelper.getSpotifyAlbumArt(
+					spotifyArtist.getID(),
+					spotifyArtist.getImageURL(),
+					new WebHelper.GetSpotifyAlbumArtCallback() {
+						@Override
+						public void returnSpotifyAlbumArt(Bitmap bitmap) {
+							imgAlbumArt.setImageBitmap(bitmap);
+						}
+					});
 				break;
 			}
-			case (SearchResultsActivity.REQUEST_CODE_ALBUM_ARTIST):
-			case (SearchResultsActivity.REQUEST_CODE_ALBUM): {
-				if (resultCode == Activity.RESULT_OK){
-					spotifyAlbum = new Gson().fromJson(data.getStringExtra(SearchResultsActivity.ALBUM_JSON), SpotifyAlbum.class);
-					searchViewAlbum.setQueryHint(spotifyAlbum.getName());
-					searchViewAlbum.setQuery("", false);
-					searchViewAlbum.clearFocus();
+			//case (SpotifySearchResultsActivity.REQUEST_CODE_ALBUM_ARTIST):
+			case (SpotifySearchResultsActivity.REQUEST_CODE_ALBUM): {
+				spotifyAlbum = new Gson().fromJson(data.getStringExtra(
+					SpotifySearchResultsActivity.ALBUM_JSON), SpotifyAlbum.class);
+				searchViewAlbum.setQueryHint(spotifyAlbum.getName());
+				searchViewAlbum.setQuery("", false);
+				searchViewAlbum.clearFocus();
 
-					if (spotifyArtist == null){
-						searchViewArtist.setQueryHint(spotifyAlbum.getArtistName());
-					}
-
-					WebHelper.getSpotifyAlbumArt(
+				if (spotifyArtist == null){
+					//searchViewArtist.setQueryHint(spotifyAlbum.getArtistName());
+					AsyncDataManager.getSpotifyAlbum(
 						spotifyAlbum.getID(),
-						spotifyAlbum.getImages(0).getUrl(),
-						new WebHelper.GetSpotifyAlbumArtCallback() {
+						new AsyncDataManager.GetSpotifyAlbumCallback() {
 							@Override
-							public void returnSpotifyAlbumArt(Bitmap bitmap) {
-								imgAlbumArt.setImageBitmap(bitmap);
+							public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
+								if (spotifyAlbum != null) {
+									PostFragment.this.spotifyAlbum = spotifyAlbum;
+									searchViewArtist.setQueryHint(spotifyAlbum.getArtistName());
+								}
 							}
 						});
 				}
+
+				WebHelper.getSpotifyAlbumArt(
+					spotifyAlbum.getID(),
+					spotifyAlbum.getImages(0).getUrl(),
+					new WebHelper.GetSpotifyAlbumArtCallback() {
+						@Override
+						public void returnSpotifyAlbumArt(Bitmap bitmap) {
+							imgAlbumArt.setImageBitmap(bitmap);
+						}
+					});
 				break;
 			}
 			case (AddressPicker.REQUEST_CODE): {
-				if (resultCode == Activity.RESULT_OK){
-					placeName = data.getStringExtra(AddressPicker.ADDRESS_STRING);
-					googlePlaceID = data.getStringExtra(AddressPicker.GOOGLE_PLACE_ID);
-					txtLocation.setText(placeName);
-				}
+				placeName = data.getStringExtra(AddressPicker.ADDRESS_STRING);
+				googlePlaceID = data.getStringExtra(AddressPicker.GOOGLE_PLACE_ID);
+				txtLocation.setText(placeName);
 			}
 		}
 

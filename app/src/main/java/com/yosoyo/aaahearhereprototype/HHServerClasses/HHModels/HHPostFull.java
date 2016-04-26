@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -126,12 +127,18 @@ public class HHPostFull implements Comparable, Parcelable {
 		dest.writeParcelable(post, flags);
 		dest.writeParcelable(user, flags);
 		dest.writeParcelable(track, flags);
+		if (comments == null)
+			comments = new ArrayList<>();
 		dest.writeTypedList(comments);
+		if (likes == null)
+			likes = new ArrayList<>();
 		dest.writeTypedList(likes);
+		if (tags == null)
+			tags = new ArrayList<>();
 		dest.writeTypedList(tags);
 	}
 
-	private final static Parcelable.Creator<HHPostFull> CREATOR = new Parcelable.Creator<HHPostFull>(){
+	public final static Parcelable.Creator<HHPostFull> CREATOR = new Parcelable.Creator<HHPostFull>(){
 
 		@Override
 		public HHPostFull createFromParcel(Parcel source) {
@@ -149,8 +156,14 @@ public class HHPostFull implements Comparable, Parcelable {
 		post = in.readParcelable(HHPost.class.getClassLoader());
 		user = in.readParcelable(HHUser.class.getClassLoader());
 		track = in.readParcelable(HHCachedSpotifyTrack.class.getClassLoader());
+		if (comments == null)
+			comments = new ArrayList<>();
 		in.readTypedList(comments, HHCommentUser.CREATOR);
+		if (likes == null)
+			likes = new ArrayList<>();
 		in.readTypedList(likes, HHLikeUser.CREATOR);
+		if (tags == null)
+			tags = new ArrayList<>();
 		in.readTypedList(tags, HHTagUser.CREATOR);
 	}
 

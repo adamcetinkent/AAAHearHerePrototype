@@ -82,13 +82,21 @@ public class SpotifyTrack {
 		return  getArtistName() + " - " + getAlbumName();
 	}
 
-	public String getPreviewUrl() {
+	public String getPreviewURL() {
 		return preview_url;
 	}
 
 	@Override
 	public String toString(){
 		return name;
+	}
+
+	public String getImageURL(){
+		SpotifyImage image = getImages(0);
+		if (image != null){
+			return image.getUrl();
+		}
+		return null;
 	}
 
 }

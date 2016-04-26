@@ -21,10 +21,18 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestAlbum;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestArtist;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestArtistTopTracks;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestSearch;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestTrack;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -179,14 +187,47 @@ public class WebHelper {
 	}
 
 	public static void getSpotifyTrack(String trackID, final GetSpotifyTrackCallback callback){
-		new SpotifyAPIRequestTrack(trackID,
-								   new SpotifyAPIRequestTrack.SpotifyAPIRequestTrackCallback() {
-			@Override
-			public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
-				callback.returnSpotifyTrack(spotifyTrack);
-				preLoadTrackBitmaps(spotifyTrack);
-			}
-		}).execute();
+		new SpotifyAPIRequestTrack(
+			trackID,
+			new SpotifyAPIRequestTrack.Callback() {
+				@Override
+				public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+					callback.returnSpotifyTrack(spotifyTrack);
+					if (spotifyTrack != null) {
+						preLoadTrackBitmaps(spotifyTrack);
+					}
+				}
+			}).execute();
+	}
+
+	public interface GetSpotifyAlbumCallback {
+		void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum);
+	}
+
+	public static void getSpotifyAlbum(String albumID, final GetSpotifyAlbumCallback callback){
+		new SpotifyAPIRequestAlbum(
+			albumID,
+			new SpotifyAPIRequestAlbum.Callback() {
+				@Override
+				public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
+					callback.returnSpotifyAlbum(spotifyAlbum);
+				}
+			}).execute();
+	}
+
+	public interface GetSpotifyArtistCallback {
+		void returnSpotifyArtist(SpotifyArtist spotifyArtist);
+	}
+
+	public static void getSpotifyArtist(String artistID, final GetSpotifyArtistCallback callback){
+		new SpotifyAPIRequestArtist(
+			artistID,
+			new SpotifyAPIRequestArtist.Callback() {
+				@Override
+				public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
+					callback.returnSpotifyArtist(spotifyArtist);
+				}
+			}).execute();
 	}
 
 	public interface GetSpotifyAlbumArtCallback {
@@ -462,7 +503,7 @@ public class WebHelper {
 
 	public static void preLoadTrackBitmaps(SpotifyTrack spotifyTrack){
 		if (checkWifi()){
-			getSpotifyAlbumArt(spotifyTrack.getID(), spotifyTrack.getImages(0).getUrl(), null);
+			getSpotifyAlbumArt(spotifyTrack.getID(), spotifyTrack.getImageURL(), null);
 		}
 	}
 
@@ -487,6 +528,103 @@ public class WebHelper {
 				.getSupplicantState() != SupplicantState.COMPLETED);
 		}
 		return false;
+	}
+
+	public interface SearchSpotifyTracksCallback{
+		void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks);
+	}
+
+	public static void searchSpotifyTracks(final String query,
+										   final int offset,
+										   final SearchSpotifyTracksCallback callback){
+		new SpotifyAPIRequestSearch(
+			query,
+			SpotifyAPIRequestSearch.SEARCH_TYPE_TRACK,
+			offset,
+			new SpotifyAPIRequestSearch.Callback() {
+				@Override
+				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
+					if (output.getTracks() != null) {
+						callback.returnSearchSpotifyTracks(
+							output.getTracks().getItemsList(),
+							output.getTracks().getTotal());
+					} else {
+						callback.returnSearchSpotifyTracks(new ArrayList<SpotifyTrack>(), 0);
+					}
+				}
+			}).execute();
+	}
+
+	public interface SearchSpotifyArtistsCallback{
+		void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists);
+	}
+
+	public static void searchSpotifyArtists(final String query,
+											final int offset,
+											final SearchSpotifyArtistsCallback callback){
+		new SpotifyAPIRequestSearch(
+			query,
+			SpotifyAPIRequestSearch.SEARCH_TYPE_ARTIST,
+			offset,
+			new SpotifyAPIRequestSearch.Callback() {
+				@Override
+				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
+					if (output.getArtists() != null) {
+						callback.returnSearchSpotifyArtists(
+							output.getArtists().getItemsList(),
+							output.getArtists().getTotal());
+					} else {
+						callback.returnSearchSpotifyArtists(new ArrayList<SpotifyArtist>(), 0);
+					}
+				}
+			}).execute();
+	}
+
+	public interface SearchSpotifyAlbumsCallback{
+		void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums);
+	}
+
+	public static void searchSpotifyAlbums(final String query,
+										   final int offset,
+										   final SearchSpotifyAlbumsCallback callback){
+		new SpotifyAPIRequestSearch(
+			query,
+			SpotifyAPIRequestSearch.SEARCH_TYPE_ALBUM,
+			offset,
+			new SpotifyAPIRequestSearch.Callback() {
+				@Override
+				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
+					if (output.getAlbums() != null) {
+						callback.returnSearchSpotifyAlbums(
+							output.getAlbums().getItemsList(),
+							output.getAlbums().getTotal());
+					} else {
+						callback.returnSearchSpotifyAlbums(new ArrayList<SpotifyAlbum>(), 0);
+					}
+				}
+			}).execute();
+	}
+
+	public interface GetSpotifyArtistTopTracksCallback{
+		void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks);
+	}
+
+	public static void getSpotifyArtistTopTracks(final String artistID,
+												 final String country,
+												 final GetSpotifyArtistTopTracksCallback callback){
+		new SpotifyAPIRequestArtistTopTracks(
+			artistID,
+			country,
+			new SpotifyAPIRequestArtistTopTracks.Callback() {
+				@Override
+				public void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks) {
+					if (spotifyTracks != null) {
+						callback.returnGetSpotifyArtistTopTracks(spotifyTracks);
+					} else {
+						callback.returnGetSpotifyArtistTopTracks(new ArrayList<SpotifyTrack>());
+					}
+				}
+			}).execute();
 	}
 
 }

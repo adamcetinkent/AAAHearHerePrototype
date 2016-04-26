@@ -61,4 +61,12 @@ public class SpotifyAlbum {
 		return id;
 	}
 
+	public String getImageURL(){
+		SpotifyImage image = getImages(0);
+		if (image != null){
+			return image.getUrl();
+		}
+		return null;
+	}
+
 }

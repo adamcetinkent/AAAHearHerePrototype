@@ -3,6 +3,7 @@ package com.yosoyo.aaahearhereprototype.LocationService;
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.util.Log;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import com.yosoyo.aaahearhereprototype.HolderActivity;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
@@ -36,7 +38,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 
 	@Override
 	public void returnNewLocation(final Location location) {
-		Intent intent = new Intent();
+		final Intent intent = new Intent();
 		intent.setAction(LOCATION_UPDATE);
 		intent.putExtra(HHBroadcastReceiver.DOUBLE_LATITUDE, location.getLatitude());
 		intent.putExtra(HHBroadcastReceiver.DOUBLE_LONGITUDE, location.getLongitude());
@@ -89,6 +91,19 @@ public class LocationListenerService extends Service implements HHLocationListen
 										+ " posted " + cachedSpotifyTrack.getName()
 										+ " at " + post.getPost().getPlaceName();
 
+									Intent postIntent = new Intent(
+										getApplicationContext(),
+										HolderActivity.class
+									);
+									postIntent.setAction(Intent.ACTION_VIEW);
+									postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_POST, post);
+									PendingIntent intent = PendingIntent.getActivity(
+										getApplicationContext(),
+										HolderActivity.REQUEST_CODE_SHOW_POST,
+										postIntent,
+										PendingIntent.FLAG_UPDATE_CURRENT
+									);
+
 									Notification notification;
 									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
 										notification = new Notification.Builder(
@@ -99,6 +114,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 											.setAutoCancel(true)
 											.setPriority(Notification.PRIORITY_DEFAULT)
 											.setDefaults(Notification.DEFAULT_VIBRATE)
+											.setContentIntent(intent)
 											.build();
 									} else {
 										//noinspection deprecation
@@ -109,6 +125,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 											.setContentText(notificationText)
 											.setAutoCancel(true)
 											.setDefaults(Notification.DEFAULT_VIBRATE)
+											.setContentIntent(intent)
 											.getNotification();
 									}
 

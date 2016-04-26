@@ -1,5 +1,9 @@
 package com.yosoyo.aaahearhereprototype.SpotifyClasses;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Adam Kent on 09/02/2016.
  *
@@ -19,5 +23,13 @@ public class SpotifyPaging<T> {
 
 	public T[] getItems() {
 		return items;
+	}
+
+	public List<T> getItemsList(){
+		return new ArrayList<>(Arrays.asList(items));
+	}
+
+	public int getTotal() {
+		return total;
 	}
 }

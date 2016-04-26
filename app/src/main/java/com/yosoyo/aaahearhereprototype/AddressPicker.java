@@ -176,7 +176,7 @@ public class AddressPicker extends Activity {
 				resultIntent.putExtra(ADDRESS_STRING, outputString);
 				resultIntent.putExtra(GOOGLE_PLACE_ID, googlePlaceID);
 
-				setResult(Activity.RESULT_OK, resultIntent);
+				setResult(REQUEST_CODE, resultIntent);
 				finish();
 			}
 		});
@@ -234,7 +234,7 @@ public class AddressPicker extends Activity {
 		private final List<SimpleGooglePlace> places;
 
 		public PlaceArrayAdapter(Activity context, List<SimpleGooglePlace> places) {
-			super(context, R.layout.list_row_track, places);
+			super(context, R.layout.list_row_spotify_search_results, places);
 			this.context = context;
 			this.places = places;
 		}

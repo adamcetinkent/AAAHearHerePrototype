@@ -36,11 +36,13 @@ public class SpotifyArtist {
 	}
 
 	public String getGenres(){
+		if (genres.length == 0)
+			return "";
 		StringBuilder sb = new StringBuilder();
 		for (String genre : genres) {
-			sb.append(genre);
+			sb.append(genre).append("; ");
 		}
-		return sb.toString();
+		return sb.substring(0, sb.length()-2);
 	}
 
 	public String getName(){
@@ -50,6 +52,14 @@ public class SpotifyArtist {
 	@Override
 	public String toString(){
 		return name;
+	}
+
+	public String getImageURL(){
+		SpotifyImage image = getImages(0);
+		if (image != null){
+			return image.getUrl();
+		}
+		return null;
 	}
 
 }

@@ -22,6 +22,8 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.GetUserTask;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.PostUserTask;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 import java.net.HttpURLConnection;
@@ -955,7 +957,7 @@ public class AsyncDataManager {
 	}
 
 	//**********************************************************************************************
-	// SPOTIFY TRACKS
+	// SPOTIFY
 	//**********************************************************************************************
 
 	// GET SPOTIFY TRACK --------------
@@ -1000,18 +1002,241 @@ public class AsyncDataManager {
 						@Override
 						public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
 							callback.returnSpotifyTrack(spotifyTrack);
-							DatabaseHelper.insertSpotifyTrack(
-								context,
-								spotifyTrack,
-								new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
-									@Override
-									public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
-										callback.returnCachedSpotifyTrack(track);
-									}
-								});
+							if (spotifyTrack != null) {
+								DatabaseHelper.insertSpotifyTrack(
+									context,
+									spotifyTrack,
+									new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
+										@Override
+										public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+											callback.returnCachedSpotifyTrack(track);
+										}
+									});
+							} else {
+								callback.returnCachedSpotifyTrack(null);
+							}
 						}
 					});
 
+				}
+			});
+	}
+
+	// GET SPOTIFY ALBUM --------------
+
+	public interface  GetSpotifyAlbumCallback{
+		void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum);
+	}
+
+	/**
+	 * Fetch {@link SpotifyAlbum}
+	 *
+	 * @param albumID	: ID of {@link SpotifyAlbum}
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyAlbum(final String albumID, final GetSpotifyAlbumCallback callback){
+		getSpotifyAlbum(context, albumID, callback);
+	}
+
+	/**
+	 * Fetch {@link SpotifyAlbum}
+	 *
+	 * @param context	: {@link Context} required for database queries
+	 * @param albumID	: ID of {@link SpotifyAlbum}
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyAlbum(final Context context, final String albumID, final GetSpotifyAlbumCallback callback) {
+
+		WebHelper.getSpotifyAlbum(albumID, new WebHelper.GetSpotifyAlbumCallback() {
+			@Override
+			public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
+				callback.returnSpotifyAlbum(spotifyAlbum);
+			}
+		});
+	}
+
+	// GET SPOTIFY ARTIST -------------
+
+	public interface  GetSpotifyArtistCallback{
+		void returnSpotifyArtist(SpotifyArtist spotifyArtist);
+	}
+
+	/**
+	 * Fetch {@link SpotifyArtist}
+	 *
+	 * @param artistID	: ID of {@link SpotifyArtist}
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyArtist(final String artistID, final GetSpotifyArtistCallback callback){
+		getSpotifyArtist(context, artistID, callback);
+	}
+
+	/**
+	 * Fetch {@link SpotifyArtist}
+	 *
+	 * @param context	: {@link Context} required for database queries
+	 * @param artistID	: ID of {@link SpotifyArtist}
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyArtist(final Context context, final String artistID, final GetSpotifyArtistCallback callback) {
+
+		WebHelper.getSpotifyArtist(artistID, new WebHelper.GetSpotifyArtistCallback() {
+			@Override
+			public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
+				callback.returnSpotifyArtist(spotifyArtist);
+			}
+		});
+	}
+
+	// SEARCH SPOTIFY TRACKS ----------
+
+	public interface SearchSpotifyTracksCallback{
+		void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks);
+	}
+
+	/**
+	 * Search {@link SpotifyTrack}
+	 *
+	 * @param query		: search query
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyTracks(final String query,
+										   final SearchSpotifyTracksCallback callback){
+		searchSpotifyTracks(query, 0, callback);
+	}
+
+	/**
+	 * Search {@link SpotifyTrack}
+	 *
+	 * @param query		: search query
+	 * @param offset	: offset from beginning of search
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyTracks(final String query,
+										   int offset,
+										   final SearchSpotifyTracksCallback callback){
+		WebHelper.searchSpotifyTracks(
+			query,
+			offset,
+			new WebHelper.SearchSpotifyTracksCallback() {
+				@Override
+				public void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks) {
+					callback.returnSearchSpotifyTracks(spotifyTracks, totalTracks);
+				}
+			});
+	}
+
+	// SEARCH SPOTIFY ARTISTS ----------
+
+	public interface SearchSpotifyArtistsCallback{
+		void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists);
+	}
+
+	/**
+	 * Search {@link SpotifyArtist}
+	 *
+	 * @param query		: search query
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyArtists(final String query,
+											final SearchSpotifyArtistsCallback callback){
+		searchSpotifyArtists(query, 0, callback);
+	}
+
+	/**
+	 * Search {@link SpotifyArtist}
+	 *
+	 * @param query		: search query
+	 * @param offset	: offset from beginning of search
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyArtists(final String query,
+											int offset,
+											final SearchSpotifyArtistsCallback callback){
+		WebHelper.searchSpotifyArtists(
+			query,
+			offset,
+			new WebHelper.SearchSpotifyArtistsCallback() {
+				@Override
+				public void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists) {
+					callback.returnSearchSpotifyArtists(spotifyArtists, totalArtists);
+				}
+			});
+	}
+
+	// SEARCH SPOTIFY ALBUMS ----------
+
+	public interface SearchSpotifyAlbumsCallback{
+		void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums);
+	}
+
+	/**
+	 * Search {@link SpotifyAlbum}
+	 *
+	 * @param query		: search query
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyAlbums(final String query,
+										   final SearchSpotifyAlbumsCallback callback){
+		searchSpotifyAlbums(query, 0, callback);
+	}
+
+	/**
+	 * Search {@link SpotifyAlbum}
+	 *
+	 * @param query		: search query
+	 * @param offset	: offset from beginning of search
+	 * @param callback	: results returned via callback
+	 */
+	public static void searchSpotifyAlbums(final String query,
+										   int offset,
+										   final SearchSpotifyAlbumsCallback callback){
+		WebHelper.searchSpotifyAlbums(
+			query,
+			offset,
+			new WebHelper.SearchSpotifyAlbumsCallback() {
+				@Override
+				public void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums) {
+					callback.returnSearchSpotifyAlbums(spotifyAlbums, totalAlbums);
+				}
+			});
+	}
+
+	// GET ARTIST TOP TRACKS ----------
+
+	public interface GetSpotifyArtistTopTracksCallback {
+		void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks);
+	}
+
+	/**
+	 * Get top {@link SpotifyTrack}s for the specified {@link SpotifyArtist}
+	 *
+	 * @param artistID	: ID of specified artist
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyArtistTopTracks(final String artistID,
+												 final GetSpotifyArtistTopTracksCallback callback){
+		//TODO: something smarter with country codes!
+		getSpotifyArtistTopTracks(artistID, "GB", callback);
+	}
+
+	/**
+	 * Search {@link SpotifyTrack}
+	 *
+	 * @param artistID	: ID of specified artist
+	 * @param country	: country code of Spotify market
+	 * @param callback	: results returned via callback
+	 */
+	public static void getSpotifyArtistTopTracks(final String artistID,
+												 final String country,
+												 final GetSpotifyArtistTopTracksCallback callback){
+		WebHelper.getSpotifyArtistTopTracks(
+			artistID,
+			country,
+			new WebHelper.GetSpotifyArtistTopTracksCallback() {
+				@Override
+				public void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks) {
+					callback.returnGetSpotifyArtistTopTracks(spotifyTracks);
 				}
 			});
 	}

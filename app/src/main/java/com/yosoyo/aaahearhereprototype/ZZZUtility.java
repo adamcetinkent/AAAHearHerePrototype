@@ -26,13 +26,8 @@ import java.util.Objects;
  * A dump for utility functions.
  */
 public class ZZZUtility {
+	public static final ColorFilter greyOut = screen(Color.LTGRAY);
 	private static final String TAG = "ZZZUtility";
-
-	public static String convertStreamToString(InputStream is) {
-		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-		return s.hasNext() ? s.next() : "";
-	}
-
 	private static final SimpleDateFormat fullDate = new SimpleDateFormat("dd MMMM yyyy", Locale.UK);
 	private static final SimpleDateFormat halfDate = new SimpleDateFormat("dd MMMM", Locale.UK);
 	private static final int SECOND_MILLIS = 1000;
@@ -40,6 +35,11 @@ public class ZZZUtility {
 	private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
 	private static final long DAY_MILLIS = 24 * HOUR_MILLIS;
 	private static final long YEAR_MILLIS = 365 * DAY_MILLIS;
+
+	public static String convertStreamToString(InputStream is) {
+		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
+	}
 
 	public static String formatDynamicDate(Timestamp timestamp){
 
@@ -128,7 +128,6 @@ public class ZZZUtility {
 		return oldList;
 	}
 
-
 	public static <T> Boolean addItemToList(List<T> oldList, T newItem){
 		for (T testItem : oldList)
 			if (testItem.equals(newItem))
@@ -162,6 +161,22 @@ public class ZZZUtility {
 		return new LightingColorFilter(0xFFFFFFFF -c, c);
 	}
 
-	public static final ColorFilter greyOut = screen(Color.LTGRAY);
+	public static String formatURL(String in){
+		return in.replaceAll("%", 	"%25")
+				 .replaceAll(" ", 	"%20")
+				 .replaceAll("\"", 	"%22")
+				 .replaceAll("-", 	"%2D")
+				 .replaceAll("\\.", "%2E")
+				 .replaceAll("<", 	"%3C")
+				 .replaceAll(">", 	"%3E")
+				 .replaceAll("\\\\","%5C")
+				 .replaceAll("\\^", "%5E")
+				 .replaceAll("_", 	"%5F")
+				 .replaceAll("`", 	"%60")
+				 .replaceAll("\\{", "%7B")
+				 .replaceAll("\\|", "%7C")
+				 .replaceAll("\\}", "%7D")
+				 .replaceAll("~", 	"%7E");
+	}
 
 }

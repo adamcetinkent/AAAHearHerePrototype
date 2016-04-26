@@ -1,6 +1,7 @@
 package com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
@@ -10,52 +11,52 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * Created by Adam Kent on 08/02/2016.
  *
  * Asynchronously performs API request from Spotify.
- * Response is returned to processFinish function of specified SpotifyAPIRequestCallback.
+ * Response is returned to processFinish function of specified Callback.
  */
 @SuppressWarnings("unused")
-public class SpotifyAPIRequest extends AsyncTask<String, Void, SpotifyAPIResponse> {
-	private static final String TAG = "SpotifyAPIRequest";
+public class SpotifyAPIRequestSearch extends AsyncTask<Void, Void, SpotifyAPIResponse> {
+	private static final String TAG = "SpotifyAPIRequestSearch";
 
 	// Interface for classes wanting to incorporate this class to make Spotify API Requests
-	public interface SpotifyAPIRequestCallback {
+	public interface Callback {
 		void returnSpotifySearchResults(SpotifyAPIResponse output);
 	}
 
-	private static final String urlSpotifySearch = "https://api.spotify.com/v1/search?q=";
-	private static final String urlSpotifyType = "&type=";
+	private static final String URL_TEMPLATE = "https://api.spotify.com/v1/search?q=%1$s&type=%2$s&offset=%3$d";
+	public static final String SEARCH_TYPE_TRACK = "track";
+	public static final String SEARCH_TYPE_ARTIST = "artist";
+	public static final String SEARCH_TYPE_ALBUM = "album";
 
-	private final SpotifyAPIRequestCallback callbackTo;
+	private final Callback callbackTo;
+	private final String query;
 	private final String searchType;
+	private final int offset;
 
-	public SpotifyAPIRequest(SpotifyAPIRequestCallback callbackTo, String searchType){
+	public SpotifyAPIRequestSearch(String query, String searchType, int offset, Callback callbackTo){
+		this.query = query;
 		this.callbackTo = callbackTo;
 		this.searchType = searchType;
-	}
-
-	// Construct Spotify API URL from input string
-	private static URL makeSpotifyQuery(String query, String type){
-		try {
-			return new URL(urlSpotifySearch + query.replace(" ","%20") + urlSpotifyType + type);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return null;
+		this.offset = offset;
 	}
 
 	@Override
 	// The actual process which makes the HTTP request
-	protected SpotifyAPIResponse doInBackground(String... strings) {
+	protected SpotifyAPIResponse doInBackground(Void... params) {
+		String urlString = String.format(Locale.ENGLISH,
+										 URL_TEMPLATE,
+										 ZZZUtility.formatURL(query),
+										 searchType,
+										 offset);
+		Log.d(TAG, "Searching Spotify: "+urlString);
 		try {
-			URL url = makeSpotifyQuery(strings[0], this.searchType);
-			if (url == null)
-				return null;
+			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

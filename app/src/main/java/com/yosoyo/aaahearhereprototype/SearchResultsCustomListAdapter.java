@@ -27,7 +27,7 @@ class SearchResultsCustomListAdapter extends ArrayAdapter<String>{
 	private final String[] descriptions;	// Displayed in artistDesc TextView
 
 	public SearchResultsCustomListAdapter(Activity context, String[] ids, String[] titles, String[] images, String[] descriptions){
-		super(context, R.layout.list_row_track, titles);
+		super(context, R.layout.list_row_spotify_search_results, titles);
 
 		this.context = context;
 		this.ids = ids;
@@ -48,15 +48,15 @@ class SearchResultsCustomListAdapter extends ArrayAdapter<String>{
 
 		if (convertView == null) {
 			LayoutInflater inflater = context.getLayoutInflater();
-			convertView = inflater.inflate(R.layout.list_row_track, parent, false);
+			convertView = inflater.inflate(R.layout.list_row_spotify_search_results, parent, false);
 
 			viewHolder = new ViewHolder();
 
 			viewHolder.position = position;
 
-			viewHolder.txtArtistName = (TextView) convertView.findViewById(R.id.list_row_track_artist_name);
-			viewHolder.txtArtistDesc = (TextView) convertView.findViewById(R.id.list_row_track_artist_desc);
-			viewHolder.imgArtwork = (ImageView) convertView.findViewById(R.id.list_row_track_artwork);
+			viewHolder.txtArtistName = (TextView) convertView.findViewById(R.id.list_row_spotify_search_results_txtName);
+			viewHolder.txtArtistDesc = (TextView) convertView.findViewById(R.id.list_row_spotify_search_results_txtDesc);
+			viewHolder.imgArtwork = (ImageView) convertView.findViewById(R.id.list_row_spotify_search_results_imgArtwork);
 
 			convertView.setTag(viewHolder);
 
