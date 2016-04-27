@@ -58,6 +58,7 @@ class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Token token="+HHUser.getAuthorisationToken());
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);

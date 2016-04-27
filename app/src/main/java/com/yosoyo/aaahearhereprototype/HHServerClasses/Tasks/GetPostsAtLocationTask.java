@@ -34,11 +34,13 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 
 	private final Location location;
 	private final long userID;
+	private final String authToken;
 	private final Callback callbackTo;
 
-	public GetPostsAtLocationTask(Location location, long userID, Callback callbackTo) {
+	public GetPostsAtLocationTask(Location location, long userID, String authToken, Callback callbackTo) {
 		this.location = location;
 		this.userID = userID;
+		this.authToken = authToken;
 		this.callbackTo = callbackTo;
 	}
 
@@ -53,6 +55,7 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);

@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
@@ -66,10 +67,11 @@ public class AsyncDataManager {
 			accessToken,
 			new AuthenticateUserFacebookTask.Callback() {
 				@Override
-				public void returnAuthenticationResult(Integer result, HHUserFullProcess returnedUser) {
+				public void returnAuthenticationResult(Integer result, HHUserFullProcess returnedUser, String HHAuthToken) {
 					if (result == HttpURLConnection.HTTP_OK) {
 						// USER ALREADY REGISTERED :: SIGN IN
 						HHUser.setCurrentUser(returnedUser);
+						HHUser.setAuthorisationToken(HHAuthToken);
 						DatabaseHelper.processCurrentUser(
 							context,
 							returnedUser,
@@ -320,8 +322,13 @@ public class AsyncDataManager {
 	 * @param location	: {@link Location} to look for posts
 	 * @param callback	: results returned via callback
 	 */
-	public static void getPostsAtLocation(Location location, final GetPostsAtLocationCallback callback){
-		getPostsAtLocation(context, location, HHUser.getCurrentUserID(), callback);
+	public static void getPostsAtLocation(final Location location,
+										  final GetPostsAtLocationCallback callback){
+		getPostsAtLocation(context,
+						   location,
+						   HHUser.getCurrentUserID(),
+						   HHUser.getAuthorisationToken(),
+						   callback);
 	}
 
 	/**
@@ -331,8 +338,11 @@ public class AsyncDataManager {
 	 * @param userID	: ID of user requesting posts
 	 * @param callback	: results returned via callback
 	 */
-	public static void getPostsAtLocation(Location location, final long userID, final GetPostsAtLocationCallback callback) {
-		getPostsAtLocation(context, location, userID, callback);
+	public static void getPostsAtLocation(final Location location,
+										  final long userID,
+										  final String authToken,
+										  final GetPostsAtLocationCallback callback) {
+		getPostsAtLocation(context, location, userID, authToken, callback);
 	}
 
 	/**
@@ -341,16 +351,98 @@ public class AsyncDataManager {
 	 * @param context	: {@link Context} for database request
 	 * @param location	: {@link Location} to look for posts
 	 * @param userID	: ID of user requesting posts
+	 * @param authToken : authentication token for Hear Here API
 	 * @param callback	: results returned via callback
 	 */
-	public static void getPostsAtLocation(Context context, Location location, final long userID, final GetPostsAtLocationCallback callback){
+	public static void getPostsAtLocation(final Context context,
+										  final Location location,
+										  final long userID,
+										  final String authToken,
+										  final GetPostsAtLocationCallback callback){
 		WebHelper.getPostsAtLocation(
 			location,
 			userID,
+			authToken,
 			new WebHelper.GetPostsAtLocationCallback() {
 				@Override
 				public void returnGetPostsAtLocation(List<HHPostFull> webPosts) {
 					callback.returnPostsAtLocation(webPosts);
+				}
+			});
+	}
+
+	// GET POSTS WITHIN BOUNDS
+
+	/**
+	 * Fetch posts visible to current user within given bounds
+	 * @param bounds    	: {@link LatLngBounds} within which to look for posts
+	 * @param process		: if true, add the posts to the database
+	 * @param excludeIDs	: IDs of posts not to be returned
+	 * @param callback  	: results returned via callback
+	 */
+	public static void getPostsWithinBounds(final LatLngBounds bounds,
+											final boolean process,
+											final Long[] excludeIDs,
+											final GetAllPostsCallback callback){
+		getPostsWithinBounds(context, bounds, HHUser.getCurrentUserID(), excludeIDs, process, callback);
+	}
+
+	/**
+	 * Fetch posts visible to user within given bounds
+	 *
+	 * @param bounds		: {@link LatLngBounds} within which to look for posts
+	 * @param userID		: ID of user requesting posts
+	 * @param excludeIDs	: IDs of posts not to be returned
+	 * @param process		: if true, add the posts to the database
+	 * @param callback		: results returned via callback
+	 */
+	public static void getPostsWithinBounds(final LatLngBounds bounds,
+											final long userID,
+											final Long[] excludeIDs,
+											final boolean process,
+											final GetAllPostsCallback callback) {
+		getPostsWithinBounds(context, bounds, userID, excludeIDs, process, callback);
+	}
+
+	/**
+	 * Fetch posts visible to user within given bounds
+	 *
+	 * @param context		: {@link Context} for database request
+	 * @param bounds		: {@link LatLngBounds} within which to look for posts
+	 * @param userID		: ID of user requesting posts
+	 * @param excludeIDs	: IDs of posts not to be returned
+	 * @param process		: if true, add the posts to the database
+	 * @param callback		: results returned via callback
+	 */
+	public static void getPostsWithinBounds(final Context context,
+										  	final LatLngBounds bounds,
+										  	final long userID,
+											final Long[] excludeIDs,
+											final boolean process,
+										  	final GetAllPostsCallback callback){
+		WebHelper.getPostsWithinBounds(
+			bounds,
+			userID,
+			excludeIDs,
+			new WebHelper.GetAllPostsCallback() {
+				@Override
+				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
+					if (webPostsToProcess != null) {
+						if (process)
+							DatabaseHelper.processWebPosts(context, webPostsToProcess, callback);
+						else {
+							List<HHPostFull> posts = new ArrayList<>();
+							for (HHPostFullProcess processPost : webPostsToProcess){
+								posts.add(new HHPostFull(processPost));
+							}
+							callback.returnPostList(posts);
+						}
+					}
+				}
+
+				@Override
+				public void warnNoEarlierPosts() {
+					callback.warnNoEarlierPosts();
 				}
 			});
 	}

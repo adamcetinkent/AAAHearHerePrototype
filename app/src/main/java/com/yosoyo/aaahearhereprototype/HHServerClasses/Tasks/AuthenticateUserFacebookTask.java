@@ -27,12 +27,13 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/auth/";
 
 	public interface Callback {
-		void returnAuthenticationResult(Integer result, HHUserFullProcess user);
+		void returnAuthenticationResult(Integer result, HHUserFullProcess user, String HHAuthToken);
 	}
 
 	private final Callback callbackTo;
 	private final AccessToken accessToken;
 	private HHUserFullProcess user;
+	private String HHAuthToken;
 
 	public AuthenticateUserFacebookTask(AccessToken accessToken, Callback callbackTo) {
 		this.callbackTo = callbackTo;
@@ -68,6 +69,7 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 
 					Log.d(TAG, httpResponseStream);
 					user = new HHUserFullProcess(new Gson().fromJson(httpResponseStream, HHUserFullNested.class));
+					HHAuthToken = urlConnection.getHeaderField("Authorization");
 					return httpResult;
 
 				} else if (httpResult == HttpURLConnection.HTTP_ACCEPTED) {
@@ -92,7 +94,7 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Integer result) {
-		callbackTo.returnAuthenticationResult(result, user);	// sends results back
+		callbackTo.returnAuthenticationResult(result, user, HHAuthToken);	// sends results back
 	}
 
 }

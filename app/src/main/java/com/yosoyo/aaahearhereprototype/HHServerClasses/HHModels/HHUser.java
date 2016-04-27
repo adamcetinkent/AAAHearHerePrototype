@@ -143,6 +143,7 @@ public class HHUser extends HHBase implements Parcelable {
 
 	private static HHUserFull currentUser;
 	private static long currentUserUpdated;
+	private static String authorisationToken;
 	public static HHUserFull getCurrentUser(){
 		return currentUser;
 	}
@@ -155,6 +156,12 @@ public class HHUser extends HHBase implements Parcelable {
 	}
 	public static long getCurrentUserUpdated(){
 		return currentUserUpdated;
+	}
+	public static void setAuthorisationToken(String authorisationToken){
+		HHUser.authorisationToken = authorisationToken;
+	}
+	public static String getAuthorisationToken(){
+		return HHUser.authorisationToken;
 	}
 
 	private static Bitmap profilePicture;

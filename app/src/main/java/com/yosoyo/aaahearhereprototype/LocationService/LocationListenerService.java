@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
@@ -33,8 +34,10 @@ public class LocationListenerService extends Service implements HHLocationListen
 	private static final float LOCATION_DISTANCE = 10f;
 	public static final String LOCATION_UPDATE = "locationUpdate";
 	private static final int NOTIFICATION_ID = 17441503;
-	private static long userID;
-	public static final String USER_ID = "userID";
+	private long userID;
+	private String authToken;
+	public static final String USER_ID = TAG+"userID";
+	public static final String AUTH_TOKEN = TAG+"authToken";
 
 	@Override
 	public void returnNewLocation(final Location location) {
@@ -50,6 +53,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 			this,
 			location,
 			userID,
+			authToken,
 			new AsyncDataManager.GetPostsAtLocationCallback() {
 				@Override
 				public void returnPostsAtLocation(List<HHPostFull> returnedPosts) {
@@ -109,6 +113,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 										notification = new Notification.Builder(
 											getApplicationContext())
 											.setSmallIcon(R.mipmap.ic_launcher)
+											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
 											.setContentTitle(getString(R.string.app_name))
 											.setContentText(notificationText)
 											.setAutoCancel(true)
@@ -121,6 +126,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 										notification = new Notification.Builder(
 											getApplicationContext())
 											.setSmallIcon(R.mipmap.ic_launcher)
+											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
 											.setContentTitle(getString(R.string.app_name))
 											.setContentText(notificationText)
 											.setAutoCancel(true)
@@ -161,6 +167,9 @@ public class LocationListenerService extends Service implements HHLocationListen
 		if (intent != null) {
 			if (intent.hasExtra(USER_ID)) {
 				userID = intent.getLongExtra(USER_ID, -1);
+			}
+			if (intent.hasExtra(AUTH_TOKEN)){
+				authToken = intent.getStringExtra(AUTH_TOKEN);
 			}
 		}
 		Log.d(TAG, "userID: "+userID);

@@ -33,6 +33,9 @@ public class HHPostFullNested extends HHPost {
 	}
 
 	public List<HHCommentUser> getCommentsList(){
+		if (comments == null){
+			return new ArrayList<>();
+		}
 		List<HHCommentUser> commentUsers = new ArrayList<>(comments.length);
 		for (HHCommentUserNested commentNested : comments){
 			HHCommentUser commentUser = new HHCommentUser(commentNested);
@@ -42,6 +45,9 @@ public class HHPostFullNested extends HHPost {
 	}
 
 	public List<HHLikeUser> getLikesList(){
+		if (likes == null){
+			return new ArrayList<>();
+		}
 		List<HHLikeUser> likeUsers = new ArrayList<>(likes.length);
 		for (HHLikeUserNested likeUserNested : likes){
 			HHLikeUser likeUser = new HHLikeUser(likeUserNested);
@@ -51,6 +57,9 @@ public class HHPostFullNested extends HHPost {
 	}
 
 	public List<HHTagUser> getTagsList(){
+		if (tags == null){
+			return new ArrayList<>();
+		}
 		List<HHTagUser> tagUsers = new ArrayList<>(tags.length);
 		for (HHTagUserNested tagUserNested : tags){
 			HHTagUser tagUser = new HHTagUser(tagUserNested);

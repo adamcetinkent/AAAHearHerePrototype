@@ -243,24 +243,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			.addApi(Places.GEO_DATA_API)
 			.build();
 
-		if (HHUser.getCurrentUser() != null) {
-			if (!isServiceRunning(LocationListenerService.class)) {
-				Intent serviceIntent = new Intent(this, LocationListenerService.class);
-				serviceIntent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
-				startService(serviceIntent);
-			}
-		}
 
-	}
+		startLocationListenerService();
 
-	private boolean isServiceRunning(Class<?> serviceClass){
-		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)){
-			if (serviceClass.getName().equals(serviceInfo.service.getClassName())){
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -565,11 +550,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	public void onLoginSuccess(){
 
-		if (!isServiceRunning(LocationListenerService.class)) {
-			Intent intent = new Intent(this, LocationListenerService.class);
-			intent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
-			startService(intent);
-		}
+		startLocationListenerService();
 
 		WebHelper.getFacebookProfilePicture(
 			Profile.getCurrentProfile().getId(),
@@ -626,4 +607,29 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 		}
 	}
+
+	private void startLocationListenerService(){
+		if (HHUser.getCurrentUser() != null
+				&& HHUser.getAuthorisationToken() != null
+				&& !HHUser.getAuthorisationToken().isEmpty()
+				&& !isServiceRunning(LocationListenerService.class)) {
+			Intent serviceIntent = new Intent(this, LocationListenerService.class);
+			serviceIntent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
+			serviceIntent
+				.putExtra(LocationListenerService.AUTH_TOKEN, HHUser.getAuthorisationToken());
+			startService(serviceIntent);
+
+		}
+	}
+
+	private boolean isServiceRunning(Class<?> serviceClass){
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)){
+			if (serviceClass.getName().equals(serviceInfo.service.getClassName())){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

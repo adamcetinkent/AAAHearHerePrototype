@@ -37,6 +37,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
@@ -57,7 +58,10 @@ import com.yosoyo.aaahearhereprototype.ZZZUtility;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,6 +140,9 @@ public class MapViewFragment
 	private Timestamp requestedWebPost;
 	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
 	private boolean haveEarliestPost = false;
+
+	private boolean alreadyFetchingPosts = false;
+	private Set<Long> currentPostIDs = new HashSet<>();
 
 	public MapViewFragment() {
 		//required empty public constructor
@@ -531,6 +538,65 @@ public class MapViewFragment
 					needToOpenInfoWindow = false;
 					updateUIWidgets();
 				}
+				if (!alreadyFetchingPosts) {
+					alreadyFetchingPosts = true;
+					LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+					if (mapType == GENERAL_MAP) {
+						AsyncDataManager.getPostsWithinBounds(
+							latLngBounds,
+							true,
+							currentPostIDs.toArray(new Long[currentPostIDs.size()]),
+							new AsyncDataManager.GetAllPostsCallback() {
+								@Override
+								public void returnGetPost(HHPostFull post) {
+									if (ZZZUtility.addItemToList(posts, post)) {
+										Collections.sort(posts);
+										currentPostIDs.add(post.getPost().getID());
+										addMapMarker(post, false);
+										fetchData = false;
+										updateUIWidgets();
+									}
+									alreadyFetchingPosts = false;
+								}
+
+								@Override
+								public void returnPostList(List<HHPostFull> posts) {
+									MapViewFragment.this.posts = ZZZUtility.mergeLists(MapViewFragment.this.posts, posts);
+									Collections.sort(posts);
+									for (HHPostFull post : MapViewFragment.this.posts){
+										currentPostIDs.add(post.getPost().getID());
+										if (posts.contains(post)){
+											addMapMarker(post, false);
+										}
+									}
+									fetchData = false;
+									updateUIWidgets();
+									alreadyFetchingPosts = false;
+								}
+
+								@Override
+								public void warnNoEarlierPosts() {
+									alreadyFetchingPosts = false;
+								}
+							});
+					} else if (mapType == USER_MAP) {
+					/*AsyncDataManager.getUserPostsWithinBounds(
+						latLngBounds,
+						new AsyncDataManager.GetAllPostsCallback() {
+							@Override
+							public void returnGetPost(HHPostFull post) {
+							}
+
+							@Override
+							public void returnPostList(List<HHPostFull> posts) {
+							}
+
+							@Override
+							public void warnNoEarlierPosts() {
+							}
+						});*/
+					}
+				}
 
 				if (MapViewFragment.this.shiftedCameraPosition == null)
 					return;
@@ -544,32 +610,40 @@ public class MapViewFragment
 		});
 
 		if (fetchData) {
-			AsyncDataManager.getAllPosts(
-				null,
-				new AsyncDataManager.GetAllPostsCallback() {
-					@Override
-					public void returnPostList(List<HHPostFull> posts) {
-						MapViewFragment.this.posts = ZZZUtility.mergeLists(
-							MapViewFragment.this.posts, posts);
-						addMapMarkers();
-						fetchData = false;
-						updateUIWidgets();
-					}
+			if (!alreadyFetchingPosts) {
+				alreadyFetchingPosts = true;
+				if (mapType == GENERAL_MAP) {
+					AsyncDataManager.getAllPosts(
+						null,
+						new AsyncDataManager.GetAllPostsCallback() {
+							@Override
+							public void returnPostList(List<HHPostFull> posts) {
+								MapViewFragment.this.posts = ZZZUtility.mergeLists(MapViewFragment.this.posts, posts);
+								Collections.sort(posts);
+								addMapMarkers();
+								fetchData = false;
+								updateUIWidgets();
+							}
 
-					@Override
-					public void returnGetPost(HHPostFull post) {
-						if (ZZZUtility.addItemToList(posts, post)) {
-							addMapMarker(post, true);
-							fetchData = false;
-							updateUIWidgets();
-						}
-					}
+							@Override
+							public void returnGetPost(HHPostFull post) {
+								if (ZZZUtility.addItemToList(posts, post)) {
+									Collections.sort(posts);
+									currentPostIDs.add(post.getPost().getID());
+									addMapMarker(post, true);
+									fetchData = false;
+									updateUIWidgets();
+									alreadyFetchingPosts = false;
+								}
+							}
 
-					@Override
-					public void warnNoEarlierPosts() {
-						//TODO
-					}
-				});
+							@Override
+							public void warnNoEarlierPosts() {
+								//TODO
+							}
+						});
+				}
+			}
 		} else {
 			addMapMarkers();
 			if (needToOpenInfoWindow && currentMarker != null){

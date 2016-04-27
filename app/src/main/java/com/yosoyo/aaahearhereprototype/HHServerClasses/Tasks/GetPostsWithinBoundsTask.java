@@ -3,6 +3,7 @@ package com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -15,7 +16,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,45 +23,43 @@ import java.util.Locale;
 /**
  * Created by adam on 18/02/16.
  *
- * Requests the posts from the server by the given user before the given time
+ * Requests the posts from the server that fall within the given bounds
  */
-class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
-	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/";
-	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s";
+class GetPostsWithinBoundsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
+	private static final String TAG = "GetPostsWithinBounds";
+	//private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/within/%2$.6f/%3$.6f/%4$.6f/%5$.6f";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/within/%2$.6f/%3$.6f/%4$.6f/%5$.6f/%6$s";
 
 	public interface Callback {
-		void returnPosts(List<HHPostFullProcess> postsToProcess);
+		void returnPostsWithinBounds(List<HHPostFullProcess> posts);
 	}
 
+	private final LatLngBounds bounds;
 	private final long userID;
-	private final Timestamp beforeTime;
+	private final Long[] excludeIDs;
 	private final Callback callbackTo;
 
-	public GetPostsUserTask(final long userID,
-							final Timestamp beforeTime,
-							final Callback callbackTo) {
+	public GetPostsWithinBoundsTask(final LatLngBounds bounds,
+									final long userID,
+									final Long[] excludeIDs,
+									final Callback callbackTo) {
+		this.bounds = bounds;
 		this.userID = userID;
+		this.excludeIDs = excludeIDs;
 		this.callbackTo = callbackTo;
-		this.beforeTime = beforeTime;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		String urlString;
-		if (beforeTime != null) {
-			urlString = String.format(Locale.ENGLISH,
-									  VM_SERVER_ADDRESS_BEFORE,
-									  userID,
-									  HHUser.getCurrentUserID(),
-									  beforeTime.toString());
-			urlString = urlString.replace(" ", "%20");
-		} else {
-			urlString = String.format(Locale.ENGLISH,
-									  VM_SERVER_ADDRESS,
-									  userID,
-									  HHUser.getCurrentUserID());
-		}
+		urlString = String.format(Locale.ENGLISH,
+								  VM_SERVER_ADDRESS,
+								  userID,
+								  bounds.southwest.latitude,
+								  bounds.northeast.latitude,
+								  bounds.southwest.longitude,
+								  bounds.northeast.longitude,
+								  ZZZUtility.formatURL(excludeIDs));
 		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {
 			URL url = new URL(urlString);
@@ -70,12 +68,12 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				HHPostFullNested[] postsNested = new Gson().fromJson(streamString, HHPostFullNested[].class);
-				List<HHPostFullProcess> posts = new ArrayList<>(postsNested.length);
-				for (HHPostFullNested postNested : postsNested) {
-					posts.add(new HHPostFullProcess(postNested));
+				HHPostFullNested[] posts = new Gson().fromJson(streamString,HHPostFullNested[].class);
+				List<HHPostFullProcess> postsFull = new ArrayList<>();
+				for (HHPostFullNested post : posts){
+					postsFull.add(new HHPostFullProcess(post));
 				}
-				return posts;
+				return postsFull;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -90,7 +88,7 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(List<HHPostFullProcess> result) {
-		callbackTo.returnPosts(result);	// sends results back
+		callbackTo.returnPostsWithinBounds(result);	// sends results back
 	}
 
 }

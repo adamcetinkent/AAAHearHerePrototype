@@ -179,4 +179,14 @@ public class ZZZUtility {
 				 .replaceAll("~", 	"%7E");
 	}
 
+	public static String formatURL(Long[] longs){
+		if (longs.length == 0)
+			return "";
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < longs.length; i++){
+			sb.append(longs[i]).append(",");
+		}
+		return sb.substring(0, sb.length()-1);
+	}
+
 }

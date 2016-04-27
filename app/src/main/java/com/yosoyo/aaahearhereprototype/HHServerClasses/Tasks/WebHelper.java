@@ -8,6 +8,7 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
@@ -65,9 +66,11 @@ public class WebHelper {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 				callback.returnGetAllPosts(postsToProcess);
-				preLoadPostProcessBitmaps(postsToProcess);
-				if (postsToProcess.size() <= 0)
-					callback.warnNoEarlierPosts();
+				if (postsToProcess != null) {
+					preLoadPostProcessBitmaps(postsToProcess);
+					if (postsToProcess.size() <= 0)
+						callback.warnNoEarlierPosts();
+				}
 			}
 		}).execute();
 	}
@@ -82,9 +85,11 @@ public class WebHelper {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
 					callback.returnGetAllPosts(postsToProcess);
-					preLoadPostProcessBitmaps(postsToProcess);
-					if (postsToProcess.size() <= 0)
-						callback.warnNoEarlierPosts();
+					if (postsToProcess != null) {
+						preLoadPostProcessBitmaps(postsToProcess);
+						if (postsToProcess.size() <= 0)
+							callback.warnNoEarlierPosts();
+					}
 				}
 			}).execute();
 	}
@@ -160,11 +165,40 @@ public class WebHelper {
 		void returnGetPostsAtLocation(List<HHPostFull> posts);
 	}
 
-	public static void getPostsAtLocation(Location location, long userID, final GetPostsAtLocationCallback callback){
-		new GetPostsAtLocationTask(location, userID, new GetPostsAtLocationTask.Callback(){
+	public static void getPostsAtLocation(final Location location,
+										  final long userID,
+										  final String authToken,
+										  final GetPostsAtLocationCallback callback){
+		new GetPostsAtLocationTask(location, userID, authToken, new GetPostsAtLocationTask.Callback(){
 			@Override
 			public void returnPostsAtLocation(List<HHPostFull> posts){
 				callback.returnGetPostsAtLocation(posts);
+			}
+		}).execute();
+	}
+
+	/*public interface GetPostsWithinBoundsCallback {
+		void returnGetPostsWithinBounds(List<HHPostFull> posts);
+	}*/
+
+	public static void getPostsWithinBounds(final LatLngBounds bounds,
+											final long userID,
+											final Long[] excludeIDs,
+											final GetAllPostsCallback callback){
+		new GetPostsWithinBoundsTask(bounds,
+									 userID,
+									 excludeIDs,
+									 new GetPostsWithinBoundsTask.Callback(){
+			@Override
+			public void returnPostsWithinBounds(List<HHPostFullProcess> postsToProcess){
+				callback.returnGetAllPosts(postsToProcess);
+				if (postsToProcess != null) {
+					preLoadPostProcessBitmaps(postsToProcess);
+					if (postsToProcess.size() <= 0)
+						callback.warnNoEarlierPosts();
+				} else {
+					callback.warnNoEarlierPosts();
+				}
 			}
 		}).execute();
 	}
@@ -454,9 +488,11 @@ public class WebHelper {
 	}
 
 	private static void preLoadPostProcessBitmaps(HHPostFullProcess post, boolean shortcut){
-		if (shortcut || checkWifi()){
-			getFacebookProfilePicture(post.getUser().getFBUserID(), null);
-			getSpotifyAlbumArt(post.getTrack(), null);
+		if ((shortcut || checkWifi()) && post != null){
+			if (post.getUser() != null)
+				getFacebookProfilePicture(post.getUser().getFBUserID(), null);
+			if (post.getTrack() != null)
+				getSpotifyAlbumArt(post.getTrack(), null);
 		}
 	}
 
