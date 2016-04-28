@@ -6,7 +6,7 @@
               android:paddingTop="5dp"
               android:paddingBottom="5dp"
               android:gravity="center_vertical"
-              android:background="#fff4f4f4"
+              android:background="@color/adam_theme_black"
     >
 
     <FrameLayout
@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/like_full"
             android:contentDescription="@string/contentDescription_number_of_likes"
-            />
+            android:tint="@color/adam_theme_base"/>
 
         <TextView
             android:id="@+id/list_row_comment_like_txtNumber"
@@ -32,7 +32,7 @@
             android:layout_gravity="center"
             android:text="@string/placholder_num_likes"
             android:textSize="8sp"
-            android:textColor="@android:color/white"/>
+            android:textColor="@color/adam_theme_black"/>
 
     </FrameLayout>
 
@@ -49,7 +49,7 @@
             android:layout_weight="1"
             android:layout_marginRight="10dp"
             android:text="@string/placeholder_likers"
-            />
+            android:textColor="@color/adam_theme_lightest"/>
 
     </LinearLayout>
 

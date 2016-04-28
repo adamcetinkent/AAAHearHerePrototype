@@ -1,8 +1,10 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -121,6 +123,7 @@ public class FriendsListFragment extends FeedbackFragment {
 		};
 
 		adapter = new FriendsListAdapter(
+			getActivity(),
 			currentUser,
 			adapterCallback);
 		lstFriends.setAdapter(adapter);
@@ -129,6 +132,7 @@ public class FriendsListFragment extends FeedbackFragment {
 	}
 
 	static class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.ViewHolder> {
+		private final Context context;
 		private static HHUserFull user;
 		private final AdapterCallback adapterCallback;
 
@@ -183,10 +187,12 @@ public class FriendsListFragment extends FeedbackFragment {
 			public final OnClickFollowRequestListener btnUnfollowOnClickListener;
 			public final OnClickUserListener onClickUserListener;
 			public int position;
+			private final Context context;
 			//private final AdapterCallback adapterCallback;
 
-			public ViewHolder(View view, final AdapterCallback adapterCallback){
+			public ViewHolder(final Context context, View view, final AdapterCallback adapterCallback){
 				super(view);
+				this.context = context;
 				//this.adapterCallback = adapterCallback;
 				txtUserName = (TextView) view.findViewById(R.id.rv_row_friendship_txtUserName);
 				imgProfile = (ImageView) view.findViewById(R.id.rv_row_friendship_imgProfile);
@@ -271,7 +277,8 @@ public class FriendsListFragment extends FeedbackFragment {
 			}
 		}
 
-		public FriendsListAdapter(final HHUserFull user, AdapterCallback adapterCallback){
+		public FriendsListAdapter(final Context context, final HHUserFull user, AdapterCallback adapterCallback){
+			this.context = context;
 			FriendsListAdapter.user = user;
 			this.adapterCallback = adapterCallback;
 
@@ -301,7 +308,7 @@ public class FriendsListFragment extends FeedbackFragment {
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View view = LayoutInflater.from(parent.getContext())
 									  .inflate(R.layout.rv_row_friend, parent, false);
-			ViewHolder viewHolder = new ViewHolder(view, adapterCallback);
+			ViewHolder viewHolder = new ViewHolder(context, view, adapterCallback);
 
 			return viewHolder;
 		}
@@ -331,7 +338,7 @@ public class FriendsListFragment extends FeedbackFragment {
 			}
 
 			if (friendIsRequested){
-				holder.btnFollow.setColorFilter(ZZZUtility.greyOut);
+				holder.btnFollow.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(context, R.color.adam_theme_darkest)));
 				holder.btnFollow.setEnabled(false);
 			}
 

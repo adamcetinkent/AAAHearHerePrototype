@@ -4,7 +4,7 @@
                                    android:layout_width="match_parent"
                                    android:layout_height="match_parent"
                                    android:orientation="vertical"
-                                   android:background="#ffffffff">
+                                   android:background="@color/adam_theme_black">
 
     <LinearLayout
         android:id="@+id/fragment_profile_llProfile"
@@ -43,7 +43,7 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/frame_white"
                     android:contentDescription="@string/contentDescription_user_profile_picture_frame"
-                    />
+                    android:tint="@color/adam_theme_black"/>
             </FrameLayout>
 
             <FrameLayout
@@ -65,7 +65,7 @@
                     android:src="@drawable/minus_button"
                     android:visibility="gone"
                     android:contentDescription="@string/contentDescription_unfollow_user_button"
-                    />
+                    android:tint="@color/adam_theme_dark"/>
 
                 <ProgressBar
                     android:id="@+id/fragment_profile_btnUnfollow_progress"
@@ -82,7 +82,7 @@
                     android:src="@drawable/add_user_full"
                     android:visibility="gone"
                     android:contentDescription="@string/contentDescription_send_follow_request_button"
-                    />
+                    android:tint="@color/adam_theme_base"/>
 
                 <ProgressBar
                     android:id="@+id/fragment_profile_btnFollow_progress"
@@ -113,7 +113,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/cross_button"
-                        android:contentDescription="@string/contentDescription_delete_follow_request_button"/>
+                        android:contentDescription="@string/contentDescription_delete_follow_request_button"
+                        android:tint="@color/adam_theme_dark"/>
 
                     <ProgressBar
                         android:id="@+id/fragment_profile_btnDelete_progress"
@@ -133,7 +134,8 @@
                         android:layout_height="match_parent"
                         android:layout_width="match_parent"
                         android:src="@drawable/tick_button"
-                        android:contentDescription="@string/contentDescription_accept_follow_request_button"/>
+                        android:contentDescription="@string/contentDescription_accept_follow_request_button"
+                        android:tint="@color/adam_theme_base"/>
 
                     <ProgressBar
                         android:id="@+id/fragment_profile_btnAccept_progress"
@@ -167,7 +169,8 @@
                     android:layout_height="30dp"
                     android:src="@drawable/follow_none"
                     android:layout_gravity="center_vertical"
-                    android:contentDescription="@string/contentDescription_user_follow_status"/>
+                    android:contentDescription="@string/contentDescription_user_follow_status"
+                    android:tint="@color/adam_theme_base"/>
 
                 <LinearLayout
                     android:id="@+id/fragment_profile_llPostsCount"
@@ -188,7 +191,8 @@
                             android:layout_height="wrap_content"
                             android:text="@string/placeholder_100"
                             android:textSize="25sp"
-                            android:visibility="invisible"/>
+                            android:visibility="invisible"
+                            android:textColor="@color/adam_theme_light"/>
 
                         <ProgressBar
                             android:id="@+id/fragment_profile_txtPostsCount_progress"
@@ -204,7 +208,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/title_posts"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:textColor="@color/adam_theme_grey"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -226,7 +231,8 @@
                             android:layout_height="wrap_content"
                             android:text="@string/placeholder_100"
                             android:textSize="25sp"
-                            android:visibility="invisible"/>
+                            android:visibility="invisible"
+                            android:textColor="@color/adam_theme_light"/>
 
                         <ProgressBar
                             android:id="@+id/fragment_profile_txtFollowsInCount_progress"
@@ -242,7 +248,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/title_followers"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:textColor="@color/adam_theme_grey"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -264,7 +271,8 @@
                             android:layout_height="wrap_content"
                             android:text="@string/placeholder_100"
                             android:textSize="25sp"
-                            android:visibility="invisible"/>
+                            android:visibility="invisible"
+                            android:textColor="@color/adam_theme_light"/>
 
                         <ProgressBar
                             android:id="@+id/fragment_profile_txtFollowsOutCount_progress"
@@ -280,7 +288,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/title_following"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:textColor="@color/adam_theme_grey"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -291,7 +300,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="5dp"
-                android:text="@string/placeholder_user_name"/>
+                android:text="@string/placeholder_user_name"
+                android:textColor="@color/adam_theme_base"/>
 
             <LinearLayout
                 android:orientation="vertical"
@@ -305,7 +315,7 @@
                     android:text="@string/placeholder_140_chars"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"
-                    />
+                    android:textColor="@color/adam_theme_grey"/>
 
                 <TextView
                     android:id="@+id/fragment_profile_txtURL"
@@ -317,7 +327,8 @@
                     android:clickable="true"
                     android:autoLink="web"
                     android:linksClickable="true"
-                    android:lines="1"/>
+                    android:lines="1"
+                    android:textColor="@color/adam_theme_light"/>
 
             </LinearLayout>
 
@@ -325,17 +336,20 @@
                 android:id="@+id/fragment_profile_llPrivacy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:orientation="horizontal">
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/lock"
-                    android:contentDescription="@string/contentDescription_private_profile"/>
+                    android:contentDescription="@string/contentDescription_private_profile"
+                    android:tint="@color/adam_theme_base"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/private_profile_warning"/>
+                    android:text="@string/private_profile_warning"
+                    android:textColor="@color/adam_theme_lightest"
+                    android:layout_marginBottom="5dp"/>
 
             </LinearLayout>
 
@@ -347,7 +361,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#fff4f4f4"
+        android:background="@color/adam_theme_base"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:layout_gravity="center_vertical"
@@ -360,7 +374,8 @@
             android:layout_gravity="bottom"
             android:src="@drawable/comment"
             android:layout_weight="1"
-            android:contentDescription="@string/contentDescription_feed_button"/>
+            android:contentDescription="@string/contentDescription_feed_button"
+            android:tint="@color/adam_theme_black"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -375,7 +390,7 @@
             android:src="@drawable/map"
             android:layout_weight="1"
             android:contentDescription="@string/contentDescription_map_button"
-            />
+            android:tint="@color/adam_theme_black"/>
 
         <com.yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton
             android:id="@+id/fragment_profile_btnShowHide"
@@ -387,7 +402,8 @@
             android:scaleType="fitXY"
             android:textOn=""
             android:textOff=""
-            android:checked="true"/>
+            android:checked="true"
+            android:backgroundTint="@color/adam_theme_black"/>
         </LinearLayout>
 
     </LinearLayout>

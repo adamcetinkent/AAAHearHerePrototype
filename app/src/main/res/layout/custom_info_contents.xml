@@ -4,15 +4,15 @@
               android:layout_width="match_parent"
               android:padding="10dp"
               android:layout_height="wrap_content"
-    >
+              android:background="@color/adam_theme_light">
 
     <FrameLayout
         android:id="@+id/list_row_timeline_llUserFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="#fff4f4f4">
+        android:background="@color/adam_theme_base"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/frame"
                     android:contentDescription="@string/contentDescription_user_profile_picture_frame"
-                    />
+                    android:tint="@color/adam_theme_base"/>
 
             </FrameLayout>
 
@@ -53,7 +53,8 @@
                     android:id="@+id/list_row_timeline_txtUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder_user_name"/>
+                    android:text="@string/placeholder_user_name"
+                    android:textColor="@color/adam_theme_darkest"/>
 
                 <TextView
                     android:id="@+id/list_row_timeline_txtLocation"
@@ -61,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/placeholder_location"
                     android:layout_marginLeft="10dp"
-                    />
+                    android:textColor="@color/adam_theme_darkest"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -72,7 +73,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="12sp"
-            android:textColor="#ffaaaaaa"
+            android:textColor="@color/adam_theme_dark"
             android:layout_gravity="center_vertical|right"
             android:textAlignment="gravity"
             android:text="@string/placeholder_date"
@@ -107,7 +108,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_darkest"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="5dp"
@@ -121,7 +122,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_darkest"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
@@ -136,7 +137,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_darkest"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
@@ -150,7 +151,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff7f7f7f"
+                android:textColor="@color/adam_theme_dark"
                 android:textSize="14sp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
@@ -165,7 +166,8 @@
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp">
 
             <FrameLayout
                 android:layout_width="104dp"
@@ -176,7 +178,7 @@
                 <ImageView
                     android:layout_width="104dp"
                     android:layout_height="104dp"
-                    android:background="@color/cardview_dark_background"
+                    android:background="@color/adam_theme_darkest"
                     android:contentDescription="@string/contentDescription_album_artwork_frame"
                     />
 
@@ -186,7 +188,7 @@
                     android:layout_height="100dp"
                     android:layout_marginLeft="1dp"
                     android:layout_marginTop="1dp"
-                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    android:src="@drawable/spotify_blank"
                     android:contentDescription="@string/contentDescription_album_artwork"
                     />
 

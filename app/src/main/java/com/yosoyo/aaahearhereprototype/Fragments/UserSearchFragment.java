@@ -1,7 +1,9 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -167,6 +169,7 @@ public class UserSearchFragment extends FeedbackFragment {
 		};
 
 		adapter = new UserSearchListAdapter(
+			getActivity(),
 			currentUser,
 			new ArrayList<HHUser>(),
 			adapterCallback);
@@ -176,6 +179,7 @@ public class UserSearchFragment extends FeedbackFragment {
 	}
 
 	static class UserSearchListAdapter extends RecyclerView.Adapter<UserSearchListAdapter.ViewHolder> {
+		private final Context context;
 		private static HHUserFull currentUser;
 
 		public static void setFoundUsers(List<HHUser> foundUsers) {
@@ -236,10 +240,12 @@ public class UserSearchFragment extends FeedbackFragment {
 			public final OnClickFollowRequestListener btnUnfollowOnClickListener;
 			public final OnClickUserListener onClickUserListener;
 			public int position;
+			private final Context context;
 			//private final AdapterCallback adapterCallback;
 
-			public ViewHolder(View view, final AdapterCallback adapterCallback){
+			public ViewHolder(Context context, View view, final AdapterCallback adapterCallback){
 				super(view);
+				this.context = context;
 				//this.adapterCallback = adapterCallback;
 				txtUserName = (TextView) view.findViewById(R.id.rv_row_friendship_txtUserName);
 				imgProfile = (ImageView) view.findViewById(R.id.rv_row_friendship_imgProfile);
@@ -328,7 +334,8 @@ public class UserSearchFragment extends FeedbackFragment {
 			}
 		}
 
-		public UserSearchListAdapter(HHUserFull currentUser, List<HHUser> foundUsers, AdapterCallback adapterCallback){
+		public UserSearchListAdapter(Context context, HHUserFull currentUser, List<HHUser> foundUsers, AdapterCallback adapterCallback){
+			this.context = context;
 			UserSearchListAdapter.currentUser = currentUser;
 			UserSearchListAdapter.foundUsers = foundUsers;
 			this.adapterCallback = adapterCallback;
@@ -359,7 +366,7 @@ public class UserSearchFragment extends FeedbackFragment {
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View view = LayoutInflater.from(parent.getContext())
 									  .inflate(R.layout.rv_row_friend, parent, false);
-			ViewHolder viewHolder = new ViewHolder(view, adapterCallback);
+			ViewHolder viewHolder = new ViewHolder(context, view, adapterCallback);
 
 			return viewHolder;
 		}
@@ -389,7 +396,7 @@ public class UserSearchFragment extends FeedbackFragment {
 			}
 
 			if (friendIsRequested){
-				holder.btnFollow.setColorFilter(ZZZUtility.greyOut);
+				holder.btnFollow.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(context, R.color.adam_theme_darkest)));
 				holder.btnFollow.setEnabled(false);
 			}
 

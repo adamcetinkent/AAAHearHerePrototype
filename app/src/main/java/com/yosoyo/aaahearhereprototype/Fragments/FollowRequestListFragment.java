@@ -1,8 +1,10 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -104,6 +106,7 @@ public class FollowRequestListFragment extends FeedbackFragment {
 		};
 
 		adapter = new FollowRequestAdapter(
+			getActivity(),
 			currentUser,
 			adapterCallback);
 
@@ -113,6 +116,7 @@ public class FollowRequestListFragment extends FeedbackFragment {
 	}
 
 	static class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdapter.ViewHolder> {
+		private final Context context;
 		private final HHUserFull user;
 		private final AdapterCallback adapterCallback;
 
@@ -165,10 +169,12 @@ public class FollowRequestListFragment extends FeedbackFragment {
 			public final OnClickFollowRequestListener btnDeleteOnClickListener;
 			public final OnClickUserListener onClickUserListener;
 			public int position;
+			private final Context context;
 			//private final AdapterCallback adapterCallback;
 
-			public ViewHolder(View view, final AdapterCallback adapterCallback){
+			public ViewHolder(final Context context, View view, final AdapterCallback adapterCallback){
 				super(view);
+				this.context = context;
 				//this.adapterCallback = adapterCallback;
 				txtUserName = (TextView) view.findViewById(R.id.rv_row_follow_request_txtUserName);
 				imgProfile = (ImageView) view.findViewById(R.id.rv_row_follow_request_imgProfile);
@@ -184,7 +190,7 @@ public class FollowRequestListFragment extends FeedbackFragment {
 					@Override
 					public void onClick(View v) {
 						btnAccept.setVisibility(View.GONE);
-						btnDelete.setColorFilter(ZZZUtility.greyOut);
+						btnDelete.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(ViewHolder.this.context, R.color.adam_theme_darkest)));
 						btnDelete.setEnabled(false);
 						btnAcceptProgressBar.setVisibility(View.VISIBLE);
 						AsyncDataManager.acceptFollowRequest(
@@ -209,7 +215,7 @@ public class FollowRequestListFragment extends FeedbackFragment {
 					@Override
 					public void onClick(View v) {
 						btnDelete.setVisibility(View.GONE);
-						btnAccept.setColorFilter(ZZZUtility.greyOut);
+						btnAccept.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(ViewHolder.this.context, R.color.adam_theme_darkest)));
 						btnAccept.setEnabled(false);
 						btnDeleteProgressBar.setVisibility(View.VISIBLE);
 						AsyncDataManager.deleteFollowRequest(
@@ -233,7 +239,8 @@ public class FollowRequestListFragment extends FeedbackFragment {
 			}
 		}
 
-		public FollowRequestAdapter(HHUserFull user, AdapterCallback adapterCallback){
+		public FollowRequestAdapter(Context context, HHUserFull user, AdapterCallback adapterCallback){
+			this.context = context;
 			this.user = user;
 			this.adapterCallback = adapterCallback;
 
@@ -249,7 +256,7 @@ public class FollowRequestListFragment extends FeedbackFragment {
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View view = LayoutInflater.from(parent.getContext())
 									  .inflate(R.layout.rv_row_follow_request, parent, false);
-			return new ViewHolder(view, adapterCallback);
+			return new ViewHolder(context, view, adapterCallback);
 		}
 
 		@Override

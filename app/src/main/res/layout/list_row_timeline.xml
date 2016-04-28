@@ -3,15 +3,15 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-    >
+              android:background="@color/adam_theme_black">
 
     <LinearLayout
         android:id="@+id/list_row_timeline_llUserFrame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:background="#fff4f4f4">
+        android:background="@color/adam_theme_base"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <FrameLayout
             android:layout_width="50dp"
@@ -32,6 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/frame"
+                android:tint="@color/adam_theme_base"
                 android:contentDescription="@string/contentDescription_user_profile_picture_frame"
                 />
 
@@ -48,7 +49,8 @@
                 android:id="@+id/list_row_timeline_txtUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/placeholder_user_name"/>
+                android:text="@string/placeholder_user_name"
+                android:textColor="@color/adam_theme_black"/>
 
             <TextView
                 android:id="@+id/list_row_timeline_txtLocation"
@@ -56,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/placeholder_location"
                 android:layout_marginLeft="10dp"
-                />
+                android:textColor="@color/adam_theme_black"/>
 
         </LinearLayout>
 
@@ -66,7 +68,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="12sp"
-            android:textColor="#ffaaaaaa"
+            android:textColor="@color/adam_theme_lightest"
             android:layout_gravity="center_vertical|right"
             android:textAlignment="gravity"
             android:text="@string/placeholder_date"
@@ -83,7 +85,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:background="@color/adam_theme_black">
 
         <LinearLayout
             android:id="@+id/list_row_timeline_llTrackFrame"
@@ -103,7 +106,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_light"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="5dp"
@@ -117,7 +120,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_light"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
@@ -132,7 +135,7 @@
                 android:layout_gravity="left"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff000000"
+                android:textColor="@color/adam_theme_light"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="15dp"
@@ -146,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="false"
-                android:textColor="#ff7f7f7f"
+                android:textColor="@color/adam_theme_grey"
                 android:textSize="14sp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
@@ -167,12 +170,13 @@
                 android:layout_width="104dp"
                 android:layout_height="104dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginLeft="5dp">
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp">
 
                 <ImageView
                     android:layout_width="104dp"
                     android:layout_height="104dp"
-                    android:background="@color/cardview_dark_background"
+                    android:background="@color/adam_theme_darkest"
                     android:contentDescription="@string/contentDescription_user_profile_picture_frame"
                     />
 
@@ -182,7 +186,7 @@
                     android:layout_height="100dp"
                     android:layout_marginLeft="1dp"
                     android:layout_marginTop="1dp"
-                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    android:src="@drawable/spotify_blank"
                     android:contentDescription="@string/contentDescription_album_artwork"
                     />
 
@@ -215,7 +219,8 @@
         android:id="@+id/list_row_timeline_llLikeCommentShare"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_marginBottom="5dp">
+        android:layout_marginBottom="5dp"
+        android:background="@color/adam_theme_black">
 
         <ToggleButton
             android:id="@+id/list_row_timeline_btnLike"
@@ -226,7 +231,8 @@
             android:background="@drawable/ic_like_toggle"
             android:textOn=""
             android:textOff=""
-            android:checked="false"/>
+            android:checked="false"
+            android:backgroundTint="@color/adam_theme_base"/>
 
         <ImageButton
             android:id="@+id/list_row_timeline_btnComment"
@@ -237,7 +243,7 @@
             android:src="@drawable/comment"
             android:background="@android:color/transparent"
             android:contentDescription="@string/contentDescription_add_comment_button"
-            />
+            android:tint="@color/adam_theme_base"/>
 
         <ImageButton
             android:id="@+id/list_row_timeline_btnShare"
@@ -247,7 +253,8 @@
             android:scaleType="fitXY"
             android:src="@drawable/share"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/contentDescription_share_button"/>
+            android:contentDescription="@string/contentDescription_share_button"
+            android:tint="@color/adam_theme_base"/>
 
     </LinearLayout>
 

@@ -6,7 +6,7 @@
               android:paddingTop="5dp"
               android:paddingBottom="5dp"
               android:gravity="center_vertical"
-              android:background="#fff4f4f4"
+              android:background="@color/adam_theme_black"
     >
 
     <FrameLayout
@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/frame"
             android:contentDescription="@string/contentDescription_user_profile_picture_frame"
-            />
+            android:tint="@color/adam_theme_black"/>
 
     </FrameLayout>
 
@@ -42,7 +42,8 @@
         android:layout_weight="1"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:text="@string/placeholder_user_name"/>
+        android:text="@string/placeholder_user_name"
+        android:textColor="@color/adam_theme_base"/>
 
     <FrameLayout
         android:layout_width="30dp"
@@ -56,7 +57,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/cross_button"
             android:contentDescription="@string/contentDescription_delete_follow_request_button"
-            />
+            android:tint="@color/adam_theme_dark"/>
 
         <ProgressBar
             android:id="@+id/rv_row_follow_request_btnDelete_progress"
@@ -79,7 +80,7 @@
             android:layout_width="match_parent"
             android:src="@drawable/tick_button"
             android:contentDescription="@string/contentDescription_accept_follow_request_button"
-            />
+            android:tint="@color/adam_theme_base"/>
 
         <ProgressBar
             android:id="@+id/rv_row_follow_request_btnAccept_progress"

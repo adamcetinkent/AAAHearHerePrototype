@@ -6,7 +6,7 @@
               android:paddingTop="5dp"
               android:paddingBottom="5dp"
               android:gravity="center_vertical"
-              android:background="#fff4f4f4"
+              android:background="@color/adam_theme_black"
     >
 
     <FrameLayout
@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/frame"
             android:contentDescription="@string/contentDescription_user_profile_picture_frame"
-            />
+            android:tint="@color/adam_theme_black"/>
 
     </FrameLayout>
 
@@ -42,14 +42,16 @@
         android:layout_weight="1"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:text="@string/placeholder_user_name"/>
+        android:text="@string/placeholder_user_name"
+        android:textColor="@color/adam_theme_base"/>
 
     <ImageView
         android:id="@+id/rv_row_friendship_imgFollowStatus"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/follow_none"
-        android:contentDescription="@string/contentDescription_user_follow_status"/>
+        android:contentDescription="@string/contentDescription_user_follow_status"
+        android:tint="@color/adam_theme_base"/>
 
     <FrameLayout
         android:layout_width="50dp"
@@ -64,7 +66,7 @@
             android:layout_gravity="center"
             android:src="@drawable/minus_button"
             android:contentDescription="@string/contentDescription_unfollow_user_button"
-            />
+            android:tint="@color/adam_theme_dark"/>
 
         <ProgressBar
             android:id="@+id/rv_row_friendship_btnUnfollow_progress"
@@ -81,7 +83,7 @@
             android:src="@drawable/add_user_full"
             android:visibility="gone"
             android:contentDescription="@string/contentDescription_send_follow_request_button"
-            />
+            android:tint="@color/adam_theme_base"/>
 
         <ProgressBar
             android:id="@+id/rv_row_friendship_btnFollow_progress"

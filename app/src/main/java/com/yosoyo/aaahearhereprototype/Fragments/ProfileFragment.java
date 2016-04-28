@@ -3,6 +3,7 @@ package com.yosoyo.aaahearhereprototype.Fragments;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -350,7 +351,7 @@ public class ProfileFragment extends FeedbackFragment {
 		@Override
 		public void onClick(View v) {
 			btnAccept.setVisibility(View.GONE);
-			btnDelete.setColorFilter(ZZZUtility.greyOut);
+			btnDelete.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(getActivity(), R.color.adam_theme_darkest)));
 			btnDelete.setEnabled(false);
 			btnAcceptProgressBar.setVisibility(View.VISIBLE);
 
@@ -409,7 +410,7 @@ public class ProfileFragment extends FeedbackFragment {
 		@Override
 		public void onClick(View v) {
 			btnDelete.setVisibility(View.GONE);
-			btnAccept.setColorFilter(ZZZUtility.greyOut);
+			btnAccept.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(getActivity(), R.color.adam_theme_darkest)));
 			btnAccept.setEnabled(false);
 			btnDeleteProgressBar.setVisibility(View.VISIBLE);
 
@@ -484,7 +485,7 @@ public class ProfileFragment extends FeedbackFragment {
 									}
 								}
 							);
-							btnFollow.setColorFilter(ZZZUtility.greyOut);
+							btnFollow.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(getActivity(), R.color.adam_theme_darkest)));
 							btnFollow.setEnabled(false);
 						}
 						btnFollow.setVisibility(View.VISIBLE);
@@ -785,7 +786,7 @@ public class ProfileFragment extends FeedbackFragment {
 		}
 
 		if (friendIsRequested) {
-			btnFollow.setColorFilter(ZZZUtility.greyOut);
+			btnFollow.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(getActivity(), R.color.adam_theme_darkest)));
 			btnFollow.setEnabled(false);
 		}
 

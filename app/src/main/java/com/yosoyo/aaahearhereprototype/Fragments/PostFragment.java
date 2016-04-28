@@ -463,7 +463,7 @@ public class PostFragment extends FeedbackFragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 				HHUser user = ((HHUser) tagArrayAdapter.getItem(position));
-				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(user, null);
+				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(getContext(), user, null);
 
 				int selectionEnd = setTaggableText(txtMessage, userSpan, user);
 				txtMessage.setSelection(selectionEnd);
@@ -917,7 +917,7 @@ public class PostFragment extends FeedbackFragment {
 			@Override
 			public CharSequence convertResultToString(Object resultValue) {
 				if (resultValue instanceof HHUser){
-					return ((HHUser) resultValue).toCharSequence();
+					return ((HHUser) resultValue).toCharSequence(context);
 				}
 				return super.convertResultToString(resultValue);
 			}

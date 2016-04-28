@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -338,6 +339,7 @@ public class FeedFragment extends FeedbackFragment {
 		int footersCount = lstTimeline.getFooterViewsCount();
 		if (active && footersCount <= 0){
 			footerView = new ProgressBar(getActivity());
+			footerView.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.adam_theme_black));
 			lstTimeline.addFooterView(footerView);
 		} else if (footersCount > 0) {
 			lstTimeline.removeFooterView(footerView);
@@ -862,7 +864,7 @@ public class FeedFragment extends FeedbackFragment {
 					String userName = tagUser.getName();
 					message.replace(start, end, userName);
 					message.setSpan(
-						new HHUser.HHUserSpan(tagUser, userSpanClickCallback),
+						new HHUser.HHUserSpan(context, tagUser, userSpanClickCallback),
 						start,
 						start + userName.length(),
 						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -1000,7 +1002,7 @@ public class FeedFragment extends FeedbackFragment {
 				youLike = 0;
 				sb = new SpannableStringBuilder("You");
 				sb.setSpan(
-					new HHUser.HHUserSpan(HHUser.getCurrentUser().getUser(), userSpanClickCallback),
+					new HHUser.HHUserSpan(context, HHUser.getCurrentUser().getUser(), userSpanClickCallback),
 					0,
 					3,
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -1008,7 +1010,7 @@ public class FeedFragment extends FeedbackFragment {
 			} else {
 				sb = new SpannableStringBuilder(likes.get(0).getUser().getName());
 				sb.setSpan(
-					new HHUser.HHUserSpan(likes.get(0).getUser(), userSpanClickCallback),
+					new HHUser.HHUserSpan(context, likes.get(0).getUser(), userSpanClickCallback),
 					0,
 					sb.length(),
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1020,7 +1022,7 @@ public class FeedFragment extends FeedbackFragment {
 				} else {
 					sb.append(", ").append(user.getName());
 					sb.setSpan(
-						new HHUser.HHUserSpan(user, userSpanClickCallback),
+						new HHUser.HHUserSpan(context, user, userSpanClickCallback),
 						sb.length()-user.getName().length(),
 						sb.length(),
 						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1029,7 +1031,7 @@ public class FeedFragment extends FeedbackFragment {
 			if (youLike > 0){
 				sb.insert(0, "You, ");
 				sb.setSpan(
-					new HHUser.HHUserSpan(HHUser.getCurrentUser().getUser(), userSpanClickCallback),
+					new HHUser.HHUserSpan(context, HHUser.getCurrentUser().getUser(), userSpanClickCallback),
 					0,
 					3,
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

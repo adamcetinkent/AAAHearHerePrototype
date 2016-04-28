@@ -903,7 +903,7 @@ public class MapViewFragment
 					String userName = tagUser.getName();
 					message.replace(start, end, userName);
 					message.setSpan(
-						new HHUser.HHUserSpan(tagUser, null),
+						new HHUser.HHUserSpan(getContext(), tagUser, null),
 						start,
 						start + userName.length(),
 						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

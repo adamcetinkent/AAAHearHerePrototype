@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:layout_alignParentTop="true"
     android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true">
+    android:layout_alignParentStart="true"
+    android:background="@color/adam_theme_black">
 
     <!--<android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"

@@ -1,10 +1,11 @@
 package com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -14,6 +15,7 @@ import android.view.View;
 import com.facebook.Profile;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.ORMUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHUserFullNested;
+import com.yosoyo.aaahearhereprototype.R;
 
 import java.sql.Timestamp;
 
@@ -126,13 +128,13 @@ public class HHUser extends HHBase implements Parcelable {
 
 	}
 
-	public CharSequence toCharSequence(){
+	public CharSequence toCharSequence(Context context){
 		String name = getName();
 		SpannableString spannable = new SpannableString(name);
 		int length = spannable.length();
 		if (length > 0){
 			spannable.setSpan(
-				new HHUserSpan(this, null),
+				new HHUserSpan(context, this, null),
 				0,
 				length,
 				Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -326,14 +328,16 @@ public class HHUser extends HHBase implements Parcelable {
 
 	public static class HHUserSpan extends ClickableSpan {
 		private final HHUser user;
+		private final Context context;
 		private final HHUserSpanClickCallback clickCallback;
 
 		public interface HHUserSpanClickCallback{
 			void onClickSpan(HHUser hhUser);
 		}
 
-		public HHUserSpan(HHUser user, HHUserSpanClickCallback clickCallback){
+		public HHUserSpan(Context context, HHUser user, HHUserSpanClickCallback clickCallback){
 			super();
+			this.context = context;
 			this.clickCallback = clickCallback;
 			this.user = user;
 		}
@@ -344,9 +348,9 @@ public class HHUser extends HHBase implements Parcelable {
 
 		@Override
 		public void updateDrawState(TextPaint ds){
-			ds.setColor(Color.BLACK);
+			ds.setColor(ContextCompat.getColor(context, R.color.adam_theme_black));
 			ds.setFakeBoldText(true);
-			ds.bgColor = 0xFFDDDDDD;
+			ds.bgColor = ContextCompat.getColor(context, R.color.adam_theme_lightest);
 		}
 
 		@Override

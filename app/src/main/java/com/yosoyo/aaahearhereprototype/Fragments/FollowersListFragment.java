@@ -1,8 +1,10 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -201,6 +203,7 @@ public class FollowersListFragment extends FeedbackFragment {
 
 		if (user != null) {
 			adapter = new FollowersListAdapter(
+				getActivity(),
 				user,
 				currentUser,
 				followerType,
@@ -218,6 +221,7 @@ public class FollowersListFragment extends FeedbackFragment {
 					if (returnedUser != null) {
 						user = returnedUser;
 						adapter = new FollowersListAdapter(
+							getActivity(),
 							user,
 							currentUser,
 							followerType,
@@ -294,9 +298,11 @@ public class FollowersListFragment extends FeedbackFragment {
 
 		public final OnClickUserListener onClickUserListener;
 		public int position;
+		private final Context context;
 
-		public ViewHolder(View view, final FollowersListAdapterCallback adapterCallback){
+		public ViewHolder(final Context context, View view, final FollowersListAdapterCallback adapterCallback){
 			super(view);
+			this.context = context;
 			txtUserName = (TextView) view.findViewById(R.id.rv_row_follower_txtUserName);
 			imgProfile = (ImageView) view.findViewById(R.id.rv_row_follower_imgProfile);
 			onClickUserListener = new OnClickUserListener(null, adapterCallback);
@@ -389,7 +395,7 @@ public class FollowersListFragment extends FeedbackFragment {
 				@Override
 				public void onClick(View v) {
 					btnAccept.setVisibility(View.GONE);
-					btnDelete.setColorFilter(ZZZUtility.greyOut);
+					btnDelete.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(ViewHolder.this.context, R.color.adam_theme_darkest)));
 					btnDelete.setEnabled(false);
 					btnAcceptProgressBar.setVisibility(View.VISIBLE);
 
@@ -432,7 +438,7 @@ public class FollowersListFragment extends FeedbackFragment {
 				@Override
 				public void onClick(View v) {
 					btnDelete.setVisibility(View.GONE);
-					btnAccept.setColorFilter(ZZZUtility.greyOut);
+					btnAccept.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(ViewHolder.this.context, R.color.adam_theme_darkest)));
 					btnAccept.setEnabled(false);
 					btnDeleteProgressBar.setVisibility(View.VISIBLE);
 
@@ -475,15 +481,18 @@ public class FollowersListFragment extends FeedbackFragment {
 	}
 
 	private class FollowersListAdapter extends RecyclerView.Adapter<ViewHolder> {
+		private final Context context;
 		private final HHUserFull user;
 		private final HHUserFull currentUser;
 		private final int FOLLOWER_TYPE;
 		private final FollowersListAdapterCallback adapterCallback;
 
-		public FollowersListAdapter(final HHUserFull user,
+		public FollowersListAdapter(final Context context,
+									final HHUserFull user,
 									final HHUserFull currentUser,
 									final int followerType,
 									FollowersListAdapterCallback adapterCallback){
+			this.context = context;
 			this.user = user;
 			this.currentUser = currentUser;
 			this.FOLLOWER_TYPE = followerType;
@@ -524,7 +533,7 @@ public class FollowersListFragment extends FeedbackFragment {
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 			View view = LayoutInflater.from(parent.getContext())
 									  .inflate(R.layout.rv_row_follower, parent, false);
-			ViewHolder viewHolder = new ViewHolder(view, adapterCallback);
+			ViewHolder viewHolder = new ViewHolder(context, view, adapterCallback);
 
 			return viewHolder;
 		}
@@ -573,7 +582,7 @@ public class FollowersListFragment extends FeedbackFragment {
 				}
 
 				if (friendIsRequested) {
-					holder.btnFollow.setColorFilter(ZZZUtility.greyOut);
+					holder.btnFollow.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(context, R.color.adam_theme_darkest)));
 					holder.btnFollow.setEnabled(false);
 				}
 

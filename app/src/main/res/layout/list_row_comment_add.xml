@@ -6,7 +6,7 @@
               android:paddingTop="5dp"
               android:paddingBottom="5dp"
               android:gravity="center_vertical"
-              android:background="#fff4f4f4"
+              android:background="@color/adam_theme_black"
     >
 
     <FrameLayout
@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/frame"
             android:contentDescription="@string/contentDescription_user_profile_picture_frame"
-            />
+            android:tint="@color/adam_theme_black"/>
 
     </FrameLayout>
 
@@ -46,7 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/list_row_comment_add_txtAddComment_hint"
-            android:inputType="textCapSentences|textMultiLine"/>
+            android:inputType="textCapSentences|textMultiLine"
+            android:textColor="@color/adam_theme_grey"/>
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -63,7 +64,8 @@
                 android:src="@drawable/send"
                 android:background="@android:color/transparent"
                 android:layout_gravity="center"
-                android:contentDescription="@string/contentDescription_post_comment_button"/>
+                android:contentDescription="@string/contentDescription_post_comment_button"
+                android:tint="@color/adam_theme_base"/>
 
             <ProgressBar
                 android:id="@+id/list_row_comment_add_progressBar"
