@@ -219,9 +219,10 @@ public class AsyncDataManager {
 	 * @param callback		: return results via callback
 	 */
 	public static void getAllPosts(final Timestamp beforeTime,
+								   final Long[] excludeIDs,
 								   final GetAllPostsCallback callback){
 		//getAllCachedPosts(beforeTime, callback);
-		getAllWebPosts(beforeTime, callback);
+		getAllWebPosts(beforeTime, excludeIDs, callback);
 	}
 
 	private static void getAllCachedPosts(final Timestamp beforeTime,
@@ -239,9 +240,11 @@ public class AsyncDataManager {
 	}
 
 	private static void getAllWebPosts(final Timestamp beforeTime,
+									   final Long[] excludeIDs,
 									   final GetAllPostsCallback callback){
 		WebHelper.getAllPosts(
 			beforeTime,
+			excludeIDs,
 			new WebHelper.GetAllPostsCallback() {
 				@Override
 				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
@@ -267,9 +270,10 @@ public class AsyncDataManager {
 	 */
 	public static void getUserPosts(final long userID,
 									final Timestamp beforeTime,
+									final Long[] excludeIDs,
 									final GetAllPostsCallback callback){
 		//getUserCachedPosts(userID, beforeTime, callback);
-		getUserWebPosts(userID, beforeTime, callback);
+		getUserWebPosts(userID, beforeTime, excludeIDs, callback);
 	}
 
 	private static void getUserCachedPosts(final long userID,
@@ -292,10 +296,12 @@ public class AsyncDataManager {
 
 	private static void getUserWebPosts(final long userID,
 										final Timestamp beforeTime,
+										final Long[] excludeIDs,
 										final GetAllPostsCallback callback){
 		WebHelper.getUserPosts(
 			userID,
 			beforeTime,
+			excludeIDs,
 			new WebHelper.GetAllPostsCallback() {
 				@Override
 				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {

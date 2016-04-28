@@ -59,9 +59,11 @@ public class WebHelper {
 	}
 
 	public static void getAllPosts(final Timestamp beforeTime,
+								   final Long[] excludeIDs,
 								   final GetAllPostsCallback callback){
 		new GetPostsTask(
 			beforeTime,
+			excludeIDs,
 			new GetPostsTask.Callback() {
 			@Override
 			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
@@ -77,10 +79,12 @@ public class WebHelper {
 
 	public static void getUserPosts(final long userID,
 									final Timestamp beforeTime,
+									final Long[] excludeIDs,
 									final GetAllPostsCallback callback){
 		new GetPostsUserTask(
 			userID,
 			beforeTime,
+			excludeIDs,
 			new GetPostsUserTask.Callback() {
 				@Override
 				public void returnPosts(List<HHPostFullProcess> postsToProcess) {

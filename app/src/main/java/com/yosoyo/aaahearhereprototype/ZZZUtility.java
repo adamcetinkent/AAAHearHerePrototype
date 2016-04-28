@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by Adam Kent on 10/02/2016.
@@ -187,6 +188,29 @@ public class ZZZUtility {
 			sb.append(longs[i]).append(",");
 		}
 		return sb.substring(0, sb.length()-1);
+	}
+
+	public static long[] getLongArray(Set<Long> set){
+		long[] longs = new long[set.size()];
+		Long[] Longs = set.toArray(new Long[set.size()]);
+		for (int i = 0; i < Longs.length; i++){
+			longs[i] = Longs[i];
+		}
+		return longs;
+	}
+
+	public static Long[] getLongArray(long[] longs){
+		Long[] Longs = new Long[longs.length];
+		for (int i = 0; i < longs.length; i++){
+			Longs[i] = longs[i];
+		}
+		return Longs;
+	}
+
+	public static <T> void fillSetFromArray(Set<T> set, final T[] array){
+		for (T t : array){
+			set.add(t);
+		}
 	}
 
 }

@@ -49,7 +49,9 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +95,9 @@ public class FeedFragment extends FeedbackFragment {
 	private Timestamp requestedWebPost;
 	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
 	private boolean haveEarliestPost = false;
+
+	private Set<Long> currentPostIDs = new HashSet<>();
+	public static final String KEY_CURRENT_POST_IDS = TAG + "current_post_ids";
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -143,6 +148,7 @@ public class FeedFragment extends FeedbackFragment {
 		bundle.putParcelableArrayList(MapViewFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
 		bundle.putLong(MapViewFragment.KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
 		bundle.putBoolean(MapViewFragment.KEY_HAVE_EARLIEST_POST, haveEarliestPost);
+		bundle.putLongArray(MapViewFragment.KEY_CURRENT_POST_IDS, ZZZUtility.getLongArray(currentPostIDs));
 	}
 
 	public FeedFragment() {
@@ -159,6 +165,10 @@ public class FeedFragment extends FeedbackFragment {
 		if (bundle.containsKey(KEY_POST_ID)) postID = bundle.getLong(KEY_POST_ID);
 		if (bundle.containsKey(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE))
 			profileFragmentBundle = bundle.getBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE);
+		if (bundle.containsKey(KEY_CURRENT_POST_IDS)){
+			long[] longs = bundle.getLongArray(KEY_CURRENT_POST_IDS);
+			ZZZUtility.fillSetFromArray(currentPostIDs, ZZZUtility.getLongArray(longs));
+		}
 	}
 
 	public void setProfileFragmentBundle(Bundle bundle){
@@ -372,6 +382,7 @@ public class FeedFragment extends FeedbackFragment {
 				earliestWebPost = post.getPost().getCreatedAt();
 				lstTimelineAdapter.setEarliestWebPost(earliestWebPost);
 				setListProgressBar(false);
+				currentPostIDs.add(post.getPost().getID());
 			}
 		}
 
@@ -384,7 +395,9 @@ public class FeedFragment extends FeedbackFragment {
 	};
 
 	private void getAllData(){
-		AsyncDataManager.getAllPosts(earliestWebPost, getAllPostsCallback);
+		AsyncDataManager.getAllPosts(earliestWebPost,
+									 currentPostIDs.toArray(new Long[currentPostIDs.size()]),
+									 getAllPostsCallback);
 		if (requestedWebPost == null){
 			requestedWebPost = new Timestamp(System.currentTimeMillis());
 			if (earliestWebPost == null)
@@ -406,7 +419,10 @@ public class FeedFragment extends FeedbackFragment {
 
 				@Override
 				public void returnWebUserPrivacy(boolean userPrivacy) {
-					AsyncDataManager.getUserPosts(userID, earliestWebPost, getAllPostsCallback);
+					AsyncDataManager.getUserPosts(userID,
+												  earliestWebPost,
+												  currentPostIDs.toArray(new Long[currentPostIDs.size()]),
+												  getAllPostsCallback);
 					if (!userPrivacy) {
 						setPrivateProfile();
 					}

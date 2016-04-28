@@ -28,7 +28,8 @@ import java.util.Locale;
 class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/";
-	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s";
+	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s/";
+	private static final String VM_SERVER_ADDRESS_BEFORE_EXCLUDE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s/exclude/%4$s";
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
@@ -36,25 +37,36 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 
 	private final long userID;
 	private final Timestamp beforeTime;
+	private final Long[] excludeIDs;
 	private final Callback callbackTo;
 
 	public GetPostsUserTask(final long userID,
 							final Timestamp beforeTime,
+							final Long[] excludeIDs,
 							final Callback callbackTo) {
 		this.userID = userID;
-		this.callbackTo = callbackTo;
 		this.beforeTime = beforeTime;
+		this.excludeIDs = excludeIDs;
+		this.callbackTo = callbackTo;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		String urlString;
 		if (beforeTime != null) {
-			urlString = String.format(Locale.ENGLISH,
-									  VM_SERVER_ADDRESS_BEFORE,
-									  userID,
-									  HHUser.getCurrentUserID(),
-									  beforeTime.toString());
+			if (excludeIDs != null && excludeIDs.length > 0)
+				urlString = String.format(Locale.ENGLISH,
+										  VM_SERVER_ADDRESS_BEFORE_EXCLUDE,
+										  userID,
+										  HHUser.getCurrentUserID(),
+										  beforeTime.toString(),
+										  ZZZUtility.formatURL(excludeIDs));
+			else
+				urlString = String.format(Locale.ENGLISH,
+										  VM_SERVER_ADDRESS_BEFORE,
+										  userID,
+										  HHUser.getCurrentUserID(),
+										  beforeTime.toString());
 			urlString = urlString.replace(" ", "%20");
 		} else {
 			urlString = String.format(Locale.ENGLISH,

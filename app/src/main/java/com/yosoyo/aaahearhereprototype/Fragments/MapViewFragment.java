@@ -49,6 +49,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import com.yosoyo.aaahearhereprototype.PostMarker;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.Services.AddressResultReceiver;
 import com.yosoyo.aaahearhereprototype.Services.FetchAddressIntentService;
@@ -79,7 +80,7 @@ public class MapViewFragment
 
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
-	private final List<Marker> markers = new ArrayList<>();
+	private final List<PostMarker> markers = new ArrayList<>();
 
 	private int mapType;
 	public static final String KEY_MAP_TYPE = TAG + "map_type";
@@ -143,6 +144,7 @@ public class MapViewFragment
 
 	private boolean alreadyFetchingPosts = false;
 	private Set<Long> currentPostIDs = new HashSet<>();
+	public static final String KEY_CURRENT_POST_IDS = TAG + "current_post_ids";
 
 	public MapViewFragment() {
 		//required empty public constructor
@@ -188,6 +190,9 @@ public class MapViewFragment
 		bundle.putBoolean(FeedFragment.KEY_FETCH_DATA, fetchData);
 		bundle.putInt(FeedFragment.KEY_FEED_TYPE, mapType);
 		bundle.putParcelableArrayList(FeedFragment.KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
+		bundle.putLong(FeedFragment.KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
+		bundle.putBoolean(FeedFragment.KEY_HAVE_EARLIEST_POST, haveEarliestPost);
+		bundle.putLongArray(FeedFragment.KEY_CURRENT_POST_IDS, ZZZUtility.getLongArray(currentPostIDs));
 		/*if (googleMap != null) {
 			cameraPosition = googleMap.getCameraPosition();
 		}
@@ -213,6 +218,10 @@ public class MapViewFragment
 		needToOpenInfoWindow = bundle.getBoolean(KEY_INFO_WINDOW_OPEN);
 		earliestWebPost = new Timestamp(bundle.getLong(KEY_EARLIEST_WEB_POST));
 		haveEarliestPost = bundle.getBoolean(KEY_HAVE_EARLIEST_POST);
+		if (bundle.containsKey(KEY_CURRENT_POST_IDS)){
+			long[] longs = bundle.getLongArray(KEY_CURRENT_POST_IDS);
+			ZZZUtility.fillSetFromArray(currentPostIDs, ZZZUtility.getLongArray(longs));
+		}
 	}
 
 
@@ -304,7 +313,7 @@ public class MapViewFragment
 						position = posts.size() - 1;
 					}
 					currentPost = posts.get(position);
-					currentMarker = markers.get(position);
+					currentMarker = markers.get(position).getMarker();
 					alreadyShifted = false;
 					shiftedCameraPosition = null;
 					activateMarker(currentMarker);
@@ -325,7 +334,7 @@ public class MapViewFragment
 						position = 0;
 					}
 					currentPost = posts.get(position);
-					currentMarker = markers.get(position);
+					currentMarker = markers.get(position).getMarker();
 					alreadyShifted = false;
 					shiftedCameraPosition = null;
 					activateMarker(currentMarker);
@@ -553,6 +562,7 @@ public class MapViewFragment
 										Collections.sort(posts);
 										currentPostIDs.add(post.getPost().getID());
 										addMapMarker(post, false);
+										Collections.sort(markers);
 										fetchData = false;
 										updateUIWidgets();
 									}
@@ -569,6 +579,7 @@ public class MapViewFragment
 											addMapMarker(post, false);
 										}
 									}
+									Collections.sort(markers);
 									fetchData = false;
 									updateUIWidgets();
 									alreadyFetchingPosts = false;
@@ -615,12 +626,14 @@ public class MapViewFragment
 				if (mapType == GENERAL_MAP) {
 					AsyncDataManager.getAllPosts(
 						null,
+						currentPostIDs.toArray(new Long[currentPostIDs.size()]),
 						new AsyncDataManager.GetAllPostsCallback() {
 							@Override
 							public void returnPostList(List<HHPostFull> posts) {
 								MapViewFragment.this.posts = ZZZUtility.mergeLists(MapViewFragment.this.posts, posts);
 								Collections.sort(posts);
 								addMapMarkers();
+								Collections.sort(markers);
 								fetchData = false;
 								updateUIWidgets();
 							}
@@ -631,6 +644,7 @@ public class MapViewFragment
 									Collections.sort(posts);
 									currentPostIDs.add(post.getPost().getID());
 									addMapMarker(post, true);
+									Collections.sort(markers);
 									fetchData = false;
 									updateUIWidgets();
 									alreadyFetchingPosts = false;
@@ -688,7 +702,7 @@ public class MapViewFragment
 		if (currentPost != null && posts != null) {
 			int postsPosition = posts.indexOf(currentPost);
 			if (postsPosition >= 0) {
-				currentMarker = markers.get(postsPosition);
+				currentMarker = markers.get(postsPosition).getMarker();
 			}
 		}
 	}
@@ -699,7 +713,7 @@ public class MapViewFragment
 			new MarkerOptions().position(latLng)
 							   .title(new Gson().toJson(post))
 							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker)));
-		markers.add(marker);
+		markers.add(new PostMarker(marker, post));
 	}
 
 	private void startIntentService() {

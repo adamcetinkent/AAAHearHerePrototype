@@ -28,28 +28,40 @@ import java.util.Locale;
 class GetPostsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/";
-	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/for/%1$d/before/%2$s";
+	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/for/%1$d/before/%2$s/";
+	private static final String VM_SERVER_ADDRESS_BEFORE_EXCLUDE = WebHelper.SERVER_IP + "/posts/for/%1$d/before/%2$s/exclude/%3$s";
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
 	}
 
-	private final Callback callbackTo;
 	private final Timestamp beforeTime;
+	private final Long[] excludeIDs;
+	private final Callback callbackTo;
 
-	public GetPostsTask(Timestamp beforeTime, Callback callbackTo) {
-		this.callbackTo = callbackTo;
+	public GetPostsTask(final Timestamp beforeTime,
+						final Long[] excludeIDs,
+						final Callback callbackTo) {
+		this.excludeIDs = excludeIDs;
 		this.beforeTime = beforeTime;
+		this.callbackTo = callbackTo;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		String urlString;
 		if (beforeTime != null) {
-			urlString = String.format(Locale.ENGLISH,
-									  VM_SERVER_ADDRESS_BEFORE,
-									  HHUser.getCurrentUserID(),
-									  beforeTime.toString());
+			if (excludeIDs != null && excludeIDs.length > 0)
+				urlString = String.format(Locale.ENGLISH,
+										  VM_SERVER_ADDRESS_BEFORE_EXCLUDE,
+										  HHUser.getCurrentUserID(),
+										  beforeTime.toString(),
+										  ZZZUtility.formatURL(excludeIDs));
+			else
+				urlString = String.format(Locale.ENGLISH,
+										  VM_SERVER_ADDRESS_BEFORE,
+										  HHUser.getCurrentUserID(),
+										  beforeTime.toString());
 			urlString = urlString.replace(" ", "%20");
 		} else {
 			urlString = VM_SERVER_ADDRESS + HHUser.getCurrentUserID();

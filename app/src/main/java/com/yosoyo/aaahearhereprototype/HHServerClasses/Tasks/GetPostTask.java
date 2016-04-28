@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -43,6 +44,7 @@ class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + post_id);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Token token="+ HHUser.getAuthorisationToken());
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
