@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="horizontal" >
+              android:orientation="horizontal"
+              android:background="@color/adam_theme_black">
 
     <ImageView
         android:id="@+id/list_row_spotify_search_results_imgArtwork"
@@ -23,12 +24,14 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
-            android:padding="2dp" />
+            android:padding="2dp"
+            android:textColor="@color/adam_theme_light"/>
         <TextView
             android:id="@+id/list_row_spotify_search_results_txtDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/placholder_artist_desc"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/adam_theme_grey"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype.LocationService;
+package com.yosoyo.aaahearhereprototype.Services.LocationService;
 
 import android.location.Location;
 import android.os.Bundle;

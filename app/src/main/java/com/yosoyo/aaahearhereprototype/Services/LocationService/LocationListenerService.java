@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype.LocationService;
+package com.yosoyo.aaahearhereprototype.Services.LocationService;
 
 import android.Manifest;
 import android.app.Notification;
@@ -43,8 +43,8 @@ public class LocationListenerService extends Service implements HHLocationListen
 	public void returnNewLocation(final Location location) {
 		final Intent intent = new Intent();
 		intent.setAction(LOCATION_UPDATE);
-		intent.putExtra(HHBroadcastReceiver.DOUBLE_LATITUDE, location.getLatitude());
-		intent.putExtra(HHBroadcastReceiver.DOUBLE_LONGITUDE, location.getLongitude());
+		intent.putExtra(HHLocationBroadcastReceiver.DOUBLE_LATITUDE, location.getLatitude());
+		intent.putExtra(HHLocationBroadcastReceiver.DOUBLE_LONGITUDE, location.getLongitude());
 		sendBroadcast(intent);
 
 		Log.d(TAG, "returnNewLocation:: userID: " + userID);
@@ -234,4 +234,5 @@ public class LocationListenerService extends Service implements HHLocationListen
 			}
 		}
 	}
+
 }

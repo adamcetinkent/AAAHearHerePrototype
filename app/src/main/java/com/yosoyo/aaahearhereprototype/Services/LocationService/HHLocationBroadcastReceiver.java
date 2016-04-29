@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype.LocationService;
+package com.yosoyo.aaahearhereprototype.Services.LocationService;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.content.Intent;
  *
  * A receiver for new location results from the {@link LocationListenerService}
  */
-public class HHBroadcastReceiver extends BroadcastReceiver {
+public class HHLocationBroadcastReceiver extends BroadcastReceiver {
 
 	public static final String DOUBLE_LATITUDE = "latitude";
 	public static final String DOUBLE_LONGITUDE = "longitude";
@@ -19,7 +19,7 @@ public class HHBroadcastReceiver extends BroadcastReceiver {
 		void returnNewLocation(double lat, double lng);
 	}
 
-	public HHBroadcastReceiver(HHBroadCastReceiverCallback callback) {
+	public HHLocationBroadcastReceiver(HHBroadCastReceiverCallback callback) {
 		this.callback = callback;
 	}
 

@@ -28,8 +28,8 @@ import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.gson.Gson;
+import com.yosoyo.aaahearhereprototype.GoogleClasses.SimpleGooglePlace;
 import com.yosoyo.aaahearhereprototype.R;
-import com.yosoyo.aaahearhereprototype.SimpleGooglePlace;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/at/%2$.6f/%3$.6f";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/at/%1$.6f/%2$.6f";
 
 	public interface Callback {
 		void returnPostsAtLocation(List<HHPostFull> posts);
@@ -48,7 +48,6 @@ class GetPostsAtLocationTask extends AsyncTask<Void, Void, List<HHPostFull>> {
 	protected List<HHPostFull> doInBackground(Void... params) {
 		String urlString = String.format(Locale.ENGLISH,
 										 VM_SERVER_ADDRESS,
-										 userID,
 										 location.getLatitude(),
 										 location.getLongitude());
 		Log.d(TAG, "Fetching Posts from " + urlString);

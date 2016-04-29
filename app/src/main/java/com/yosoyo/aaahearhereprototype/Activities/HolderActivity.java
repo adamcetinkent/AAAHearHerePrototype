@@ -55,9 +55,9 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
-import com.yosoyo.aaahearhereprototype.LocationService.HHBroadcastReceiver;
-import com.yosoyo.aaahearhereprototype.LocationService.LocationListenerService;
 import com.yosoyo.aaahearhereprototype.R;
+import com.yosoyo.aaahearhereprototype.Services.LocationService.HHLocationBroadcastReceiver;
+import com.yosoyo.aaahearhereprototype.Services.LocationService.LocationListenerService;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.util.HashMap;
@@ -86,11 +86,12 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 	public static GoogleApiClient mGoogleApiClient;
 
-	private HHBroadcastReceiver broadcastReceiver;
+	private HHLocationBroadcastReceiver broadcastReceiver;
 
 	private static MenuItem menuRequests;
 
 	private FeedbackFragment pendingFragment;
+	private boolean newToken = false;
 
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
@@ -112,25 +113,31 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		super.onCreate(savedInstanceState);
 
 		Intent intent = getIntent();
-		switch (intent.getAction()){
-			case Intent.ACTION_SEND:{
+		if (intent != null && intent.getAction() != null) {
+			switch (intent.getAction()) {
+				case Intent.ACTION_SEND: {
 
-				Log.d(TAG, "NEW INTENT: "+intent.toString());
-				String sharedTrackResult = intent.getStringExtra(Intent.EXTRA_TEXT);
-				String PREFIX = "https://open.spotify.com/track/";
-				String trackID = sharedTrackResult.substring(PREFIX.length());
-				Log.d(TAG, "SHARED TRACK: "+trackID);
-				Toast.makeText(this, "SHARED TRACK: "+trackID, Toast.LENGTH_LONG).show();
+					Log.d(TAG, "NEW INTENT: " + intent.toString());
+					String sharedTrackResult = intent.getStringExtra(Intent.EXTRA_TEXT);
+					String PREFIX = "https://open.spotify.com/track/";
+					String trackID = sharedTrackResult.substring(PREFIX.length());
+					Log.d(TAG, "SHARED TRACK: " + trackID);
+					Toast.makeText(this, "SHARED TRACK: " + trackID, Toast.LENGTH_LONG).show();
 
-				pendingFragment = PostFragment.newInstance(trackID);
+					pendingFragment = PostFragment.newInstance(trackID);
 
-				break;
+					break;
+				}
 			}
 		}
 
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
 		HolderActivity.callbackManager = CallbackManager.Factory.create();
 		setContentView(R.layout.activity_holder);
+
+//		Toolbar toolbar = (Toolbar) findViewById(R.id.activity_holder_toolbar);
+//		setSupportActionBar(toolbar);
+//		//toolbar.inflateMenu(R.menu.menu_main);
 
 		AsyncDataManager.setContext(this);
 		WebHelper.setActivity(this);
@@ -140,14 +147,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
 			R.string.action_search_users,
-			R.string.navigation_post_test,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
 			R.string.action_friends
 		};
 
-		final int NUM_NAV_STRINGS = 5;
+		final int NUM_NAV_STRINGS = 4;
 		String[] navStrings = new String[NUM_NAV_STRINGS];
 		for (int i = 0; i < NUM_NAV_STRINGS; i++){
 			navStrings[i] = getString(navOptions[i]);
@@ -288,8 +294,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	protected void onResume() {
 		super.onResume();
 		if (broadcastReceiver == null){
-			broadcastReceiver = new HHBroadcastReceiver(
-				new HHBroadcastReceiver.HHBroadCastReceiverCallback() {
+			broadcastReceiver = new HHLocationBroadcastReceiver(
+				new HHLocationBroadcastReceiver.HHBroadCastReceiverCallback() {
 					@Override
 					public void returnNewLocation(double lat, double lng) {
 						Toast.makeText(HolderActivity.this, "NEW LOCATION: " + lat + " " + lng, Toast.LENGTH_SHORT).show();
@@ -550,6 +556,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	@Override
 	public void onLoginSuccess(){
 
+		newToken = true;
+
 		startLocationListenerService();
 
 		WebHelper.getFacebookProfilePicture(
@@ -609,27 +617,32 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	}
 
 	private void startLocationListenerService(){
+		ActivityManager.RunningServiceInfo service = isServiceRunning(LocationListenerService.class);
+		if (service != null && newToken){
+			stopService(new Intent(getApplicationContext(), LocationListenerService.class));
+			Log.d(TAG, "STOPPING SERVICE");
+		}
 		if (HHUser.getCurrentUser() != null
-				&& HHUser.getAuthorisationToken() != null
-				&& !HHUser.getAuthorisationToken().isEmpty()
-				&& !isServiceRunning(LocationListenerService.class)) {
+			&& HHUser.getAuthorisationToken() != null
+			&& !HHUser.getAuthorisationToken().isEmpty()
+			&& newToken) {
 			Intent serviceIntent = new Intent(this, LocationListenerService.class);
 			serviceIntent.putExtra(LocationListenerService.USER_ID, HHUser.getCurrentUserID());
-			serviceIntent
-				.putExtra(LocationListenerService.AUTH_TOKEN, HHUser.getAuthorisationToken());
+			serviceIntent.putExtra(LocationListenerService.AUTH_TOKEN, HHUser.getAuthorisationToken());
 			startService(serviceIntent);
-
+			Log.d(TAG, "STARTING SERVICE: "+HHUser.getAuthorisationToken());
+			newToken = false;
 		}
 	}
 
-	private boolean isServiceRunning(Class<?> serviceClass){
+	private ActivityManager.RunningServiceInfo isServiceRunning(Class<?> serviceClass){
 		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)){
 			if (serviceClass.getName().equals(serviceInfo.service.getClassName())){
-				return true;
+				return serviceInfo;
 			}
 		}
-		return false;
+		return null;
 	}
 
 }

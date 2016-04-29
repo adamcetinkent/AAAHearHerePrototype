@@ -1,4 +1,4 @@
-package com.yosoyo.aaahearhereprototype;
+package com.yosoyo.aaahearhereprototype.GoogleClasses;
 
 import com.google.android.gms.maps.model.Marker;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;

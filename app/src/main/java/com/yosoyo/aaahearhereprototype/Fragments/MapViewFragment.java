@@ -44,12 +44,12 @@ import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
+import com.yosoyo.aaahearhereprototype.GoogleClasses.PostMarker;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
-import com.yosoyo.aaahearhereprototype.PostMarker;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.Services.AddressResultReceiver;
 import com.yosoyo.aaahearhereprototype.Services.FetchAddressIntentService;
@@ -900,7 +900,7 @@ public class MapViewFragment
 
 				HHUser tagUser = getTagUser(post.getTags(), userID);
 				if (tagUser != null){
-					String userName = tagUser.getName();
+					String userName = String.format(" %s ", tagUser.getName());
 					message.replace(start, end, userName);
 					message.setSpan(
 						new HHUser.HHUserSpan(getContext(), tagUser, null),

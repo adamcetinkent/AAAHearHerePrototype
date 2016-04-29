@@ -27,9 +27,9 @@ import java.util.Locale;
  */
 class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/";
-	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s/";
-	private static final String VM_SERVER_ADDRESS_BEFORE_EXCLUDE = WebHelper.SERVER_IP + "/posts/by/%1$d/for/%2$d/before/%3$s/exclude/%4$s";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/by/%1$d/";
+	private static final String VM_SERVER_ADDRESS_BEFORE = WebHelper.SERVER_IP + "/posts/by/%1$d/before/%2$s/";
+	private static final String VM_SERVER_ADDRESS_BEFORE_EXCLUDE = WebHelper.SERVER_IP + "/posts/by/%1$d/before/%2$s/exclude/%3$s";
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
@@ -58,21 +58,18 @@ class GetPostsUserTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 				urlString = String.format(Locale.ENGLISH,
 										  VM_SERVER_ADDRESS_BEFORE_EXCLUDE,
 										  userID,
-										  HHUser.getCurrentUserID(),
 										  beforeTime.toString(),
 										  ZZZUtility.formatURL(excludeIDs));
 			else
 				urlString = String.format(Locale.ENGLISH,
 										  VM_SERVER_ADDRESS_BEFORE,
 										  userID,
-										  HHUser.getCurrentUserID(),
 										  beforeTime.toString());
 			urlString = urlString.replace(" ", "%20");
 		} else {
 			urlString = String.format(Locale.ENGLISH,
 									  VM_SERVER_ADDRESS,
-									  userID,
-									  HHUser.getCurrentUserID());
+									  userID);
 		}
 		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {

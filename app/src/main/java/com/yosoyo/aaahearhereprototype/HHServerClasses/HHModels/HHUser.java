@@ -130,9 +130,9 @@ public class HHUser extends HHBase implements Parcelable {
 
 	public CharSequence toCharSequence(Context context){
 		String name = getName();
-		SpannableString spannable = new SpannableString(name);
+		SpannableString spannable = new SpannableString(String.format(" %s ", name));
 		int length = spannable.length();
-		if (length > 0){
+		if (length > 2){
 			spannable.setSpan(
 				new HHUserSpan(context, this, null),
 				0,
@@ -360,7 +360,7 @@ public class HHUser extends HHBase implements Parcelable {
 
 		@Override
 		public String toString(){
-			return user.getName();
+			return String.format(" %s ", user.getName());
 		}
 
 	}

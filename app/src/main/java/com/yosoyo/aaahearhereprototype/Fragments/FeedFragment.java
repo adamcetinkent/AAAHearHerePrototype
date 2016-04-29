@@ -861,7 +861,7 @@ public class FeedFragment extends FeedbackFragment {
 
 				HHUser tagUser = getTagUser(viewHolder.post.getTags(), userID);
 				if (tagUser != null){
-					String userName = tagUser.getName();
+					String userName = String.format(" %s ", tagUser.getName());
 					message.replace(start, end, userName);
 					message.setSpan(
 						new HHUser.HHUserSpan(context, tagUser, userSpanClickCallback),
@@ -1000,15 +1000,15 @@ public class FeedFragment extends FeedbackFragment {
 			SpannableStringBuilder sb;
 			if (likes.get(0).getUser().equals(HHUser.getCurrentUser().getUser())) {
 				youLike = 0;
-				sb = new SpannableStringBuilder("You");
+				sb = new SpannableStringBuilder(" You ");
 				sb.setSpan(
 					new HHUser.HHUserSpan(context, HHUser.getCurrentUser().getUser(), userSpanClickCallback),
 					0,
-					3,
+					5,
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 				);
 			} else {
-				sb = new SpannableStringBuilder(likes.get(0).getUser().getName());
+				sb = new SpannableStringBuilder(" ").append(likes.get(0).getUser().getName()).append(" ");
 				sb.setSpan(
 					new HHUser.HHUserSpan(context, likes.get(0).getUser(), userSpanClickCallback),
 					0,
@@ -1020,20 +1020,20 @@ public class FeedFragment extends FeedbackFragment {
 				if (user.equals(HHUser.getCurrentUser().getUser())){
 					youLike = i;
 				} else {
-					sb.append(", ").append(user.getName());
+					sb.append(",  ").append(user.getName()).append(" ");
 					sb.setSpan(
 						new HHUser.HHUserSpan(context, user, userSpanClickCallback),
-						sb.length()-user.getName().length(),
+						sb.length()-user.getName().length()-2,
 						sb.length(),
 						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 			}
 			if (youLike > 0){
-				sb.insert(0, "You, ");
+				sb.insert(0, " You , ");
 				sb.setSpan(
 					new HHUser.HHUserSpan(context, HHUser.getCurrentUser().getUser(), userSpanClickCallback),
 					0,
-					3,
+					5,
 					Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 				);
 			}

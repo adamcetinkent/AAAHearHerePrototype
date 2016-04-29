@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsSinceTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/since/%2$s";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/since/%2$s";
 
 	private final long userID;
 	private final Timestamp since;
@@ -47,7 +47,6 @@ class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
 		String urlString = String.format(Locale.ENGLISH,
 										 VM_SERVER_ADDRESS,
-										 userID,
 										 since.toString());
 		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {

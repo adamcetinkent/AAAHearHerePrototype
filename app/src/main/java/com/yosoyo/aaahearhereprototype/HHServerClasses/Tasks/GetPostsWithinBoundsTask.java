@@ -28,7 +28,7 @@ import java.util.Locale;
 class GetPostsWithinBoundsTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsWithinBounds";
 	//private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/within/%2$.6f/%3$.6f/%4$.6f/%5$.6f";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/for/%1$d/within/%2$.6f/%3$.6f/%4$.6f/%5$.6f/exclude/%6$s";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/within/%1$.6f/%2$.6f/%3$.6f/%4$.6f/exclude/%5$s";
 
 	public interface Callback {
 		void returnPostsWithinBounds(List<HHPostFullProcess> posts);
@@ -54,7 +54,6 @@ class GetPostsWithinBoundsTask extends AsyncTask<Void, Void, List<HHPostFullProc
 		String urlString;
 		urlString = String.format(Locale.ENGLISH,
 								  VM_SERVER_ADDRESS,
-								  userID,
 								  bounds.southwest.latitude,
 								  bounds.northeast.latitude,
 								  bounds.southwest.longitude,

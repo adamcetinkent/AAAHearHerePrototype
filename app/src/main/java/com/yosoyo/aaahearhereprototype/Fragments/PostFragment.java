@@ -64,8 +64,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Created by adam on 26/02/2016.
@@ -448,14 +450,16 @@ public class PostFragment extends FeedbackFragment {
 			}
 		});
 
-		final List<HHUser> userList = new ArrayList<>();
+		Set<HHUser> userSet = new HashSet<>();
 		HHUserFull currentUser = HHUser.getCurrentUser();
 		for (HHFollowUser followUser: currentUser.getFollowOuts()){
-			userList.add(followUser.getUser());
+			userSet.add(followUser.getUser());
 		}
 		for (HHFollowUser followUser: currentUser.getFollowIns()){
-			userList.add(followUser.getUser());
+			userSet.add(followUser.getUser());
 		}
+		final List<HHUser> userList = new ArrayList<>();
+		userList.addAll(userSet);
 		final TagArrayAdapter tagArrayAdapter = new TagArrayAdapter(getActivity(), userList, txtMessage);
 		txtMessage.setAdapter(tagArrayAdapter);
 		txtMessage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -463,7 +467,7 @@ public class PostFragment extends FeedbackFragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
 				HHUser user = ((HHUser) tagArrayAdapter.getItem(position));
-				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(getContext(), user, null);
+				HHUser.HHUserSpan userSpan = new HHUser.HHUserSpan(getActivity(), user, null);
 
 				int selectionEnd = setTaggableText(txtMessage, userSpan, user);
 				txtMessage.setSelection(selectionEnd);

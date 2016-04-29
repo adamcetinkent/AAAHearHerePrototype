@@ -22,7 +22,7 @@ import java.util.Locale;
  */
 class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "GetUserPrivacyTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/privacy/by/%1$d/for/%2$d/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/privacy/by/%1$d/";
 
 	public interface Callback {
 		void returnUserPrivacy(boolean userPrivacy);
@@ -40,8 +40,7 @@ class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 	protected Boolean doInBackground(Void... params) {
 		String urlString = String.format(Locale.ENGLISH,
 										 VM_SERVER_ADDRESS,
-										 userID,
-										 HHUser.getCurrentUserID());
+										 userID);
 		Log.d(TAG, "Fetching user privacy by " + urlString);
 		try {
 			URL url = new URL(urlString);

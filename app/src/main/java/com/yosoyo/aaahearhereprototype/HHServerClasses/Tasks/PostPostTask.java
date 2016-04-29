@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
@@ -51,6 +52,7 @@ class PostPostTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
+				urlConnection.setRequestProperty("Authorization", "Token token="+ HHUser.getAuthorisationToken());
 				urlConnection.setRequestMethod("POST");
 
 				String json = new Gson().toJson(post, HHPostTagsArray.class);
