@@ -4,7 +4,6 @@ package com.yosoyo.aaahearhereprototype.Fragments;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -77,8 +76,6 @@ import java.util.Set;
 public class PostFragment extends FeedbackFragment {
 
 	private static final String TAG = "PostFragment";
-
-	private FragmentChangeRequestListener fragmentChangeRequestListener;
 
 	private SpotifyTrack spotifyTrack;
 	private SpotifyArtist spotifyArtist;
@@ -325,6 +322,10 @@ public class PostFragment extends FeedbackFragment {
 					Log.e(TAG, "Error: " + e.getMessage());
 					progressDialog.dismiss();
 					e.printStackTrace();
+				} catch (NullPointerException e) {
+					Log.e(TAG, "Error: " + e.getMessage());
+					progressDialog.dismiss();
+					e.printStackTrace();
 				}
 			}
 		});
@@ -371,7 +372,7 @@ public class PostFragment extends FeedbackFragment {
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
 					@Override
 					public void returnPostPost(boolean success, HHPostFullProcess returnedPost) {
-						fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.MAP_VIEW_REQUEST, null);
+						requestMapView();
 					}
 				});
 				postButton.setVisibility(View.INVISIBLE);
@@ -633,11 +634,15 @@ public class PostFragment extends FeedbackFragment {
 				new AddressResultReceiver.AddressResultReceiverCallback() {
 					@Override
 					public void returnAddress(Address returnedAddress) {
-						address = returnedAddress;
-						txtLocation.setText(address.getThoroughfare());
-						placeName = address.getThoroughfare();
-						btnLocationButton.setVisibility(View.VISIBLE);
-						mAddressRequested = false;
+						if (address != null) {
+							address = returnedAddress;
+							txtLocation.setText(address.getThoroughfare());
+							placeName = address.getThoroughfare();
+							btnLocationButton.setVisibility(View.VISIBLE);
+							mAddressRequested = false;
+						} else {
+							Toast.makeText(getActivity(), "NO ADDRESS FOUND", Toast.LENGTH_LONG).show();
+						}
 					}
 				});
 			if (HolderActivity.mGoogleApiClient.isConnected() && lastLocation != null) {
@@ -654,7 +659,7 @@ public class PostFragment extends FeedbackFragment {
 	}
 
 	private void updatePlayButton(ImageView btnPlayButton){
-		if (spotifyTrack == null){
+		if (spotifyTrack == null || spotifyTrack.getPreviewURL() == null){
 			btnPlayButton.setVisibility(View.GONE);
 		} else {
 			btnPlayButton.setVisibility(View.VISIBLE);
@@ -676,16 +681,6 @@ public class PostFragment extends FeedbackFragment {
 	public void startActivityForResult(Intent intent, int requestCode){
 		intent.putExtra(HolderActivity.REQUEST_CODE, requestCode);
 		super.startActivityForResult(intent, requestCode);
-	}
-
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		try {
-			fragmentChangeRequestListener = (FragmentChangeRequestListener) context;
-		} catch (ClassCastException e){
-			e.printStackTrace();
-		}
 	}
 
 	@Override

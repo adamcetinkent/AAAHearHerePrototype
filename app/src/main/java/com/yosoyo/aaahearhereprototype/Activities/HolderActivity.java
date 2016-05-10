@@ -25,9 +25,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
@@ -167,9 +170,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		drawerList = (ListView) findViewById(R.id.drawer);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-		drawerList.setAdapter(
-			new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1,
-							   navStrings));
+		//drawerList.setAdapter(
+		//	new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1, navStrings));
+		drawerList.setAdapter(new DrawerArrayAdapter(navStrings));
 		drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		if (savedInstanceState == null){
@@ -643,6 +646,57 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 		}
 		return null;
+	}
+
+	private class DrawerArrayAdapter extends BaseAdapter {
+
+		private final String[] navOptions;
+
+		private DrawerArrayAdapter(String[] navOptions) {
+			this.navOptions = navOptions;
+		}
+
+		@Override
+		public int getCount() {
+			return navOptions.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return navOptions[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = getLayoutInflater().inflate(R.layout.list_row_drawer, parent, false);
+			TextView textView = (TextView) view.findViewById(R.id.list_row_drawer_txtView);
+			textView.setText(navOptions[position]);
+			ImageView imageView = (ImageView) view.findViewById(R.id.list_row_drawer_imgView);
+			switch (position){
+				case 0:
+					imageView.setImageResource(R.drawable.home);
+					break;
+				case 1:
+					imageView.setImageResource(R.drawable.map);
+					break;
+				case 2:
+					imageView.setImageBitmap(HHUser.getProfilePicture());
+					imageView.setImageTintList(null);
+					ImageView imgFrame = (ImageView) view.findViewById(R.id.list_row_drawer_imgFrame);
+					imgFrame.setVisibility(View.VISIBLE);
+
+					break;
+				case 3:
+					imageView.setImageResource(R.drawable.search);
+					break;
+			}
+			return view;
+		}
 	}
 
 }

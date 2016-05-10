@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:background="@color/adam_theme_base"
         android:paddingTop="5dp"
-        android:paddingBottom="5dp">
+        android:paddingBottom="5dp"
+        android:elevation="4dp">
 
         <FrameLayout
             android:layout_width="50dp"
@@ -171,7 +172,8 @@
                 android:layout_height="104dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="5dp"
+                android:elevation="2dp">
 
                 <ImageView
                     android:layout_width="104dp"

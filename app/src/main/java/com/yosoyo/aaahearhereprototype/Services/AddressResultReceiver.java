@@ -29,8 +29,12 @@ public class AddressResultReceiver extends ResultReceiver {
 
 	@Override
 	protected void onReceiveResult(int resultCode, Bundle resultData){
-		Address address = new Gson().fromJson(resultData.getString(FetchAddressIntentService.Constants.RESULT_DATA_KEY), Address.class);
-
-		callback.returnAddress(address);
+		try {
+			Address address = new Gson().fromJson(resultData.getString(FetchAddressIntentService.Constants.RESULT_DATA_KEY), Address.class);
+			callback.returnAddress(address);
+		} catch (Exception e){
+			callback.returnAddress(null);
+			e.printStackTrace();
+		}
 	}
 }

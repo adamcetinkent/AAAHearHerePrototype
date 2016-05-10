@@ -4,8 +4,10 @@ package com.yosoyo.aaahearhereprototype.Fragments;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -17,19 +19,23 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.facebook.Profile;
@@ -44,6 +50,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.R;
+import com.yosoyo.aaahearhereprototype.ZZZInterface.OverscrollExpandableListView;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.IOException;
@@ -84,21 +91,26 @@ public class FeedFragment extends FeedbackFragment {
 	private ProfileFragment profileFragment;
 	private Bundle profileFragmentBundle;
 
-	private ExpandableListView lstTimeline;
+	private OverscrollExpandableListView lstTimeline;
 	private TimelineCustomExpandableAdapter lstTimelineAdapter;
 	public static final String KEY_POSTS = TAG + "posts";
 	private List<HHPostFull> posts = new ArrayList<>();
 
 	private ProgressBar footerView;
+	private LinearLayout headerView;
 
 	public static final String KEY_EARLIEST_WEB_POST = TAG + "earliest_web_post";
 	private Timestamp earliestWebPost;
-	private Timestamp requestedWebPost;
+	//private Timestamp requestedWebPost;
 	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
 	private boolean haveEarliestPost = false;
+	public static final String KEY_LATEST_WEB_POST = TAG + "latest_web_post";
+	private Timestamp latestWebPost;
 
 	private Set<Long> currentPostIDs = new HashSet<>();
 	public static final String KEY_CURRENT_POST_IDS = TAG + "current_post_ids";
+	private boolean refreshing;
+	//private boolean overScrollReleased = false;
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -150,6 +162,7 @@ public class FeedFragment extends FeedbackFragment {
 		bundle.putLong(MapViewFragment.KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
 		bundle.putBoolean(MapViewFragment.KEY_HAVE_EARLIEST_POST, haveEarliestPost);
 		bundle.putLongArray(MapViewFragment.KEY_CURRENT_POST_IDS, ZZZUtility.getLongArray(currentPostIDs));
+		bundle.putLong(MapViewFragment.KEY_LATEST_WEB_POST, latestWebPost.getTime());
 	}
 
 	public FeedFragment() {
@@ -162,6 +175,7 @@ public class FeedFragment extends FeedbackFragment {
 		feedType = bundle.getInt(KEY_FEED_TYPE);
 		posts = bundle.getParcelableArrayList(KEY_POSTS);
 		earliestWebPost = new Timestamp(bundle.getLong(KEY_EARLIEST_WEB_POST));
+		latestWebPost = new Timestamp(bundle.getLong(KEY_LATEST_WEB_POST));
 		haveEarliestPost = bundle.getBoolean(KEY_HAVE_EARLIEST_POST);
 		if (bundle.containsKey(KEY_POST_ID)) postID = bundle.getLong(KEY_POST_ID);
 		if (bundle.containsKey(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE))
@@ -234,6 +248,7 @@ public class FeedFragment extends FeedbackFragment {
 		outState.putParcelableArrayList(KEY_POSTS, (ArrayList<? extends Parcelable>) posts);
 		outState.putBoolean(KEY_HAVE_EARLIEST_POST, haveEarliestPost);
 		outState.putLong(KEY_EARLIEST_WEB_POST, earliestWebPost.getTime());
+		outState.putLong(KEY_LATEST_WEB_POST, latestWebPost.getTime());
 
 		if (profileFragmentBundle != null){
 			outState.putBundle(ProfileFragment.KEY_PROFILE_FRAGMENT_BUNDLE, profileFragmentBundle);
@@ -250,7 +265,7 @@ public class FeedFragment extends FeedbackFragment {
 
 		View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
-		lstTimeline = (ExpandableListView) view.findViewById(R.id.fragment_feed_lstTimeline);
+		lstTimeline = (OverscrollExpandableListView) view.findViewById(R.id.fragment_feed_lstTimeline);
 		//progressBarFooter = inflater.inflate(R.layout.list_row_timeline_footer, null, false);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
@@ -324,7 +339,24 @@ public class FeedFragment extends FeedbackFragment {
 				lstTimelineAdapter.setHaveEarliestPost(haveEarliestPost);
 			if (savedInstanceState.containsKey(KEY_EARLIEST_WEB_POST))
 				lstTimelineAdapter.setEarliestWebPost(earliestWebPost);
+			//if (savedInstanceState.containsKey(KEY_LATEST_WEB_POST))
+			//	lstTimelineAdapter.setLatestWebPost(latestWebPost);
 		}
+		lstTimeline.setOnOverScrollListener(
+			new OverscrollExpandableListView.onOverScrollListener() {
+				@Override
+				public void onOverScroll() {
+					//Toast.makeText(getActivity(), "REFRESH", Toast.LENGTH_LONG).show();
+					getNewData();
+				}
+
+				@Override
+				public void onRelease() {
+					//overScrollReleased = true;
+					if (!refreshing)
+						setListRefreshProgressBar(false);
+				}
+			});
 
 		if (fetchData) {
 			getData();
@@ -346,6 +378,44 @@ public class FeedFragment extends FeedbackFragment {
 		}
 	}
 
+	private void setListRefreshProgressBar(boolean active){
+		int headersCount = lstTimeline.getHeaderViewsCount();
+		if (active && (headersCount <= 0 || feedType == USER_PROFILE_FEED && headersCount <= 1)){
+			headerView = new LinearLayout(getActivity());
+			headerView.setGravity(Gravity.CENTER);
+			headerView.addView(new ProgressBar(getActivity()));
+			headerView.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.adam_theme_black));
+			lstTimeline.addHeaderView(headerView);
+		} else if (headerView != null && headersCount > 0 || (feedType == USER_PROFILE_FEED && headersCount > 1)) {
+			final int height = headerView.getHeight();
+			Animation shrink = new Animation() {
+
+				@Override
+				protected void applyTransformation(float interpolatedTime, Transformation t) {
+					if (interpolatedTime > 0.95){
+						// NOT USING A LISTENER TO AVOID WEIRD FLASHING BEHAVIOUR
+						lstTimeline.removeHeaderView(headerView);
+					} else {
+						headerView.setScaleX(1-interpolatedTime);
+						headerView.setScaleY(1-interpolatedTime);
+						ViewGroup.LayoutParams layoutParams = headerView.getLayoutParams();
+						layoutParams.height = (int) (height * (1.0f-interpolatedTime));
+						headerView.setLayoutParams(layoutParams);
+					}
+				}
+
+				@Override
+				public boolean willChangeBounds() {
+					return true;
+				}
+			};
+
+			shrink.setDuration(500);
+
+			headerView.startAnimation(shrink);
+		}
+	}
+
 	private void getData(){
 		setListProgressBar(true);
 		switch (feedType) {
@@ -358,6 +428,26 @@ public class FeedFragment extends FeedbackFragment {
 				getUserData();
 				break;
 			}
+			case SINGLE_POST_FEED:{
+				getSinglePostData();
+				break;
+			}
+		}
+	}
+
+	private void getNewData(){
+		refreshing = true;
+		setListRefreshProgressBar(true);
+		switch (feedType) {
+			case GENERAL_FEED: {
+				getAllNewData();
+				break;
+			}
+			/*case HOME_PROFILE_FEED:
+			case USER_PROFILE_FEED: {
+				getUserNewData();
+				break;
+			}*/
 			case SINGLE_POST_FEED:{
 				getSinglePostData();
 				break;
@@ -386,6 +476,15 @@ public class FeedFragment extends FeedbackFragment {
 				setListProgressBar(false);
 				currentPostIDs.add(post.getPost().getID());
 			}
+			if (latestWebPost == null || feedType == SINGLE_POST_FEED || post.getPost().getCreatedAt().after(latestWebPost)){
+				latestWebPost = post.getPost().getCreatedAt();
+				lstTimelineAdapter.setLatestWebPost(latestWebPost);
+				//setListRefreshProgressBar(false);
+				currentPostIDs.add(post.getPost().getID());
+			}
+			if (refreshing){
+				setListRefreshProgressBar(false);
+			}
 		}
 
 		@Override
@@ -394,23 +493,50 @@ public class FeedFragment extends FeedbackFragment {
 			lstTimelineAdapter.setHaveEarliestPost(true);
 			setListProgressBar(false);
 		}
+
+		@Override
+		public void warnNoLaterPosts() {
+			Toast.makeText(getActivity(), "NO NEW POSTS", Toast.LENGTH_SHORT).show();
+			refreshing = false;
+			setListRefreshProgressBar(false);
+		}
 	};
 
 	private void getAllData(){
+		if (earliestWebPost == null)
+			earliestWebPost = new Timestamp(System.currentTimeMillis());
 		AsyncDataManager.getAllPosts(earliestWebPost,
 									 currentPostIDs.toArray(new Long[currentPostIDs.size()]),
 									 getAllPostsCallback);
-		if (requestedWebPost == null){
+		/*if (requestedWebPost == null){
 			requestedWebPost = new Timestamp(System.currentTimeMillis());
 			if (earliestWebPost == null)
 				earliestWebPost = requestedWebPost;
 		} else {
 			requestedWebPost = earliestWebPost;
 		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
+	}
+
+	private void getAllNewData(){
+		if (latestWebPost == null)
+			latestWebPost = new Timestamp(System.currentTimeMillis());
+		AsyncDataManager.getAllPostsSince(latestWebPost,
+										  currentPostIDs.toArray(new Long[currentPostIDs.size()]),
+										  getAllPostsCallback);
+		/*if (requestedWebPost == null){
+			requestedWebPost = new Timestamp(System.currentTimeMillis());
+			if (latestWebPost == null)
+				earliestWebPost = latestWebPost;
+		} else {
+			requestedWebPost = earliestWebPost;
+		}
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void getUserData(){
+		if (earliestWebPost == null)
+			earliestWebPost = new Timestamp(System.currentTimeMillis());
 		AsyncDataManager.getUserPrivacy(
 			userID,
 			true,
@@ -430,17 +556,19 @@ public class FeedFragment extends FeedbackFragment {
 					}
 				}
 			});
-		if (requestedWebPost == null){
+		/*if (requestedWebPost == null){
 			requestedWebPost = new Timestamp(System.currentTimeMillis());
 			if (earliestWebPost == null)
 				earliestWebPost = requestedWebPost;
 		} else {
 			requestedWebPost = earliestWebPost;
 		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void getSinglePostData(){
+		if (earliestWebPost == null)
+			earliestWebPost = new Timestamp(System.currentTimeMillis());
 		//TODO SHOULD ACTUALLY CHECK FOR POST PRIVACY
 		AsyncDataManager.getUserPrivacy(
 			userID,
@@ -459,14 +587,14 @@ public class FeedFragment extends FeedbackFragment {
 					}
 				}
 			});
-		if (requestedWebPost == null){
+		/*if (requestedWebPost == null){
 			requestedWebPost = new Timestamp(System.currentTimeMillis());
 			if (earliestWebPost == null)
 				earliestWebPost = requestedWebPost;
 		} else {
 			requestedWebPost = earliestWebPost;
 		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);
+		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void setPrivateProfile(){
@@ -518,9 +646,11 @@ public class FeedFragment extends FeedbackFragment {
 
 		private List<HHPostFull> posts;
 		private Timestamp earliestWebPost;
-		private Timestamp requestedWebPost;
+		private Timestamp latestWebPost;
+		//private Timestamp requestedWebPost;
 		private int addingComment = -1;
 		private boolean haveEarliestPost = false;
+		//private boolean refreshing = false;
 
 		public TimelineCustomExpandableAdapter(Activity context, List<HHPostFull> posts, AdapterCallback callback, HHUser.HHUserSpan.HHUserSpanClickCallback userSpanClickCallback){
 			super();
@@ -534,9 +664,13 @@ public class FeedFragment extends FeedbackFragment {
 			this.earliestWebPost = earliestWebPost;
 		}
 
-		public void setRequestedWebPost(Timestamp requestedWebPost){
-			this.requestedWebPost = requestedWebPost;
+		public void setLatestWebPost(Timestamp latestWebPost){
+			this.latestWebPost = latestWebPost;
 		}
+
+		/*public void setRequestedWebPost(Timestamp requestedWebPost){
+			this.requestedWebPost = requestedWebPost;
+		}*/
 
 		public void setHaveEarliestPost(boolean haveEarliestPost){
 			this.haveEarliestPost = haveEarliestPost;
@@ -796,7 +930,22 @@ public class FeedFragment extends FeedbackFragment {
 					@Override
 					public void onClick(View v) {
 						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("spotify:track:"+viewHolder.post.getTrack().getTrackID()));
-						context.startActivity(intent);
+						try {
+							context.startActivity(intent);
+						} catch (ActivityNotFoundException activityNotFoundException){
+							try {
+								context.getPackageManager().getPackageInfo("com.spotify.music", PackageManager.GET_ACTIVITIES);
+								Toast.makeText(context, "SPOTIFY NOT FOUND", Toast.LENGTH_LONG).show();
+							} catch (PackageManager.NameNotFoundException nameNotFoundException) {
+								nameNotFoundException.printStackTrace();
+								try {
+									context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.spotify.music")));
+								} catch (ActivityNotFoundException playStoreNotFoundException){
+									context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.spotify.music")));
+								}
+							}
+							activityNotFoundException.printStackTrace();
+						}
 					}
 				});
 
@@ -889,7 +1038,7 @@ public class FeedFragment extends FeedbackFragment {
 			viewHolder.btnLikeButton.setOnCheckedChangeListener(viewHolder.likeCheckListener);
 
 			if (!haveEarliestPost
-				&& (requestedWebPost == null || !requestedWebPost.equals(earliestWebPost))
+				//&& (requestedWebPost == null || !requestedWebPost.equals(earliestWebPost))
 				&& (viewHolder.post.getPost().getCreatedAt().equals(earliestWebPost)
 					|| groupPosition == getGroupCount() - 1)
 				){

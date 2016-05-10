@@ -112,30 +112,30 @@
 
                 <SearchView
                     android:id="@+id/post_fragment_searchTrackName"
+                    style="@style/SearchViewTheme"
                     android:text="@string/placeholder_track_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
-                    android:textColor="#ff000000"
                     android:textSize="14sp"
                     android:textStyle="bold"
+                    android:textColor="@color/adam_theme_light"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
                     android:queryHint="Track name"
-                    android:iconifiedByDefault="false"
-                    />
+                    android:iconifiedByDefault="false"/>
 
                 <SearchView
                     android:id="@+id/post_fragment_searchArtist"
+                    style="SearchViewTheme"
                     android:text="@string/placeholder_artist_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
-                    android:textColor="#ff000000"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"
@@ -146,13 +146,13 @@
 
                 <SearchView
                     android:id="@+id/post_fragment_searchAlbum"
+                    style="SearchViewTheme"
                     android:text="@string/placeholder_album_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:ellipsize="end"
                     android:singleLine="false"
-                    android:textColor="#ff000000"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginLeft="15dp"

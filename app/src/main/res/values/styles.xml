@@ -7,6 +7,17 @@
     <!--<style name="AppTheme" parent="Theme.AppCompat.NoActionBar">-->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:actionBarStyle">@style/AdamActionBar</item>
+        <item name="android:editTextColor">@color/adam_theme_lightest</item>
+    </style>
+
+    <style name="AdamActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/adam_theme_base</item>
+    </style>
+
+    <style name="SearchViewTheme" parent="AppTheme">
+        <item name="android:editTextColor">@color/adam_theme_lightest</item>
+        <item name="android:textColorHint">@color/adam_theme_grey</item>
     </style>
 
 </resources>

@@ -141,6 +141,8 @@ public class MapViewFragment
 	private Timestamp requestedWebPost;
 	public static final String KEY_HAVE_EARLIEST_POST = TAG + "have_earliest_post";
 	private boolean haveEarliestPost = false;
+	public static final String KEY_LATEST_WEB_POST = TAG + "latest_web_post";
+	private Timestamp latestWebPost;
 
 	private boolean alreadyFetchingPosts = false;
 	private Set<Long> currentPostIDs = new HashSet<>();
@@ -589,6 +591,11 @@ public class MapViewFragment
 								public void warnNoEarlierPosts() {
 									alreadyFetchingPosts = false;
 								}
+
+								@Override
+								public void warnNoLaterPosts() {
+
+								}
 							});
 					} else if (mapType == USER_MAP) {
 					/*AsyncDataManager.getUserPostsWithinBounds(
@@ -653,6 +660,11 @@ public class MapViewFragment
 
 							@Override
 							public void warnNoEarlierPosts() {
+								//TODO
+							}
+
+							@Override
+							public void warnNoLaterPosts() {
 								//TODO
 							}
 						});
@@ -903,7 +915,7 @@ public class MapViewFragment
 					String userName = String.format(" %s ", tagUser.getName());
 					message.replace(start, end, userName);
 					message.setSpan(
-						new HHUser.HHUserSpan(getContext(), tagUser, null),
+						new HHUser.HHUserSpan(getActivity(), tagUser, null),
 						start,
 						start + userName.length(),
 						Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

@@ -8,6 +8,7 @@
     <color name="adam_theme_darkest">#845100</color>
     <color name="adam_theme_black">#202020</color>
     <color name="adam_theme_grey">#909090</color>
+    <!--<color name="adam_theme_grey_hint">#B0B0B0</color>-->
     <color name="adam_theme_white">#ffffff</color>
 
 </resources>

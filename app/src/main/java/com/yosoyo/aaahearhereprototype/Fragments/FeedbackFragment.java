@@ -1,5 +1,6 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,6 +22,16 @@ public abstract class FeedbackFragment extends Fragment {
 		super.onAttach(context);
 		try {
 			fragmentChangeRequestListener = (FragmentChangeRequestListener) context;
+		} catch (ClassCastException e){
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onAttach(Activity activtiy) {
+		super.onAttach(activtiy);
+		try {
+			fragmentChangeRequestListener = (FragmentChangeRequestListener) activtiy;
 		} catch (ClassCastException e){
 			e.printStackTrace();
 		}
@@ -66,6 +77,10 @@ public abstract class FeedbackFragment extends Fragment {
 	// TODO: DOCUMENTATION
 	void onLoginSuccess(){
 		fragmentChangeRequestListener.onLoginSuccess();
+	}
+
+	void requestMapView(){
+		fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.MAP_VIEW_REQUEST, null);
 	}
 
 }

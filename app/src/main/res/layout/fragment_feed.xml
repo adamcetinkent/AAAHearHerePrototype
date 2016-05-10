@@ -6,13 +6,14 @@
              tools:context=".Fragments.FeedFragment"
              android:background="@color/adam_theme_black">
 
-    <ExpandableListView
+    <com.yosoyo.aaahearhereprototype.ZZZInterface.OverscrollExpandableListView
         android:id="@+id/fragment_feed_lstTimeline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:groupIndicator="@null"
         android:divider="@color/adam_theme_darkest"
-        android:childDivider="@android:color/transparent"/>
+        android:childDivider="@android:color/transparent"
+        android:overScrollMode="always"/>
 
    <!-- <android.support.design.widget.FloatingActionButton
         android:id="@+id/fragment_feed_fab"

@@ -56,6 +56,7 @@ public class WebHelper {
 	public interface GetAllPostsCallback {
 		void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess);
 		void warnNoEarlierPosts();
+		void warnNoLaterPosts();
 	}
 
 	public static void getAllPosts(final Timestamp beforeTime,
@@ -65,16 +66,35 @@ public class WebHelper {
 			beforeTime,
 			excludeIDs,
 			new GetPostsTask.Callback() {
-			@Override
-			public void returnPosts(List<HHPostFullProcess> postsToProcess) {
-				callback.returnGetAllPosts(postsToProcess);
-				if (postsToProcess != null) {
-					preLoadPostProcessBitmaps(postsToProcess);
-					if (postsToProcess.size() <= 0)
-						callback.warnNoEarlierPosts();
+				@Override
+				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
+					callback.returnGetAllPosts(postsToProcess);
+					if (postsToProcess != null) {
+						preLoadPostProcessBitmaps(postsToProcess);
+						if (postsToProcess.size() <= 0)
+							callback.warnNoEarlierPosts();
+					}
 				}
-			}
-		}).execute();
+			}).execute();
+	}
+
+	public static void getAllPostsSince(final Timestamp sinceTime,
+								   		final Long[] excludeIDs,
+								   		final GetAllPostsCallback callback){
+		new GetPostsSinceTask(
+			sinceTime,
+			excludeIDs,
+			new GetPostsSinceTask.Callback() {
+				@Override
+				public void returnPosts(List<HHPostFullProcess> postsToProcess) {
+					callback.returnGetAllPosts(postsToProcess);
+					if (postsToProcess != null) {
+						preLoadPostProcessBitmaps(postsToProcess);
+						if (postsToProcess.size() <= 0)
+							callback.warnNoLaterPosts();
+					}
+				}
+			}).execute();
 	}
 
 	public static void getUserPosts(final long userID,

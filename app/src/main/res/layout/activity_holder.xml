@@ -28,7 +28,7 @@
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
-        android:background="#ffffff"
+        android:background="@color/adam_theme_black"
         />
 
 </android.support.v4.widget.DrawerLayout>

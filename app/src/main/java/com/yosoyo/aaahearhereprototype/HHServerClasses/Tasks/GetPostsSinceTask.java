@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostFullNested;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -22,14 +23,16 @@ import java.util.Locale;
 /**
  * Created by adam on 18/02/16.
  *
- * Requests the posts from the server since the given time
+ * Requests the posts from the server sinceTime the given time
  */
 class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 	private static final String TAG = "GetPostsSinceTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/since/%2$s";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/since/%1$s";
+	private static final String VM_SERVER_ADDRESS_EXCLUDE = WebHelper.SERVER_IP + "/posts/since/%1$s/exclude/%2$s";
 
-	private final long userID;
-	private final Timestamp since;
+	//private final long userID;
+	private final Timestamp sinceTime;
+	private final Long[] excludeIDs;
 
 	public interface Callback {
 		void returnPosts(List<HHPostFullProcess> postsToProcess);
@@ -37,21 +40,33 @@ class GetPostsSinceTask extends AsyncTask<Void, Void, List<HHPostFullProcess>> {
 
 	private final Callback callbackTo;
 
-	public GetPostsSinceTask(long userID, Timestamp since, Callback callbackTo) {
-		this.userID = userID;
-		this.since = since;
+	public GetPostsSinceTask(final Timestamp sinceTime,
+							 final Long[] excludeIDs,
+							 final Callback callbackTo) {
+		//this.userID = userID;
+		this.excludeIDs = excludeIDs;
+		this.sinceTime = sinceTime;
 		this.callbackTo = callbackTo;
 	}
 
 	@Override
 	protected List<HHPostFullProcess> doInBackground(Void... params) {
-		String urlString = String.format(Locale.ENGLISH,
-										 VM_SERVER_ADDRESS,
-										 since.toString());
+		String urlString;
+		if (excludeIDs != null && excludeIDs.length > 0)
+			urlString = String.format(Locale.ENGLISH,
+									  VM_SERVER_ADDRESS_EXCLUDE,
+									  sinceTime.toString(),
+									  ZZZUtility.formatURL(excludeIDs));
+		else
+			urlString = String.format(Locale.ENGLISH,
+									  VM_SERVER_ADDRESS,
+									  sinceTime.toString());
+		urlString = urlString.replace(" ", "%20");
 		Log.d(TAG, "Fetching Posts from " + urlString);
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestProperty("Authorization", "Token token="+ HHUser.getAuthorisationToken());
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);

@@ -172,6 +172,7 @@ public class AsyncDataManager {
 	public interface GetAllPostsCallback extends GetPostCallback {
 		void returnPostList(List<HHPostFull> posts);
 		void warnNoEarlierPosts();
+		void warnNoLaterPosts();
 	}
 
 	/**
@@ -256,6 +257,61 @@ public class AsyncDataManager {
 				public void warnNoEarlierPosts(){
 					callback.warnNoEarlierPosts();
 				}
+
+				@Override
+				public void warnNoLaterPosts(){}
+			});
+	}
+
+	/**
+	 * Fetch the next batch of posts that the current user is allowed to see
+	 *
+	 * @param sinceTime 	: fetch batch since this date
+	 * @param callback		: return results via callback
+	 */
+	public static void getAllPostsSince(final Timestamp sinceTime,
+								   		final Long[] excludeIDs,
+								   		final GetAllPostsCallback callback){
+		//getAllCachedPosts(beforeTime, callback);
+		getAllWebPostsSince(sinceTime, excludeIDs, callback);
+	}
+
+	private static void getAllCachedPostsSince(final Timestamp beforeTime,
+											   final GetAllPostsCallback callback){
+		if (beforeTime == null)
+			return;
+		//TODO INCLUDE BEFORETIME
+		DatabaseHelper.getAllCachedPosts(context, new DatabaseHelper.GetAllCachedPostsCallback() {
+			@Override
+			public void returnGetAllCachedPosts(List<HHPostFull> cachedPosts) {
+				callback.returnPostList(cachedPosts);
+				WebHelper.preLoadPostBitmaps(cachedPosts);
+			}
+		});
+	}
+
+	private static void getAllWebPostsSince(final Timestamp sinceTime,
+									   		final Long[] excludeIDs,
+									   		final GetAllPostsCallback callback){
+		WebHelper.getAllPostsSince(
+			sinceTime,
+			excludeIDs,
+			new WebHelper.GetAllPostsCallback() {
+				@Override
+				public void returnGetAllPosts(List<HHPostFullProcess> webPostsToProcess) {
+					if (webPostsToProcess != null)
+						DatabaseHelper.processWebPosts(context, webPostsToProcess, callback);
+				}
+
+				@Override
+				public void warnNoEarlierPosts(){
+					callback.warnNoEarlierPosts();
+				}
+
+				@Override
+				public void warnNoLaterPosts(){
+					callback.warnNoLaterPosts();
+				}
 			});
 	}
 
@@ -313,6 +369,9 @@ public class AsyncDataManager {
 				public void warnNoEarlierPosts(){
 					callback.warnNoEarlierPosts();
 				}
+
+				@Override
+				public void warnNoLaterPosts(){}
 			});
 	}
 
@@ -447,8 +506,11 @@ public class AsyncDataManager {
 				}
 
 				@Override
-				public void warnNoEarlierPosts() {
-					callback.warnNoEarlierPosts();
+				public void warnNoEarlierPosts() {}
+
+				@Override
+				public void warnNoLaterPosts() {
+					callback.warnNoLaterPosts();
 				}
 			});
 	}

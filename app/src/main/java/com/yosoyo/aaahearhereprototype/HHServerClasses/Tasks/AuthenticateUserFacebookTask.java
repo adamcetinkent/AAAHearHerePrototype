@@ -52,6 +52,7 @@ public class AuthenticateUserFacebookTask extends AsyncTask<Void, Void, Integer>
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
+				urlConnection.setRequestProperty("Authorization", "Token token="+ accessToken.getToken());
 				urlConnection.setRequestMethod("POST");
 
 				String json = new Gson().toJson(accessToken, AccessToken.class);
