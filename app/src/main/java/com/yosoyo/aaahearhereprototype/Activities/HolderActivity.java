@@ -55,6 +55,7 @@ import com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
@@ -74,7 +75,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	public static final String VISIBLE_FRAGMENT = "visible_fragment";
 	public static final String REQUEST_CODE = "request_code";
 	public static final int REQUEST_CODE_SHOW_POST = 44260420;
+	public static final int REQUEST_CODE_SHOW_POST_FROM_ID = 44260421;
 	public static final String KEY_NOTIFICATION_POST = TAG + "notification_post";
+	public static final String KEY_NOTIFICATION_NEW_POST = TAG + "notification_new_post";
 
 	public static CallbackManager callbackManager;
 
@@ -130,6 +133,21 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					pendingFragment = PostFragment.newInstance(trackID);
 
 					break;
+				}
+				case Intent.ACTION_VIEW:{
+
+					Log.d(TAG, "NEW INTENT: "+intent.toString());
+					HHPostFull post = intent.getParcelableExtra(KEY_NOTIFICATION_POST);
+					if (post != null) {
+						pendingFragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED,
+																		   post.getUser().getID(),
+																		   post.getPost().getID());
+					} else if (intent.hasExtra(KEY_NOTIFICATION_NEW_POST)){
+						HHNotification notification = intent.getParcelableExtra(KEY_NOTIFICATION_NEW_POST);
+						pendingFragment = FeedFragment.newInstance(notification);
+					}
+					break;
+
 				}
 			}
 		}
@@ -611,6 +629,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					commitFragmentTransaction(FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED,
 																	   post.getUser().getID(),
 																	   post.getPost().getID()),
+											  true);
+				} else if (intent.hasExtra(KEY_NOTIFICATION_NEW_POST)){
+					HHNotification notification = intent.getParcelableExtra(KEY_NOTIFICATION_NEW_POST);
+					commitFragmentTransaction(FeedFragment.newInstance(notification),
 											  true);
 				}
 				break;

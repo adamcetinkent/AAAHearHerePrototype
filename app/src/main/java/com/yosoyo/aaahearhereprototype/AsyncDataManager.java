@@ -13,6 +13,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -1399,6 +1400,56 @@ public class AsyncDataManager {
 					callback.returnGetSpotifyArtistTopTracks(spotifyTracks);
 				}
 			});
+	}
+
+	//TODO DOCUMENTATION ETC
+
+	public interface GetNotificationsCallback {
+		void returnGetNotifications(List<HHNotification> notifications);
+	}
+
+	public static void getNotifications(final String authToken,
+										final GetNotificationsCallback callback){
+		getNotifications(authToken, null, null, callback);
+	}
+
+	public static void getNotifications(final String authToken,
+										final Timestamp sinceTime,
+										final GetNotificationsCallback callback){
+		getNotifications(authToken, sinceTime, null, callback);
+	}
+
+	public static void getNotifications(final String authToken,
+										final Timestamp sinceTime,
+										final Long[] excludeIDs,
+										final GetNotificationsCallback callback){
+		WebHelper.getNotifications(
+			authToken,
+			sinceTime,
+			excludeIDs,
+			new WebHelper.GetNotificationsCallback() {
+				@Override
+				public void returnGetNotifications(List<HHNotification> notifications) {
+					callback.returnGetNotifications(notifications);
+				}
+			});
+	}
+
+	public interface ReadNotificationCallback {
+		void returnReadNotification(HHNotification readNotification);
+	}
+
+	public static void readNotification(final HHNotification notification,
+										final ReadNotificationCallback callback){
+		WebHelper.readNotification(
+			notification,
+			new WebHelper.ReadNotificationCallback(){
+				@Override
+				public void returnReadNotification(HHNotification readNotification) {
+					callback.returnReadNotification(readNotification);
+				}
+			}
+		);
 	}
 
 }

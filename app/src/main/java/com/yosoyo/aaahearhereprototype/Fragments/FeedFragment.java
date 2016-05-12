@@ -45,6 +45,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -112,6 +113,8 @@ public class FeedFragment extends FeedbackFragment {
 	private boolean refreshing;
 	//private boolean overScrollReleased = false;
 
+	private HHNotification postNotification;
+
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
 	}
@@ -119,10 +122,12 @@ public class FeedFragment extends FeedbackFragment {
 	public static FeedFragment newInstance(int feedType, long userID){
 		FeedFragment feedFragment = new FeedFragment();
 
-		Bundle arguments = new Bundle();
+		/*Bundle arguments = new Bundle();
 		arguments.putInt(KEY_FEED_TYPE, feedType);
 		arguments.putLong(KEY_USER_ID, userID);
-		feedFragment.setArguments(arguments);
+		feedFragment.setArguments(arguments);*/
+		feedFragment.feedType = feedType;
+		feedFragment.userID = userID;
 
 		return feedFragment;
 	}
@@ -130,11 +135,28 @@ public class FeedFragment extends FeedbackFragment {
 	public static FeedFragment newInstance(int feedType, long userID, long postID){
 		FeedFragment feedFragment = new FeedFragment();
 
-		Bundle arguments = new Bundle();
+		/*Bundle arguments = new Bundle();
 		arguments.putInt(KEY_FEED_TYPE, feedType);
 		arguments.putLong(KEY_USER_ID, userID);
 		arguments.putLong(KEY_POST_ID, postID);
-		feedFragment.setArguments(arguments);
+		feedFragment.setArguments(arguments);*/
+		feedFragment.feedType = feedType;
+		feedFragment.userID = userID;
+		feedFragment.postID = postID;
+
+		return feedFragment;
+	}
+
+	public static FeedFragment newInstance(final HHNotification notification){
+		FeedFragment feedFragment = new FeedFragment();
+
+		/*Bundle arguments = new Bundle();
+		arguments.putInt(KEY_FEED_TYPE, feedType);
+		arguments.putLong(KEY_USER_ID, userID);
+		arguments.putLong(KEY_POST_ID, postID);
+		feedFragment.setArguments(arguments);*/
+		feedFragment.feedType = SINGLE_POST_FEED;
+		feedFragment.postNotification = notification;
 
 		return feedFragment;
 	}
@@ -196,10 +218,10 @@ public class FeedFragment extends FeedbackFragment {
 
 		setHasOptionsMenu(true);
 
-		Bundle arguments = getArguments();
+		/*Bundle arguments = getArguments();
 		if (arguments != null){
 			handleArguments(arguments);
-		}
+		}*/
 
 		if (savedInstanceState != null){
 			restoreInstanceState(savedInstanceState);
@@ -207,7 +229,7 @@ public class FeedFragment extends FeedbackFragment {
 
 	}
 
-	private void handleArguments(Bundle arguments){
+	/*private void handleArguments(Bundle arguments){
 		feedType = arguments.getInt(KEY_FEED_TYPE);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
@@ -224,7 +246,7 @@ public class FeedFragment extends FeedbackFragment {
 			postID = arguments.getLong(KEY_POST_ID);
 		}
 
-	}
+	}*/
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -266,7 +288,6 @@ public class FeedFragment extends FeedbackFragment {
 		View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
 		lstTimeline = (OverscrollExpandableListView) view.findViewById(R.id.fragment_feed_lstTimeline);
-		//progressBarFooter = inflater.inflate(R.layout.list_row_timeline_footer, null, false);
 
 		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED) {
 			View headerView = inflater.inflate(R.layout.fragment_frame, null, false);
@@ -322,7 +343,8 @@ public class FeedFragment extends FeedbackFragment {
 
 				@Override
 				public void onLastItemReached(){
-					getData();
+					if (feedType != SINGLE_POST_FEED)
+						getData();
 				}
 			},
 			new HHUser.HHUserSpan.HHUserSpanClickCallback() {
@@ -465,7 +487,7 @@ public class FeedFragment extends FeedbackFragment {
 		}
 
 		@Override
-		public void returnGetPost(HHPostFull post) {
+		public void returnGetPost(final HHPostFull post) {
 			Log.d(TAG, "Web post returned!");
 			posts = ZZZUtility.updateList(posts, post);
 			notifyAdapter();
@@ -484,6 +506,19 @@ public class FeedFragment extends FeedbackFragment {
 			}
 			if (refreshing){
 				setListRefreshProgressBar(false);
+			}
+			if (feedType == SINGLE_POST_FEED && postNotification != null){
+				AsyncDataManager.readNotification(
+					postNotification,
+					new AsyncDataManager.ReadNotificationCallback(){
+						@Override
+						public void returnReadNotification(HHNotification readNotification){
+							postID = post.getPost().getID();
+							postNotification = null;
+						}
+					}
+				);
+
 			}
 		}
 
@@ -508,14 +543,6 @@ public class FeedFragment extends FeedbackFragment {
 		AsyncDataManager.getAllPosts(earliestWebPost,
 									 currentPostIDs.toArray(new Long[currentPostIDs.size()]),
 									 getAllPostsCallback);
-		/*if (requestedWebPost == null){
-			requestedWebPost = new Timestamp(System.currentTimeMillis());
-			if (earliestWebPost == null)
-				earliestWebPost = requestedWebPost;
-		} else {
-			requestedWebPost = earliestWebPost;
-		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void getAllNewData(){
@@ -524,14 +551,6 @@ public class FeedFragment extends FeedbackFragment {
 		AsyncDataManager.getAllPostsSince(latestWebPost,
 										  currentPostIDs.toArray(new Long[currentPostIDs.size()]),
 										  getAllPostsCallback);
-		/*if (requestedWebPost == null){
-			requestedWebPost = new Timestamp(System.currentTimeMillis());
-			if (latestWebPost == null)
-				earliestWebPost = latestWebPost;
-		} else {
-			requestedWebPost = earliestWebPost;
-		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void getUserData(){
@@ -556,45 +575,16 @@ public class FeedFragment extends FeedbackFragment {
 					}
 				}
 			});
-		/*if (requestedWebPost == null){
-			requestedWebPost = new Timestamp(System.currentTimeMillis());
-			if (earliestWebPost == null)
-				earliestWebPost = requestedWebPost;
-		} else {
-			requestedWebPost = earliestWebPost;
-		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void getSinglePostData(){
 		if (earliestWebPost == null)
 			earliestWebPost = new Timestamp(System.currentTimeMillis());
-		//TODO SHOULD ACTUALLY CHECK FOR POST PRIVACY
-		AsyncDataManager.getUserPrivacy(
-			userID,
-			true,
-			new AsyncDataManager.GetUserPrivacyCallback() {
-				@Override
-				public void returnCachedUserPrivacy(boolean userPrivacy) {
-				}
-
-				@Override
-				public void returnWebUserPrivacy(boolean userPrivacy) {
-					if (userPrivacy) {
-						AsyncDataManager.getPost(postID, getAllPostsCallback);
-					} else {
-						setPrivateProfile();
-					}
-				}
-			});
-		/*if (requestedWebPost == null){
-			requestedWebPost = new Timestamp(System.currentTimeMillis());
-			if (earliestWebPost == null)
-				earliestWebPost = requestedWebPost;
-		} else {
-			requestedWebPost = earliestWebPost;
+		if (postID >= 0) {
+			AsyncDataManager.getPost(postID, getAllPostsCallback);
+		} else if (postNotification != null){
+			AsyncDataManager.getPost(postNotification.getNotificationLink(), getAllPostsCallback);
 		}
-		lstTimelineAdapter.setRequestedWebPost(requestedWebPost);*/
 	}
 
 	private void setPrivateProfile(){

@@ -15,6 +15,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -497,6 +498,43 @@ public class WebHelper {
 					preLoadUserBitmaps(foundUsers);
 				}
 			}).execute();
+	}
+
+	public interface GetNotificationsCallback{
+		void returnGetNotifications(List<HHNotification> notifications);
+	}
+
+	public static void getNotifications(final String authToken,
+										final Timestamp sinceTime,
+										final Long[] excludeIDs,
+										final GetNotificationsCallback callback){
+		new GetNotificationsTask(
+			authToken,
+			sinceTime,
+			excludeIDs,
+			new GetNotificationsTask.Callback() {
+				@Override
+				public void returnGetNotifications(List<HHNotification> notifications) {
+					callback.returnGetNotifications(notifications);
+				}
+			}).execute();
+	}
+
+	public interface ReadNotificationCallback {
+		void returnReadNotification(HHNotification readNotification);
+	}
+
+	public static void readNotification(final HHNotification notification,
+										final ReadNotificationCallback callback){
+		new ReadNotificationTask(
+			notification,
+			new ReadNotificationTask.Callback(){
+				@Override
+				public void returnReadNotification(HHNotification readNotification) {
+					callback.returnReadNotification(readNotification);
+				}
+			}
+		).execute();
 	}
 
 	private static void preLoadPostProcessBitmaps(List<HHPostFullProcess> posts){

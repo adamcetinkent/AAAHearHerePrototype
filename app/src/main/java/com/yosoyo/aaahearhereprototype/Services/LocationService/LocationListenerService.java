@@ -18,6 +18,7 @@ import android.util.Log;
 import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
@@ -108,9 +109,9 @@ public class LocationListenerService extends Service implements HHLocationListen
 										PendingIntent.FLAG_UPDATE_CURRENT
 									);
 
-									Notification notification;
+									Notification locationNotification;
 									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-										notification = new Notification.Builder(
+										locationNotification = new Notification.Builder(
 											getApplicationContext())
 											.setSmallIcon(R.mipmap.ic_launcher)
 											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
@@ -123,7 +124,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 											.build();
 									} else {
 										//noinspection deprecation
-										notification = new Notification.Builder(
+										locationNotification = new Notification.Builder(
 											getApplicationContext())
 											.setSmallIcon(R.mipmap.ic_launcher)
 											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
@@ -137,13 +138,63 @@ public class LocationListenerService extends Service implements HHLocationListen
 
 									NotificationManager notificationManager = (NotificationManager) getSystemService(
 										Context.NOTIFICATION_SERVICE);
-									notificationManager.notify(NOTIFICATION_ID, notification);
+									notificationManager.notify(NOTIFICATION_ID, locationNotification);
 								}
 							}
 						);
 					}
 				}
 			});
+
+		AsyncDataManager.getNotifications(
+			authToken,
+			new AsyncDataManager.GetNotificationsCallback() {
+				@Override
+				public void returnGetNotifications(List<HHNotification> notifications) {
+					if (notifications != null && !notifications.isEmpty()){
+						for (HHNotification notification : notifications){
+							switch (notification.getNotificationType()){
+								case HHNotification.NOTIFICATION_TYPE_NEW_POST:{
+
+									Intent postIntent = new Intent(
+										getApplicationContext(),
+										HolderActivity.class
+									);
+									postIntent.setAction(Intent.ACTION_VIEW);
+									postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_NEW_POST, notification);
+									PendingIntent intent = PendingIntent.getActivity(
+										getApplicationContext(),
+										HolderActivity.REQUEST_CODE_SHOW_POST_FROM_ID,
+										postIntent,
+										PendingIntent.FLAG_UPDATE_CURRENT
+									);
+
+									Notification postNotification;
+									postNotification = new Notification.Builder(
+										getApplicationContext())
+										.setSmallIcon(R.mipmap.ic_launcher)
+										.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
+										.setContentTitle(getString(R.string.app_name))
+										.setContentText("NOTIFICATION: post #"+notification.getNotificationLink())
+										.setAutoCancel(true)
+										.setPriority(Notification.PRIORITY_DEFAULT)
+										.setDefaults(Notification.DEFAULT_VIBRATE)
+										.setContentIntent(intent)
+										.setNumber(HHNotification.NOTIFICATION_TYPE_NEW_POST * 10000000 + (int) notification.getNotificationLink())
+										.build();
+
+									NotificationManager notificationManager = (NotificationManager) getSystemService(
+										Context.NOTIFICATION_SERVICE);
+									notificationManager.notify(NOTIFICATION_ID, postNotification);
+
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		);
 
 	}
 
