@@ -8,7 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
@@ -17,9 +17,10 @@ import android.util.Log;
 
 import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
+import com.yosoyo.aaahearhereprototype.HHNotificationsManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
@@ -39,6 +40,8 @@ public class LocationListenerService extends Service implements HHLocationListen
 	private String authToken;
 	public static final String USER_ID = TAG+"userID";
 	public static final String AUTH_TOKEN = TAG+"authToken";
+
+	private HHNotificationsManager notificationsManager;
 
 	@Override
 	public void returnNewLocation(final Location location) {
@@ -91,54 +94,63 @@ public class LocationListenerService extends Service implements HHLocationListen
 								public void returnSpotifyTrack(SpotifyTrack spotifyTrack){}
 
 								@Override
-								public void returnCachedSpotifyTrack(HHCachedSpotifyTrack cachedSpotifyTrack) {
-									String notificationText = post.getUser().getName()
-										+ " posted " + cachedSpotifyTrack.getName()
-										+ " at " + post.getPost().getPlaceName();
+								public void returnCachedSpotifyTrack(final HHCachedSpotifyTrack cachedSpotifyTrack) {
 
-									Intent postIntent = new Intent(
-										getApplicationContext(),
-										HolderActivity.class
-									);
-									postIntent.setAction(Intent.ACTION_VIEW);
-									postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_POST, post);
-									PendingIntent intent = PendingIntent.getActivity(
-										getApplicationContext(),
-										HolderActivity.REQUEST_CODE_SHOW_POST,
-										postIntent,
-										PendingIntent.FLAG_UPDATE_CURRENT
-									);
+									WebHelper.getFacebookProfilePicture(
+										post.getUser().getFBUserID(),
+										new WebHelper.GetFacebookProfilePictureCallback() {
+											@Override
+											public void returnFacebookProfilePicture(Bitmap bitmap) {
+												String notificationText = post.getUser().getName()
+													+ " posted " + cachedSpotifyTrack.getName()
+													+ " at " + post.getPost().getPlaceName();
 
-									Notification locationNotification;
-									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-										locationNotification = new Notification.Builder(
-											getApplicationContext())
-											.setSmallIcon(R.mipmap.ic_launcher)
-											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
-											.setContentTitle(getString(R.string.app_name))
-											.setContentText(notificationText)
-											.setAutoCancel(true)
-											.setPriority(Notification.PRIORITY_DEFAULT)
-											.setDefaults(Notification.DEFAULT_VIBRATE)
-											.setContentIntent(intent)
-											.build();
-									} else {
-										//noinspection deprecation
-										locationNotification = new Notification.Builder(
-											getApplicationContext())
-											.setSmallIcon(R.mipmap.ic_launcher)
-											.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
-											.setContentTitle(getString(R.string.app_name))
-											.setContentText(notificationText)
-											.setAutoCancel(true)
-											.setDefaults(Notification.DEFAULT_VIBRATE)
-											.setContentIntent(intent)
-											.getNotification();
-									}
+												Intent postIntent = new Intent(
+													getApplicationContext(),
+													HolderActivity.class
+												);
+												postIntent.setAction(Intent.ACTION_VIEW);
+												postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_POST, post);
+												PendingIntent intent = PendingIntent.getActivity(
+													getApplicationContext(),
+													HolderActivity.REQUEST_CODE_SHOW_POST,
+													postIntent,
+													PendingIntent.FLAG_UPDATE_CURRENT
+												);
 
-									NotificationManager notificationManager = (NotificationManager) getSystemService(
-										Context.NOTIFICATION_SERVICE);
-									notificationManager.notify(NOTIFICATION_ID, locationNotification);
+												Notification locationNotification;
+												if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+													locationNotification = new Notification.Builder(
+														getApplicationContext())
+														.setSmallIcon(R.drawable.app_logo)
+														.setLargeIcon(bitmap)
+														.setContentTitle(getString(R.string.app_name))
+														.setContentText(notificationText)
+														.setAutoCancel(true)
+														.setPriority(Notification.PRIORITY_DEFAULT)
+														.setDefaults(Notification.DEFAULT_VIBRATE)
+														.setContentIntent(intent)
+														.build();
+												} else {
+													//noinspection deprecation
+													locationNotification = new Notification.Builder(
+														getApplicationContext())
+														.setSmallIcon(R.drawable.app_logo)
+														.setLargeIcon(bitmap)
+														.setContentTitle(getString(R.string.app_name))
+														.setContentText(notificationText)
+														.setAutoCancel(true)
+														.setDefaults(Notification.DEFAULT_VIBRATE)
+														.setContentIntent(intent)
+														.getNotification();
+												}
+
+												NotificationManager notificationManager = (NotificationManager) getSystemService(
+													Context.NOTIFICATION_SERVICE);
+												notificationManager.notify(NOTIFICATION_ID, locationNotification);
+											}
+										});
+
 								}
 							}
 						);
@@ -148,52 +160,7 @@ public class LocationListenerService extends Service implements HHLocationListen
 
 		AsyncDataManager.getNotifications(
 			authToken,
-			new AsyncDataManager.GetNotificationsCallback() {
-				@Override
-				public void returnGetNotifications(List<HHNotification> notifications) {
-					if (notifications != null && !notifications.isEmpty()){
-						for (HHNotification notification : notifications){
-							switch (notification.getNotificationType()){
-								case HHNotification.NOTIFICATION_TYPE_NEW_POST:{
-
-									Intent postIntent = new Intent(
-										getApplicationContext(),
-										HolderActivity.class
-									);
-									postIntent.setAction(Intent.ACTION_VIEW);
-									postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_NEW_POST, notification);
-									PendingIntent intent = PendingIntent.getActivity(
-										getApplicationContext(),
-										HolderActivity.REQUEST_CODE_SHOW_POST_FROM_ID,
-										postIntent,
-										PendingIntent.FLAG_UPDATE_CURRENT
-									);
-
-									Notification postNotification;
-									postNotification = new Notification.Builder(
-										getApplicationContext())
-										.setSmallIcon(R.mipmap.ic_launcher)
-										.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.app_logo))
-										.setContentTitle(getString(R.string.app_name))
-										.setContentText("NOTIFICATION: post #"+notification.getNotificationLink())
-										.setAutoCancel(true)
-										.setPriority(Notification.PRIORITY_DEFAULT)
-										.setDefaults(Notification.DEFAULT_VIBRATE)
-										.setContentIntent(intent)
-										.setNumber(HHNotification.NOTIFICATION_TYPE_NEW_POST * 10000000 + (int) notification.getNotificationLink())
-										.build();
-
-									NotificationManager notificationManager = (NotificationManager) getSystemService(
-										Context.NOTIFICATION_SERVICE);
-									notificationManager.notify(NOTIFICATION_ID, postNotification);
-
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
+			notificationsManager.getNotificationsCallback
 		);
 
 	}
@@ -256,6 +223,12 @@ public class LocationListenerService extends Service implements HHLocationListen
 		} catch (IllegalArgumentException e){
 			e.printStackTrace();
 		}
+
+		notificationsManager = new HHNotificationsManager(
+			getApplicationContext(),
+			(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
+			authToken,
+			getString(R.string.app_name));
 	}
 
 	private void initialiseLocationManager(){

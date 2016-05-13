@@ -878,15 +878,19 @@ public class AsyncDataManager {
 		WebHelper.postComment(comment, new WebHelper.PostCommentCallback() {
 			@Override
 			public void returnPostComment(final HHComment returnedComment) {
-				DatabaseHelper.insertComment(
-					context,
-					returnedComment,
-					new DatabaseHelper.InsertCommentCallback() {
-						@Override
-						public void returnInsertComment(Long commentID, HHComment comment) {
-							callback.returnPostComment(returnedComment);
-						}
-					});
+				if (returnedComment != null) {
+					DatabaseHelper.insertComment(
+						context,
+						returnedComment,
+						new DatabaseHelper.InsertCommentCallback() {
+							@Override
+							public void returnInsertComment(Long commentID, HHComment comment) {
+								callback.returnPostComment(returnedComment);
+							}
+						});
+				} else {
+					callback.returnPostComment(null);
+				}
 			}
 		});
 	}
@@ -1064,7 +1068,7 @@ public class AsyncDataManager {
 	public static void acceptFollowRequest(final HHFollowRequestUser followRequest, final AcceptFollowRequestCallback callback){
 		WebHelper.acceptFollowRequest(followRequest, new WebHelper.AcceptFollowRequestCallback() {
 			@Override
-			public void returnAcceptFollowRequest(boolean success) {
+			public void returnAcceptFollowRequest(boolean success, final HHFollowRequestUser acceptedFollowRequest) {
 				if (success) {
 					DatabaseHelper.deleteFollowRequest(
 						context,
@@ -1081,6 +1085,34 @@ public class AsyncDataManager {
 				}
 			}
 		});
+	}
+
+	//TODO: DOCUMENTATION
+	public static void acceptFollowRequest(final String authToken,
+										   final HHNotification notification,
+										   final AcceptFollowRequestCallback callback){
+		WebHelper.acceptFollowRequest(
+			authToken,
+			notification,
+				new WebHelper.AcceptFollowRequestCallback() {
+				@Override
+				public void returnAcceptFollowRequest(boolean success, final HHFollowRequestUser acceptedFollowRequest) {
+					if (success) {
+						DatabaseHelper.deleteFollowRequest(
+							context,
+							acceptedFollowRequest,
+							new DatabaseHelper.DeleteFollowRequestCallback() {
+								@Override
+								public void returnDeleteFollowRequest(boolean success) {
+									callback.returnAcceptFollowRequest(success, acceptedFollowRequest);
+								}
+							}
+						);
+					} else {
+						callback.returnAcceptFollowRequest(false, acceptedFollowRequest);
+					}
+				}
+			});
 	}
 
 	// DELETE FOLLOW REQUEST ----------
@@ -1441,7 +1473,14 @@ public class AsyncDataManager {
 
 	public static void readNotification(final HHNotification notification,
 										final ReadNotificationCallback callback){
+		readNotification(null, notification, callback);
+	}
+
+	public static void readNotification(final String authToken,
+										final HHNotification notification,
+										final ReadNotificationCallback callback){
 		WebHelper.readNotification(
+			authToken,
 			notification,
 			new WebHelper.ReadNotificationCallback(){
 				@Override

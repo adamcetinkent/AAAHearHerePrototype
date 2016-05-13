@@ -634,7 +634,7 @@ public class PostFragment extends FeedbackFragment {
 				new AddressResultReceiver.AddressResultReceiverCallback() {
 					@Override
 					public void returnAddress(Address returnedAddress) {
-						if (address != null) {
+						if (returnedAddress != null) {
 							address = returnedAddress;
 							txtLocation.setText(address.getThoroughfare());
 							placeName = address.getThoroughfare();

@@ -14,26 +14,42 @@ public class HHNotification extends HHBase implements Parcelable {
 	public static final int NOTIFICATION_TYPE_LIKE_POST = 1;
 	public static final int NOTIFICATION_TYPE_NEW_COMMENT = 2;
 	public static final int NOTIFICATION_TYPE_NEW_FOLLOW = 3;
+	public static final int NOTIFICATION_TYPE_NEW_FOLLOW_REQUEST = 4;
 
-	private long user_id;
-	private Timestamp read_at;
 	private int notification_type;
-	private long notification_link;
+	private long for_user_id;
+	private String by_fb_user_id;
+	private long post_id;
+	private String notification_text;
+	private Timestamp read_at;
+	private Timestamp sent_at;
 
-	public long getUserID() {
-		return user_id;
+	public long getForUserID(){
+		return for_user_id;
+	}
+
+	public String getByFacebookUserID() {
+		return by_fb_user_id;
+	}
+
+	public long getPostID() {
+		return post_id;
+	}
+
+	public String getNotificationText() {
+		return notification_text;
 	}
 
 	public Timestamp getReadAt() {
 		return read_at;
 	}
 
-	public int getNotificationType() {
-		return notification_type;
+	public Timestamp getSentAt() {
+		return sent_at;
 	}
 
-	public long getNotificationLink() {
-		return notification_link;
+	public int getNotificationType() {
+		return notification_type;
 	}
 
 	@Override
@@ -44,13 +60,19 @@ public class HHNotification extends HHBase implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeLong(user_id);
+		dest.writeInt(notification_type);
+		dest.writeLong(for_user_id);
+		dest.writeString(by_fb_user_id);
+		dest.writeLong(post_id);
+		dest.writeString(notification_text);
 		if (read_at != null)
 			dest.writeLong(read_at.getTime());
 		else
 			dest.writeLong(-1);
-		dest.writeInt(notification_type);
-		dest.writeLong(notification_link);
+		if (sent_at != null)
+			dest.writeLong(sent_at.getTime());
+		else
+			dest.writeLong(-1);
 	}
 
 	public static final Parcelable.Creator<HHNotification> CREATOR = new Parcelable.Creator<HHNotification>(){
@@ -69,14 +91,21 @@ public class HHNotification extends HHBase implements Parcelable {
 
 	protected HHNotification(Parcel in){
 		super(in);
-		user_id = in.readLong();
+		notification_type = in.readInt();
+		for_user_id = in.readLong();
+		by_fb_user_id = in.readString();
+		post_id = in.readLong();
+		notification_text = in.readString();
 		long read_at_time = in.readLong();
 		if (read_at_time == -1)
 			read_at = null;
 		else
 			read_at = new Timestamp(read_at_time);
-		notification_type = in.readInt();
-		notification_link = in.readLong();
+		long sent_at_time = in.readLong();
+		if (sent_at_time == -1)
+			sent_at = null;
+		else
+			sent_at = new Timestamp(sent_at_time);
 	}
 
 }

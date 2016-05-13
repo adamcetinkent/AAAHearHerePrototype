@@ -31,11 +31,14 @@ class ReadNotificationTask extends AsyncTask<Void, Void, HHNotification> {
 		void returnReadNotification(HHNotification readNotifications);
 	}
 
+	private String authToken;
 	private final Callback callbackTo;
 
-	public ReadNotificationTask(final HHNotification notification,
+	public ReadNotificationTask(final String authToken,
+								final HHNotification notification,
 								final Callback callbackTo) {
 		this.notification = notification;
+		this.authToken = authToken;
 		this.callbackTo = callbackTo;
 	}
 
@@ -50,7 +53,9 @@ class ReadNotificationTask extends AsyncTask<Void, Void, HHNotification> {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setRequestProperty("Authorization", "Token token="+ HHUser.getAuthorisationToken());
+			if (authToken == null)
+				authToken = HHUser.getAuthorisationToken();
+			urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 			urlConnection.setRequestMethod("POST");
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

@@ -583,7 +583,7 @@ public class FeedFragment extends FeedbackFragment {
 		if (postID >= 0) {
 			AsyncDataManager.getPost(postID, getAllPostsCallback);
 		} else if (postNotification != null){
-			AsyncDataManager.getPost(postNotification.getNotificationLink(), getAllPostsCallback);
+			AsyncDataManager.getPost(postNotification.getPostID(), getAllPostsCallback);
 		}
 	}
 

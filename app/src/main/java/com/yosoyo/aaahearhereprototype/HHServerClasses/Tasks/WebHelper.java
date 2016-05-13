@@ -439,16 +439,31 @@ public class WebHelper {
 	}
 
 	public interface AcceptFollowRequestCallback{
-		void returnAcceptFollowRequest(boolean success);
+		void returnAcceptFollowRequest(boolean success, HHFollowRequestUser acceptedFollowRequest);
 	}
 
-	public static void acceptFollowRequest(final HHFollowRequestUser followRequest, final AcceptFollowRequestCallback callback){
+	public static void acceptFollowRequest(final HHFollowRequestUser followRequest,
+										   final AcceptFollowRequestCallback callback){
 		new PostAcceptFollowRequestTask(
 			followRequest,
 			new PostAcceptFollowRequestTask.Callback() {
 				@Override
-				public void returnPostAcceptFollowRequest(Boolean success) {
-					callback.returnAcceptFollowRequest(success);
+				public void returnPostAcceptFollowRequest(boolean success, HHFollowRequestUser acceptedFollowRequest) {
+					callback.returnAcceptFollowRequest(success, acceptedFollowRequest);
+				}
+			}).execute();
+	}
+
+	public static void acceptFollowRequest(final String authToken,
+										   final HHNotification notification,
+										   final AcceptFollowRequestCallback callback){
+		new PostAcceptFollowRequestTask(
+			authToken,
+			notification,
+			new PostAcceptFollowRequestTask.Callback() {
+				@Override
+				public void returnPostAcceptFollowRequest(boolean success, HHFollowRequestUser acceptedFollowRequest) {
+					callback.returnAcceptFollowRequest(success, acceptedFollowRequest);
 				}
 			}).execute();
 	}
@@ -524,9 +539,11 @@ public class WebHelper {
 		void returnReadNotification(HHNotification readNotification);
 	}
 
-	public static void readNotification(final HHNotification notification,
+	public static void readNotification(final String authToken,
+										final HHNotification notification,
 										final ReadNotificationCallback callback){
 		new ReadNotificationTask(
+			authToken,
 			notification,
 			new ReadNotificationTask.Callback(){
 				@Override
