@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -54,9 +55,9 @@ import com.yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
+import com.yosoyo.aaahearhereprototype.HHNotificationsManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.R;
@@ -101,6 +102,8 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 	private FeedbackFragment pendingFragment;
 	private boolean newToken = false;
 
+	public static HHNotificationsManager notificationsManager;
+
 	private class DrawerItemClickListener implements ListView.OnItemClickListener{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
@@ -139,16 +142,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				case Intent.ACTION_VIEW:{
 
 					Log.d(TAG, "NEW INTENT: "+intent.toString());
-					HHPostFull post = intent.getParcelableExtra(KEY_NOTIFICATION_POST);
-					if (post != null) {
-						pendingFragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED,
-																		   post.getUser().getID(),
-																		   post.getPost().getID());
-					} else if (intent.hasExtra(KEY_NOTIFICATION_VIEW_POST)){
-						HHNotification notification = intent.getParcelableExtra(
-							KEY_NOTIFICATION_VIEW_POST);
-						pendingFragment = FeedFragment.newInstance(notification);
-					} else if (intent.hasExtra(KEY_NOTIFICATION_VIEW_POST))
+					if (intent.hasExtra(KEY_NOTIFICATION_VIEW_POST)){
+						HHNotification notification = intent.getParcelableExtra(KEY_NOTIFICATION_VIEW_POST);
+						pendingFragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED, notification);
+					} else if (intent.hasExtra(KEY_NOTIFICATION_VIEW_USER)){
+						HHNotification notification = intent.getParcelableExtra(KEY_NOTIFICATION_VIEW_USER);
+						pendingFragment = FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, notification);
+					}
 					break;
 
 				}
@@ -584,6 +584,12 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 
 		startLocationListenerService();
 
+		notificationsManager = new HHNotificationsManager(
+			getApplicationContext(),
+			(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
+			HHUser.getAuthorisationToken(),
+			getString(R.string.app_name));
+
 		WebHelper.getFacebookProfilePicture(
 			Profile.getCurrentProfile().getId(),
 			new WebHelper.GetFacebookProfilePictureCallback() {
@@ -627,16 +633,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			case Intent.ACTION_VIEW:{
 
 				Log.d(TAG, "NEW INTENT: "+intent.toString());
-				HHPostFull post = intent.getParcelableExtra(KEY_NOTIFICATION_POST);
-				if (post != null) {
-					commitFragmentTransaction(FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED,
-																	   post.getUser().getID(),
-																	   post.getPost().getID()),
-											  true);
-				} else if (intent.hasExtra(KEY_NOTIFICATION_VIEW_POST)){
+				if (intent.hasExtra(KEY_NOTIFICATION_VIEW_POST)){
 					HHNotification notification = intent.getParcelableExtra(
 						KEY_NOTIFICATION_VIEW_POST);
-					commitFragmentTransaction(FeedFragment.newInstance(notification),
+					commitFragmentTransaction(FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED, notification),
+											  true);
+				} else if (intent.hasExtra(KEY_NOTIFICATION_VIEW_USER)){
+					HHNotification notification = intent.getParcelableExtra(KEY_NOTIFICATION_VIEW_USER);
+					commitFragmentTransaction(FeedFragment.newInstance(FeedFragment.USER_PROFILE_FEED, notification),
 											  true);
 				}
 				break;

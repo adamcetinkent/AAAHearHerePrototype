@@ -187,7 +187,7 @@ public class WebHelper {
 	}
 
 	public interface GetPostsAtLocationCallback {
-		void returnGetPostsAtLocation(List<HHPostFull> posts);
+		void returnGetPostsAtLocation(List<HHNotification> posts);
 	}
 
 	public static void getPostsAtLocation(final Location location,
@@ -196,7 +196,7 @@ public class WebHelper {
 										  final GetPostsAtLocationCallback callback){
 		new GetPostsAtLocationTask(location, userID, authToken, new GetPostsAtLocationTask.Callback(){
 			@Override
-			public void returnPostsAtLocation(List<HHPostFull> posts){
+			public void returnPostsAtLocation(List<HHNotification> posts){
 				callback.returnGetPostsAtLocation(posts);
 			}
 		}).execute();

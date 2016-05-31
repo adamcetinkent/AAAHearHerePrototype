@@ -113,7 +113,7 @@ public class FeedFragment extends FeedbackFragment {
 	private boolean refreshing;
 	//private boolean overScrollReleased = false;
 
-	private HHNotification postNotification;
+	private HHNotification notification;
 
 	public static FeedFragment newInstance(){
 		return newInstance(GENERAL_FEED, -1);
@@ -122,10 +122,6 @@ public class FeedFragment extends FeedbackFragment {
 	public static FeedFragment newInstance(int feedType, long userID){
 		FeedFragment feedFragment = new FeedFragment();
 
-		/*Bundle arguments = new Bundle();
-		arguments.putInt(KEY_FEED_TYPE, feedType);
-		arguments.putLong(KEY_USER_ID, userID);
-		feedFragment.setArguments(arguments);*/
 		feedFragment.feedType = feedType;
 		feedFragment.userID = userID;
 
@@ -135,11 +131,6 @@ public class FeedFragment extends FeedbackFragment {
 	public static FeedFragment newInstance(int feedType, long userID, long postID){
 		FeedFragment feedFragment = new FeedFragment();
 
-		/*Bundle arguments = new Bundle();
-		arguments.putInt(KEY_FEED_TYPE, feedType);
-		arguments.putLong(KEY_USER_ID, userID);
-		arguments.putLong(KEY_POST_ID, postID);
-		feedFragment.setArguments(arguments);*/
 		feedFragment.feedType = feedType;
 		feedFragment.userID = userID;
 		feedFragment.postID = postID;
@@ -147,16 +138,14 @@ public class FeedFragment extends FeedbackFragment {
 		return feedFragment;
 	}
 
-	public static FeedFragment newInstance(final HHNotification notification){
+	public static FeedFragment newInstance(int feedType, final HHNotification notification){
 		FeedFragment feedFragment = new FeedFragment();
 
-		/*Bundle arguments = new Bundle();
-		arguments.putInt(KEY_FEED_TYPE, feedType);
-		arguments.putLong(KEY_USER_ID, userID);
-		arguments.putLong(KEY_POST_ID, postID);
-		feedFragment.setArguments(arguments);*/
-		feedFragment.feedType = SINGLE_POST_FEED;
-		feedFragment.postNotification = notification;
+		feedFragment.feedType = feedType;
+		feedFragment.notification = notification;
+		if (feedType == USER_PROFILE_FEED && notification != null){
+			feedFragment.userID = notification.getByUserID();
+		}
 
 		return feedFragment;
 	}
@@ -221,6 +210,33 @@ public class FeedFragment extends FeedbackFragment {
 		/*Bundle arguments = getArguments();
 		if (arguments != null){
 			handleArguments(arguments);
+		}*/
+
+		/*if (notification != null) {
+			if (notification
+				.getNotificationType() == HHNotification.NOTIFICATION_TYPE_NEW_FOLLOW_REQUEST) {
+				for (HHFollowRequestUser followRequest : HHUser.getCurrentUser()
+															   .getFollowInRequests()) {
+					if (followRequest.getUser().getFBUserID() == notification.getByFacebookUserID()) {
+						userID = followRequest.getUser().getID();
+						profileFragment = ProfileFragment
+							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER,
+										 followRequest.getUser().getID());
+						break;
+					}
+				}
+			} else if (notification
+				.getNotificationType() == HHNotification.NOTIFICATION_TYPE_NEW_FOLLOW) {
+				for (HHFollowUser follow : HHUser.getCurrentUser().getFollowIns()) {
+					if (follow.getUser().getFBUserID() == notification.getByFacebookUserID()) {
+						userID = follow.getUser().getID();
+						profileFragment = ProfileFragment
+							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER,
+										 follow.getUser().getID());
+						break;
+					}
+				}
+			}
 		}*/
 
 		if (savedInstanceState != null){
@@ -300,9 +316,11 @@ public class FeedFragment extends FeedbackFragment {
 					if (userID == HHUser.getCurrentUserID()) {
 						profileFragment = ProfileFragment
 							.newInstance(ProfileFragment.PROFILE_TYPE_CURRENT_USER, userID);
-					} else {
+					} else if (userID >= 0) {
 						profileFragment = ProfileFragment
 							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER, userID);
+					} else if (notification != null){
+
 					}
 				} else if (profileFragment != null) {
 					profileFragmentBundle = profileFragment.getBundle();
@@ -370,6 +388,7 @@ public class FeedFragment extends FeedbackFragment {
 				public void onOverScroll() {
 					//Toast.makeText(getActivity(), "REFRESH", Toast.LENGTH_LONG).show();
 					getNewData();
+					AsyncDataManager.getNotifications(HolderActivity.notificationsManager.getNotificationsCallback);
 				}
 
 				@Override
@@ -507,14 +526,18 @@ public class FeedFragment extends FeedbackFragment {
 			if (refreshing){
 				setListRefreshProgressBar(false);
 			}
-			if (feedType == SINGLE_POST_FEED && postNotification != null){
+			if (feedType == SINGLE_POST_FEED && feedType == USER_PROFILE_FEED && notification != null){
 				AsyncDataManager.readNotification(
-					postNotification,
+					notification,
 					new AsyncDataManager.ReadNotificationCallback(){
 						@Override
 						public void returnReadNotification(HHNotification readNotification){
-							postID = post.getPost().getID();
-							postNotification = null;
+							if (feedType == SINGLE_POST_FEED) {
+								postID = post.getPost().getID();
+							} else if (feedType == USER_PROFILE_FEED){
+								//userID;
+							}
+							notification = null;
 						}
 					}
 				);
@@ -582,8 +605,8 @@ public class FeedFragment extends FeedbackFragment {
 			earliestWebPost = new Timestamp(System.currentTimeMillis());
 		if (postID >= 0) {
 			AsyncDataManager.getPost(postID, getAllPostsCallback);
-		} else if (postNotification != null){
-			AsyncDataManager.getPost(postNotification.getPostID(), getAllPostsCallback);
+		} else if (notification != null){
+			AsyncDataManager.getPost(notification.getPostID(), getAllPostsCallback);
 		}
 	}
 

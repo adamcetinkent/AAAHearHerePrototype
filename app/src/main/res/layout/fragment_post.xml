@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:background="@color/adam_theme_black">
 
     <LinearLayout
@@ -269,7 +269,7 @@
                     android:layout_height="100dp"
                     android:layout_marginLeft="1dp"
                     android:layout_marginTop="1dp"
-                    android:src="@drawable/spotify_blank"
+                    android:src="@drawable/spotify_blank_square"
                     android:contentDescription="@string/contentDescription_album_artwork"
                     />
 

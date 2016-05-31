@@ -379,7 +379,7 @@ public class AsyncDataManager {
 	// GET POSTS AT LOCATION
 
 	public interface GetPostsAtLocationCallback{
-		void returnPostsAtLocation(List<HHPostFull> returnedPosts);
+		void returnPostsAtLocation(Location location, List<HHNotification> returnedPosts);
 	}
 
 	/**
@@ -431,8 +431,8 @@ public class AsyncDataManager {
 			authToken,
 			new WebHelper.GetPostsAtLocationCallback() {
 				@Override
-				public void returnGetPostsAtLocation(List<HHPostFull> webPosts) {
-					callback.returnPostsAtLocation(webPosts);
+				public void returnGetPostsAtLocation(List<HHNotification> webPosts) {
+					callback.returnPostsAtLocation(location, webPosts);
 				}
 			});
 	}
@@ -1438,6 +1438,10 @@ public class AsyncDataManager {
 
 	public interface GetNotificationsCallback {
 		void returnGetNotifications(List<HHNotification> notifications);
+	}
+
+	public static void getNotifications(final GetNotificationsCallback callback){
+		getNotifications(null, null, null, callback);
 	}
 
 	public static void getNotifications(final String authToken,

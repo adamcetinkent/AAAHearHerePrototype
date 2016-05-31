@@ -1,32 +1,20 @@
 package com.yosoyo.aaahearhereprototype.Services.LocationService;
 
 import android.Manifest;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHNotificationsManager;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.R;
-import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class LocationListenerService extends Service implements HHLocationListener.HHLocationListenerCallback {
 
@@ -58,105 +46,8 @@ public class LocationListenerService extends Service implements HHLocationListen
 			location,
 			userID,
 			authToken,
-			new AsyncDataManager.GetPostsAtLocationCallback() {
-				@Override
-				public void returnPostsAtLocation(List<HHPostFull> returnedPosts) {
-					Log.d(TAG, (returnedPosts == null) ? "null" : returnedPosts.toString());
-					if (returnedPosts != null && returnedPosts.size() > 0) {
-
-						Collections.sort(returnedPosts, new Comparator<HHPostFull>() {
-							@Override
-							public int compare(HHPostFull lhs, HHPostFull rhs) {
-								double lhsR2 = Math
-									.pow(lhs.getPost().getLat() - location.getLatitude(), 2)
-									+ Math.pow(lhs.getPost().getLon() - location.getLongitude(), 2);
-								double rhsR2 = Math
-									.pow(rhs.getPost().getLat() - location.getLatitude(), 2)
-									+ Math.pow(rhs.getPost().getLon() - location.getLongitude(), 2);
-								double result = lhsR2 - rhsR2;
-
-								if (result > 0)
-									return 1;
-								if (result < 0)
-									return -1;
-
-								return 0;
-							}
-						});
-
-						final HHPostFull post = returnedPosts.get(0);
-
-						AsyncDataManager.getSpotifyTrack(
-							getApplicationContext(),
-							post.getPost().getTrack(),
-							new AsyncDataManager.GetSpotifyTrackCallback() {
-								@Override
-								public void returnSpotifyTrack(SpotifyTrack spotifyTrack){}
-
-								@Override
-								public void returnCachedSpotifyTrack(final HHCachedSpotifyTrack cachedSpotifyTrack) {
-
-									WebHelper.getFacebookProfilePicture(
-										post.getUser().getFBUserID(),
-										new WebHelper.GetFacebookProfilePictureCallback() {
-											@Override
-											public void returnFacebookProfilePicture(Bitmap bitmap) {
-												String notificationText = post.getUser().getName()
-													+ " posted " + cachedSpotifyTrack.getName()
-													+ " at " + post.getPost().getPlaceName();
-
-												Intent postIntent = new Intent(
-													getApplicationContext(),
-													HolderActivity.class
-												);
-												postIntent.setAction(Intent.ACTION_VIEW);
-												postIntent.putExtra(HolderActivity.KEY_NOTIFICATION_POST, post);
-												PendingIntent intent = PendingIntent.getActivity(
-													getApplicationContext(),
-													HolderActivity.REQUEST_CODE_SHOW_POST,
-													postIntent,
-													PendingIntent.FLAG_UPDATE_CURRENT
-												);
-
-												Notification locationNotification;
-												if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-													locationNotification = new Notification.Builder(
-														getApplicationContext())
-														.setSmallIcon(R.drawable.app_logo)
-														.setLargeIcon(bitmap)
-														.setContentTitle(getString(R.string.app_name))
-														.setContentText(notificationText)
-														.setAutoCancel(true)
-														.setPriority(Notification.PRIORITY_DEFAULT)
-														.setDefaults(Notification.DEFAULT_VIBRATE)
-														.setContentIntent(intent)
-														.build();
-												} else {
-													//noinspection deprecation
-													locationNotification = new Notification.Builder(
-														getApplicationContext())
-														.setSmallIcon(R.drawable.app_logo)
-														.setLargeIcon(bitmap)
-														.setContentTitle(getString(R.string.app_name))
-														.setContentText(notificationText)
-														.setAutoCancel(true)
-														.setDefaults(Notification.DEFAULT_VIBRATE)
-														.setContentIntent(intent)
-														.getNotification();
-												}
-
-												NotificationManager notificationManager = (NotificationManager) getSystemService(
-													Context.NOTIFICATION_SERVICE);
-												notificationManager.notify(NOTIFICATION_ID, locationNotification);
-											}
-										});
-
-								}
-							}
-						);
-					}
-				}
-			});
+			notificationsManager.getPostsAtLocationCallback
+		);
 
 		AsyncDataManager.getNotifications(
 			authToken,
