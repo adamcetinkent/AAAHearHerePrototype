@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:background="@color/adam_theme_black"
+              tools:context=".Fragments.PostPrivacyDialogFragment"
+              android:padding="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/post_privacy_title"
+        android:textColor="@color/adam_theme_base"
+        android:layout_gravity="center"
+        android:textSize="16sp"/>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_post_privacy_btnGroup"
+        android:padding="10dp">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_privacy_public"
+            android:id="@+id/fragment_post_privacy_btn0"
+            android:textColor="@color/adam_theme_light"
+            android:buttonTint="@color/adam_theme_base"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_privacy_friends"
+            android:id="@+id/fragment_post_privacy_btn1"
+            android:textColor="@color/adam_theme_light"
+            android:buttonTint="@color/adam_theme_base"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_privacy_followers"
+            android:id="@+id/fragment_post_privacy_btn2"
+            android:textColor="@color/adam_theme_light"
+            android:buttonTint="@color/adam_theme_base"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_privacy_private"
+            android:id="@+id/fragment_post_privacy_btn3"
+            android:textColor="@color/adam_theme_light"
+            android:buttonTint="@color/adam_theme_base"/>
+
+    </RadioGroup>
+
+</LinearLayout>

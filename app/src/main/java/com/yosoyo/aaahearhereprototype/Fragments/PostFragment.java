@@ -2,6 +2,7 @@ package com.yosoyo.aaahearhereprototype.Fragments;
 
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -42,6 +44,7 @@ import com.yosoyo.aaahearhereprototype.Activities.SpotifySearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyTrack;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTag;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -96,6 +99,7 @@ public class PostFragment extends FeedbackFragment {
 	private LinearLayout llText;
 	private ImageView btnPlayButton;
 	private ImageView btnLocationButton;
+	private LinearLayout llPostPrivacy;
 
 	private AddressResultReceiver mResultReceiver;
 	private boolean mAddressRequested;
@@ -105,6 +109,10 @@ public class PostFragment extends FeedbackFragment {
 
 	private static final String KEY_TRACK_ID = TAG + "track_id";
 	private String trackID;
+
+	private int postPrivacy;
+	private ImageView imgPrivacy;
+	private TextView txtPrivacy;
 
 	public static PostFragment newInstance(String trackID){
 		PostFragment postFragment = new PostFragment();
@@ -142,7 +150,7 @@ public class PostFragment extends FeedbackFragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 
 		final View view = inflater.inflate(R.layout.fragment_post, container, false);
@@ -184,6 +192,28 @@ public class PostFragment extends FeedbackFragment {
 		llSearch = (LinearLayout) view.findViewById(R.id.post_fragment_llPostFrameSearch);
 		llText = (LinearLayout) view.findViewById(R.id.post_fragment_llPostFrameText);
 		llText.setVisibility(View.GONE);
+
+		imgPrivacy = (ImageView) view.findViewById(R.id.post_fragment_imgPrivacy);
+		txtPrivacy = (TextView) view.findViewById(R.id.post_fragment_txtPostPrivacy);
+
+		llPostPrivacy = (LinearLayout) view.findViewById(R.id.post_fragment_llPostPrivacy);
+		llPostPrivacy.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				FragmentManager fragmentManager = getFragmentManager();
+				PostPrivacyDialogFragment postPrivacyDialogFragment = PostPrivacyDialogFragment.newInstance(
+					postPrivacy,
+					new PostPrivacyDialogFragment.Callback() {
+						@Override
+						public void setPrivacy(int privacy) {
+							postPrivacy = privacy;
+							updatePrivacy();
+						}
+					}
+				);
+				postPrivacyDialogFragment.show(fragmentManager, "TODO");
+			}
+		});
 
 		searchViewTrack.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
@@ -367,6 +397,7 @@ public class PostFragment extends FeedbackFragment {
 					message.toString(),
 					placeName,
 					googlePlaceID,
+					postPrivacy,
 					tags
 				);
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {
@@ -665,7 +696,7 @@ public class PostFragment extends FeedbackFragment {
 			btnPlayButton.setVisibility(View.VISIBLE);
 		}
 		if (spotifyAlbum == null && spotifyArtist == null && spotifyTrack == null){
-			imgAlbumArt.setImageBitmap(null);
+			imgAlbumArt.setImageDrawable(getResources().getDrawable(R.drawable.spotify_blank_square));
 			imgAlbumArt.setBackgroundColor(Color.WHITE);
 		} else {
 			imgAlbumArt.setBackgroundColor(Color.TRANSPARENT);
@@ -674,6 +705,48 @@ public class PostFragment extends FeedbackFragment {
 			btnPlayButton.setImageResource(R.drawable.pause_overlay);
 		} else {
 			btnPlayButton.setImageResource(R.drawable.play_overlay);
+		}
+	}
+
+	private void updatePrivacy(){
+		switch (postPrivacy){
+			default:
+			case (HHPost.PUBLIC):{
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.lock_open, null));
+				} else {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.lock_open));
+				}
+				txtPrivacy.setText(R.string.post_privacy_public);
+				break;
+			}
+			case (HHPost.FRIENDS):{
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.friends_empty, null));
+				} else {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.friends_empty));
+				}
+				txtPrivacy.setText(R.string.post_privacy_friends);
+				break;
+			}
+			case (HHPost.FOLLOWERS):{
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.follow_in_out, null));
+				} else {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.follow_in_out));
+				}
+				txtPrivacy.setText(R.string.post_privacy_followers);
+				break;
+			}
+			case (HHPost.PRIVATE):{
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.lock, null));
+				} else {
+					imgPrivacy.setImageDrawable(getResources().getDrawable(R.drawable.lock));
+				}
+				txtPrivacy.setText(R.string.post_privacy_private);
+				break;
+			}
 		}
 	}
 

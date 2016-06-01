@@ -67,6 +67,11 @@ public class ORMPost {
 	public static String GOOGLE_PLACE_ID() { return COLUMN_GOOGLE_PLACE_ID_NAME; }
 	public static String dotGOOGLE_PLACE_ID() { return TABLE_NAME + "." + COLUMN_GOOGLE_PLACE_ID_NAME; }
 
+	private static final String COLUMN_PRIVACY_ID_NAME =		"privacy";
+	private static final String COLUMN_PRIVACY_ID_TYPE =		"INTEGER";
+	public static String PRIVACY() { return COLUMN_PRIVACY_ID_NAME; }
+	public static String dotPRIVACY() { return TABLE_NAME + "." + COLUMN_PRIVACY_ID_NAME; }
+
 	private static final String COLUMN_CREATED_AT_NAME = 		"created_at";
 	private static final String COLUMN_CREATED_AT_TYPE = 		"TIMESTAMP";
 	public static String CREATED_AT() { return COLUMN_CREATED_AT_NAME; }
@@ -93,6 +98,7 @@ public class ORMPost {
 			COLUMN_MESSAGE_NAME			+ " "	+ COLUMN_MESSAGE_TYPE 			+ COMMA_SEP	+
 			COLUMN_PLACE_NAME_NAME		+ " "	+ COLUMN_PLACE_NAME_TYPE 		+ COMMA_SEP	+
 			COLUMN_GOOGLE_PLACE_ID_NAME	+ " "	+ COLUMN_GOOGLE_PLACE_ID_TYPE	+ COMMA_SEP	+
+			COLUMN_PRIVACY_ID_NAME		+ " "	+ COLUMN_PRIVACY_ID_TYPE		+ COMMA_SEP	+
 			COLUMN_CREATED_AT_NAME		+ " "	+ COLUMN_CREATED_AT_TYPE		+ COMMA_SEP	+
 			COLUMN_UPDATED_AT_NAME		+ " "	+ COLUMN_UPDATED_AT_TYPE		+ COMMA_SEP	+
 			COLUMN_CACHED_AT_NAME		+ " "	+ COLUMN_CACHED_AT_TYPE 		+ " " 		+ COLUMN_CACHED_AT_DEFAULT	+
@@ -130,6 +136,7 @@ public class ORMPost {
 		contentValues.put(COLUMN_MESSAGE_NAME, 			post.getMessage());
 		contentValues.put(COLUMN_PLACE_NAME_NAME, 		post.getPlaceName());
 		contentValues.put(COLUMN_GOOGLE_PLACE_ID_NAME, 	post.getGooglePlaceID());
+		contentValues.put(COLUMN_PRIVACY_ID_NAME, 		post.getPrivacy());
 		contentValues.put(COLUMN_CREATED_AT_NAME,	 	String.valueOf(post.getCreatedAt()));
 		contentValues.put(COLUMN_UPDATED_AT_NAME, 		String.valueOf(post.getUpdatedAt()));
 		return contentValues;

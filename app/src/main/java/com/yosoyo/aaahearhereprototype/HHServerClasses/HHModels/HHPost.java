@@ -17,6 +17,11 @@ import java.sql.Timestamp;
  */
 public class HHPost extends HHBase implements Parcelable {
 
+	public static final int PUBLIC = 	0;
+	public static final int FRIENDS = 	1;
+	public static final int FOLLOWERS = 2;
+	public static final int PRIVATE = 	3;
+
 	private long user_id;
 	private String track;
 	private double lat;
@@ -24,6 +29,7 @@ public class HHPost extends HHBase implements Parcelable {
 	private String place_name;
 	private String google_place_id;
 	private String message;
+	private int privacy;
 
 	public String getTrack() {
 		return track;
@@ -44,9 +50,10 @@ public class HHPost extends HHBase implements Parcelable {
 		this.message = nested.getMessage();
 		this.place_name = nested.getPlaceName();
 		this.google_place_id = nested.getGooglePlaceID();
+		this.privacy = nested.getPrivacy();
 	}
 
-	protected HHPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id) {
+	protected HHPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id, int privacy) {
 		super();
 		this.user_id = user_id;
 		this.track = track;
@@ -55,6 +62,7 @@ public class HHPost extends HHBase implements Parcelable {
 		this.message = message;
 		this.place_name = place_name;
 		this.google_place_id = google_place_id;
+		this.privacy = privacy;
 	}
 
 	public HHPost(Cursor cursor){
@@ -70,6 +78,7 @@ public class HHPost extends HHBase implements Parcelable {
 		this.message = cursor.getString(cursor.getColumnIndex(ORMPost.MESSAGE()));
 		this.place_name = cursor.getString(cursor.getColumnIndex(ORMPost.PLACE_NAME()));
 		this.google_place_id = cursor.getString(cursor.getColumnIndex(ORMPost.GOOGLE_PLACE_ID()));
+		this.privacy = cursor.getInt(cursor.getColumnIndex(ORMPost.PRIVACY()));
 	}
 
 	public double getLat() {
@@ -96,6 +105,10 @@ public class HHPost extends HHBase implements Parcelable {
 		return google_place_id;
 	}
 
+	public int getPrivacy(){
+		return privacy;
+	}
+
 	@Override
 	public int describeContents() {
 		return 0;
@@ -111,6 +124,7 @@ public class HHPost extends HHBase implements Parcelable {
 		dest.writeString(place_name);
 		dest.writeString(google_place_id);
 		dest.writeString(message);
+		dest.writeInt(privacy);
 	}
 
 	public static final Parcelable.Creator<HHPost> CREATOR = new Parcelable.Creator<HHPost>(){
@@ -136,5 +150,6 @@ public class HHPost extends HHBase implements Parcelable {
 		place_name = 		in.readString();
 		google_place_id = 	in.readString();
 		message = 			in.readString();
+		privacy =			in.readInt();
 	}
 }

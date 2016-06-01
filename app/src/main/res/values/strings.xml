@@ -102,5 +102,10 @@
     <string name="title_followers">Followers</string>
     <string name="title_following">Following</string>
     <string name="contentDescription_spotify_button">Listen on Spotify</string>
+    <string name="post_privacy_public">Public</string>
+    <string name="post_privacy_title">Post Privacy</string>
+    <string name="post_privacy_friends"><![CDATA[Followers & Friends]]></string>
+    <string name="post_privacy_followers">Followers Only</string>
+    <string name="post_privacy_private">Private</string>
 
 </resources>

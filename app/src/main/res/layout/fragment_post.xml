@@ -182,7 +182,6 @@
                     android:textStyle="bold"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:queryHint="Track name"
                     android:iconifiedByDefault="false"/>
 
                 <TextView
@@ -199,7 +198,6 @@
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:queryHint="Artist name"
                     android:iconifiedByDefault="false"/>
 
                 <TextView
@@ -216,7 +214,6 @@
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="5dp"
-                    android:queryHint="Album name"
                     android:iconifiedByDefault="false"/>
 
             </LinearLayout>
@@ -294,17 +291,53 @@
         android:gravity="bottom|right"
         >
 
+        <LinearLayout
+            android:id="@+id/post_fragment_llPostPrivacy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="10dp">
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/lock_open"
+                android:background="@android:color/transparent"
+                android:id="@+id/post_fragment_imgPrivacy"
+                android:contentDescription="@string/contentDescription_post_button"
+                android:tint="@color/adam_theme_base"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="10dp"
+                android:clickable="false"/>
+
+            <TextView
+                android:id="@+id/post_fragment_txtPostPrivacy"
+                android:text="@string/post_privacy_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="false"
+                android:textColor="@color/adam_theme_lightest"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_gravity="center_vertical"
+                android:iconifiedByDefault="false"/>
+
+        </LinearLayout>
+
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            >
+            android:layout_margin="10dp">
 
             <ImageButton
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/send"
                 android:background="@android:color/transparent"
@@ -314,10 +347,11 @@
 
             <ProgressBar
                 android:id="@+id/post_fragment_progressBar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:visibility="invisible"/>
+                android:visibility="invisible"
+                />
 
         </FrameLayout>
 

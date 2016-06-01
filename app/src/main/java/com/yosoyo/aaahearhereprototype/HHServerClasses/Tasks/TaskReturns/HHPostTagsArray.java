@@ -22,8 +22,9 @@ public class HHPostTagsArray extends HHPost {
 						   String message,
 						   String place_name,
 						   String google_place_id,
+						   int privacy,
 						   HHTag[] tags){
-		super(user_id, track, lat, lon, message, place_name, google_place_id);
+		super(user_id, track, lat, lon, message, place_name, google_place_id, privacy);
 		this.tags_attributes = tags;
 	}
 
