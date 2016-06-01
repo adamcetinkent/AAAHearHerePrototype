@@ -29,24 +29,12 @@ public class PostPrivacyDialogFragment extends DialogFragment {
 		void setPrivacy(int privacy);
 	}
 
-	/*interface ListenerRequest {
-		Callback requestListener();
-	}*/
-
 	public static PostPrivacyDialogFragment newInstance(int privacy, Callback callback){
 		PostPrivacyDialogFragment postPrivacyDialogFragment = new PostPrivacyDialogFragment();
 		postPrivacyDialogFragment.privacy = privacy;
 		postPrivacyDialogFragment.callback = callback;
 		return postPrivacyDialogFragment;
 	}
-
-	/*@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if (activity instanceof ListenerRequest) {
-			callback = ((ListenerRequest) activity).requestListener();
-		}
-	}*/
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {

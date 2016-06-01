@@ -1,8 +1,11 @@
-package com.yosoyo.aaahearhereprototype.Activities;
+package com.yosoyo.aaahearhereprototype.Fragments;
+
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Intent;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -27,23 +31,22 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.gson.Gson;
+import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.GoogleClasses.SimpleGooglePlace;
 import com.yosoyo.aaahearhereprototype.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddressPicker extends Activity {
+/**
+ * Created by adam on 01/06/16.
+ */
+public class AddressPickerDialogFragment extends DialogFragment {
 
-	public static final String TAG = "AddressPicker";
-
-	public static final int REQUEST_CODE = 14070703;
-	public static final String ADDRESS_JSON = "addressJson";
-	public static final String ADDRESS_STRING = "addressString";
-	public static final String GOOGLE_PLACE_ID = "googlePlaceID";
+	private static final String TAG = AddressPickerDialogFragment.class.getSimpleName();
 
 	private Address address;
+	private Callback callback;
 
 	private AutoCompleteTextView txtLocation;
 	private EditText txtStreet;
@@ -55,60 +58,102 @@ public class AddressPicker extends Activity {
 	private ToggleButton btnLocality;
 	private ToggleButton btnCountry;
 	private ImageButton btnContinue;
+	private ProgressBar txtLocationProgressBar;
 
 	private PlaceArrayAdapter placeArrayAdapter;
 	private final List<SimpleGooglePlace> places = new ArrayList<>();
 	private final String[] addressOutput = new String[4];
+	private String[] addressInput = new String[4];
+	private boolean[] addressInputToggles = new boolean[4];
 	private String googlePlaceID = "";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_address_picker);
-		this.setFinishOnTouchOutside(true);
+	private boolean hasBeenDismissed = false;
 
-		Intent intent = getIntent();
-		String addressJson = intent.getStringExtra(ADDRESS_JSON);
-		address = new Gson().fromJson(addressJson, Address.class);
+	interface Callback {
+		void setPlaceName(String placeName, String[] addressOutput, boolean[] addressToggles);
+		void setGooglePlaceID(String googlePlaceID);
+	}
+
+	public static AddressPickerDialogFragment newInstance(Address address,
+														  String[] addressInput,
+														  boolean[] addressInputToggles,
+														  Callback callback){
+		AddressPickerDialogFragment addressPickerDialogFragment = new AddressPickerDialogFragment();
+		addressPickerDialogFragment.address = address;
+		addressPickerDialogFragment.addressInput = addressInput;
+		addressPickerDialogFragment.addressInputToggles = addressInputToggles;
+		addressPickerDialogFragment.callback = callback;
+		return addressPickerDialogFragment;
+	}
+
+	public AddressPickerDialogFragment() {
+		// Required empty public constructor
+	}
+
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = super.onCreateDialog(savedInstanceState);
+		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		dialog.setCanceledOnTouchOutside(false);
+		return dialog;
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		final View view = inflater.inflate(R.layout.dialog_fragment_address_picker, container, false);
 
 		addressOutput[1] = address.getThoroughfare();
 
-		txtLocation = (AutoCompleteTextView) findViewById(R.id.address_picker_txtLocation);
-		txtStreet = (EditText) findViewById(R.id.address_picker_txtStreet);
-		txtLocality = (EditText) findViewById(R.id.address_picker_txtLocality);
-		txtCountry = (EditText) findViewById(R.id.address_picker_txtCountry);
-		txtOutput = (TextView) findViewById(R.id.address_picker_txtOutput);
+		txtLocation = (AutoCompleteTextView) view.findViewById(R.id.fragment_address_picker_txtLocation);
+		txtStreet = (EditText) view.findViewById(R.id.fragment_address_picker_txtStreet);
+		txtLocality = (EditText) view.findViewById(R.id.fragment_address_picker_txtLocality);
+		txtCountry = (EditText) view.findViewById(R.id.fragment_address_picker_txtCountry);
+		txtOutput = (TextView) view.findViewById(R.id.fragment_address_picker_txtOutput);
 
-		btnLocation = (ToggleButton) findViewById(R.id.address_picker_btnLocation);
-		btnStreet = (ToggleButton) findViewById(R.id.address_picker_btnStreet);
-		btnLocality = (ToggleButton) findViewById(R.id.address_picker_btnLocality);
-		btnCountry = (ToggleButton) findViewById(R.id.address_picker_btnCountry);
-		btnContinue = (ImageButton) findViewById(R.id.address_picker_btnContinue);
+		btnLocation = (ToggleButton) view.findViewById(R.id.fragment_address_picker_btnLocation);
+		btnStreet = (ToggleButton) view.findViewById(R.id.fragment_address_picker_btnStreet);
+		btnLocality = (ToggleButton) view.findViewById(R.id.fragment_address_picker_btnLocality);
+		btnCountry = (ToggleButton) view.findViewById(R.id.fragment_address_picker_btnCountry);
+		btnContinue = (ImageButton) view.findViewById(R.id.fragment_address_picker_btnContinue);
 
-		txtLocation.setText("");
+		txtLocation.setText(addressInput[0]);
 		txtStreet.setText(address.getThoroughfare());
 		txtLocality.setText(address.getLocality());
 		txtCountry.setText(address.getCountryName());
 
 		txtLocation.addTextChangedListener(new TextWatcher() {
+			boolean delete = false;
+
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (googlePlaceID != null && !googlePlaceID.isEmpty()){
+					delete = true;
+					googlePlaceID = "";
+				}
 			}
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				addressOutput[0] = s.toString();
-				btnLocation.setChecked(true);
+
+				if (delete){
+					s.clear();
+					addressOutput[0] = "";
+					btnLocation.setChecked(false);
+					delete = false;
+				} else {
+					addressOutput[0] = s.toString();
+					btnLocation.setChecked(true);
+				}
 				updateOutput();
 			}
 		});
 
-		placeArrayAdapter = new PlaceArrayAdapter(this, places);
+		placeArrayAdapter = new PlaceArrayAdapter(getActivity(), places);
 
 		txtLocation.setAdapter(placeArrayAdapter);
 		txtLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -168,43 +213,57 @@ public class AddressPicker extends Activity {
 			}
 		});
 
+		if (addressInputToggles != null){
+			btnLocation.setChecked(addressInputToggles[0]);
+			btnStreet.setChecked(addressInputToggles[1]);
+			btnLocality.setChecked(addressInputToggles[2]);
+			btnCountry.setChecked(addressInputToggles[3]);
+			for (int i = 0; i < 4; i++)
+				if (addressInputToggles[i]) addressOutput[i] = addressInput[i];
+		}
+
 		btnContinue.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				String outputString = updateOutput();
 				if (outputString.isEmpty())
 					return;
-				Intent resultIntent = new Intent();
-				resultIntent.putExtra(ADDRESS_STRING, outputString);
-				resultIntent.putExtra(GOOGLE_PLACE_ID, googlePlaceID);
 
-				setResult(REQUEST_CODE, resultIntent);
-				finish();
+				callback.setPlaceName(outputString, addressOutput, addressInputToggles);
+				callback.setGooglePlaceID(googlePlaceID);
+				dismiss();
 			}
 		});
 
-		if (ActivityCompat.checkSelfPermission(this,
-											   Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
-			return;
+		if (ActivityCompat.checkSelfPermission(
+			getActivity(),
+			Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+			&& ActivityCompat.checkSelfPermission(
+			getActivity(),
+			Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, HolderActivity.LOCATION_PERMISSIONS);
+
+			return view;
 		}
-		PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(
-			HolderActivity.mGoogleApiClient, null);
+
+		txtLocationProgressBar = (ProgressBar) view.findViewById(R.id.fragment_address_picker_txtLocationProgressBar);
+		txtLocation.setEnabled(false);
+		final PendingResult<PlaceLikelihoodBuffer> result =
+			Places.PlaceDetectionApi.getCurrentPlace(HolderActivity.mGoogleApiClient, null);
 		result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
 			@Override
 			public void onResult(@NonNull PlaceLikelihoodBuffer placeLikelihoods) {
+				if (hasBeenDismissed)
+					return;
+
 				places.clear();
 				for (PlaceLikelihood placeLikelihood : placeLikelihoods){
 					places.add(new SimpleGooglePlace(placeLikelihood.getPlace()));
 				}
 				placeLikelihoods.release();
-				placeArrayAdapter = new PlaceArrayAdapter(AddressPicker.this, places);
+				placeArrayAdapter = new PlaceArrayAdapter(getActivity(), places);
+				txtLocation.setEnabled(true);
+				txtLocationProgressBar.setVisibility(View.INVISIBLE);
 				txtLocation.setAdapter(placeArrayAdapter);
 				txtLocation.showDropDown();
 			}
@@ -212,6 +271,7 @@ public class AddressPicker extends Activity {
 
 		updateOutput();
 
+		return view;
 	}
 
 	private String updateOutput(){
@@ -223,11 +283,20 @@ public class AddressPicker extends Activity {
 					sb.append(", ");
 				sb.append(addressOutput[i]);
 				started = true;
+				if (addressInputToggles == null)
+					addressInputToggles = new boolean[4];
+				addressInputToggles[i] = true;
 			}
 		}
 		String outputString = sb.toString();
 		txtOutput.setText(outputString);
 		return outputString;
+	}
+
+	@Override
+	public void onDismiss(DialogInterface dialog) {
+		super.onDismiss(dialog);
+		hasBeenDismissed = true;
 	}
 
 	private static class PlaceArrayAdapter extends ArrayAdapter<SimpleGooglePlace> {

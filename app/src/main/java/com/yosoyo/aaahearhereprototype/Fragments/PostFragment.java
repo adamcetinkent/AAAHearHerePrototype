@@ -38,7 +38,6 @@ import android.widget.Toast;
 
 import com.facebook.Profile;
 import com.google.gson.Gson;
-import com.yosoyo.aaahearhereprototype.Activities.AddressPicker;
 import com.yosoyo.aaahearhereprototype.Activities.HolderActivity;
 import com.yosoyo.aaahearhereprototype.Activities.SpotifySearchResultsActivity;
 import com.yosoyo.aaahearhereprototype.AsyncDataManager;
@@ -104,6 +103,8 @@ public class PostFragment extends FeedbackFragment {
 	private AddressResultReceiver mResultReceiver;
 	private boolean mAddressRequested;
 	private Address address;
+	private String[] addressParts = new String[4];
+	private boolean[] addressToggles = null;
 	private String placeName = "";
 	private String googlePlaceID = "";
 
@@ -170,10 +171,28 @@ public class PostFragment extends FeedbackFragment {
 		btnLocationButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(getActivity(), AddressPicker.class);
-				String stringJson = new Gson().toJson(address, Address.class);
-				intent.putExtra(AddressPicker.ADDRESS_JSON, stringJson);
-				startActivityForResult(intent, AddressPicker.REQUEST_CODE);
+				FragmentManager fragmentManager = getFragmentManager();
+				AddressPickerDialogFragment addressPickerDialogFragment = AddressPickerDialogFragment.newInstance(
+					address,
+					addressParts,
+					addressToggles,
+					new AddressPickerDialogFragment.Callback() {
+						@Override
+						public void setPlaceName(String placeName, String[] addressParts, boolean[] addressToggles) {
+							PostFragment.this.placeName = placeName;
+							PostFragment.this.addressParts = addressParts;
+							PostFragment.this.addressToggles = addressToggles;
+							txtLocation.setText(ZZZUtility.truncatedAddress(placeName, 35));
+						}
+
+						@Override
+						public void setGooglePlaceID(String googlePlaceID) {
+							PostFragment.this.googlePlaceID = googlePlaceID;
+							txtLocation.setText(placeName);
+						}
+					}
+				);
+				addressPickerDialogFragment.show(fragmentManager, "TODO");
 			}
 		});
 
@@ -838,11 +857,6 @@ public class PostFragment extends FeedbackFragment {
 						}
 					});
 				break;
-			}
-			case (AddressPicker.REQUEST_CODE): {
-				placeName = data.getStringExtra(AddressPicker.ADDRESS_STRING);
-				googlePlaceID = data.getStringExtra(AddressPicker.GOOGLE_PLACE_ID);
-				txtLocation.setText(placeName);
 			}
 		}
 
