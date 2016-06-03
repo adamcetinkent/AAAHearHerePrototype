@@ -68,6 +68,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -408,15 +409,32 @@ public class PostFragment extends FeedbackFragment {
 					tags[i] = new HHTag(0, span.getUser().getID());
 				}
 
+				double latitude = lastLocation.getLatitude();
+				double longitude = lastLocation.getLongitude();
+				double dummyLatitude = latitude;
+				double dummyLongitude = longitude;
+				Random random = new Random();
+
+				while (dummyLatitude == latitude && dummyLongitude == longitude) {
+					final double TWO_FIFTY = 0.0025;
+					double dummyLatitudeShift = TWO_FIFTY * (2 * random.nextDouble() - 1);
+					double dummyLongitudeShift = TWO_FIFTY * (2 * random.nextDouble() - 1);
+					double cosLongitude = Math.max(Math.cos(Math.toRadians(longitude)), 0.5);
+					dummyLatitude = Math.max(Math.min(latitude + dummyLatitudeShift, 90), -90);
+					dummyLongitude = Math.min(Math.max(longitude + dummyLongitudeShift / cosLongitude, -180), 180);
+				}
+
 				HHPostTagsArray post = new HHPostTagsArray(
 					HHUser.getCurrentUserID(),
 					spotifyTrack.getID(),
-					lastLocation.getLatitude(),
-					lastLocation.getLongitude(),
+					latitude,
+					longitude,
 					message.toString(),
 					placeName,
 					googlePlaceID,
 					postPrivacy,
+					dummyLatitude,
+					dummyLongitude,
 					tags
 				);
 				AsyncDataManager.postPost(post, new AsyncDataManager.PostPostCallback() {

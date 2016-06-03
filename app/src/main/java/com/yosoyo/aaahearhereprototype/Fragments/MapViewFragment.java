@@ -74,7 +74,8 @@ import java.util.regex.Pattern;
  */
 public class MapViewFragment
 	extends Fragment
-	implements GoogleMap.OnInfoWindowClickListener {
+	implements GoogleMap.OnInfoWindowClickListener,
+	GoogleMap.OnMapClickListener {
 
 	private static final String TAG = "MapViewFragment";
 
@@ -101,6 +102,7 @@ public class MapViewFragment
 	private Location middleLocation;
 
 	private Marker currentMarker;
+	private Marker dummyMarker;
 
 	private HHPostFull currentPost;
 	private static final String KEY_CURRENT_POST = TAG + "current_post";
@@ -726,6 +728,13 @@ public class MapViewFragment
 							   .title(new Gson().toJson(post))
 							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker)));
 		markers.add(new PostMarker(marker, post));
+
+		/*latLng = new LatLng(post.getPost().getDummyLat(), post.getPost().getDummyLon());
+		marker = googleMap.addMarker(
+			new MarkerOptions().position(latLng)
+							   .title(new Gson().toJson(post))
+							   .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_dummy)));
+		markers.add(new PostMarker(marker, post));*/
 	}
 
 	private void startIntentService() {
@@ -797,6 +806,12 @@ public class MapViewFragment
 			e.printStackTrace();
 		}
 
+	}
+
+	@Override
+	public void onMapClick(LatLng latLng) {
+		dummyMarker.remove();
+		dummyMarker = null;
 	}
 
 	class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -943,6 +958,14 @@ public class MapViewFragment
 				btnLikeButton.setChecked(false);
 			}*/
 
+			if (dummyMarker != null)
+				dummyMarker.remove();
+			LatLng latLng = new LatLng(post.getPost().getDummyLat(), post.getPost().getDummyLon());
+			dummyMarker = googleMap.addMarker(
+				new MarkerOptions().position(latLng)
+								   .title(new Gson().toJson(post))
+								   .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker_dummy)));
+
 		}
 	}
 
@@ -990,5 +1013,7 @@ public class MapViewFragment
 			btnCentreProgressBar.setVisibility(View.VISIBLE);
 		}
 	}
+
+
 
 }

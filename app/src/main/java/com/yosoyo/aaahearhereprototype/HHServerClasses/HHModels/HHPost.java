@@ -30,6 +30,8 @@ public class HHPost extends HHBase implements Parcelable {
 	private String google_place_id;
 	private String message;
 	private int privacy;
+	private double dummy_lat;
+	private double dummy_lon;
 
 	public String getTrack() {
 		return track;
@@ -51,9 +53,20 @@ public class HHPost extends HHBase implements Parcelable {
 		this.place_name = nested.getPlaceName();
 		this.google_place_id = nested.getGooglePlaceID();
 		this.privacy = nested.getPrivacy();
+		this.dummy_lat = nested.getDummyLat();
+		this.dummy_lon = nested.getDummyLon();
 	}
 
-	protected HHPost(long user_id, String track, double lat, double lon, String message, String place_name, String google_place_id, int privacy) {
+	protected HHPost(long user_id,
+					 String track,
+					 double lat,
+					 double lon,
+					 String message,
+					 String place_name,
+					 String google_place_id,
+					 int privacy,
+					 double dummyLat,
+					 double dummy_lon) {
 		super();
 		this.user_id = user_id;
 		this.track = track;
@@ -63,6 +76,8 @@ public class HHPost extends HHBase implements Parcelable {
 		this.place_name = place_name;
 		this.google_place_id = google_place_id;
 		this.privacy = privacy;
+		this.dummy_lat = dummyLat;
+		this.dummy_lon = dummy_lon;
 	}
 
 	public HHPost(Cursor cursor){
@@ -79,6 +94,8 @@ public class HHPost extends HHBase implements Parcelable {
 		this.place_name = cursor.getString(cursor.getColumnIndex(ORMPost.PLACE_NAME()));
 		this.google_place_id = cursor.getString(cursor.getColumnIndex(ORMPost.GOOGLE_PLACE_ID()));
 		this.privacy = cursor.getInt(cursor.getColumnIndex(ORMPost.PRIVACY()));
+		this.dummy_lat = cursor.getDouble(cursor.getColumnIndex(ORMPost.DUMMY_LAT()));
+		this.dummy_lon = cursor.getDouble(cursor.getColumnIndex(ORMPost.DUMMY_LON()));
 	}
 
 	public double getLat() {
@@ -109,6 +126,14 @@ public class HHPost extends HHBase implements Parcelable {
 		return privacy;
 	}
 
+	public double getDummyLat() {
+		return dummy_lat;
+	}
+
+	public double getDummyLon() {
+		return dummy_lon;
+	}
+
 	@Override
 	public int describeContents() {
 		return 0;
@@ -125,6 +150,8 @@ public class HHPost extends HHBase implements Parcelable {
 		dest.writeString(google_place_id);
 		dest.writeString(message);
 		dest.writeInt(privacy);
+		dest.writeDouble(dummy_lat);
+		dest.writeDouble(dummy_lon);
 	}
 
 	public static final Parcelable.Creator<HHPost> CREATOR = new Parcelable.Creator<HHPost>(){
@@ -151,5 +178,7 @@ public class HHPost extends HHBase implements Parcelable {
 		google_place_id = 	in.readString();
 		message = 			in.readString();
 		privacy =			in.readInt();
+		dummy_lat = 		in.readDouble();
+		dummy_lon = 		in.readDouble();
 	}
 }
