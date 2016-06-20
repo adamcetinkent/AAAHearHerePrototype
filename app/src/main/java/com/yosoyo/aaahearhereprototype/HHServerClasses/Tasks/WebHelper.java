@@ -15,6 +15,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHMute;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
@@ -553,6 +554,27 @@ public class WebHelper {
 			}
 		).execute();
 	}
+
+	public interface PostMutePostCallback {
+		void returnPostMutePost(boolean success, HHMute returnedMute);
+	}
+
+	public static void postMutePost(final String authToken,
+									final long postID,
+									final PostMutePostCallback callback){
+		new PostMutePostTask(
+			authToken,
+			postID,
+			new PostMutePostTask.Callback() {
+				@Override
+				public void returnPostMute(Boolean success, HHMute mute) {
+					callback.returnPostMutePost(success, mute);
+				}
+			}
+		).execute();
+	}
+
+
 
 	private static void preLoadPostProcessBitmaps(List<HHPostFullProcess> posts){
 		if (posts != null && checkWifi()){

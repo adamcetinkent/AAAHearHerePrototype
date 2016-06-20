@@ -17,6 +17,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCachedSpotifyT
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.Services.MarkReadService;
+import com.yosoyo.aaahearhereprototype.Services.MutePostService;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 import java.util.Collections;
@@ -309,6 +310,9 @@ public class HHNotificationsManager {
 								new WebHelper.GetFacebookProfilePictureCallback() {
 									@Override
 									public void returnFacebookProfilePicture(Bitmap bitmap) {
+
+										int notificationID = (int) (notification.getNotificationType() * 10000000 + notification.getID());
+
 										String notificationText = notification.getByUser().getName()
 											+ " posted " + cachedSpotifyTrack.getName()
 											+ " at " + notification.getPost().getPlaceName();
@@ -344,6 +348,42 @@ public class HHNotificationsManager {
 														R.color.adam_theme_base));
 										}
 
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+											// ADD MUTE ACTION
+											Intent intentMutePost = new Intent(
+												context,
+												MutePostService.class
+											);
+											intentMutePost.putExtra(
+												MutePostService.KEY_NOTIFICATION_NO,
+												notificationID);
+											intentMutePost.putExtra(
+												MutePostService.KEY_POST_ID,
+												notification.getPostID());
+											intentMutePost.putExtra(
+												MutePostService.KEY_AUTH_TOKEN,
+												authToken);
+											PendingIntent pendingIntentMutePost = PendingIntent
+												.getService(
+													context,
+													notificationID * 2,
+													intentMutePost,
+													PendingIntent.FLAG_UPDATE_CURRENT
+												);
+
+											Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
+												Icon.createWithResource(context,
+																		R.drawable.alert_empty),
+												"Mute",
+												pendingIntentMutePost
+											);
+
+											Notification.Action actionAcceptFollow = actionBuilder
+												.build();
+											notificationBuilder.addAction(actionAcceptFollow);
+										}
+
 										Notification locationNotification = null;
 										if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
 											locationNotification = notificationBuilder.build();
@@ -351,7 +391,7 @@ public class HHNotificationsManager {
 											locationNotification = notificationBuilder.getNotification();
 										}
 
-										notificationManager.notify((int) notification.getID(), locationNotification);
+										notificationManager.notify(notificationID, locationNotification);
 									}
 								});
 

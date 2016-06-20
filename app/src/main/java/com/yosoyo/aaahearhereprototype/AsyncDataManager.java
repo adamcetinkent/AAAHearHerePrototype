@@ -13,6 +13,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequest;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowRequestUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHFollowUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHMute;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFullProcess;
@@ -1494,5 +1495,25 @@ public class AsyncDataManager {
 			}
 		);
 	}
+
+	public interface PostMutePostCallback {
+		void returnPostMutePost(boolean success, HHMute returnedMute);
+	}
+
+	public static void postMutePost(final String authToken,
+									final long postID,
+									final PostMutePostCallback callback){
+		WebHelper.postMutePost(
+			authToken,
+			postID,
+			new WebHelper.PostMutePostCallback(){
+				@Override
+				public void returnPostMutePost(boolean success, HHMute returnedMute) {
+					callback.returnPostMutePost(success, returnedMute);
+				}
+			}
+		);
+	}
+
 
 }

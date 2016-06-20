@@ -83,6 +83,13 @@ public class LocationListenerService extends Service implements HHLocationListen
 		}
 		Log.d(TAG, "userID: "+userID);
 		super.onStartCommand(intent, flags, startId);
+
+		notificationsManager = new HHNotificationsManager(
+			getApplicationContext(),
+			(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
+			authToken,
+			getString(R.string.app_name));
+
 		return START_REDELIVER_INTENT;
 	}
 
@@ -114,12 +121,6 @@ public class LocationListenerService extends Service implements HHLocationListen
 		} catch (IllegalArgumentException e){
 			e.printStackTrace();
 		}
-
-		notificationsManager = new HHNotificationsManager(
-			getApplicationContext(),
-			(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
-			authToken,
-			getString(R.string.app_name));
 	}
 
 	private void initialiseLocationManager(){
