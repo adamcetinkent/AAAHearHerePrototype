@@ -567,14 +567,31 @@ public class WebHelper {
 			postID,
 			new PostMutePostTask.Callback() {
 				@Override
-				public void returnPostMute(Boolean success, HHMute mute) {
+				public void returnPostMutePost(Boolean success, HHMute mute) {
 					callback.returnPostMutePost(success, mute);
 				}
 			}
 		).execute();
 	}
 
+	public interface DeleteMutePostCallback {
+		void returnDeleteMutePost(boolean success, HHMute deletedMute);
+	}
 
+	public static void deleteMutePost(final String authToken,
+									  final long postID,
+									  final DeleteMutePostCallback callback){
+		new DeleteMutePostTask(
+			authToken,
+			postID,
+			new DeleteMutePostTask.Callback() {
+				@Override
+				public void returnDeleteMutePost(Boolean success, HHMute deletedMute) {
+					callback.returnDeleteMutePost(success, deletedMute);
+				}
+			}
+		).execute();
+	}
 
 	private static void preLoadPostProcessBitmaps(List<HHPostFullProcess> posts){
 		if (posts != null && checkWifi()){

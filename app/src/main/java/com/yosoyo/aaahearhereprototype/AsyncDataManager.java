@@ -1515,5 +1515,24 @@ public class AsyncDataManager {
 		);
 	}
 
+	public interface DeleteMutePostCallback {
+		void returnDeleteMutePost(boolean success, HHMute deletedMute);
+	}
+
+	public static void deleteMutePost(final String authToken,
+									  final long postID,
+									  final DeleteMutePostCallback callback){
+		WebHelper.deleteMutePost(
+			authToken,
+			postID,
+			new WebHelper.DeleteMutePostCallback(){
+				@Override
+				public void returnDeleteMutePost(boolean success, HHMute deletedMute) {
+					callback.returnDeleteMutePost(success, deletedMute);
+				}
+			}
+		);
+	}
+
 
 }

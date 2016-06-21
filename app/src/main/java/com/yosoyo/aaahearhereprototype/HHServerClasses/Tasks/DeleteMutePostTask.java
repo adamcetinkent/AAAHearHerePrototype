@@ -16,25 +16,25 @@ import java.net.URL;
 import java.util.Locale;
 
 /**
- * Created by adam on 20/06/16.
+ * Created by adam on 21/06/16.
  *
- * Posts a new {@link HHMute} to the server
+ * Deletes a new {@link HHMute} from the server
  */
-class PostMutePostTask extends AsyncTask<Void, Void, Boolean> {
-	private static final String TAG = "PostMutePostTask";
+class DeleteMutePostTask extends AsyncTask<Void, Void, Boolean> {
+	private static final String TAG = "DeleteMutePostTask";
 	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/mutes/%1$s";
 
 	// Interface for classes wanting to incorporate this class to post a user asynchronously
 	public interface Callback {
-		void returnPostMutePost(Boolean success, HHMute mute);
+		void returnDeleteMutePost(Boolean success, HHMute deletedMute);
 	}
 
 	private final Callback callbackTo;
 	private final long postID;
 	private final String authToken;
-	private HHMute muteReturned;
+	private HHMute deletedMute;
 
-	public PostMutePostTask(String authToken, long postID, Callback callbackTo) {
+	public DeleteMutePostTask(String authToken, long postID, Callback callbackTo) {
 		this.callbackTo = callbackTo;
 		this.postID = postID;
 		this.authToken = authToken;
@@ -55,7 +55,7 @@ class PostMutePostTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
 				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
-				urlConnection.setRequestMethod("POST");
+				urlConnection.setRequestMethod("DELETE");
 
 				int httpResult = urlConnection.getResponseCode();
 				if (httpResult == HttpURLConnection.HTTP_OK){
@@ -64,15 +64,15 @@ class PostMutePostTask extends AsyncTask<Void, Void, Boolean> {
 					String inString = ZZZUtility.convertStreamToString(in);
 					in.close();
 
-					muteReturned = new Gson().fromJson(inString, HHMute.class);
+					deletedMute = new Gson().fromJson(inString, HHMute.class);
 
-					return (muteReturned != null);
+					return (deletedMute != null);
 
 				} else {
 					Log.e(TAG, "HTTP ERROR! " + httpResult);
 				}
 
-				return true;
+				return false;
 			} finally {
 				urlConnection.disconnect();
 			}
@@ -87,7 +87,7 @@ class PostMutePostTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	// Fires once doInBackground is completed
 	protected void onPostExecute(Boolean result) {
-		callbackTo.returnPostMutePost(result, muteReturned);	// sends results back
+		callbackTo.returnDeleteMutePost(result, deletedMute);	// sends results back
 	}
 
 }

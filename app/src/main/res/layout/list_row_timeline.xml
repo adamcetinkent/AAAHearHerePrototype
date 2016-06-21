@@ -224,39 +224,56 @@
         android:layout_marginBottom="5dp"
         android:background="@color/adam_theme_black">
 
-        <ToggleButton
-            android:id="@+id/list_row_timeline_btnLike"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:scaleType="fitXY"
-            android:background="@drawable/ic_like_toggle"
-            android:textOn=""
-            android:textOff=""
-            android:checked="false"
-            android:backgroundTint="@color/adam_theme_base"/>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp">
+            <ToggleButton
+                android:id="@+id/list_row_timeline_btnLike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/ic_like_toggle"
+                android:textOn=""
+                android:textOff=""
+                android:checked="false"
+                android:backgroundTint="@color/adam_theme_base"/>
+
+            <ImageButton
+                android:id="@+id/list_row_timeline_btnComment"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/comment"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/contentDescription_add_comment_button"
+                android:tint="@color/adam_theme_base"/>
+
+            <ImageButton
+                android:id="@+id/list_row_timeline_btnShare"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/share"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/contentDescription_share_button"
+                android:tint="@color/adam_theme_base"/>
+        </LinearLayout>
 
         <ImageButton
-            android:id="@+id/list_row_timeline_btnComment"
+            android:id="@+id/list_row_timeline_btnMore"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/comment"
+            android:src="@drawable/dots_full"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/contentDescription_add_comment_button"
-            android:tint="@color/adam_theme_base"/>
-
-        <ImageButton
-            android:id="@+id/list_row_timeline_btnShare"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/share"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/contentDescription_share_button"
-            android:tint="@color/adam_theme_base"/>
+            android:contentDescription="@string/contentDescription_more_button"
+            android:tint="@color/adam_theme_base"
+            android:layout_marginRight="10dp"/>
 
     </LinearLayout>
 

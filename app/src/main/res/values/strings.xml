@@ -107,5 +107,6 @@
     <string name="post_privacy_friends"><![CDATA[Followers & Friends]]></string>
     <string name="post_privacy_followers">Followers Only</string>
     <string name="post_privacy_private">Private</string>
+    <string name="contentDescription_more_button">More Button</string>
 
 </resources>

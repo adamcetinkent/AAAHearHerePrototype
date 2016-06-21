@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHMute;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPost;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
@@ -27,6 +28,7 @@ public class HHPostFullNested extends HHPost {
 	private HHCommentUserNested[] comments;
 	private HHLikeUserNested[] likes;
 	private HHTagUserNested[] tags;
+	private HHMute mute;
 
 	public HHUser getUser(){
 		return user;
@@ -66,6 +68,10 @@ public class HHPostFullNested extends HHPost {
 			tagUsers.add(tagUser);
 		}
 		return tagUsers;
+	}
+
+	public HHMute getMute(){
+		return mute;
 	}
 
 }

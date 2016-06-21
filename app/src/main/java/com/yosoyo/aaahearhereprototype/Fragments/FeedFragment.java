@@ -27,12 +27,16 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListPopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +49,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHComment;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHCommentUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLike;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHLikeUser;
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHMute;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHPostFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHTagUser;
@@ -207,62 +212,11 @@ public class FeedFragment extends FeedbackFragment {
 
 		setHasOptionsMenu(true);
 
-		/*Bundle arguments = getArguments();
-		if (arguments != null){
-			handleArguments(arguments);
-		}*/
-
-		/*if (notification != null) {
-			if (notification
-				.getNotificationType() == HHNotification.NOTIFICATION_TYPE_NEW_FOLLOW_REQUEST) {
-				for (HHFollowRequestUser followRequest : HHUser.getCurrentUser()
-															   .getFollowInRequests()) {
-					if (followRequest.getUser().getFBUserID() == notification.getByFacebookUserID()) {
-						userID = followRequest.getUser().getID();
-						profileFragment = ProfileFragment
-							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER,
-										 followRequest.getUser().getID());
-						break;
-					}
-				}
-			} else if (notification
-				.getNotificationType() == HHNotification.NOTIFICATION_TYPE_NEW_FOLLOW) {
-				for (HHFollowUser follow : HHUser.getCurrentUser().getFollowIns()) {
-					if (follow.getUser().getFBUserID() == notification.getByFacebookUserID()) {
-						userID = follow.getUser().getID();
-						profileFragment = ProfileFragment
-							.newInstance(ProfileFragment.PROFILE_TYPE_OTHER_USER,
-										 follow.getUser().getID());
-						break;
-					}
-				}
-			}
-		}*/
-
 		if (savedInstanceState != null){
 			restoreInstanceState(savedInstanceState);
 		}
 
 	}
-
-	/*private void handleArguments(Bundle arguments){
-		feedType = arguments.getInt(KEY_FEED_TYPE);
-
-		if (feedType == HOME_PROFILE_FEED || feedType == USER_PROFILE_FEED){
-			userID = arguments.getLong(KEY_USER_ID);
-			try {
-				//noinspection ConstantConditions
-				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-			} catch (NullPointerException e){
-				Log.e(TAG, e.getMessage());
-				e.printStackTrace();
-			}
-		} else if (feedType == SINGLE_POST_FEED){
-			userID = arguments.getLong(KEY_USER_ID);
-			postID = arguments.getLong(KEY_POST_ID);
-		}
-
-	}*/
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -484,7 +438,7 @@ public class FeedFragment extends FeedbackFragment {
 				getAllNewData();
 				break;
 			}
-			/*case HOME_PROFILE_FEED:
+			/*case HOME_PROFILE_FEED: //TODO ??
 			case USER_PROFILE_FEED: {
 				getUserNewData();
 				break;
@@ -743,6 +697,7 @@ public class FeedFragment extends FeedbackFragment {
 			ToggleButton btnLikeButton;
 			ImageButton btnCommentButton;
 			ImageButton btnShareButton;
+			ImageButton btnMenuButton;
 			int groupPosition;
 			boolean addingComment;
 			HHPostFull post;
@@ -788,6 +743,83 @@ public class FeedFragment extends FeedbackFragment {
 				viewHolder.btnCommentButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnComment);
 				viewHolder.btnShareButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnShare);
 				viewHolder.btnSpotifyButton = (ImageView) convertView.findViewById(R.id.list_row_timeline_btnSpotify);
+				viewHolder.btnMenuButton = (ImageButton) convertView.findViewById(R.id.list_row_timeline_btnMore);
+
+				{
+					// TODO: WORKING OUT POPUP MENU!
+
+					viewHolder.btnMenuButton.setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								final ListPopupWindow listPopupWindow = new ListPopupWindow(context);
+								final String[] listMute = {"Mute Post"};
+								final String[] listUnmute = {"Unmute Post"};
+
+								final ListAdapter adapter = new ArrayAdapter<String>(
+									context,
+									android.R.layout.simple_list_item_1,
+									viewHolder.post.getMute() == null ? listMute : listUnmute
+								);
+
+								listPopupWindow.setAnchorView(viewHolder.btnMenuButton);
+								listPopupWindow.setAdapter(adapter);
+								listPopupWindow.setWidth(400);
+
+								listPopupWindow.setOnItemClickListener(
+									new AdapterView.OnItemClickListener() {
+										@Override
+										public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+											if (position == 0) {
+												if (viewHolder.post.getMute() == null){
+													AsyncDataManager.postMutePost(
+														HHUser.getAuthorisationToken(),
+														viewHolder.post.getPost().getID(),
+														new AsyncDataManager.PostMutePostCallback() {
+															@Override
+															public void returnPostMutePost(boolean success, HHMute returnedMute) {
+																if (success){
+																	viewHolder.post.setMute(returnedMute);
+																	final ListAdapter newAdapter = new ArrayAdapter<String>(
+																		context,
+																		android.R.layout.simple_list_item_1,
+																		listUnmute
+																	);
+																	listPopupWindow.setAdapter(newAdapter);
+																}
+															}
+														}
+													);
+												} else {
+													AsyncDataManager.deleteMutePost(
+														HHUser.getAuthorisationToken(),
+														viewHolder.post.getPost().getID(),
+														new AsyncDataManager.DeleteMutePostCallback() {
+															@Override
+															public void returnDeleteMutePost(boolean success, HHMute deletedMute) {
+																if (success){
+																	viewHolder.post.setMute(null);
+																	final ListAdapter newAdapter = new ArrayAdapter<String>(
+																		context,
+																		android.R.layout.simple_list_item_1,
+																		listMute
+																	);
+																	listPopupWindow.setAdapter(newAdapter);
+																}
+															}
+														}
+													);
+												}
+											}
+										}
+									});
+
+								listPopupWindow.show();
+
+							}
+						}
+					);
+				}
 
 				viewHolder.likeCheckListener = new CompoundButton.OnCheckedChangeListener() {
 					@Override

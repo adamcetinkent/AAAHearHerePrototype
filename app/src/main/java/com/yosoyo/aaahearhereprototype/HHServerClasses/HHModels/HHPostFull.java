@@ -24,6 +24,7 @@ public class HHPostFull implements Comparable, Parcelable {
 	private List<HHCommentUser> comments;
 	private List<HHLikeUser> likes;
 	private List<HHTagUser> tags;
+	private HHMute mute;
 
 	public HHPostFull(HHPostFullProcess that){
 		this.post = that.getPost();
@@ -32,6 +33,7 @@ public class HHPostFull implements Comparable, Parcelable {
 		this.track = that.getTrack();
 		this.likes = that.getLikes();
 		this.tags = that.getTags();
+		this.mute = that.getMute();
 	}
 
 	public HHPostFull(HHPostFullNested nested){
@@ -40,6 +42,7 @@ public class HHPostFull implements Comparable, Parcelable {
 		this.comments = nested.getCommentsList();
 		this.likes = nested.getLikesList();
 		this.tags = nested.getTagsList();
+		this.mute = nested.getMute();
 	}
 
 	public HHPostFull(HHPostFullNested nested, HHUser user){
@@ -48,12 +51,14 @@ public class HHPostFull implements Comparable, Parcelable {
 		this.comments = null;
 		this.likes = null;
 		this.tags = null;
+		this.mute = null; //TODO: ?
 	}
 
 	public HHPostFull(Cursor cursor, String userIDColumnIndex){
 		this.post = new HHPost(cursor);
 		this.user = new HHUser(cursor, userIDColumnIndex);
 		this.track = new HHCachedSpotifyTrack(cursor);
+		this.mute = null; //TODO: ?
 	}
 
 	public HHPost getPost() {
@@ -80,6 +85,10 @@ public class HHPostFull implements Comparable, Parcelable {
 		return track;
 	}
 
+	public HHMute getMute() {
+		return mute;
+	}
+
 	public void setTrack(HHCachedSpotifyTrack cachedSpotifyTrack){
 		this.track = cachedSpotifyTrack;
 	}
@@ -94,6 +103,10 @@ public class HHPostFull implements Comparable, Parcelable {
 
 	public void setTags(List<HHTagUser> tags) {
 		this.tags = tags;
+	}
+
+	public void setMute(HHMute mute) {
+		this.mute = mute;
 	}
 
 	@Override
@@ -136,6 +149,7 @@ public class HHPostFull implements Comparable, Parcelable {
 		if (tags == null)
 			tags = new ArrayList<>();
 		dest.writeTypedList(tags);
+		dest.writeParcelable(mute, flags);
 	}
 
 	public final static Parcelable.Creator<HHPostFull> CREATOR = new Parcelable.Creator<HHPostFull>(){
@@ -165,6 +179,7 @@ public class HHPostFull implements Comparable, Parcelable {
 		if (tags == null)
 			tags = new ArrayList<>();
 		in.readTypedList(tags, HHTagUser.CREATOR);
+		mute = in.readParcelable(HHMute.class.getClassLoader());
 	}
 
 }
