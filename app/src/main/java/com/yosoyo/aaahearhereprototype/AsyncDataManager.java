@@ -117,6 +117,7 @@ public class AsyncDataManager {
 	 */
 	public static void updateCurrentUser(final UpdateCurrentUserCallback callback){
 		new GetUserTask(
+			HHUser.getAuthorisationToken(),
 			HHUser.getCurrentUserID(),
 			new GetUserTask.Callback() {
 				@Override
@@ -536,10 +537,13 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 
-	public static void getUser(final long userID, final boolean webOnly, final GetUserCallback callback){
+	public static void getUser(final String authToken,
+							   final long userID,
+							   final boolean webOnly,
+							   final GetUserCallback callback){
 		if (!webOnly)
 			getCachedUser(userID, callback);
-		getWebUser(userID, callback);
+		getWebUser(authToken, userID, callback);
 	}
 
 	private static void getCachedUser(final long userID, final GetUserCallback callback){
@@ -557,8 +561,11 @@ public class AsyncDataManager {
 		);
 	}
 
-	private static void getWebUser(final long userID, final GetUserCallback callback){
+	private static void getWebUser(final String authToken,
+								   final long userID,
+								   final GetUserCallback callback){
 		WebHelper.getUser(
+			authToken,
 			userID,
 			new WebHelper.GetUserCallback() {
 				@Override
@@ -583,7 +590,7 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void getUserPrivacy(final long userID, final GetUserPrivacyCallback callback) {
-		getUserPrivacy(context, userID, false, callback);
+		getUserPrivacy(context, HHUser.getAuthorisationToken(), userID, false, callback);
 	}
 
 	/**
@@ -594,7 +601,7 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void getUserPrivacy(final long userID, final boolean webOnly, final GetUserPrivacyCallback callback) {
-		getUserPrivacy(context, userID, webOnly, callback);
+		getUserPrivacy(context, HHUser.getAuthorisationToken(), userID, webOnly, callback);
 	}
 
 	/**
@@ -605,11 +612,15 @@ public class AsyncDataManager {
 	 * @param webOnly	: if true, does not query database
 	 * @param callback	: results returned via callback
 	 */
-	public static void getUserPrivacy(Context context, final long userID, final boolean webOnly, final GetUserPrivacyCallback callback){
+	public static void getUserPrivacy(Context context,
+									  final String authToken,
+									  final long userID,
+									  final boolean webOnly,
+									  final GetUserPrivacyCallback callback){
 		if (!webOnly) {
 			getUserCachedPrivacy(context, userID, callback);
 		}
-		getUserWebPrivacy(userID, callback);
+		getUserWebPrivacy(authToken, userID, callback);
 	}
 
 	private static void getUserCachedPrivacy(Context context, final long userID, final  GetUserPrivacyCallback callback){
@@ -625,8 +636,11 @@ public class AsyncDataManager {
 		);
 	}
 
-	private static void getUserWebPrivacy(final long userID, final GetUserPrivacyCallback callback){
+	private static void getUserWebPrivacy(final String authToken,
+										  final long userID,
+										  final GetUserPrivacyCallback callback){
 		WebHelper.getUserPrivacy(
+			authToken,
 			userID,
 			new WebHelper.GetUserPrivacyCallback() {
 				@Override
@@ -717,8 +731,9 @@ public class AsyncDataManager {
 	 * @param userID	: ID of user
 	 * @param callback	: results returned via callback
 	 */
-	public static void getUserFollowersInCount(final long userID, final GetUserFollowersInCountCallback callback) {
-		getUserFollowersInCount(context, userID, false, callback);
+	public static void getUserFollowersInCount(final long userID,
+											   final GetUserFollowersInCountCallback callback) {
+		getUserFollowersInCount(context, HHUser.getAuthorisationToken(), userID, false, callback);
 	}
 
 	/**
@@ -729,7 +744,7 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void getUserFollowersInCount(final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback) {
-		getUserFollowersInCount(context, userID, webOnly, callback);
+		getUserFollowersInCount(context, HHUser.getAuthorisationToken(), userID, webOnly, callback);
 	}
 
 	/**
@@ -740,11 +755,15 @@ public class AsyncDataManager {
 	 * @param webOnly	: if true, does not query databse
 	 * @param callback	: results returned via callback
 	 */
-	public static void getUserFollowersInCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersInCountCallback callback){
+	public static void getUserFollowersInCount(Context context,
+											   final String authToken,
+											   final long userID,
+											   final boolean webOnly,
+											   final GetUserFollowersInCountCallback callback){
 		if (!webOnly) {
 			getUserCachedFollowersInCount(context, userID, callback);
 		}
-		getUserWebFollowersInCount(userID, callback);
+		getUserWebFollowersInCount(authToken, userID, callback);
 	}
 
 	private static void getUserCachedFollowersInCount(Context context, final long userID, final  GetUserFollowersInCountCallback callback){
@@ -760,9 +779,13 @@ public class AsyncDataManager {
 		);
 	}
 
-	private static void getUserWebFollowersInCount(final long userID, final GetUserFollowersInCountCallback callback){
+	private static void getUserWebFollowersInCount(final String authToken,
+												   final long userID,
+												   final GetUserFollowersInCountCallback callback){
 		WebHelper.getUserFollowersInCount(
-			userID, new WebHelper.GetUserFollowersInCountCallback() {
+			authToken,
+			userID,
+			new WebHelper.GetUserFollowersInCountCallback() {
 				@Override
 				public void returnGetUserFollowersInCount(int followersInCount) {
 					callback.returnWebUserFollowersInCount(followersInCount);
@@ -785,7 +808,7 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void getUserFollowersInCount(final long userID, final GetUserFollowersOutCountCallback callback) {
-		getUserFollowersOutCount(context, userID, false, callback);
+		getUserFollowersOutCount(context, HHUser.getAuthorisationToken(), userID, false, callback);
 	}
 
 	/**
@@ -796,7 +819,7 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void getUserFollowersOutCount(final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback) {
-		getUserFollowersOutCount(context, userID, webOnly, callback);
+		getUserFollowersOutCount(context, HHUser.getAuthorisationToken(), userID, webOnly, callback);
 	}
 
 	/**
@@ -807,11 +830,15 @@ public class AsyncDataManager {
 	 * @param webOnly 	: if true, does not query database
 	 * @param callback	: results returned via callback
 	 */
-	public static void getUserFollowersOutCount(Context context, final long userID, final boolean webOnly, final GetUserFollowersOutCountCallback callback){
+	public static void getUserFollowersOutCount(Context context,
+												final String authToken,
+												final long userID,
+												final boolean webOnly,
+												final GetUserFollowersOutCountCallback callback){
 		if (!webOnly) {
 			getUserCachedFollowersOutCount(context, userID, callback);
 		}
-		getUserWebFollowersOutCount(userID, callback);
+		getUserWebFollowersOutCount(authToken, userID, callback);
 	}
 
 	private static void getUserCachedFollowersOutCount(Context context, final long userID, final  GetUserFollowersOutCountCallback callback){
@@ -827,9 +854,13 @@ public class AsyncDataManager {
 		);
 	}
 
-	private static void getUserWebFollowersOutCount(final long userID, final GetUserFollowersOutCountCallback callback){
+	private static void getUserWebFollowersOutCount(final String authToken,
+													final long userID,
+													final GetUserFollowersOutCountCallback callback){
 		WebHelper.getUserFollowersOutCount(
-			userID, new WebHelper.GetUserFollowersOutCountCallback() {
+			authToken,
+			userID,
+			new WebHelper.GetUserFollowersOutCountCallback() {
 				@Override
 				public void returnGetUserFollowersOutCount(int followersOutCount) {
 					callback.returnWebUserFollowersOutCount(followersOutCount);
@@ -850,8 +881,8 @@ public class AsyncDataManager {
 	 * @param query		: query string to perform search
 	 * @param callback	: results returned via callback
 	 */
-	public static void searchUsers(final String query, final SearchUsersCallback callback){
-		WebHelper.searchUsers(query, new WebHelper.SearchUsersCallback() {
+	public static void searchUsers(final String authToken, final String query, final SearchUsersCallback callback){
+		WebHelper.searchUsers(authToken, query, new WebHelper.SearchUsersCallback() {
 			@Override
 			public void returnSearchUsers(List<HHUser> foundUsers) {
 				callback.returnSearchUsers(query, foundUsers);
@@ -1534,5 +1565,67 @@ public class AsyncDataManager {
 		);
 	}
 
+	public interface UpdateUserProfilePrivacyCallback {
+		void returnUpdateUserProfilePrivacy(boolean success, int profilePrivacy);
+	}
+
+	public static void updateUserProfilePrivacy(final String authToken,
+												final int profilePrivacy,
+												final UpdateUserProfilePrivacyCallback callback){
+		WebHelper.updateUserProfilePrivacy(
+			authToken,
+			profilePrivacy,
+			new WebHelper.UpdateUserProfilePrivacyCallback(){
+				@Override
+				public void returnUpdateUserProfilePrivacy(boolean success, int profilePrivacy) {
+					if (success)
+						HHUser.setCurrentUserProfilePrivacy(profilePrivacy);
+					callback.returnUpdateUserProfilePrivacy(success, profilePrivacy);
+				}
+			}
+		);
+	}
+
+	public interface UpdateUserSearchPrivacyCallback {
+		void returnUpdateUserSearchPrivacy(boolean success, int searchPrivacy);
+	}
+
+	public static void updateUserSearchPrivacy(final String authToken,
+											   final int searchPrivacy,
+											   final UpdateUserSearchPrivacyCallback callback){
+		WebHelper.updateUserSearchPrivacy(
+			authToken,
+			searchPrivacy,
+			new WebHelper.UpdateUserSearchPrivacyCallback(){
+				@Override
+				public void returnUpdateUserSearchPrivacy(boolean success, int searchPrivacy) {
+					if (success)
+						HHUser.setCurrentUserSearchPrivacy(searchPrivacy);
+					callback.returnUpdateUserSearchPrivacy(success, searchPrivacy);
+				}
+			}
+		);
+	}
+
+	public interface UpdateUserAutoAcceptCallback {
+		void returnUpdateUserAutoAccept(boolean success, int searchPrivacy);
+	}
+
+	public static void updateUserAutoAccept(final String authToken,
+											final int autoAccept,
+											final UpdateUserAutoAcceptCallback callback){
+		WebHelper.updateUserAutoAccept(
+			authToken,
+			autoAccept,
+			new WebHelper.UpdateUserAutoAcceptCallback(){
+				@Override
+				public void returnUpdateUserAutoAccept(boolean success, int autoAccept) {
+					if (success)
+						HHUser.setCurrentUserAutoAccept(autoAccept);
+					callback.returnUpdateUserAutoAccept(success, autoAccept);
+				}
+			}
+		);
+	}
 
 }

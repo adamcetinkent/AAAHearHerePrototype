@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="adam_theme_base">#d8901E</color>
+    <color name="adam_theme_base">#d8901e</color>
     <color name="adam_theme_lightest">#ffcb78</color>
     <color name="adam_theme_light">#e8aa49</color>
     <color name="adam_theme_dark">#ab6e0e</color>

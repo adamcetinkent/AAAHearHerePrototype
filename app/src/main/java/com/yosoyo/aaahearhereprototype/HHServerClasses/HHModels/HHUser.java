@@ -117,6 +117,18 @@ public class HHUser extends HHBase implements Parcelable {
 		return search_privacy;
 	}
 
+	public void setProfilePrivacy(int profilePrivacy) {
+		this.profile_privacy = profilePrivacy;
+	}
+
+	public void setSearchPrivacy(int searchPrivacy) {
+		this.search_privacy = searchPrivacy;
+	}
+
+	public void setAutoAccept(int autoAccept) {
+		this.auto_accept = autoAccept;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -174,6 +186,17 @@ public class HHUser extends HHBase implements Parcelable {
 		return profilePicture;
 	}
 
+	public static void setCurrentUserProfilePrivacy(int profilePrivacy){
+		currentUser.getUser().setProfilePrivacy(profilePrivacy);
+	}
+
+	public static void setCurrentUserSearchPrivacy(int searchPrivacy){
+		currentUser.getUser().setSearchPrivacy(searchPrivacy);
+	}
+
+	public static void setCurrentUserAutoAccept(int autoAccept){
+		currentUser.getUser().setAutoAccept(autoAccept);
+	}
 
 	public static boolean userIsFriend(long testID){
 		return userIsFriend(getCurrentUser(), testID);

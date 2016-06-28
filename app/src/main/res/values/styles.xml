@@ -20,4 +20,40 @@
         <item name="android:textColorHint">@color/adam_theme_grey</item>
     </style>
 
+    <style name="Theme_Holo_Dialog_Alert" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle_Holo</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+    </style>
+
+    <style name="DialogWindowTitle_Holo">
+        <item name="android:maxLines">1</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.DialogWindowTitle</item>
+    </style>
+
+    <style name="AdamDialog" parent="@android:style/Theme.Holo">
+        <item name="android:alertDialogTheme">@style/AdamAlertDialog</item>
+    </style>
+
+    <style name="AdamAlertDialog" parent="@style/Theme_Holo_Dialog_Alert">
+        <item name="android:windowTitleStyle">@style/AdamDialogWindowTitle</item>
+        <item name="android:textColorPrimary">@color/adam_theme_light</item>
+        <item name="android:borderlessButtonStyle">@style/AdamDialogButtonStyle</item>
+    </style>
+
+    <style name="AdamDialogWindowTitle" parent="DialogWindowTitle_Holo">
+        <item name="android:textAppearance">@style/AdamDialogWindowTitleTextAppearance</item>
+    </style>
+
+    <style name="AdamDialogWindowTitleTextAppearance" parent="@android:style/TextAppearance.Holo.DialogWindowTitle">
+        <item name="android:textColor">@color/adam_theme_base</item>
+    </style>
+
+    <style name="AdamDialogButtonStyle" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:textColor">@color/adam_theme_base</item>
+    </style>
+
 </resources>

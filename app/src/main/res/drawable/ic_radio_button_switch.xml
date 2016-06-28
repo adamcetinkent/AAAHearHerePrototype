@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:state_pressed="true"
+        android:drawable="@color/adam_theme_light"
+        android:color="@color/adam_theme_black"/>
+
+    <item
+        android:state_checked="true"
+        android:drawable="@color/adam_theme_base"
+        android:color="@color/adam_theme_black"/>
+
+    <item
+        android:state_checked="false"
+        android:drawable="@color/adam_theme_black"
+        android:color="@color/adam_theme_light"/>
+
+</selector>

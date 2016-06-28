@@ -78,6 +78,7 @@ public class UserSearchFragment extends FeedbackFragment {
 			public boolean onQueryTextSubmit(String query) {
 				Log.d(TAG, "search query submitted");
 				AsyncDataManager.searchUsers(
+					HHUser.getAuthorisationToken(),
 					query,
 					new AsyncDataManager.SearchUsersCallback() {
 						@Override

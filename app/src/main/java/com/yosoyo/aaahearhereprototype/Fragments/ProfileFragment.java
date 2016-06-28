@@ -1,10 +1,14 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +33,8 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.ZZZInterface.AutoShowHideButton;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
+
+import java.util.Locale;
 
 /**
  * Created by adam on 26/02/2016.
@@ -275,6 +281,7 @@ public class ProfileFragment extends FeedbackFragment {
 				}
 				case PROFILE_TYPE_OTHER_USER:{
 					AsyncDataManager.getUser(
+						HHUser.getAuthorisationToken(),
 						userID,
 						false,
 						new AsyncDataManager.GetUserCallback() {
@@ -430,34 +437,76 @@ public class ProfileFragment extends FeedbackFragment {
 				return;
 			}
 
-			AsyncDataManager.deleteFollowRequest(
-				deleteFollowRequest,
-				new AsyncDataManager.DeleteFollowRequestCallback() {
-					@Override
-					public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
-						if (success) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.AdamDialog));
+			final HHFollowRequestUser finalDeleteFollowRequest = deleteFollowRequest;
+			builder.setTitle("Delete Follow Request")
+				   .setMessage(String.format(Locale.ENGLISH,
+											 "Are you sure you want to delete the follow request from %1$s?",
+											 user.getUser().getName()))
+				   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+					   @Override
+					   public void onCancel(DialogInterface dialog) {
+						   btnDelete.setVisibility(View.VISIBLE);
+						   btnDeleteProgressBar.setVisibility(View.GONE);
+						   btnAccept.clearColorFilter();
+						   btnAccept.setEnabled(true);
+					   }
+				   })
+				   .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+					   @Override
+					   public void onClick(final DialogInterface dialog, int which) {
+						   AsyncDataManager.deleteFollowRequest(
+							   finalDeleteFollowRequest,
+							   new AsyncDataManager.DeleteFollowRequestCallback() {
+								   @Override
+								   public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
+									   if (success) {
 
-							AsyncDataManager.updateCurrentUser(
-								new AsyncDataManager.UpdateCurrentUserCallback() {
-									@Override
-									public void returnUpdateCurrentUser(boolean success) {
-										if (success) {
-											getActivity().invalidateOptionsMenu();
-										}
-									}
-								}
-							);
+										   AsyncDataManager.updateCurrentUser(
+											   new AsyncDataManager.UpdateCurrentUserCallback() {
+												   @Override
+												   public void returnUpdateCurrentUser(boolean success) {
+													   if (success) {
+														   getActivity()
+															   .invalidateOptionsMenu();
+													   }
+												   }
+											   }
+										   );
 
-							llRequestedResponse.setVisibility(View.GONE);
+										   llRequestedResponse.setVisibility(View.GONE);
 
-						} else {
-							btnDelete.setVisibility(View.VISIBLE);
-							btnAccept.clearColorFilter();
-							btnAccept.setEnabled(true);
-						}
-						btnDeleteProgressBar.setVisibility(View.GONE);
+									   } else {
+										   btnDelete.setVisibility(View.VISIBLE);
+										   btnAccept.clearColorFilter();
+										   btnAccept.setEnabled(true);
+									   }
+									   btnDeleteProgressBar.setVisibility(View.GONE);
+									   dialog.dismiss();
+								   }
+							   });
+					   }
+				   })
+				   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					   @Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
 					}
 				});
+
+			AlertDialog dialog = builder.create();
+			dialog.show();
+
+			int titleDividerID = getResources().getIdentifier("titleDivider", "id", "android");
+			View titleDivider = dialog.findViewById(titleDividerID);
+			if (titleDivider != null){
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base, null));
+				} else {
+					titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base));
+				}
+			}
+
 		}
 	};
 
@@ -543,38 +592,76 @@ public class ProfileFragment extends FeedbackFragment {
 				return;
 			}
 
-			AsyncDataManager.deleteFollow(
-				deleteFollow,
-				new AsyncDataManager.DeleteFollowCallback() {
+			AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.AdamDialog));
+			final HHFollowUser finalDeleteFollow = deleteFollow;
+			builder.setTitle("Unfollow")
+				   .setMessage(String.format(Locale.ENGLISH,
+											 "Are you sure you want to unfollow %1$s?",
+											 user.getUser().getName()))
+				   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+					   @Override
+					   public void onCancel(DialogInterface dialog) {
+						   btnUnfollow.setVisibility(View.VISIBLE);
+						   btnUnfollowProgressBar.setVisibility(View.GONE);
+					   }
+				   })
+				   .setPositiveButton("Unfollow", new DialogInterface.OnClickListener() {
 					@Override
-					public void returnDeleteFollow(boolean success, HHFollowUser deletedFollow) {
+					public void onClick(final DialogInterface dialog, int which) {
+						AsyncDataManager.deleteFollow(
+							finalDeleteFollow,
+							new AsyncDataManager.DeleteFollowCallback() {
+								@Override
+								public void returnDeleteFollow(boolean success, HHFollowUser deletedFollow) {
 
-						hideFollowsInCount();
+									hideFollowsInCount();
 
-						if (success) {
-							AsyncDataManager.updateCurrentUser(
-								new AsyncDataManager.UpdateCurrentUserCallback() {
-									@Override
-									public void returnUpdateCurrentUser(boolean success) {
-										if (success) {
-											getActivity().invalidateOptionsMenu();
-											if (profileType == PROFILE_TYPE_CURRENT_USER) {
-												user = HHUser.getCurrentUser();
+									if (success) {
+										AsyncDataManager.updateCurrentUser(
+											new AsyncDataManager.UpdateCurrentUserCallback() {
+												@Override
+												public void returnUpdateCurrentUser(boolean success) {
+													if (success) {
+														getActivity().invalidateOptionsMenu();
+														if (profileType == PROFILE_TYPE_CURRENT_USER) {
+															user = HHUser.getCurrentUser();
+														}
+														updateFollowersInCount(true);
+														updateFollowStatus();
+													}
+												}
 											}
-											updateFollowersInCount(true);
-											updateFollowStatus();
-										}
+										);
+										btnFollow.setVisibility(View.VISIBLE);
+									} else {
+										txtFollowsInCount.setVisibility(View.VISIBLE);
+										btnUnfollow.setVisibility(View.VISIBLE);
 									}
+									btnUnfollowProgressBar.setVisibility(View.GONE);
+									dialog.dismiss();
 								}
-							);
-							btnFollow.setVisibility(View.VISIBLE);
-						} else {
-							txtFollowsInCount.setVisibility(View.VISIBLE);
-							btnUnfollow.setVisibility(View.VISIBLE);
-						}
-						btnUnfollowProgressBar.setVisibility(View.GONE);
+							});
+					}
+				})
+				   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
 					}
 				});
+			AlertDialog dialog = builder.create();
+			dialog.show();
+
+			int titleDividerID = getResources().getIdentifier("titleDivider", "id", "android");
+			View titleDivider = dialog.findViewById(titleDividerID);
+			if (titleDivider != null){
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base, null));
+				} else {
+					titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base));
+				}
+			}
+
 		}
 	};
 
@@ -831,7 +918,10 @@ public class ProfileFragment extends FeedbackFragment {
 
 	private void updatePostCount(final int postCount){
 		ProfileFragment.this.postCount = postCount;
-		txtPostsCount.setText(String.valueOf(postCount));
+		if (postCount == -1)
+			txtPostsCount.setText("?");
+		else
+			txtPostsCount.setText(String.valueOf(postCount));
 		txtPostsCount.setVisibility(View.VISIBLE);
 		txtPostsCountProgressBar.setVisibility(View.GONE);
 	}
@@ -855,7 +945,10 @@ public class ProfileFragment extends FeedbackFragment {
 
 	private void updateFollowersInCount(final int followersInCount){
 		ProfileFragment.this.followersInCount = followersInCount;
-		txtFollowsInCount.setText(String.valueOf(followersInCount));
+		if (followersInCount == -1)
+			txtFollowsInCount.setText("?");
+		else
+			txtFollowsInCount.setText(String.valueOf(followersInCount));
 		txtFollowsInCount.setVisibility(View.VISIBLE);
 		txtFollowsInCountProgressBar.setVisibility(View.GONE);
 	}
@@ -879,7 +972,10 @@ public class ProfileFragment extends FeedbackFragment {
 
 	private void updateFollowersOutCount(final int followersOutCount){
 		ProfileFragment.this.followersOutCount = followersOutCount;
-		txtFollowsOutCount.setText(String.valueOf(followersOutCount));
+		if (followersOutCount == -1)
+			txtFollowsOutCount.setText("?");
+		else
+			txtFollowsOutCount.setText(String.valueOf(followersOutCount));
 		txtFollowsOutCount.setVisibility(View.VISIBLE);
 		txtFollowsOutCountProgressBar.setVisibility(View.GONE);
 	}

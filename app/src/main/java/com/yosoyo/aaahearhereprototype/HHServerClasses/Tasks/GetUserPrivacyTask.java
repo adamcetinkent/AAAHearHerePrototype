@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.BufferedInputStream;
@@ -22,16 +21,20 @@ import java.util.Locale;
  */
 class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 	private static final String TAG = "GetUserPrivacyTask";
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/posts/privacy/by/%1$d/";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/users/profile_privacy/%1$d/";
 
 	public interface Callback {
 		void returnUserPrivacy(boolean userPrivacy);
 	}
 
+	private final String authToken;
 	private final long userID;
 	private final Callback callbackTo;
 
-	public GetUserPrivacyTask(long userID, Callback callbackTo) {
+	public GetUserPrivacyTask(final String authToken,
+							  final long userID,
+							  final Callback callbackTo) {
+		this.authToken = authToken;
 		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
@@ -45,7 +48,7 @@ class GetUserPrivacyTask extends AsyncTask<Void, Void, Boolean> {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setRequestProperty("Authorization", "Token token="+HHUser.getAuthorisationToken());
+			urlConnection.setRequestProperty("Authorization", "Token token="+authToken);
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);

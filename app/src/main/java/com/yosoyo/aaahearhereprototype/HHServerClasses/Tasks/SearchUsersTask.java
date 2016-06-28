@@ -33,8 +33,10 @@ class SearchUsersTask extends AsyncTask<Void, Void, List<HHUser>> {
 
 	private final Callback callbackTo;
 	private final String query;
+	private final String authToken;
 
-	public SearchUsersTask(final String query, final Callback callbackTo) {
+	public SearchUsersTask(final String authToken, final String query, final Callback callbackTo) {
+		this.authToken = authToken;
 		this.query = query;
 		this.callbackTo = callbackTo;
 	}
@@ -58,6 +60,8 @@ class SearchUsersTask extends AsyncTask<Void, Void, List<HHUser>> {
 				return null;
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
+				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
+
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
 				HHUser[] users = new Gson().fromJson(streamString, HHUser[].class);

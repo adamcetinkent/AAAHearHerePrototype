@@ -54,6 +54,7 @@ import com.yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
+import com.yosoyo.aaahearhereprototype.Fragments.SettingsFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.UserSearchFragment;
 import com.yosoyo.aaahearhereprototype.HHNotificationsManager;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Database.DatabaseHelper;
@@ -171,13 +172,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_map,
 			R.string.navigation_option_profile,
 			R.string.action_search_users,
+			R.string.navigation_option_settings,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
 			R.string.action_friends
 		};
 
-		final int NUM_NAV_STRINGS = 4;
+		final int NUM_NAV_STRINGS = 5;
 		String[] navStrings = new String[NUM_NAV_STRINGS];
 		for (int i = 0; i < NUM_NAV_STRINGS; i++){
 			navStrings[i] = getString(navOptions[i]);
@@ -352,6 +354,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			}
 			case R.string.navigation_option_profile: {
 				fragment = FeedFragment.newInstance(FeedFragment.HOME_PROFILE_FEED, HHUser.getCurrentUserID());
+				break;
+			}
+			case R.string.navigation_option_settings: {
+				fragment = new SettingsFragment();
 				break;
 			}
 			case R.string.action_create_post: {
@@ -723,6 +729,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					break;
 				case 3:
 					imageView.setImageResource(R.drawable.search);
+					break;
+				case 4:
+					imageView.setImageResource(R.drawable.settings);
 					break;
 			}
 			return view;

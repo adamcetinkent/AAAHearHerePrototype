@@ -151,26 +151,36 @@ public class WebHelper {
 		void returnGetUserFollowersInCount(int followersInCount);
 	}
 
-	public static void getUserFollowersInCount(final long user_id, final GetUserFollowersInCountCallback callback){
-		new GetUserFollowersInCountTask(user_id, new GetUserFollowersInCountTask.Callback(){
-			@Override
-			public void returnUserFollowersInCount(int followersInCount) {
-				callback.returnGetUserFollowersInCount(followersInCount);
-			}
-		}).execute();
+	public static void getUserFollowersInCount(final String authToken,
+											   final long user_id,
+											   final GetUserFollowersInCountCallback callback){
+		new GetUserFollowersInCountTask(
+			authToken,
+			user_id,
+			new GetUserFollowersInCountTask.Callback(){
+				@Override
+				public void returnUserFollowersInCount(int followersInCount) {
+					callback.returnGetUserFollowersInCount(followersInCount);
+				}
+			}).execute();
 	}
 
 	public interface GetUserFollowersOutCountCallback {
 		void returnGetUserFollowersOutCount(int followersOutCount);
 	}
 
-	public static void getUserFollowersOutCount(final long user_id, final GetUserFollowersOutCountCallback callback){
-		new GetUserFollowersOutCountTask(user_id, new GetUserFollowersOutCountTask.Callback(){
-			@Override
-			public void returnUserFollowersOutCount(int followersOutCount) {
-				callback.returnGetUserFollowersOutCount(followersOutCount);
-			}
-		}).execute();
+	public static void getUserFollowersOutCount(final String authToken,
+												final long user_id,
+												final GetUserFollowersOutCountCallback callback){
+		new GetUserFollowersOutCountTask(
+			authToken,
+			user_id,
+				new GetUserFollowersOutCountTask.Callback(){
+				@Override
+				public void returnUserFollowersOutCount(int followersOutCount) {
+					callback.returnGetUserFollowersOutCount(followersOutCount);
+				}
+			}).execute();
 	}
 
 
@@ -178,14 +188,19 @@ public class WebHelper {
 		void returnGetUserPrivacy(boolean userPrivacy);
 	}
 
-	public static void getUserPrivacy(final long user_id, final GetUserPrivacyCallback callback){
-		new GetUserPrivacyTask(user_id, new GetUserPrivacyTask.Callback(){
-			@Override
-			public void returnUserPrivacy(boolean userPrivacy) {
-				callback.returnGetUserPrivacy(userPrivacy);
-			}
-		}).execute();
-	}
+	public static void getUserPrivacy(final String authToken,
+									  final long user_id,
+									  final GetUserPrivacyCallback callback){
+		new GetUserPrivacyTask(
+			authToken,
+			user_id,
+			new GetUserPrivacyTask.Callback(){
+				@Override
+				public void returnUserPrivacy(boolean userPrivacy) {
+					callback.returnGetUserPrivacy(userPrivacy);
+				}
+			}).execute();
+		}
 
 	public interface GetPostsAtLocationCallback {
 		void returnGetPostsAtLocation(List<HHNotification> posts);
@@ -488,8 +503,11 @@ public class WebHelper {
 		void returnGetUser(HHUserFull user);
 	}
 
-	public static void getUser(final long userID, final GetUserCallback callback){
+	public static void getUser(final String authToken,
+							   final long userID,
+							   final GetUserCallback callback){
 		new GetUserTask(
+			authToken,
 			userID,
 			new GetUserTask.Callback() {
 				@Override
@@ -504,8 +522,11 @@ public class WebHelper {
 		void returnSearchUsers(List<HHUser> foundUsers);
 	}
 
-	public static void searchUsers(final String query, final SearchUsersCallback callback){
+	public static void searchUsers(final String authToken,
+								   final String query,
+								   final SearchUsersCallback callback){
 		new SearchUsersTask(
+			authToken,
 			query,
 			new SearchUsersTask.Callback() {
 				@Override
@@ -588,6 +609,63 @@ public class WebHelper {
 				@Override
 				public void returnDeleteMutePost(Boolean success, HHMute deletedMute) {
 					callback.returnDeleteMutePost(success, deletedMute);
+				}
+			}
+		).execute();
+	}
+
+	public interface UpdateUserProfilePrivacyCallback {
+		void returnUpdateUserProfilePrivacy(boolean success, int profilePrivacy);
+	}
+
+	public static void updateUserProfilePrivacy(final String authToken,
+												final int profilePrivacy,
+												final UpdateUserProfilePrivacyCallback callback){
+		new UpdateUserProfilePrivacyTask(
+			authToken,
+			profilePrivacy,
+			new UpdateUserProfilePrivacyTask.Callback(){
+				@Override
+				public void returnUpdateUserProfilePrivacy(Boolean success, int profilePrivacy) {
+					callback.returnUpdateUserProfilePrivacy(success, profilePrivacy);
+				}
+			}
+		).execute();
+	}
+
+	public interface UpdateUserSearchPrivacyCallback {
+		void returnUpdateUserSearchPrivacy(boolean success, int searchPrivacy);
+	}
+
+	public static void updateUserSearchPrivacy(final String authToken,
+											   final int searchPrivacy,
+											   final UpdateUserSearchPrivacyCallback callback){
+		new UpdateUserSearchPrivacyTask(
+			authToken,
+			searchPrivacy,
+			new UpdateUserSearchPrivacyTask.Callback(){
+				@Override
+				public void returnUpdateUserSearchPrivacy(Boolean success, int searchPrivacy) {
+					callback.returnUpdateUserSearchPrivacy(success, searchPrivacy);
+				}
+			}
+		).execute();
+	}
+
+	public interface UpdateUserAutoAcceptCallback {
+		void returnUpdateUserAutoAccept(boolean success, int autoAccept);
+	}
+
+	public static void updateUserAutoAccept(final String authToken,
+											final int autoAccept,
+											final UpdateUserAutoAcceptCallback callback){
+		new UpdateUserAutoAcceptTask(
+			authToken,
+			autoAccept,
+			new UpdateUserAutoAcceptTask.Callback(){
+				@Override
+				public void returnUpdateUserAutoAccept(Boolean success, int autoAccept) {
+					callback.returnUpdateUserAutoAccept(success, autoAccept);
 				}
 			}
 		).execute();

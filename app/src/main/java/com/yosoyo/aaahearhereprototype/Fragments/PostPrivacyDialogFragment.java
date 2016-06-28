@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.yosoyo.aaahearhereprototype.R;
 
@@ -49,17 +50,24 @@ public class PostPrivacyDialogFragment extends DialogFragment {
 		final View view = inflater
 			.inflate(R.layout.dialog_fragment_post_privacy, container, false);
 
+		final TextView txtDesc = (TextView) view.findViewById(R.id.fragment_post_privacy_txtDesc);
+		final String[] descs = getResources().getStringArray(R.array.post_privacy_descs);
+
 		btnGroup = (RadioGroup) view.findViewById(R.id.fragment_post_privacy_btnGroup);
 
 		((RadioButton) btnGroup.getChildAt(privacy)).setChecked(true);
+		txtDesc.setText(descs[privacy]);
 
 		btnGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				privacy = group.indexOfChild(view.findViewById(checkedId));
 				callback.setPrivacy(privacy);
+				txtDesc.setText(descs[privacy]);
 			}
 		});
+
+		//txtDesc.setWidth(btnGroup.getWidth());
 
 		return view;
 	}

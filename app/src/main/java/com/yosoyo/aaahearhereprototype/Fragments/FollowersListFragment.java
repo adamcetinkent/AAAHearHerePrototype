@@ -211,7 +211,7 @@ public class FollowersListFragment extends FeedbackFragment {
 			lstFollowers.setAdapter(adapter);
 			progressBar.setVisibility(View.GONE);
 		} else {
-			AsyncDataManager.getUser(userID, true, new AsyncDataManager.GetUserCallback() {
+			AsyncDataManager.getUser(HHUser.getAuthorisationToken(), userID, true, new AsyncDataManager.GetUserCallback() {
 				@Override
 				public void returnGetCachedUser(HHUserFull returnedUser) {}
 

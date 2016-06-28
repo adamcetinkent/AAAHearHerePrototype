@@ -29,11 +29,13 @@ public class GetUserTask extends AsyncTask<Integer, Void, Boolean> {
 		void returnGetUser(boolean success, HHUserFullProcess user);
 	}
 
+	private final String authToken;
 	private final Callback callbackTo;
 	private final long id;
 	private HHUserFullProcess user;
 
-	public GetUserTask(long id, Callback callbackTo) {
+	public GetUserTask(final String authToken, final long id, final Callback callbackTo) {
+		this.authToken = authToken;
 		this.id = id;
 		this.callbackTo = callbackTo;
 	}
@@ -45,6 +47,7 @@ public class GetUserTask extends AsyncTask<Integer, Void, Boolean> {
 			URL url = new URL(VM_SERVER_ADDRESS + id);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
+				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 				int httpResult = urlConnection.getResponseCode();
 
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());

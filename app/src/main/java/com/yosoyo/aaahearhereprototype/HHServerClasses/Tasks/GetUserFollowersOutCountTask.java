@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.BufferedInputStream;
@@ -27,10 +26,14 @@ class GetUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
 		void returnUserFollowersOutCount(int postCount);
 	}
 
+	private final String authToken;
 	private final long userID;
 	private final Callback callbackTo;
 
-	public GetUserFollowersOutCountTask(long userID, Callback callbackTo) {
+	public GetUserFollowersOutCountTask(final String authToken,
+										final long userID,
+										final Callback callbackTo) {
+		this.authToken = authToken;
 		this.userID = userID;
 		this.callbackTo = callbackTo;
 	}
@@ -41,7 +44,7 @@ class GetUserFollowersOutCountTask extends AsyncTask<Void, Void, Integer> {
 		try {
 			URL url = new URL(VM_SERVER_ADDRESS + userID);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setRequestProperty("Authorization", "Token token="+ HHUser.getAuthorisationToken());
+			urlConnection.setRequestProperty("Authorization", "Token token="+authToken);
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);

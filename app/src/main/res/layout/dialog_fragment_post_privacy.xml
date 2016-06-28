@@ -25,7 +25,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/post_privacy_public"
-            android:id="@+id/fragment_post_privacy_btn0"
             android:textColor="@color/adam_theme_light"
             android:buttonTint="@color/adam_theme_base"/>
 
@@ -33,7 +32,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/post_privacy_friends"
-            android:id="@+id/fragment_post_privacy_btn1"
             android:textColor="@color/adam_theme_light"
             android:buttonTint="@color/adam_theme_base"/>
 
@@ -41,7 +39,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/post_privacy_followers"
-            android:id="@+id/fragment_post_privacy_btn2"
             android:textColor="@color/adam_theme_light"
             android:buttonTint="@color/adam_theme_base"/>
 
@@ -49,10 +46,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/post_privacy_private"
-            android:id="@+id/fragment_post_privacy_btn3"
             android:textColor="@color/adam_theme_light"
             android:buttonTint="@color/adam_theme_base"/>
 
     </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in tellus vel massa dictum mattis at at risus. Sed sollicitudin tellus feugiat ex aliquam placerat."
+        android:id="@+id/fragment_post_privacy_txtDesc"
+        android:textColor="@color/adam_theme_lightest"
+        android:textSize="14dp"
+        android:paddingLeft="10dp"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="10dp"/>
 
 </LinearLayout>

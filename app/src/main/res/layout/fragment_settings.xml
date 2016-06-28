@@ -1,0 +1,245 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context="com.yosoyo.aaahearhereprototype.Fragments.SettingsFragment"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile Privacy"
+            android:textColor="@color/adam_theme_light"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
+
+        <com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup
+            android:id="@+id/fragment_settings_grpProfilePrivacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:showDividers="beginning|middle|end"
+            android:divider="@drawable/ic_radio_button_switch_divider"
+            android:padding="10dp">
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Public"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Friends"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Followers"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:checked="false"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+        </com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in tellus vel massa dictum mattis at at risus. Sed sollicitudin tellus feugiat ex aliquam placerat."
+            android:id="@+id/fragment_settings_txtProfilePrivacyDesc"
+            android:textColor="@color/adam_theme_lightest"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search Privacy"
+            android:textColor="@color/adam_theme_light"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
+
+        <com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup
+            android:id="@+id/fragment_settings_grpSearchPrivacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:showDividers="beginning|middle|end"
+            android:divider="@drawable/ic_radio_button_switch_divider"
+            android:padding="10dp">
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Public"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Friends"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hidden"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:checked="false"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+        </com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in tellus vel massa dictum mattis at at risus. Sed sollicitudin tellus feugiat ex aliquam placerat."
+            android:id="@+id/fragment_settings_txtSearchPrivacyDesc"
+            android:textColor="@color/adam_theme_lightest"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Follower Acceptance"
+            android:textColor="@color/adam_theme_light"
+            android:textSize="16dp"
+            android:textStyle="bold"/>
+
+        <com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup
+            android:id="@+id/fragment_settings_grpAutoAcceptance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:showDividers="beginning|middle|end"
+            android:divider="@drawable/ic_radio_button_switch_divider"
+            android:padding="10dp">
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Manual"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Friends"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Automatic"
+                android:textColor="@drawable/ic_radio_button_switch"
+                android:background="@drawable/ic_radio_button_switch"
+                android:elevation="5dp"
+                android:padding="5dp"
+                android:checked="false"
+                android:buttonTint="@color/adam_theme_base"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:button="@color/adam_theme_black"/>
+        </com.yosoyo.aaahearhereprototype.ZZZInterface.MutableRadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut in tellus vel massa dictum mattis at at risus. Sed sollicitudin tellus feugiat ex aliquam placerat."
+            android:id="@+id/fragment_settings_txtAutoAcceptanceDesc"
+            android:textColor="@color/adam_theme_lightest"
+            android:textSize="14dp"
+            android:paddingLeft="10dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
