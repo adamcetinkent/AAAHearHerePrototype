@@ -24,10 +24,12 @@ class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 		void returnDeleteLike(Boolean success);
 	}
 
+	private final String authToken;
 	private final Callback callbackTo;
 	private final HHLike like;
 
-	public DeleteLikeTask(HHLike like, Callback callbackTo) {
+	public DeleteLikeTask(final String authToken, final HHLike like, final Callback callbackTo) {
+		this.authToken = authToken;
 		this.callbackTo = callbackTo;
 		this.like = like;
 	}
@@ -43,6 +45,7 @@ class DeleteLikeTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
+				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 				urlConnection.setRequestMethod("DELETE");
 
 				/*String json = new Gson().toJson(like, HHLike.class);

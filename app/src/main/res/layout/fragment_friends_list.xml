@@ -5,7 +5,6 @@
              tools:context=".Fragments.FriendsListFragment"
              android:background="@color/adam_theme_black">
 
-    <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_friends_list_lstFriends"
         android:layout_width="match_parent"

@@ -48,9 +48,10 @@ class GetPostTask extends AsyncTask<Void, Void, HHPostFullProcess> {
 			try {
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				HHPostFullNested postNested = new Gson().fromJson(streamString,
-																		  HHPostFullNested.class);
+				HHPostFullNested postNested = new Gson().fromJson(streamString, HHPostFullNested.class);
 				return new HHPostFullProcess(postNested);
+			} catch (Exception e){
+				return null;
 			} finally {
 				urlConnection.disconnect();
 			}

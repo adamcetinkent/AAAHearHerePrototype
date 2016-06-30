@@ -207,7 +207,7 @@ public class ORMCachedSpotifyTrack {
 	}
 
 	public static void insertSpotifyTrack(Context context, SpotifyTrack spotifyTrack, InsertCachedSpotifyTrackTask.Callback callback){
-		new InsertCachedSpotifyTrackTask(context, spotifyTrack, callback);
+		new InsertCachedSpotifyTrackTask(context, spotifyTrack, callback).execute();
 	}
 
 	public static class InsertCachedSpotifyTrackTask extends AsyncTask<Void, Void, Long> {

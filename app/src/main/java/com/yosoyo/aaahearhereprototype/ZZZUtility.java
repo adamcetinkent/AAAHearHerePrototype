@@ -120,7 +120,7 @@ public class ZZZUtility {
 
 	public static <T> List<T> updateList(List<T> oldList, T newItem){
 		for (int i = 0; i < oldList.size(); i++){
-			if (oldList.get(i).equals(newItem)){
+			if (oldList.get(i) != null && oldList.get(i).equals(newItem)){
 				oldList.set(i, newItem);
 				return oldList;
 			}

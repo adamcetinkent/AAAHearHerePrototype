@@ -377,8 +377,9 @@ public class WebHelper {
 		void returnPostComment(HHComment returnedComment);
 	}
 
-	public static void postComment(final HHComment comment, final PostCommentCallback callback){
+	public static void postComment(final String authToken, final HHComment comment, final PostCommentCallback callback){
 		new PostCommentTask(
+			authToken,
 			comment,
 			new PostCommentTask.Callback() {
 				  @Override
@@ -392,8 +393,9 @@ public class WebHelper {
 		void returnPostLike(HHLike returnedLike);
 	}
 
-	public static void postLike(final HHLike like, final PostLikeCallback callback){
+	public static void postLike(final String authToken, final HHLike like, final PostLikeCallback callback){
 		new PostLikeTask(
+			authToken,
 			like,
 			new PostLikeTask.Callback() {
 				@Override
@@ -407,8 +409,9 @@ public class WebHelper {
 		void returnDeleteLike(boolean success);
 	}
 
-	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
+	public static void deleteLike(final String authToken, final HHLike like, final DeleteLikeCallback callback){
 		new DeleteLikeTask(
+			authToken,
 			like,
 			new DeleteLikeTask.Callback() {
 				@Override
@@ -543,11 +546,13 @@ public class WebHelper {
 
 	public static void getNotifications(final String authToken,
 										final Timestamp sinceTime,
+										final boolean newOnly,
 										final Long[] excludeIDs,
 										final GetNotificationsCallback callback){
 		new GetNotificationsTask(
 			authToken,
 			sinceTime,
+			newOnly,
 			excludeIDs,
 			new GetNotificationsTask.Callback() {
 				@Override
@@ -695,13 +700,15 @@ public class WebHelper {
 	public static void preLoadPostBitmaps(List<HHPostFull> posts){
 		if (checkWifi()){
 			for (HHPostFull post : posts) {
-				preLoadPostBitmaps(post, true);
+				if (post != null)
+					preLoadPostBitmaps(post, true);
 			}
 		}
 	}
 
 	public static void preLoadPostBitmaps(HHPostFull post){
-		preLoadPostBitmaps(post, false);
+		if (post != null)
+			preLoadPostBitmaps(post, false);
 	}
 
 	private static void preLoadPostBitmaps(HHPostFull post, boolean shortcut){

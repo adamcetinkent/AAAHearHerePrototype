@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHNotification;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 
 /**
@@ -16,6 +17,7 @@ public abstract class FeedbackFragment extends Fragment {
 
 	private FragmentChangeRequestListener fragmentChangeRequestListener;
 	public static final String USER_ID = "user_id";
+	public static final String NOTIFICATION = "notification";
 
 	@Override
 	public void onAttach(Context context) {
@@ -72,6 +74,12 @@ public abstract class FeedbackFragment extends Fragment {
 	 */
 	void requestProfileModeSwitch(int profileType, long userID, Bundle bundle){
 		fragmentChangeRequestListener.requestProfileModeSwitch(profileType, userID, bundle);
+	}
+
+	void requestPostFromNotification(HHNotification notification){
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(FeedbackFragment.NOTIFICATION, notification);
+		fragmentChangeRequestListener.requestFragmentChange(FragmentChangeRequestListener.POST_REQUEST, bundle);
 	}
 
 	// TODO: DOCUMENTATION

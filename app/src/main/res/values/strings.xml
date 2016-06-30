@@ -109,6 +109,7 @@
     <string name="post_privacy_followers">Followers Only</string>
     <string name="post_privacy_private">Private</string>
     <string name="contentDescription_more_button">More Button</string>
+    <string name="navigation_option_notifications">Notifications</string>
 
     <string-array name="post_privacy_descs">
         <item>All Hear Here users can see this post.\n\nUsers who are not Facebook friends will see a nearby dummy location.</item>

@@ -29,11 +29,13 @@ class PostCommentTask extends AsyncTask<Void, Void, Boolean> {
 		void returnPostComment(Boolean success, HHComment comment);
 	}
 
+	private final String authToken;
 	private final Callback callbackTo;
 	private final HHComment comment;
 	private HHComment commentReturned;
 
-	public PostCommentTask(HHComment comment, Callback callbackTo) {
+	public PostCommentTask(final String authToken, final HHComment comment, final Callback callbackTo) {
+		this.authToken = authToken;
 		this.callbackTo = callbackTo;
 		this.comment = comment;
 	}
@@ -49,6 +51,7 @@ class PostCommentTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
+				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 				urlConnection.setRequestMethod("POST");
 
 				String json = new Gson().toJson(comment, HHComment.class);

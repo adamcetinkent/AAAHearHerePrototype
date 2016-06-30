@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/adam_theme_black"
+              android:minHeight="75dp">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp">
+
+            <ImageView
+                android:id="@+id/list_row_notification_imgProfile"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                android:contentDescription="@string/contentDescription_user_profile_picture"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/frame"
+                android:tint="@color/adam_theme_black"
+                android:contentDescription="@string/contentDescription_user_profile_picture_frame"
+                />
+
+        </FrameLayout>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/top_left_triangle"
+            android:id="@+id/list_row_notification_imgNew"
+            android:tint="@color/adam_theme_base"/>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/list_row_notification_llDetails"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:paddingTop="5dp"
+        >
+
+        <TextView
+            android:id="@+id/list_row_notification_txtDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="12sp"
+            android:textColor="@color/adam_theme_lightest"
+            android:textAlignment="gravity"
+            android:text="@string/placeholder_date"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"/>
+
+        <TextView
+            android:id="@+id/list_row_notification_txtNotification"
+            android:text="USER NAME sent you a follow request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:ellipsize="end"
+            android:singleLine="false"
+            android:textColor="@color/adam_theme_base"
+            android:textSize="14sp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/list_row_notification_follow_request_llButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/list_row_notification_follow_request_btnDelete"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/cross_button"
+                android:contentDescription="@string/contentDescription_delete_follow_request_button"
+                android:tint="@color/adam_theme_dark"/>
+
+            <ProgressBar
+                android:id="@+id/list_row_notification_follow_request_btnDelete_progress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/list_row_notification_follow_request_btnAccept"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:src="@drawable/tick_button"
+                android:contentDescription="@string/contentDescription_accept_follow_request_button"
+                android:tint="@color/adam_theme_base"/>
+
+            <ProgressBar
+                android:id="@+id/list_row_notification_follow_request_btnAccept_progress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

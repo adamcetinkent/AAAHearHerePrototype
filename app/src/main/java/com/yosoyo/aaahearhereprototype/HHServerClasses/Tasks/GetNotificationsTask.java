@@ -23,16 +23,17 @@ import java.util.Locale;
 /**
  * Created by adam on 18/02/16.
  *
- * Requests new notifications from the server
+ * Requests notifications from the server
  */
 class GetNotificationsTask extends AsyncTask<Void, Void, List<HHNotification>> {
 	private static final String TAG = GetNotificationsTask.class.getSimpleName();
-	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/notifications/";
-	private static final String VM_SERVER_ADDRESS_SINCE = WebHelper.SERVER_IP + "/notifications/since/%1$s";
-	private static final String VM_SERVER_ADDRESS_EXCLUDE = WebHelper.SERVER_IP + "/notifications/since/%1$s/exclude/%2$s";
+	private static final String VM_SERVER_ADDRESS = WebHelper.SERVER_IP + "/notifications/%1$s";
+	private static final String VM_SERVER_ADDRESS_SINCE = WebHelper.SERVER_IP + "/notifications/%1$s/since/%2$s";
+	private static final String VM_SERVER_ADDRESS_EXCLUDE = WebHelper.SERVER_IP + "/notifications/%1$s/since/%2$s/exclude/%3$s";
 
 	private final String authToken;
 	private final Timestamp sinceTime;
+	private final boolean newOnly;
 	private final Long[] excludeIDs;
 
 	public interface Callback {
@@ -43,10 +44,12 @@ class GetNotificationsTask extends AsyncTask<Void, Void, List<HHNotification>> {
 
 	public GetNotificationsTask(final String authToken,
 								final Timestamp sinceTime,
+								boolean newOnly,
 								final Long[] excludeIDs,
 								final Callback callbackTo) {
 		this.authToken = authToken;
 		this.excludeIDs = excludeIDs;
+		this.newOnly = newOnly;
 		this.sinceTime = sinceTime;
 		this.callbackTo = callbackTo;
 	}
@@ -54,17 +57,22 @@ class GetNotificationsTask extends AsyncTask<Void, Void, List<HHNotification>> {
 	@Override
 	protected List<HHNotification> doInBackground(Void... params) {
 		String urlString;
+		String newPath = newOnly ? "unsent" : "all";
 		if (excludeIDs != null && excludeIDs.length > 0)
 			urlString = String.format(Locale.ENGLISH,
 									  VM_SERVER_ADDRESS_EXCLUDE,
+									  newPath,
 									  sinceTime.toString(),
 									  ZZZUtility.formatURL(excludeIDs));
 		else if (sinceTime != null)
 			urlString = String.format(Locale.ENGLISH,
 									  VM_SERVER_ADDRESS_SINCE,
+									  newPath,
 									  sinceTime.toString());
 		else
-			urlString = VM_SERVER_ADDRESS;
+			urlString = String.format(Locale.ENGLISH,
+									  VM_SERVER_ADDRESS,
+									  newPath);
 		urlString = urlString.replace(" ", "%20");
 		Log.d(TAG, "Fetching Notifications from " + urlString);
 		try {

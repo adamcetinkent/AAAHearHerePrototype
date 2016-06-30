@@ -30,11 +30,13 @@ class PostLikeTask extends AsyncTask<Void, Void, Boolean> {
 		void returnPostLike(Boolean success, HHLike like);
 	}
 
+	private final String authToken;
 	private final Callback callbackTo;
 	private final HHLike like;
 	private HHLike likeReturned;
 
-	public PostLikeTask(HHLike like, Callback callbackTo) {
+	public PostLikeTask(final String authToken, final HHLike like, final Callback callbackTo) {
+		this.authToken = authToken;
 		this.callbackTo = callbackTo;
 		this.like = like;
 	}
@@ -50,6 +52,7 @@ class PostLikeTask extends AsyncTask<Void, Void, Boolean> {
 				urlConnection.setDoInput(true);
 				urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 				urlConnection.setRequestProperty("Accept", "application/json");
+				urlConnection.setRequestProperty("Authorization", "Token token="+ authToken);
 				urlConnection.setRequestMethod("POST");
 
 				String json = new Gson().toJson(like, HHLike.class);

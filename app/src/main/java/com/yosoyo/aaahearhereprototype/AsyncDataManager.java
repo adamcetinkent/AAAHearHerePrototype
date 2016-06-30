@@ -906,25 +906,28 @@ public class AsyncDataManager {
 	 * @param comment	: {@link HHComment} to be created
 	 * @param callback	: results returned via callback
 	 */
-	public static void postComment(final HHComment comment, final PostCommentCallback callback){
-		WebHelper.postComment(comment, new WebHelper.PostCommentCallback() {
-			@Override
-			public void returnPostComment(final HHComment returnedComment) {
-				if (returnedComment != null) {
-					DatabaseHelper.insertComment(
-						context,
-						returnedComment,
-						new DatabaseHelper.InsertCommentCallback() {
-							@Override
-							public void returnInsertComment(Long commentID, HHComment comment) {
-								callback.returnPostComment(returnedComment);
-							}
-						});
-				} else {
-					callback.returnPostComment(null);
+	public static void postComment(final String authToken, final HHComment comment, final PostCommentCallback callback){
+		WebHelper.postComment(
+			authToken,
+			comment,
+			new WebHelper.PostCommentCallback() {
+				@Override
+				public void returnPostComment(final HHComment returnedComment) {
+					if (returnedComment != null) {
+						DatabaseHelper.insertComment(
+							context,
+							returnedComment,
+							new DatabaseHelper.InsertCommentCallback() {
+								@Override
+								public void returnInsertComment(Long commentID, HHComment comment) {
+									callback.returnPostComment(returnedComment);
+								}
+							});
+					} else {
+						callback.returnPostComment(null);
+					}
 				}
-			}
-		});
+			});
 	}
 
 	//**********************************************************************************************
@@ -943,21 +946,24 @@ public class AsyncDataManager {
 	 * @param like		: {@link HHLike} to be created
 	 * @param callback	: results returned via callback
 	 */
-	public static void postLike(final HHLike like, final PostLikeCallback callback){
-		WebHelper.postLike(like, new WebHelper.PostLikeCallback() {
-			@Override
-			public void returnPostLike(final HHLike returnedLike) {
-				DatabaseHelper.insertLike(
-					context,
-					returnedLike,
-					new DatabaseHelper.InsertLikeCallback() {
-						@Override
-						public void returnInsertLike(Long likeID, HHLike like) {
-							callback.returnPostLike(returnedLike);
-						}
-					});
-			}
-		});
+	public static void postLike(final String authToken, final HHLike like, final PostLikeCallback callback){
+		WebHelper.postLike(
+			authToken,
+			like,
+			new WebHelper.PostLikeCallback() {
+				@Override
+				public void returnPostLike(final HHLike returnedLike) {
+					DatabaseHelper.insertLike(
+						context,
+						returnedLike,
+						new DatabaseHelper.InsertLikeCallback() {
+							@Override
+							public void returnInsertLike(Long likeID, HHLike like) {
+								callback.returnPostLike(returnedLike);
+							}
+						});
+				}
+			});
 	}
 
 	// DELETE LIKE --------------------
@@ -972,25 +978,28 @@ public class AsyncDataManager {
 	 * @param like		: {@link HHLike} to be deleted
 	 * @param callback	: results returned via callback
 	 */
-	public static void deleteLike(final HHLike like, final DeleteLikeCallback callback){
-		WebHelper.deleteLike(like, new WebHelper.DeleteLikeCallback() {
-			@Override
-			public void returnDeleteLike(boolean success) {
-				if (success) {
-					DatabaseHelper.deleteLike(
-						context,
-						like,
-						new DatabaseHelper.DeleteLikeCallback() {
-							@Override
-							public void returnDeleteLike(boolean success) {
-								callback.returnDeleteLike(success);
-							}
-						});
-				} else {
-					callback.returnDeleteLike(false);
+	public static void deleteLike(final String authToken, final HHLike like, final DeleteLikeCallback callback){
+		WebHelper.deleteLike(
+			authToken,
+			like,
+			new WebHelper.DeleteLikeCallback() {
+				@Override
+				public void returnDeleteLike(boolean success) {
+					if (success) {
+						DatabaseHelper.deleteLike(
+							context,
+							like,
+							new DatabaseHelper.DeleteLikeCallback() {
+								@Override
+								public void returnDeleteLike(boolean success) {
+									callback.returnDeleteLike(success);
+								}
+							});
+					} else {
+						callback.returnDeleteLike(false);
+					}
 				}
-			}
-		});
+			});
 	}
 
 	//**********************************************************************************************
@@ -1473,27 +1482,34 @@ public class AsyncDataManager {
 	}
 
 	public static void getNotifications(final GetNotificationsCallback callback){
-		getNotifications(null, null, null, callback);
+		getNotifications(null, null, true, null, callback);
+	}
+
+	public static void getNotifications(final boolean newOnly,
+										final GetNotificationsCallback callback){
+		getNotifications(null, null, newOnly, null, callback);
 	}
 
 	public static void getNotifications(final String authToken,
 										final GetNotificationsCallback callback){
-		getNotifications(authToken, null, null, callback);
+		getNotifications(authToken, null, true, null, callback);
 	}
 
 	public static void getNotifications(final String authToken,
 										final Timestamp sinceTime,
 										final GetNotificationsCallback callback){
-		getNotifications(authToken, sinceTime, null, callback);
+		getNotifications(authToken, sinceTime, true, null, callback);
 	}
 
 	public static void getNotifications(final String authToken,
 										final Timestamp sinceTime,
+										final boolean newOnly,
 										final Long[] excludeIDs,
 										final GetNotificationsCallback callback){
 		WebHelper.getNotifications(
 			authToken,
 			sinceTime,
+			newOnly,
 			excludeIDs,
 			new WebHelper.GetNotificationsCallback() {
 				@Override

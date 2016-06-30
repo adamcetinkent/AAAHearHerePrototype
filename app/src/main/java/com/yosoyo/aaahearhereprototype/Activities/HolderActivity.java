@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,6 +52,7 @@ import com.yosoyo.aaahearhereprototype.Fragments.FragmentChangeRequestListener;
 import com.yosoyo.aaahearhereprototype.Fragments.FriendsListFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.LoginFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.MapViewFragment;
+import com.yosoyo.aaahearhereprototype.Fragments.NotificationsListFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.PostFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileFragment;
 import com.yosoyo.aaahearhereprototype.Fragments.ProfileMapFragment;
@@ -173,13 +175,14 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 			R.string.navigation_option_profile,
 			R.string.action_search_users,
 			R.string.navigation_option_settings,
+			R.string.navigation_option_notifications,
 			R.string.navigation_option_user_profile,
 			R.string.action_create_post,
 			R.string.action_user_requests,
 			R.string.action_friends
 		};
 
-		final int NUM_NAV_STRINGS = 5;
+		final int NUM_NAV_STRINGS = 6;
 		String[] navStrings = new String[NUM_NAV_STRINGS];
 		for (int i = 0; i < NUM_NAV_STRINGS; i++){
 			navStrings[i] = getString(navOptions[i]);
@@ -384,6 +387,10 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 				fragment = FeedFragment.newInstance();
 				break;
 			}
+			case R.string.navigation_option_notifications: {
+				fragment = new NotificationsListFragment();
+				break;
+			}
 			default: {
 				fragment = new LoginFragment();
 			}
@@ -547,6 +554,13 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					long userID = bundle.getLong(FeedbackFragment.USER_ID);
 					int followerType = bundle.getInt(FollowersListFragment.FOLLOWER_TYPE);
 					fragment = FollowersListFragment.newInstance(followerType, userID);
+				}
+				break;
+			}
+			case FragmentChangeRequestListener.POST_REQUEST:{
+				if (bundle != null) {
+					HHNotification notification = bundle.getParcelable(FeedbackFragment.NOTIFICATION);
+					fragment = FeedFragment.newInstance(FeedFragment.SINGLE_POST_FEED, notification);
 				}
 				break;
 			}
@@ -722,7 +736,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					break;
 				case 2:
 					imageView.setImageBitmap(HHUser.getProfilePicture());
-					imageView.setImageTintList(null);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						imageView.setImageTintList(null);
+					}
 					ImageView imgFrame = (ImageView) view.findViewById(R.id.list_row_drawer_imgFrame);
 					imgFrame.setVisibility(View.VISIBLE);
 
@@ -732,6 +748,9 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 					break;
 				case 4:
 					imageView.setImageResource(R.drawable.settings);
+					break;
+				case 5:
+					imageView.setImageResource(R.drawable.alert_full);
 					break;
 			}
 			return view;

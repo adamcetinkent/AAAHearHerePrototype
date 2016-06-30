@@ -462,6 +462,10 @@ public class FeedFragment extends FeedbackFragment {
 		@Override
 		public void returnGetPost(final HHPostFull post) {
 			Log.d(TAG, "Web post returned!");
+
+			if (post == null)
+				return;
+
 			posts = ZZZUtility.updateList(posts, post);
 			notifyAdapter();
 			fetchData = false; //TODO: MAKE THIS SMARTER FOR WEB REQUESTS ACROSS ROTATIONS ETC
@@ -650,8 +654,16 @@ public class FeedFragment extends FeedbackFragment {
 
 		@Override
 		public int getChildrenCount(int groupPosition) {
-			int n = posts.get(groupPosition).getComments().size();
-			if (posts.get(groupPosition).getLikes().size() > 0) n++;
+			if (posts == null)
+				return 0;
+			int n = 0;
+			HHPostFull post = posts.get(groupPosition);
+			if (post != null) {
+				List<HHCommentUser> comments = post.getComments();
+				if (comments != null)
+					n += comments.size();
+				if (post.getLikes().size() > 0) n++;
+			}
 			if (groupPosition == addingComment) n++;
 			return n;
 		}
@@ -722,10 +734,12 @@ public class FeedFragment extends FeedbackFragment {
 
 				viewHolder.post = posts.get(groupPosition);
 
-				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
-						viewHolder.myLike = like.getLike();
-						break;
+				if (viewHolder.post != null) {
+					for (HHLikeUser like : posts.get(groupPosition).getLikes()) {
+						if (like.getUser().equals(HHUser.getCurrentUser().getUser())) {
+							viewHolder.myLike = like.getLike();
+							break;
+						}
 					}
 				}
 
@@ -828,8 +842,10 @@ public class FeedFragment extends FeedbackFragment {
 						if (isChecked) {
 							HHLike like = new HHLike(viewHolder.post.getPost().getID(),
 													 HHUser.getCurrentUserID());
-							AsyncDataManager
-								.postLike(like, new AsyncDataManager.PostLikeCallback() {
+							AsyncDataManager.postLike(
+								HHUser.getAuthorisationToken(),
+								like,
+								new AsyncDataManager.PostLikeCallback() {
 									@Override
 									public void returnPostLike(HHLike returnedLike) {
 										Log.d(TAG, "Posted new comment!");
@@ -852,6 +868,7 @@ public class FeedFragment extends FeedbackFragment {
 							}
 
 							AsyncDataManager.deleteLike(
+								HHUser.getAuthorisationToken(),
 								viewHolder.myLike,
 								new AsyncDataManager.DeleteLikeCallback() {
 									@Override
@@ -994,9 +1011,11 @@ public class FeedFragment extends FeedbackFragment {
 					}
 				});
 
-				viewHolder.onClickUserListener = new OnClickUserListener(viewHolder.post.getUser(), callback);
-				viewHolder.imgProfile.setOnClickListener(viewHolder.onClickUserListener);
-				viewHolder.txtUserName.setOnClickListener(viewHolder.onClickUserListener);
+				if (viewHolder.post != null) {
+					viewHolder.onClickUserListener = new OnClickUserListener(viewHolder.post.getUser(), callback);
+					viewHolder.imgProfile.setOnClickListener(viewHolder.onClickUserListener);
+					viewHolder.txtUserName.setOnClickListener(viewHolder.onClickUserListener);
+				}
 
 				convertView.setTag(viewHolder);
 
@@ -1004,15 +1023,24 @@ public class FeedFragment extends FeedbackFragment {
 				viewHolder = (ViewHolderGroupItem) convertView.getTag();
 				viewHolder.groupPosition = groupPosition;
 				viewHolder.post = posts.get(groupPosition);
-				viewHolder.onClickUserListener.setUser(viewHolder.post.getUser());
 				viewHolder.myLike = null;
-				for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
-					if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
-						viewHolder.myLike = like.getLike();
-						break;
+				if (viewHolder.post != null) {
+					if (viewHolder.onClickUserListener != null) {
+						viewHolder.onClickUserListener.setUser(viewHolder.post.getUser());
+					} else {
+						viewHolder.onClickUserListener = new OnClickUserListener(viewHolder.post.getUser(), callback);
+					}
+					for (HHLikeUser like : posts.get(groupPosition).getLikes() ){
+						if (like.getUser().equals(HHUser.getCurrentUser().getUser())){
+							viewHolder.myLike = like.getLike();
+							break;
+						}
 					}
 				}
 			}
+
+			if (viewHolder.post == null)
+				return convertView;
 
 			// get Album Art
 			WebHelper.getSpotifyAlbumArt(
@@ -1270,8 +1298,10 @@ public class FeedFragment extends FeedbackFragment {
 					HHComment comment = new HHComment(post_id,
 													  HHUser.getCurrentUserID(),
 													  message);
-					AsyncDataManager
-						.postComment(comment, new AsyncDataManager.PostCommentCallback() {
+					AsyncDataManager.postComment(
+						HHUser.getAuthorisationToken(),
+						comment,
+						new AsyncDataManager.PostCommentCallback() {
 							@Override
 							public void returnPostComment(HHComment returnedComment) {
 								Log.d(TAG, "Posted new comment!");
