@@ -1,12 +1,16 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +28,7 @@ import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 /**
  * Created by adam on 18/03/2016.
@@ -218,21 +223,63 @@ public class FollowRequestListFragment extends FeedbackFragment {
 						btnAccept.setColorFilter(ZZZUtility.screen(ContextCompat.getColor(ViewHolder.this.context, R.color.adam_theme_darkest)));
 						btnAccept.setEnabled(false);
 						btnDeleteProgressBar.setVisibility(View.VISIBLE);
-						AsyncDataManager.deleteFollowRequest(
-							this.followRequest,
-							new AsyncDataManager.DeleteFollowRequestCallback() {
-								@Override
-								public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
-									if (success){
-										adapterCallback.requestDeleted(followRequest, position);
-									} else {
-										btnDelete.setVisibility(View.VISIBLE);
-										btnAccept.clearColorFilter();
-										btnAccept.setEnabled(true);
-									}
-									btnDeleteProgressBar.setVisibility(View.GONE);
-								}
-							});
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AdamDialog));
+						builder.setTitle("Delete Follow Request")
+							   .setMessage(String.format(Locale.ENGLISH,
+														 "Are you sure you want to delete the follow request from %1$s?",
+														 followRequest.getUser().getName()))
+							   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+								   @Override
+								   public void onCancel(DialogInterface dialog) {
+									   btnDelete.setVisibility(View.VISIBLE);
+									   btnDeleteProgressBar.setVisibility(View.GONE);
+									   btnAccept.clearColorFilter();
+									   btnAccept.setEnabled(true);
+								   }
+							   })
+							   .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+								   @Override
+								   public void onClick(final DialogInterface dialog, int which) {
+
+									   AsyncDataManager.deleteFollowRequest(
+										   followRequest,
+										   new AsyncDataManager.DeleteFollowRequestCallback() {
+											   @Override
+											   public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
+												   if (success){
+													   adapterCallback.requestDeleted(followRequest, position);
+												   } else {
+													   btnDelete.setVisibility(View.VISIBLE);
+													   btnAccept.clearColorFilter();
+													   btnAccept.setEnabled(true);
+												   }
+												   btnDeleteProgressBar.setVisibility(View.GONE);
+												   dialog.dismiss();
+											   }
+										   });
+								   }
+							   })
+							   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+								   @Override
+								   public void onClick(DialogInterface dialog, int which) {
+									   dialog.cancel();
+								   }
+							   });
+
+						AlertDialog dialog = builder.create();
+						dialog.show();
+
+						int titleDividerID = context.getResources().getIdentifier("titleDivider", "id", "android");
+						View titleDivider = dialog.findViewById(titleDividerID);
+						if (titleDivider != null){
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+								titleDivider.setBackgroundColor(context.getResources().getColor(R.color.adam_theme_base, null));
+							} else {
+								titleDivider.setBackgroundColor(context.getResources().getColor(R.color.adam_theme_base));
+							}
+						}
+
 					}
 				};
 				btnDelete.setOnClickListener(btnDeleteOnClickListener);

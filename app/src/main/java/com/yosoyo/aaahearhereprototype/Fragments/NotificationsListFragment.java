@@ -1,14 +1,20 @@
 package com.yosoyo.aaahearhereprototype.Fragments;
 
 
+import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +65,7 @@ public class NotificationsListFragment extends FeedbackFragment {
 		layoutManager = new LinearLayoutManager(getActivity());
 		lstNotifications.setLayoutManager(layoutManager);
 
-		final NotificationssListAdapterCallback adapterCallback = new NotificationssListAdapterCallback() {
+		final NotificationsListAdapterCallback adapterCallback = new NotificationsListAdapterCallback() {
 			@Override
 			public void acceptRequest(HHFollowRequestUser acceptedFollowRequest, final int position) {
 				AsyncDataManager.updateCurrentUser(
@@ -116,7 +122,7 @@ public class NotificationsListFragment extends FeedbackFragment {
 		return view;
 	}
 
-	private interface NotificationssListAdapterCallback {
+	private interface NotificationsListAdapterCallback {
 		//void madeFollowRequest(HHFollowRequestUser followRequest, int position);
 		//void madeFollowRequestAccepted(HHFollowUser follow, int position);
 		//void deleteFollow(HHFollowUser deletedFollow, int position);
@@ -150,11 +156,11 @@ public class NotificationsListFragment extends FeedbackFragment {
 		protected ImageView imgProfile;
 		protected ImageView imgNew;
 		protected OnClickUserListener onClickUserListener;
-		protected NotificationssListAdapterCallback adapterCallback;
+		protected NotificationsListAdapterCallback adapterCallback;
 
 		public ViewHolderNotification(final Context context,
 									  final View view,
-									  final NotificationssListAdapterCallback adapterCallback) {
+									  final NotificationsListAdapterCallback adapterCallback) {
 			super(view);
 			this.context = context;
 			this.txtNotification = (TextView) view.findViewById(R.id.list_row_notification_txtNotification);
@@ -172,7 +178,7 @@ public class NotificationsListFragment extends FeedbackFragment {
 
 		public ViewHolderPost(final Context context,
 							  final View view,
-							  final NotificationssListAdapterCallback adapterCallback) {
+							  final NotificationsListAdapterCallback adapterCallback) {
 			super(context, view, adapterCallback);
 			this.imgAlbumArt = (ImageView) view.findViewById(R.id.list_row_notification_post_imgAlbumArt);
 			this.onClickUserListener = new OnClickUserListener() {
@@ -205,7 +211,7 @@ public class NotificationsListFragment extends FeedbackFragment {
 
 		public ViewHolderFollowRequest(final Context context,
 									   final View view,
-									   final NotificationssListAdapterCallback adapterCallback) {
+									   final NotificationsListAdapterCallback adapterCallback) {
 			super(context, view, adapterCallback);
 			this.llButtons = (LinearLayout) view.findViewById(R.id.list_row_notification_follow_request_llButtons);
 			this.btnAccept = (ImageView) view.findViewById(R.id.list_row_notification_follow_request_btnAccept);
@@ -289,21 +295,63 @@ public class NotificationsListFragment extends FeedbackFragment {
 						return;
 					}
 
-					AsyncDataManager.deleteFollowRequest(
-						deleteFollowRequest,
-						new AsyncDataManager.DeleteFollowRequestCallback() {
-							@Override
-							public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
-								if (success){
-									adapterCallback.deleteRequest(followRequest, position);
-								} else {
-									btnDelete.setVisibility(View.VISIBLE);
-									btnAccept.clearColorFilter();
-									btnAccept.setEnabled(true);
-								}
-								btnDeleteProgressBar.setVisibility(View.GONE);
-							}
-						});
+					AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getActivity(), R.style.AdamDialog));
+					final HHFollowRequestUser finalDeleteFollowRequest = deleteFollowRequest;
+					builder.setTitle("Delete Follow Request")
+						   .setMessage(String.format(Locale.ENGLISH,
+													 "Are you sure you want to delete the follow request from %1$s?",
+													 deleteFollowRequest.getUser().getName()))
+						   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+							   @Override
+							   public void onCancel(DialogInterface dialog) {
+								   btnDelete.setVisibility(View.VISIBLE);
+								   btnDeleteProgressBar.setVisibility(View.GONE);
+								   btnAccept.clearColorFilter();
+								   btnAccept.setEnabled(true);
+							   }
+						   })
+						   .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+							   @Override
+							   public void onClick(final DialogInterface dialog, int which) {
+
+								   AsyncDataManager.deleteFollowRequest(
+									   finalDeleteFollowRequest,
+									   new AsyncDataManager.DeleteFollowRequestCallback() {
+										   @Override
+										   public void returnDeleteFollowRequest(boolean success, HHFollowRequestUser followRequest) {
+											   if (success){
+												   adapterCallback.deleteRequest(followRequest, position);
+											   } else {
+												   btnDelete.setVisibility(View.VISIBLE);
+												   btnAccept.clearColorFilter();
+												   btnAccept.setEnabled(true);
+											   }
+											   btnDeleteProgressBar.setVisibility(View.GONE);
+											   dialog.dismiss();
+										   }
+									   });
+							   }
+						   })
+						   .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							   @Override
+							   public void onClick(DialogInterface dialog, int which) {
+								   dialog.cancel();
+							   }
+						   });
+
+					AlertDialog dialog = builder.create();
+					dialog.show();
+
+					int titleDividerID = getResources().getIdentifier("titleDivider", "id", "android");
+					View titleDivider = dialog.findViewById(titleDividerID);
+					if (titleDivider != null){
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+							titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base, null));
+						} else {
+							titleDivider.setBackgroundColor(getResources().getColor(R.color.adam_theme_base));
+						}
+					}
+
 				}
 			};
 			btnDelete.setOnClickListener(btnDeleteClickListener);
@@ -314,11 +362,11 @@ public class NotificationsListFragment extends FeedbackFragment {
 	private class NotificationsListAdapter extends RecyclerView.Adapter<ViewHolderNotification> {
 		private final Context context;
 		private final List<HHNotification> notifications;
-		private final NotificationssListAdapterCallback callback;
+		private final NotificationsListAdapterCallback callback;
 
 		private NotificationsListAdapter(final Context context,
 										 final List<HHNotification> notifications,
-										 final NotificationssListAdapterCallback callback) {
+										 final NotificationsListAdapterCallback callback) {
 			this.context = context;
 			this.notifications = notifications;
 			this.callback = callback;
@@ -332,8 +380,7 @@ public class NotificationsListFragment extends FeedbackFragment {
 				case HHNotification.NOTIFICATION_TYPE_NEW_FOLLOW_REQUEST:{
 					View view = LayoutInflater.from(parent.getContext())
 											  .inflate(R.layout.list_row_notification_follow_request, parent, false);
-					ViewHolderFollowRequest viewHolderFollowRequest = new ViewHolderFollowRequest(context, view, callback);
-					return viewHolderFollowRequest;
+					return new ViewHolderFollowRequest(context, view, callback);
 				}
 				case HHNotification.NOTIFICATION_TYPE_NEW_COMMENT:
 				case HHNotification.NOTIFICATION_TYPE_LIKE_POST:
@@ -341,14 +388,13 @@ public class NotificationsListFragment extends FeedbackFragment {
 				default:{
 					View view = LayoutInflater.from(parent.getContext())
 											  .inflate(R.layout.list_row_notification_post, parent, false);
-					ViewHolderPost viewHolderPost = new ViewHolderPost(context, view, callback);
-					return viewHolderPost;
+					return new ViewHolderPost(context, view, callback);
 				}
 			}
 		}
 
 		@Override
-		public void onBindViewHolder(final ViewHolderNotification holder, int position) {
+		public void onBindViewHolder(final ViewHolderNotification holder, final int position) {
 			holder.position = position;
 			final HHNotification notification = notifications.get(position);
 			holder.txtNotification.setText(notification.getNotificationText());
@@ -364,8 +410,58 @@ public class NotificationsListFragment extends FeedbackFragment {
 					}
 				});
 
-			if (notification.getReadAt() == null){
+			if (notification.getReadAt() == null && !notification.isNewlyRead()){
 				holder.imgNew.setVisibility(View.VISIBLE);
+				AsyncDataManager.readNotification(
+					HHUser.getAuthorisationToken(),
+					notification,
+					new AsyncDataManager.ReadNotificationCallback() {
+						@Override
+						public void returnReadNotification(HHNotification readNotification) {
+							if (readNotification != null) {
+								readNotification.setNewlyRead(true);
+								ZZZUtility.updateList(notifications, readNotification);
+
+								final float[] HSVfrom = new float[3];
+								final float[] HSVto = new float[3];
+
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+									Color.colorToHSV(getResources().getColor(R.color.adam_theme_base, null), HSVfrom);
+									Color.colorToHSV(getResources().getColor(R.color.adam_theme_darkest, null), HSVto);
+								} else {
+									Color.colorToHSV(getResources().getColor(R.color.adam_theme_base), HSVfrom);
+									Color.colorToHSV(getResources().getColor(R.color.adam_theme_darkest), HSVto);
+								}
+
+								ValueAnimator animator = ValueAnimator.ofFloat(0,1);
+								animator.setDuration(5000);
+
+								final float[] HSVcurrent = new float[3];
+
+								animator.addUpdateListener(
+									new ValueAnimator.AnimatorUpdateListener() {
+										@Override
+										public void onAnimationUpdate(ValueAnimator animation) {
+											HSVcurrent[0] = HSVfrom[0] + (HSVto[0]-HSVfrom[0])*animation.getAnimatedFraction();
+											HSVcurrent[1] = HSVfrom[1] + (HSVto[1]-HSVfrom[1])*animation.getAnimatedFraction();
+											HSVcurrent[2] = HSVfrom[2] + (HSVto[2]-HSVfrom[2])*animation.getAnimatedFraction();
+
+											holder.imgNew.setColorFilter(Color.HSVToColor(HSVcurrent));
+										}
+									});
+
+								animator.start();
+
+							}
+						}
+					});
+			} else if (notification.isNewlyRead()){
+				holder.imgNew.setVisibility(View.VISIBLE);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					holder.imgNew.setColorFilter(getResources().getColor(R.color.adam_theme_darkest, null));
+				} else {
+					holder.imgNew.setColorFilter(getResources().getColor(R.color.adam_theme_darkest));
+				}
 			} else {
 				holder.imgNew.setVisibility(View.INVISIBLE);
 			}

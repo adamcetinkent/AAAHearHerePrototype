@@ -27,6 +27,7 @@ public class HHNotification extends HHBase implements Parcelable {
 	private HHUser by_user;
 	private HHUser for_user;
 	private HHPost post;
+	private boolean newlyRead;
 
 	public long getForUserID(){
 		return for_user_id;
@@ -66,6 +67,14 @@ public class HHNotification extends HHBase implements Parcelable {
 
 	public HHPost getPost() {
 		return post;
+	}
+
+	public boolean isNewlyRead() {
+		return newlyRead;
+	}
+
+	public void setNewlyRead(boolean newlyRead) {
+		this.newlyRead = newlyRead;
 	}
 
 	@Override
