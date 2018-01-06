@@ -159,6 +159,7 @@ public class HolderActivity extends Activity implements FragmentChangeRequestLis
 		}
 
 		FacebookSdk.sdkInitialize(getApplicationContext()); // DO THIS BEFORE SETTING CONTENT VIEW!
+		//AppEventsLogger.activateApp(this);
 		HolderActivity.callbackManager = CallbackManager.Factory.create();
 		setContentView(R.layout.activity_holder);
 

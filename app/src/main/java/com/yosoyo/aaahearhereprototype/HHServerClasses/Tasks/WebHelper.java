@@ -48,7 +48,8 @@ import java.util.Map;
 public class WebHelper {
 
 	public static final String TAG = "Web Helper";
-	public static final String SERVER_IP = "http://94.174.159.110";			// WEB
+	public static final String SERVER_IP = "http://92.237.9.251";			// WEB TIBBERTON
+	//public static final String SERVER_IP = "http://94.174.159.110";			// WEB
 	//public static final String SERVER_IP = "http://10.0.1.79:3000";		// MSHAW
 
 	private static final Map<String, Bitmap> spotifyAlbumArt = new HashMap<>();

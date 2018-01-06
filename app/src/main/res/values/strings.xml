@@ -11,6 +11,7 @@
     <string name="title_activity_search_results">Search Results Activity</string>
 
     <string name="facebook_app_id">966494340087272</string>
+    <string name="fb_login_protocol_scheme">fb966494340087272</string>
 
     <string name="no_location_data_provided">No location data provided</string>
     <string name="service_not_available">Service not available</string>
@@ -110,6 +111,8 @@
     <string name="post_privacy_private">Private</string>
     <string name="contentDescription_more_button">More Button</string>
     <string name="navigation_option_notifications">Notifications</string>
+    <string name="SpotifyClientID">545852d2c2254ee0b3acd73f4a1c486a</string>
+    <string name="SpotifyClientSecret">6735a62241be4d4e84df09ba42f64e11</string>
 
     <string-array name="post_privacy_descs">
         <item>All Hear Here users can see this post.\n\nUsers who are not Facebook friends will see a nearby dummy location.</item>

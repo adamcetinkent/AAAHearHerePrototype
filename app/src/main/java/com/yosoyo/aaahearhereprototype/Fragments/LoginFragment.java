@@ -30,9 +30,7 @@ public class LoginFragment extends FeedbackFragment {
 	private ProgressDialog progressDialog;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
+	public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
 	@Nullable
 	@Override
@@ -95,9 +93,20 @@ public class LoginFragment extends FeedbackFragment {
 	}
 
 	private void facebookSignInSucceeded() {
-		progressDialog.dismiss();
 
-		onLoginSuccess();
+		AsyncDataManager.spotifyAPIRequestToken(
+			new AsyncDataManager.spotifyAPIRequestTokenCallback() {
+				@Override
+				public void returnSpotifyToken(boolean success) {
+					if (success) {
+						progressDialog.dismiss();
+						onLoginSuccess();
+					} else {
+						progressDialog.dismiss();
+					}
+				}
+			});
+
 
 	}
 

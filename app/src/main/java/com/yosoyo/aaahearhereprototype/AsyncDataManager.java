@@ -2,6 +2,7 @@ package com.yosoyo.aaahearhereprototype;
 
 import android.content.Context;
 import android.location.Location;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
@@ -27,7 +28,9 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostT
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks.SpotifyAPIRequestToken;
 
 import java.net.HttpURLConnection;
 import java.sql.Timestamp;
@@ -100,6 +103,34 @@ public class AsyncDataManager {
 					}
 				}
 			}).execute();
+	}
+
+	//**********************************************************************************************
+	// REQUEST SPOTIFY TOKEN
+	//**********************************************************************************************
+
+	public interface spotifyAPIRequestTokenCallback {
+		void returnSpotifyToken(boolean success);
+	}
+
+	/**
+	 * Fetch a Spotify Token from the Spotify API
+	 *
+	 * @param callback		: return results via callback
+	 */
+	public static void spotifyAPIRequestToken(final spotifyAPIRequestTokenCallback callback){
+		new SpotifyAPIRequestToken(
+			new SpotifyAPIRequestToken.Callback() {
+				@Override
+				public void returnSpotifyToken(boolean success, SpotifyToken spotifyToken) {
+					if (success) {
+						SpotifyToken.setSpotifyToken(spotifyToken);
+						Toast.makeText(context, "SPOTIFY TOKEN SET", Toast.LENGTH_LONG).show();
+					}
+					callback.returnSpotifyToken(success);
+				}
+			},
+			context).execute();
 	}
 
 	//**********************************************************************************************
