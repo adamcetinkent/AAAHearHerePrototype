@@ -3,7 +3,6 @@ package com.yosoyo.aaahearhereprototype.SpotifyClasses.Tasks;
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
-import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
@@ -32,9 +31,11 @@ public class SpotifyAPIRequestTrack extends AsyncTask<Void, Void, SpotifyTrack> 
 
 	private final Callback callback;
 	private final String trackID;
+	private final String authorisation;
 
-	public SpotifyAPIRequestTrack(String trackID, Callback callback){
+	public SpotifyAPIRequestTrack(String trackID, String authorisation, Callback callback){
 		this.callback = callback;
+		this.authorisation = authorisation;
 		this.trackID = trackID;
 	}
 
@@ -62,7 +63,10 @@ public class SpotifyAPIRequestTrack extends AsyncTask<Void, Void, SpotifyTrack> 
 				return null;
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
-				urlConnection.setRequestProperty("Authorization", SpotifyToken.getAuthorisation());
+				urlConnection.setRequestProperty("Authorization", authorisation);
+
+				int httpResult = urlConnection.getResponseCode();
+
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
 				return new Gson().fromJson(streamString, SpotifyTrack.class);

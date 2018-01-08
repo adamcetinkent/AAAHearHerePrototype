@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
-import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.BufferedInputStream;
@@ -33,10 +32,12 @@ public class SpotifyAPIRequestAlbum extends AsyncTask<Void, Void, SpotifyAlbum> 
 
 	private final Callback callback;
 	private final String albumID;
+	private final String authorisation;
 
-	public SpotifyAPIRequestAlbum(String albumID, Callback callback){
+	public SpotifyAPIRequestAlbum(String albumID, String authorisation, Callback callback){
 		this.callback = callback;
 		this.albumID = albumID;
+		this.authorisation = authorisation;
 	}
 
 	// Construct Spotify API URL from input string
@@ -63,7 +64,7 @@ public class SpotifyAPIRequestAlbum extends AsyncTask<Void, Void, SpotifyAlbum> 
 				return null;
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
-				urlConnection.setRequestProperty("Authorization", SpotifyToken.getAuthorisation());
+				urlConnection.setRequestProperty("Authorization", authorisation);
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
 				return new Gson().fromJson(streamString, SpotifyAlbum.class);

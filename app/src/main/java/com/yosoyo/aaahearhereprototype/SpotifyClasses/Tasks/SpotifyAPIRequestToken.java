@@ -7,6 +7,7 @@ import android.util.Base64;
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.R;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTokenRaw;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.BufferedInputStream;
@@ -72,7 +73,7 @@ public class SpotifyAPIRequestToken extends AsyncTask<Void, Void, Boolean> {
 
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
-				token = new Gson().fromJson(streamString, SpotifyToken.class);
+				token = new SpotifyToken(new Gson().fromJson(streamString, SpotifyTokenRaw.class));
 				return token != null;
 			} finally {
 				urlConnection.disconnect();

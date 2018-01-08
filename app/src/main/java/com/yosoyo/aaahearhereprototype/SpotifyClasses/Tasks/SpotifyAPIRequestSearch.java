@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAPIResponse;
-import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
 import com.yosoyo.aaahearhereprototype.ZZZUtility;
 
 import java.io.BufferedInputStream;
@@ -39,12 +38,14 @@ public class SpotifyAPIRequestSearch extends AsyncTask<Void, Void, SpotifyAPIRes
 	private final String query;
 	private final String searchType;
 	private final int offset;
+	private final String authorisation;
 
-	public SpotifyAPIRequestSearch(String query, String searchType, int offset, Callback callbackTo){
+	public SpotifyAPIRequestSearch(String query, String searchType, int offset, String authorisation, Callback callbackTo){
 		this.query = query;
 		this.callbackTo = callbackTo;
 		this.searchType = searchType;
 		this.offset = offset;
+		this.authorisation = authorisation;
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class SpotifyAPIRequestSearch extends AsyncTask<Void, Void, SpotifyAPIRes
 			URL url = new URL(urlString);
 			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			try {
-				urlConnection.setRequestProperty("Authorization", SpotifyToken.getAuthorisation());
+				urlConnection.setRequestProperty("Authorization", authorisation);
 				InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 				String streamString = ZZZUtility.convertStreamToString(in);
 				return new Gson().fromJson(streamString, SpotifyAPIResponse.class);

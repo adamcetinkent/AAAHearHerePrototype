@@ -262,9 +262,10 @@ public class WebHelper {
 		void returnSpotifyTrack(SpotifyTrack spotifyTrack);
 	}
 
-	public static void getSpotifyTrack(String trackID, final GetSpotifyTrackCallback callback){
+	public static void getSpotifyTrack(String trackID, String authorisation, final GetSpotifyTrackCallback callback){
 		new SpotifyAPIRequestTrack(
 			trackID,
+			authorisation,
 			new SpotifyAPIRequestTrack.Callback() {
 				@Override
 				public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
@@ -280,9 +281,10 @@ public class WebHelper {
 		void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum);
 	}
 
-	public static void getSpotifyAlbum(String albumID, final GetSpotifyAlbumCallback callback){
+	public static void getSpotifyAlbum(String albumID, String authorisation, final GetSpotifyAlbumCallback callback){
 		new SpotifyAPIRequestAlbum(
 			albumID,
+			authorisation,
 			new SpotifyAPIRequestAlbum.Callback() {
 				@Override
 				public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
@@ -295,9 +297,10 @@ public class WebHelper {
 		void returnSpotifyArtist(SpotifyArtist spotifyArtist);
 	}
 
-	public static void getSpotifyArtist(String artistID, final GetSpotifyArtistCallback callback){
+	public static void getSpotifyArtist(String artistID, String authorisation, final GetSpotifyArtistCallback callback){
 		new SpotifyAPIRequestArtist(
 			artistID,
+			authorisation,
 			new SpotifyAPIRequestArtist.Callback() {
 				@Override
 				public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
@@ -761,7 +764,7 @@ public class WebHelper {
 		if (activity == null)
 			return false;
 
-		WifiManager wifiManager = (WifiManager) activity.getSystemService(Context.WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		if (wifiManager.isWifiEnabled()){
 			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 			return !(wifiInfo.getNetworkId() == -1 && wifiInfo
@@ -776,11 +779,13 @@ public class WebHelper {
 
 	public static void searchSpotifyTracks(final String query,
 										   final int offset,
+										   final String authorisation,
 										   final SearchSpotifyTracksCallback callback){
 		new SpotifyAPIRequestSearch(
 			query,
 			SpotifyAPIRequestSearch.SEARCH_TYPE_TRACK,
 			offset,
+			authorisation,
 			new SpotifyAPIRequestSearch.Callback() {
 				@Override
 				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
@@ -801,11 +806,13 @@ public class WebHelper {
 
 	public static void searchSpotifyArtists(final String query,
 											final int offset,
+											final String authorisation,
 											final SearchSpotifyArtistsCallback callback){
 		new SpotifyAPIRequestSearch(
 			query,
 			SpotifyAPIRequestSearch.SEARCH_TYPE_ARTIST,
 			offset,
+			authorisation,
 			new SpotifyAPIRequestSearch.Callback() {
 				@Override
 				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
@@ -826,11 +833,13 @@ public class WebHelper {
 
 	public static void searchSpotifyAlbums(final String query,
 										   final int offset,
+										   final String authorisation,
 										   final SearchSpotifyAlbumsCallback callback){
 		new SpotifyAPIRequestSearch(
 			query,
 			SpotifyAPIRequestSearch.SEARCH_TYPE_ALBUM,
 			offset,
+			authorisation,
 			new SpotifyAPIRequestSearch.Callback() {
 				@Override
 				public void returnSpotifySearchResults(SpotifyAPIResponse output) {
@@ -851,10 +860,12 @@ public class WebHelper {
 
 	public static void getSpotifyArtistTopTracks(final String artistID,
 												 final String country,
+												 final String authorisation,
 												 final GetSpotifyArtistTopTracksCallback callback){
 		new SpotifyAPIRequestArtistTopTracks(
 			artistID,
 			country,
+			authorisation,
 			new SpotifyAPIRequestArtistTopTracks.Callback() {
 				@Override
 				public void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks) {

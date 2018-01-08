@@ -23,6 +23,8 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUser;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFull;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.HHModels.HHUserFullProcess;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.GetSpotifyAuthorisationCallback;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyTrack;
 
 import java.util.List;
@@ -490,29 +492,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 						} else {
 
 							// GET TRACK FROM WEB
-							WebHelper.getSpotifyTrack(
-								postToProcess.getPost().getTrack(),
-								new WebHelper.GetSpotifyTrackCallback() {
+							SpotifyToken.getAuthorisation(
+								new GetSpotifyAuthorisationCallback() {
 									@Override
-									public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
-
-										postToProcess.setTrack(
-											new HHCachedSpotifyTrack(
-												spotifyTrack));
-
-										// INSERT TRACK INTO DATABASE
-										ORMCachedSpotifyTrack
-											.insertTrackFromPosts(
-												context,
-												postToProcess,
-												new ORMCachedSpotifyTrack.DBCachedSpotifyTrackInsertFromPostTask.Callback() {
+									public void returnSpotifyAuthorisation(String authorisation) {
+										if (authorisation != null) {
+											WebHelper.getSpotifyTrack(
+												postToProcess.getPost().getTrack(),
+												authorisation,
+												new WebHelper.GetSpotifyTrackCallback() {
 													@Override
-													public void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess) {
-														testProcessPost(
-															callback,
-															postToProcess);
+													public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+
+														postToProcess.setTrack(
+															new HHCachedSpotifyTrack(
+																spotifyTrack));
+
+														// INSERT TRACK INTO DATABASE
+														ORMCachedSpotifyTrack
+															.insertTrackFromPosts(
+																context,
+																postToProcess,
+																new ORMCachedSpotifyTrack.DBCachedSpotifyTrackInsertFromPostTask.Callback() {
+																	@Override
+																	public void returnInsertedManyCachedSpotifyTracks(HHPostFullProcess postToProcess) {
+																		testProcessPost(
+																			callback,
+																			postToProcess);
+																	}
+																});
 													}
 												});
+										}
+										else {
+											// TODO?
+										}
 									}
 								});
 

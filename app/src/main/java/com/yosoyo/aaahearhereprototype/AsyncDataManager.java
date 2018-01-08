@@ -2,7 +2,6 @@ package com.yosoyo.aaahearhereprototype;
 
 import android.content.Context;
 import android.location.Location;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
@@ -26,6 +25,7 @@ import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.GetUserTask;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.PostUserTask;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.TaskReturns.HHPostTagsArray;
 import com.yosoyo.aaahearhereprototype.HHServerClasses.Tasks.WebHelper;
+import com.yosoyo.aaahearhereprototype.SpotifyClasses.GetSpotifyAuthorisationCallback;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyAlbum;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyArtist;
 import com.yosoyo.aaahearhereprototype.SpotifyClasses.SpotifyToken;
@@ -125,7 +125,6 @@ public class AsyncDataManager {
 				public void returnSpotifyToken(boolean success, SpotifyToken spotifyToken) {
 					if (success) {
 						SpotifyToken.setSpotifyToken(spotifyToken);
-						Toast.makeText(context, "SPOTIFY TOKEN SET", Toast.LENGTH_LONG).show();
 					}
 					callback.returnSpotifyToken(success);
 				}
@@ -1263,25 +1262,35 @@ public class AsyncDataManager {
 						return;
 					}
 
-					WebHelper.getSpotifyTrack(trackID, new WebHelper.GetSpotifyTrackCallback() {
-						@Override
-						public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
-							callback.returnSpotifyTrack(spotifyTrack);
-							if (spotifyTrack != null) {
-								DatabaseHelper.insertSpotifyTrack(
-									context,
-									spotifyTrack,
-									new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
+					SpotifyToken.getAuthorisation(
+						new GetSpotifyAuthorisationCallback() {
+							@Override
+							public void returnSpotifyAuthorisation(String authorisation) {
+								if (authorisation != null) {
+									WebHelper.getSpotifyTrack(trackID, authorisation, new WebHelper.GetSpotifyTrackCallback() {
 										@Override
-										public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
-											callback.returnCachedSpotifyTrack(track);
+										public void returnSpotifyTrack(SpotifyTrack spotifyTrack) {
+											callback.returnSpotifyTrack(spotifyTrack);
+											if (spotifyTrack != null) {
+												DatabaseHelper.insertSpotifyTrack(
+													context,
+													spotifyTrack,
+													new DatabaseHelper.InsertCachedSpotifyTrackCallback() {
+														@Override
+														public void returnGetCachedSpotifyTrack(HHCachedSpotifyTrack track) {
+															callback.returnCachedSpotifyTrack(track);
+														}
+													});
+											} else {
+												callback.returnCachedSpotifyTrack(null);
+											}
 										}
 									});
-							} else {
-								callback.returnCachedSpotifyTrack(null);
+								} else {
+									callback.returnCachedSpotifyTrack(null);
+								}
 							}
-						}
-					});
+						});
 
 				}
 			});
@@ -1312,10 +1321,19 @@ public class AsyncDataManager {
 	 */
 	public static void getSpotifyAlbum(final Context context, final String albumID, final GetSpotifyAlbumCallback callback) {
 
-		WebHelper.getSpotifyAlbum(albumID, new WebHelper.GetSpotifyAlbumCallback() {
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
 			@Override
-			public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
-				callback.returnSpotifyAlbum(spotifyAlbum);
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null){
+					WebHelper.getSpotifyAlbum(albumID, authorisation, new WebHelper.GetSpotifyAlbumCallback() {
+						@Override
+						public void returnSpotifyAlbum(SpotifyAlbum spotifyAlbum) {
+							callback.returnSpotifyAlbum(spotifyAlbum);
+						}
+					});
+				} else {
+					callback.returnSpotifyAlbum(null);
+				}
 			}
 		});
 	}
@@ -1345,12 +1363,22 @@ public class AsyncDataManager {
 	 */
 	public static void getSpotifyArtist(final Context context, final String artistID, final GetSpotifyArtistCallback callback) {
 
-		WebHelper.getSpotifyArtist(artistID, new WebHelper.GetSpotifyArtistCallback() {
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
 			@Override
-			public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
-				callback.returnSpotifyArtist(spotifyArtist);
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null) {
+					WebHelper.getSpotifyArtist(artistID, authorisation, new WebHelper.GetSpotifyArtistCallback() {
+						@Override
+						public void returnSpotifyArtist(SpotifyArtist spotifyArtist) {
+							callback.returnSpotifyArtist(spotifyArtist);
+						}
+					});
+				} else {
+					callback.returnSpotifyArtist(null);
+				}
 			}
 		});
+
 	}
 
 	// SEARCH SPOTIFY TRACKS ----------
@@ -1378,17 +1406,27 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void searchSpotifyTracks(final String query,
-										   int offset,
+										   final int offset,
 										   final SearchSpotifyTracksCallback callback){
-		WebHelper.searchSpotifyTracks(
-			query,
-			offset,
-			new WebHelper.SearchSpotifyTracksCallback() {
-				@Override
-				public void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks) {
-					callback.returnSearchSpotifyTracks(spotifyTracks, totalTracks);
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
+			@Override
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null){
+					WebHelper.searchSpotifyTracks(
+						query,
+						offset,
+						authorisation,
+						new WebHelper.SearchSpotifyTracksCallback() {
+							@Override
+							public void returnSearchSpotifyTracks(List<SpotifyTrack> spotifyTracks, int totalTracks) {
+								callback.returnSearchSpotifyTracks(spotifyTracks, totalTracks);
+							}
+						});
+				} else {
+					callback.returnSearchSpotifyTracks(null,0);
 				}
-			});
+			}
+		});
 	}
 
 	// SEARCH SPOTIFY ARTISTS ----------
@@ -1416,17 +1454,27 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void searchSpotifyArtists(final String query,
-											int offset,
+											final int offset,
 											final SearchSpotifyArtistsCallback callback){
-		WebHelper.searchSpotifyArtists(
-			query,
-			offset,
-			new WebHelper.SearchSpotifyArtistsCallback() {
-				@Override
-				public void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists) {
-					callback.returnSearchSpotifyArtists(spotifyArtists, totalArtists);
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
+			@Override
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null){
+					WebHelper.searchSpotifyArtists(
+						query,
+						offset,
+						authorisation,
+						new WebHelper.SearchSpotifyArtistsCallback() {
+							@Override
+							public void returnSearchSpotifyArtists(List<SpotifyArtist> spotifyArtists, int totalArtists) {
+								callback.returnSearchSpotifyArtists(spotifyArtists, totalArtists);
+							}
+						});
+				} else {
+					callback.returnSearchSpotifyArtists(null, 0);
 				}
-			});
+			}
+		});
 	}
 
 	// SEARCH SPOTIFY ALBUMS ----------
@@ -1454,17 +1502,28 @@ public class AsyncDataManager {
 	 * @param callback	: results returned via callback
 	 */
 	public static void searchSpotifyAlbums(final String query,
-										   int offset,
+										   final int offset,
 										   final SearchSpotifyAlbumsCallback callback){
-		WebHelper.searchSpotifyAlbums(
-			query,
-			offset,
-			new WebHelper.SearchSpotifyAlbumsCallback() {
-				@Override
-				public void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums) {
-					callback.returnSearchSpotifyAlbums(spotifyAlbums, totalAlbums);
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
+			@Override
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null) {
+					WebHelper.searchSpotifyAlbums(
+						query,
+						offset,
+						authorisation,
+						new WebHelper.SearchSpotifyAlbumsCallback() {
+							@Override
+							public void returnSearchSpotifyAlbums(List<SpotifyAlbum> spotifyAlbums, int totalAlbums) {
+								callback.returnSearchSpotifyAlbums(spotifyAlbums, totalAlbums);
+							}
+						});
+				} else {
+					callback.returnSearchSpotifyAlbums(null, 0);
 				}
-			});
+			}
+		});
+
 	}
 
 	// GET ARTIST TOP TRACKS ----------
@@ -1495,15 +1554,26 @@ public class AsyncDataManager {
 	public static void getSpotifyArtistTopTracks(final String artistID,
 												 final String country,
 												 final GetSpotifyArtistTopTracksCallback callback){
-		WebHelper.getSpotifyArtistTopTracks(
-			artistID,
-			country,
-			new WebHelper.GetSpotifyArtistTopTracksCallback() {
-				@Override
-				public void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks) {
-					callback.returnGetSpotifyArtistTopTracks(spotifyTracks);
+		SpotifyToken.getAuthorisation(new GetSpotifyAuthorisationCallback() {
+			@Override
+			public void returnSpotifyAuthorisation(String authorisation) {
+				if (authorisation != null) {
+					WebHelper.getSpotifyArtistTopTracks(
+						artistID,
+						country,
+						authorisation,
+						new WebHelper.GetSpotifyArtistTopTracksCallback() {
+							@Override
+							public void returnGetSpotifyArtistTopTracks(List<SpotifyTrack> spotifyTracks) {
+								callback.returnGetSpotifyArtistTopTracks(spotifyTracks);
+							}
+						});
+				} else {
+					callback.returnGetSpotifyArtistTopTracks(null);
 				}
-			});
+			}
+		});
+
 	}
 
 	//TODO DOCUMENTATION ETC
