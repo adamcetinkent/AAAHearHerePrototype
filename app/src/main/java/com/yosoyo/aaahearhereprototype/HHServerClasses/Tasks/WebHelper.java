@@ -765,7 +765,7 @@ public class WebHelper {
 			return false;
 
 		WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-		if (wifiManager.isWifiEnabled()){
+		if (wifiManager != null && wifiManager.isWifiEnabled()) {
 			WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 			return !(wifiInfo.getNetworkId() == -1 && wifiInfo
 				.getSupplicantState() != SupplicantState.COMPLETED);
